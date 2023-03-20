@@ -1,0 +1,27 @@
+global:
+  observe_customer: somecustomer
+
+traces:
+  opentelemetry-collector:
+    mode: daemonset
+    config:
+      exporters:
+        logging:
+          loglevel: info
+        otlphttp:
+          sending_queue:
+            num_consumers: 4
+            queue_size: 100
+          retry_on_failure:
+            enabled: true
+      processors:
+        probabilistic_sampler:
+          hash_seed: 22
+          sampling_percentage: 100
+        memory_limiter:
+          # 80% of maximum memory up to 2G
+          # Must be less than limit or gc will never run
+          limit_mib: 192
+          # 25% of limit up to 2G
+          spike_limit_mib: 100
+          check_interval: 5s
