@@ -1,0 +1,15 @@
+dependencies:
+- name: traces
+  repository: file://../traces
+  version: 0.1.0
+- name: metrics
+  repository: file://../metrics
+  version: 0.1.0
+- name: logs
+  repository: file://../logs
+  version: 0.1.0
+- name: events
+  repository: file://../events
+  version: 0.1.0
+digest: sha256:ec5eb647b07e3f737bcdc653786292869622ac86d7ea5939fabe571828acb50f
+generated: "2023-04-13T15:14:12.99635-07:00"
