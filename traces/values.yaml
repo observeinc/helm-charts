@@ -1,8 +1,11 @@
 global:
-  observe_customer: somecustomer
+  observe_customer:
+  observe_collector_scheme: https
+  observe_collector_host: collect.observeinc.com
+  observe_collector_port: 443
 
 opentelemetry-collector:
-  fullnameOverride: observe-traces
+  nameOverride: traces
   image:
     tag: "0.62.1"
   mode: daemonset # daemonset or deployment
@@ -11,29 +14,50 @@ opentelemetry-collector:
   resources:
     limits:
       cpu: 256m
-      memory: 512Mi
+      memory: 256Mi
   replicaCount: 10 # only used with deployment mode
+  clusterRole:
+    create: true
+    rules:
+      - apiGroups:
+          - ""
+        resources:
+          - pods
+        verbs:
+          - get
+          - list
+          - watch
   ports:
     zpages:
       enabled: true
       containerPort: 55679
+      servicePort: 55679
       hostPort: 0
+      protocol: TCP
     metrics:
       enabled: true
       containerPort: 58888
+      servicePort: 58888
       hostPort: 0
+      protocol: TCP
     otlp:
       enabled: true
       containerPort: 4317
+      servicePort: 4317
       hostPort: 0
+      protocol: TCP
     otlp-http:
       enabled: true
       containerPort: 4318
+      servicePort: 4318
       hostPort: 0
+      protocol: TCP
     zipkin:
       enabled: true
       containerPort: 9411
+      servicePort: 9411
       hostPort: 0
+      protocol: TCP
     jaeger-compact:
       enabled: false
     jaeger-thrift:
@@ -56,12 +80,13 @@ opentelemetry-collector:
           name: otel-credentials
           key: OBSERVE_TOKEN
 
+  # opentelemetry-collector configuration
   config:
     exporters:
       logging:
         loglevel: info
       otlphttp:
-        endpoint: "https://{{.Values.global.observe_customer}}.collect.observeinc.com:443/v1/otel"
+        endpoint: "{{.Values.global.observe_collector_scheme}}://{{.Values.global.observe_customer}}.{{.Values.global.observe_collector_host}}:{{.Values.global.observe_collector_port}}/v1/otel"
         headers:
           authorization: "Bearer ${env:OBSERVE_TOKEN}"
         sending_queue:
@@ -70,7 +95,7 @@ opentelemetry-collector:
         retry_on_failure:
           enabled: true
       prometheusremotewrite:
-        endpoint: "https://{{.Values.global.observe_customer}}.collect.observeinc.com:443/v1/prometheus"
+        endpoint: "{{.Values.global.observe_collector_scheme}}://{{.Values.global.observe_customer}}.{{.Values.global.observe_collector_host}}:{{.Values.global.observe_collector_port}}/v1/prometheus"
         headers:
           authorization: "Bearer ${env:OBSERVE_TOKEN}"
     extensions:
