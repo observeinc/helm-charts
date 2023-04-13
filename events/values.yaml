@@ -1,0 +1,24 @@
+global:
+  observe_customer:
+  observe_collector_scheme: https
+  observe_collector_host: collect.observeinc.com
+  observe_collector_port: 443
+
+image:
+  kube_cluster_info:
+    repository: observeinc/kube-cluster-info
+    # Overrides the image tag whose default is {{ .Chart.AppVersion }}
+    tag: ""
+  kube_state_events:
+    repository: observeinc/kube-state-events
+    # Overrides the image tag whose default is {{ .Chart.AppVersion }}
+    tag: ""
+  pullPolicy: Always
+
+rbac:
+  create: true
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name:

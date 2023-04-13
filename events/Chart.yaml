@@ -1,0 +1,6 @@
+apiVersion: v2
+name: events
+description: Observe kubernetes event collection
+type: application
+version: 0.1.0
+appVersion: v0.9.1

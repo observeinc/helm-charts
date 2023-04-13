@@ -16,3 +16,7 @@ dependencies:
     version: 0.1.0
     repository: ../logs
     condition: logs.enabled
+  - name: events
+    version: 0.1.0
+    repository: ../events
+    condition: events.enabled
