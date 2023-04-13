@@ -1,0 +1,10 @@
+apiVersion: v2
+name: logs
+description: Observe logs collection
+type: application
+version: 0.1.0
+dependencies:
+  - name: fluent-bit
+    version: 0.25.0
+    repository: https://fluent.github.io/helm-charts
+    condition: logs.enabled
