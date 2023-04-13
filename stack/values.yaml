@@ -1,7 +1,11 @@
 global:
-  observe_customer: somecustomer
+  observe_customer:
+  observe_collector_scheme: https
+  observe_collector_host: collect.observeinc.com
+  observe_collector_port: 443
 
 traces:
+  enabled: true
   opentelemetry-collector:
     mode: daemonset
     config:
@@ -25,3 +29,12 @@ traces:
           # 25% of limit up to 2G
           spike_limit_mib: 100
           check_interval: 5s
+
+events:
+  enabled: true
+
+metrics:
+  enabled: true
+
+logs:
+  enabled: true
