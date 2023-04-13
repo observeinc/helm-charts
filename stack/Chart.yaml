@@ -12,3 +12,7 @@ dependencies:
     version: 0.1.0
     repository: ../metrics
     condition: metrics.enabled
+  - name: logs
+    version: 0.1.0
+    repository: ../logs
+    condition: logs.enabled
