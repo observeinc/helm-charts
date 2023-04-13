@@ -33,9 +33,15 @@ kubectl -n observe create secret generic otel-credentials \
 
 ## Local chart install
 
-To install `stack` using `helm install`:
+To install `stack`, first install the chart dependencies:
 
 ```bash
-$ helm install --namespace=observe --create-namespace observe stack \
+helm dep update stack
+```
+
+Then install `stack`:
+
+```bash
+helm install --namespace=observe --create-namespace observe stack \
     --set global.observe_customer=mycustomerID
 ```
