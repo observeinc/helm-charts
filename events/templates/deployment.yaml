@@ -1,0 +1,77 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kube-events.fullname" . }}
+  labels:
+    {{- include "kube-events.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "kube-events.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "kube-events.selectorLabels" . | nindent 8 }}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - {key: observeinc.com/unschedulable, operator: DoesNotExist}
+                  - {key: kubernetes.io/os, operator: NotIn, values: [windows]}
+      serviceAccountName: {{ include "fluent-bit.serviceAccountName" . }}
+      initContainers:
+        - name: kube-cluster-info
+          image: {{ .Values.image.kube_cluster_info.repository }}:{{ default .Chart.AppVersion .Values.image.kube_cluster_info_tag }}
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+      containers:
+        - name: kube-state-events
+          image: {{ .Values.image.kube_state_events.repository }}:{{ default .Chart.AppVersion .Values.image.kube_state_events_tag }}
+          args:
+            - -healthz-addr=:5171
+            - -metrics-addr=:9090
+            - -o={{.Values.global.observe_collector_scheme}}://$(OBSERVE_TOKEN)@{{.Values.global.observe_customer}}.{{.Values.global.observe_collector_host}}:{{.Values.global.observe_collector_port}}/v1/http/kubernetes/events?clusterUid=$(OBSERVE_CLUSTER)
+            - v1
+            - apps/v1
+            - autoscaling/v1
+            - batch/v1
+            - networking.k8s.io/v1
+          ports:
+            - containerPort: 5171
+            - containerPort: 9090
+              name: http-metrics
+          env:
+            - name: OBSERVE_CLUSTER
+              valueFrom:
+                configMapKeyRef:
+                  name: cluster-info
+                  key: id
+          envFrom:
+            - secretRef:
+                name: credentials
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 5171
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5171
+            timeoutSeconds: 5
+            failureThreshold: 10
+          resources:
+            limits:
+              cpu: 50m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 256Mi
