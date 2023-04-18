@@ -1,5 +1,5 @@
 apiVersion: v2
-name: logs
+name: metrics
 description: Observe metrics collection
 type: application
 version: 0.1.0
