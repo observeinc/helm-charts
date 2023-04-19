@@ -11,6 +11,20 @@ The `stack` chart installs the following components, which are also provided as 
 
 # Installation
 
+First, update the chart dependencies:
+
+```bash
+make deps
+```
+
+## Stack
+
+## Traces
+
+
+
+To install the Kubernetes collection stack
+
 ## Configure secrets
 
 First, store your datastream tokens as kubernetes secrets.
@@ -36,7 +50,7 @@ kubectl -n observe create secret generic otel-credentials \
 To install `stack`, first install the chart dependencies:
 
 ```bash
-helm dep update stack
+make deps
 ```
 
 Then install `stack`:
