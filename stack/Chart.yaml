@@ -3,3 +3,12 @@ name: observe
 description: Observe agent
 type: application
 version: 0.1.0
+dependencies:
+  - name: traces
+    version: 0.1.0
+    repository: ../traces
+    condition: traces.enabled
+  - name: metrics
+    version: 0.1.0
+    repository: ../metrics
+    condition: metrics.enabled
