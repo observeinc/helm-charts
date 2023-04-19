@@ -79,7 +79,13 @@ opentelemetry-collector:
         secretKeyRef:
           name: otel-credentials
           key: OBSERVE_TOKEN
-
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - {key: observeinc.com/unschedulable, operator: DoesNotExist}
+              - {key: kubernetes.io/os, operator: NotIn, values: [windows]}
   # opentelemetry-collector configuration
   config:
     exporters:

@@ -49,6 +49,14 @@ grafana-agent:
     replicas: 1
     podLabels:
       name: metrics
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - {key: observeinc.com/unschedulable, operator: DoesNotExist}
+                - {key: kubernetes.io/os, operator: NotIn, values: [windows]}
+
   image:
     tag: latest
 

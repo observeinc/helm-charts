@@ -25,7 +25,6 @@ fluent-bit:
       valueFrom:
         fieldRef:
           fieldPath: metadata.namespace
-
   resources:
     limits:
       cpu: 100m
@@ -33,6 +32,13 @@ fluent-bit:
     requests:
       cpu: 100m
       memory: 128Mi
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - {key: observeinc.com/unschedulable, operator: DoesNotExist}
+              - {key: kubernetes.io/os, operator: NotIn, values: [windows]}
 
   config:
     buffer_chunk_size: 32k
