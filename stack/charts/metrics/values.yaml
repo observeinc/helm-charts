@@ -1,8 +1,9 @@
 global:
-  observe_customer:
-  observe_collector_scheme: https
-  observe_collector_host: collect.observeinc.com
-  observe_collector_port: 443
+  observe:
+    customer:
+    collectorScheme: https
+    collectorHost: collect.observeinc.com
+    collectorPort: 443
 
 grafana-agent:
   nameOverride: metrics
@@ -16,6 +17,7 @@ grafana-agent:
       max_wal_time: 30m
       min_backoff: 1s
       min_wal_time: 15s
+      observe_collector_insecure: false
       remote_timeout: 30s
       remote_flush_deadline: 1m
       scrape_interval: 15s
@@ -102,7 +104,7 @@ grafana-agent:
             scrape_interval: {{.Values.prom_config.scrape_interval}}
             scrape_timeout: {{.Values.prom_config.scrape_timeout}}
             external_labels:
-              clusterUid: {{.Values.prom_config.observe_cluster}}
+              clusterUid: ${OBSERVE_CLUSTER}
           configs:
             - name: integrations
               host_filter: {{.Values.prom_config.host_filter}}
@@ -111,7 +113,7 @@ grafana-agent:
               wal_truncate_frequency: {{.Values.prom_config.wal_truncate_frequency}}
               remote_flush_deadline: {{.Values.prom_config.remote_flush_deadline}}
               remote_write:
-                - url: {{.Values.global.observe_collector_scheme}}://{{.Values.global.observe_customer}}.{{.Values.global.observe_collector_host}}:{{.Values.global.observe_collector_port}}/v1/prometheus
+                - url: {{.Values.global.observe.collectorScheme}}://{{.Values.global.observe.customer}}.{{.Values.global.observe.collectorHost}}:{{.Values.global.observe.collectorPort}}/v1/prometheus
                   authorization:
                     credentials: ${OBSERVE_TOKEN}
                   remote_timeout: {{.Values.prom_config.remote_timeout}}

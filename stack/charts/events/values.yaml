@@ -1,8 +1,9 @@
 global:
-  observe_customer:
-  observe_collector_scheme: https
-  observe_collector_host: collect.observeinc.com
-  observe_collector_port: 443
+  observe:
+    customer:
+    collectorScheme: https
+    collectorHost: collect.observeinc.com
+    collectorPort: 443
 
 image:
   kube_cluster_info:
