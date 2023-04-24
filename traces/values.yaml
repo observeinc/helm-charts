@@ -5,6 +5,10 @@ global:
     collectorHost: collect.observeinc.com
     collectorPort: 443
 
+observe:
+  token:
+    create: true
+    value:
 
 opentelemetry-collector:
   nameOverride: traces
@@ -94,7 +98,7 @@ opentelemetry-collector:
       logging:
         loglevel: info
       otlphttp:
-        endpoint: "{{.Values.global.observe_collector_scheme}}://{{.Values.global.observe_customer}}.{{.Values.global.observe_collector_host}}:{{.Values.global.observe_collector_port}}/v1/otel"
+        endpoint: "{{.Values.global.observe.collectorScheme}}://{{.Values.global.observe.customer}}.{{.Values.global.observe.collectorHost}}:{{.Values.global.observe.collectorPort}}/v1/otel"
         headers:
           authorization: "Bearer ${env:OBSERVE_TOKEN}"
         sending_queue:
@@ -103,7 +107,7 @@ opentelemetry-collector:
         retry_on_failure:
           enabled: true
       prometheusremotewrite:
-        endpoint: "{{.Values.global.observe_collector_scheme}}://{{.Values.global.observe_customer}}.{{.Values.global.observe_collector_host}}:{{.Values.global.observe_collector_port}}/v1/prometheus"
+        endpoint: "{{.Values.global.observe.collectorScheme}}://{{.Values.global.observe.customer}}.{{.Values.global.observe.collectorHost}}:{{.Values.global.observe.collectorPort}}/v1/prometheus"
         headers:
           authorization: "Bearer ${env:OBSERVE_TOKEN}"
     extensions:

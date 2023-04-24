@@ -5,6 +5,12 @@ global:
     collectorHost: collect.observeinc.com
     collectorPort: 443
 
+observe:
+  secret:
+    create: true
+    token:
+
+# see the values.yaml files in the subcharts for overrideable values.
 events:
   enabled: true
 
