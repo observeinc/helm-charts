@@ -1,8 +1,9 @@
 global:
-  observe_customer:
-  observe_collector_scheme: https
-  observe_collector_host: collect.observeinc.com
-  observe_collector_port: 443
+  observe:
+    customer: ""
+    collectorScheme: https
+    collectorHost: collect.observeinc.com
+    collectorPort: 443
 
 fluent-bit:
   nameOverride: logs
@@ -154,8 +155,8 @@ fluent-bit:
           Name                http
           Match               k8slogs*
           Alias               k8slogs
-          Host                {{.Values.global.observe_customer}}.{{.Values.global.observe_collector_host}}
-          Port                {{.Values.global.observe_collector_port}}
+          Host                {{.Values.global.observe.customer}}.{{.Values.global.observe.collectorHost}}
+          Port                {{.Values.global.observe.collectorPort}}
           TLS                 {{.Values.config.tls}}
           URI                 /v1/http/kubernetes/logs?clusterUid=${OBSERVE_CLUSTER}
           Format              msgpack
@@ -168,8 +169,8 @@ fluent-bit:
           Name                http
           Match               k8snode*
           Alias               k8snode
-          Host                {{.Values.global.observe_customer}}.{{.Values.global.observe_collector_host}}
-          Port                {{.Values.global.observe_collector_port}}
+          Host                {{.Values.global.observe.customer}}.{{.Values.global.observe.collectorHost}}
+          Port                {{.Values.global.observe.collectorPort}}
           TLS                 {{.Values.config.tls}}
           URI                 /v1/http/kubernetes/node?clusterUid=${OBSERVE_CLUSTER}
           Format              msgpack
