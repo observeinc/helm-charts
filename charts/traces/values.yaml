@@ -8,7 +8,7 @@ global:
 observe:
   token:
     create: true
-    value:
+    value: ""
 
 opentelemetry-collector:
   nameOverride: traces

@@ -6,9 +6,9 @@ global:
     collectorPort: 443
 
 observe:
-  secret:
+  token:
     create: true
-    token:
+    value: ""
 
 # see the values.yaml files in the subcharts for overrideable values.
 events:
