@@ -2,6 +2,15 @@ apiVersion: v1
 entries:
   stack:
   - apiVersion: v2
+    created: "2023-05-02T23:38:28.07256368Z"
+    description: Observe Kubernetes agent stack
+    digest: 7adc73559364227c9c36d2010c42480b400c6582c4a8be0081d7df931733fc17
+    name: stack
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/stack-0.1.2/stack-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
     created: "2023-05-02T23:29:29.942659873Z"
     description: Observe Kubernetes agent stack
     digest: 60c13c7034c8205b9bead2ba756f7901c08e12886f49148f2927a253806b5ab7
@@ -34,4 +43,4 @@ entries:
     urls:
     - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.0/traces-0.1.0.tgz
     version: 0.1.0
-generated: "2023-05-02T23:29:29.942668473Z"
+generated: "2023-05-02T23:38:28.07258838Z"
