@@ -24,7 +24,7 @@ spec:
               - matchExpressions:
                   - {key: observeinc.com/unschedulable, operator: DoesNotExist}
                   - {key: kubernetes.io/os, operator: NotIn, values: [windows]}
-      serviceAccountName: {{ include "fluent-bit.serviceAccountName" . }}
+      serviceAccountName: {{ include "kube-events.serviceAccountName" . }}
       initContainers:
         - name: kube-cluster-info
           image: {{ .Values.image.kube_cluster_info.repository }}:{{ default .Chart.AppVersion .Values.image.kube_cluster_info_tag }}
