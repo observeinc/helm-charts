@@ -1,0 +1,12 @@
+dependencies:
+- name: logs
+  repository: file://../internal/logs
+  version: 0.1.0
+- name: metrics
+  repository: file://../internal/metrics
+  version: 0.1.0
+- name: events
+  repository: file://../internal/events
+  version: 0.1.2
+digest: sha256:0ff59089263ba806f216691434b7d0fb1df7212a89c04bcebb802f5370b327bb
+generated: "2023-05-03T14:01:19.620154-07:00"

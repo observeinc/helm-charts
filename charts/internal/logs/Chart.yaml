@@ -7,4 +7,3 @@ dependencies:
   - name: fluent-bit
     version: 0.25.0
     repository: https://fluent.github.io/helm-charts
-    condition: logs.enabled
