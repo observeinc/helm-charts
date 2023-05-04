@@ -2,6 +2,28 @@ apiVersion: v1
 entries:
   stack:
   - apiVersion: v2
+    created: "2023-05-04T16:58:26.799602315Z"
+    dependencies:
+    - condition: logs.enabled
+      name: logs
+      repository: file://../internal/logs
+      version: 0.1.0
+    - condition: metrics.enabled
+      name: metrics
+      repository: file://../internal/metrics
+      version: 0.1.0
+    - condition: events.enabled
+      name: events
+      repository: file://../internal/events
+      version: 0.1.2
+    description: Observe Kubernetes agent stack
+    digest: 2c9b2f98c64f9a2d190d735cd5f5508d2d370ab2f09d4a68c4462b74a448452f
+    name: stack
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/stack-0.1.4/stack-0.1.4.tgz
+    version: 0.1.4
+  - apiVersion: v2
     created: "2023-05-03T01:54:16.268582106Z"
     description: Observe Kubernetes agent stack
     digest: caca637ebe4c438a9f9c9a33ac140b5163f8ee1d457adc5aefe9cb90609c5c18
@@ -66,4 +88,4 @@ entries:
     urls:
     - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.0/traces-0.1.0.tgz
     version: 0.1.0
-generated: "2023-05-03T01:54:16.490048462Z"
+generated: "2023-05-04T16:58:26.799621615Z"
