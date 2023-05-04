@@ -1,6 +1,6 @@
 global:
   observe:
-    customer:
+    customer: ""
     collectorScheme: https
     collectorHost: collect.observeinc.com
     collectorPort: 443

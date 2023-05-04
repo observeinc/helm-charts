@@ -3,4 +3,4 @@ dependencies:
   repository: https://fluent.github.io/helm-charts
   version: 0.25.0
 digest: sha256:b1fb614f3fe47886c997ab9f3fd952ad2558b0007c292553d66f9b7500262d52
-generated: "2023-05-03T14:00:45.012194-07:00"
+generated: "2023-05-04T13:10:01.042218-07:00"
