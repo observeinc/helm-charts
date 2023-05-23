@@ -11,7 +11,7 @@ Contents:
 
 # Installation
 
-First, install and update the observe helm repositoryY
+First, install and update the observe helm repository:
 
 ```bash
 helm repo add observe https://observeinc.github.io/helm-charts
