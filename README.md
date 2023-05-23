@@ -42,24 +42,28 @@ We recommend following the convention "observe-\<chart name\>" for release names
 
 Stack:
 ```bash
-# custom values file
-helm install -n observe observe-stack ./stack -f my_values.yaml
+# installing with a custom values file
+helm install --namespace=observe --create-namespace \
+  observe-stack charts/stack -f my_values.yaml
 
-# using --set
-helm install -n observe observe-stack ./stack \
-  --set global.observe.customer=\"123456789012\" \
-  --set observe.token.value=...
+# installing by setting values on the command line
+helm install --namespace=observe --create-namespace \
+  --set-json 'global.observe.customerID="123456789012"' \
+  --set-json 'observe.token.value="..."' \
+  observe-stack charts/stack
 ```
 
 Traces:
 ```bash
-# custom values file
-helm install -n observe observe-traces ./staces -f my_values.yaml
+# installing with a custom values file
+helm install --namespace=observe --create-namespace \
+  observe-traces charts/traces -f my_values.yaml
 
-# using --set
-helm install -n observe observe-stack ./stack \
-  --set global.observe.customer=\"123456789012\" \
-  --set observe.token.value=...
+# installing by setting values on the command line
+helm install --namespace=observe --create-namespace \
+  --set-json 'global.observe.customer="123456789012"' \
+  --set-json 'observe.token.value="..."' \
+  observe-stack charts/traces
 ```
 
 # Managing Secrets Manually
