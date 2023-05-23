@@ -11,10 +11,11 @@ Contents:
 
 # Installation
 
-First, update the chart dependencies:
+First, install and update the observe helm repositoryY
 
 ```bash
-make deps
+helm repo add observe https://observeinc.github.io/helm-charts
+helm repo update
 ```
 
 ## Required Values
@@ -44,26 +45,26 @@ Stack:
 ```bash
 # installing with a custom values file
 helm install --namespace=observe --create-namespace \
-  observe-stack charts/stack -f my_values.yaml
+  observe-stack observe/stack -f my_values.yaml
 
 # installing by setting values on the command line
 helm install --namespace=observe --create-namespace \
   --set-json 'global.observe.customerID="123456789012"' \
   --set-json 'observe.token.value="..."' \
-  observe-stack charts/stack
+  observe-stack observe/stack
 ```
 
 Traces:
 ```bash
 # installing with a custom values file
 helm install --namespace=observe --create-namespace \
-  observe-traces charts/traces -f my_values.yaml
+  observe-traces observe/traces -f my_values.yaml
 
 # installing by setting values on the command line
 helm install --namespace=observe --create-namespace \
   --set-json 'global.observe.customer="123456789012"' \
   --set-json 'observe.token.value="..."' \
-  observe-stack charts/traces
+  observe-stack observe/traces
 ```
 
 # Managing Secrets Manually
