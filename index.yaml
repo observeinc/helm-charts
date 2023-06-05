@@ -83,6 +83,19 @@ entries:
     version: 0.1.0
   traces:
   - apiVersion: v2
+    created: "2023-06-05T20:34:10.71497304Z"
+    dependencies:
+    - name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.49.1
+    description: Observe OpenTelemetry trace collection
+    digest: 9b9861edd7c0e78702a33f465d5ca4f6bfe178886a8c2c7f6940426c9398062f
+    name: traces
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.3/traces-0.1.3.tgz
+    version: 0.1.3
+  - apiVersion: v2
     created: "2023-05-04T20:12:14.732833151Z"
     dependencies:
     - name: opentelemetry-collector
@@ -123,4 +136,4 @@ entries:
     urls:
     - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.0/traces-0.1.0.tgz
     version: 0.1.0
-generated: "2023-05-04T20:12:14.732864651Z"
+generated: "2023-06-05T20:34:10.71500424Z"
