@@ -100,7 +100,7 @@ opentelemetry-collector:
       otlphttp:
         endpoint: "{{.Values.global.observe.collectorScheme}}://{{.Values.global.observe.customer}}.{{.Values.global.observe.collectorHost}}:{{.Values.global.observe.collectorPort}}/v1/otel"
         headers:
-          authorization: "Bearer ${env:OBSERVE_TOKEN}"
+          authorization: "Bearer ${OBSERVE_TOKEN}"
         sending_queue:
           num_consumers: 4
           queue_size: 100
@@ -109,7 +109,7 @@ opentelemetry-collector:
       prometheusremotewrite:
         endpoint: "{{.Values.global.observe.collectorScheme}}://{{.Values.global.observe.customer}}.{{.Values.global.observe.collectorHost}}:{{.Values.global.observe.collectorPort}}/v1/prometheus"
         headers:
-          authorization: "Bearer ${env:OBSERVE_TOKEN}"
+          authorization: "Bearer ${OBSERVE_TOKEN}"
     extensions:
       health_check: {}
       zpages: {}
@@ -120,7 +120,7 @@ opentelemetry-collector:
       resource:
         attributes:
           - key: k8s.cluster.uid
-            value: "${env:OBSERVE_CLUSTER}"
+            value: "${OBSERVE_CLUSTER}"
             action: insert
       k8sattributes:
         passthrough: false
