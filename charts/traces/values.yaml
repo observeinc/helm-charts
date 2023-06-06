@@ -19,7 +19,10 @@ opentelemetry-collector:
     extraArgs: ["--set=service.telemetry.metrics.address=:58888"]
   resources:
     limits:
-      cpu: 256m
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 250m
       memory: 256Mi
   replicaCount: 10 # only used with deployment mode
   clusterRole:
