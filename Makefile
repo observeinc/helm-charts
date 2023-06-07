@@ -7,5 +7,5 @@ deps:
 	helm repo add otel https://open-telemetry.github.io/opentelemetry-helm-charts
 	helm repo update
 	@for chart in $(CHARTS); do \
-		helm dependency build --skip-refresh $$chart; \
+		helm dependency update --skip-refresh $$chart; \
 	done

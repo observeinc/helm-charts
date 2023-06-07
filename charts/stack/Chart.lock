@@ -7,6 +7,6 @@ dependencies:
   version: 0.1.1
 - name: events
   repository: file://../internal/events
-  version: 0.1.3
-digest: sha256:0e6884b5635a64d4a88b14f237de1bd34643c4475fd79207ddf379fc52122003
-generated: "2023-05-04T13:10:02.025368-07:00"
+  version: 0.1.4
+digest: sha256:813c50f5a49a0461c74d1e5a314be608c2aca1e1c844be4664d991fba1acac88
+generated: "2023-06-06T17:32:53.775948-07:00"
