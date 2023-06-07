@@ -1,0 +1,30 @@
+events:
+  resources:
+    limits:
+      cpu: 20m
+      memory: 64Mi
+    requests:
+      cpu: 20m
+      memory: 64Mi
+
+logs:
+  fluent-bit:
+    resources:
+      limits:
+        cpu: 10m
+        memory: 64Mi
+      requests:
+        cpu: 10m
+        memory: 64Mi
+    config:
+      mem_buf_limit: 5MB
+
+metrics:
+  agent:
+    resources:
+      limits:
+        cpu: 50m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 256Mi

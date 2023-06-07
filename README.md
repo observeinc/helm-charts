@@ -37,6 +37,30 @@ observe:
 
 Or using the `--set` flag during installation.
 
+## Sizing
+
+By default, we attempt to choose defaults which have a wide operating
+range. However, some clusters will inevitably fall outside this range. We
+provide example values files corresponding to several different use cases:
+
+- [stack/xs](https://github.com/observeinc/helm-charts/tree/main/examples/stack/values-xs.yaml) - intended to run on small clusters such as development environments, where resources are scarce and reliability is less of a concern
+- [stack/m](https://github.com/observeinc/helm-charts/tree/main/examples/stack/values-m.yaml) - the default sizing, intended to run on clusters with hundreds of pods. Start here and adjust up or down accordingly.
+- [stack/l](https://github.com/observeinc/helm-charts/tree/main/examples/stack/values-l.yaml) - used for similar sized clusters as `m`, but with higher throughput in logs, metrics or events. This may be due to verbose logging, high cardinality metrics or frequent cluster reconfiguration.
+- [stack/xl](https://github.com/observeinc/helm-charts/tree/main/examples/stack/values-xl.yaml) - intended to run on large clusters with 100+ nodes. Collection is preferentially performed using daemonsets rather than deployments.
+
+Resource limits for each sizing is as follows:
+
+|         |     `xs`     |      `m`      |      `l`      |     `xl`      |
+|--------:|:------------:|:-------------:|:-------------:|:-------------:|
+|  events | 20m<br>64Mi  | 50m<br>256Mi  |  200m<br>1Gi  |  400m<br>2Gi  |
+|    logs | 10m<br>64Mi  | 100m<br>128Mi | 200m<br>192Mi | 500m<br>256Mi |
+| metrics | 50m<br>256Mi |  250m<br>2Gi  |  500m<br>4Gi  | 200m*<br>1Gi  |
+
+By default, the `logs` component is a daemonset, while `events` and `metrics` are
+single-replica deployments. Some use cases may require scaling the `metrics`
+agent beyond a single replica; in this case we recommend using a daemonset.
+Configuration for this is provided in [stack/xl](https://github.com/observeinc/helm-charts/tree/main/examples/stack/values-xl.yaml).
+
 ## Installation
 
 We recommend following the convention "observe-\<chart name\>" for release names.
