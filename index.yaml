@@ -2,6 +2,28 @@ apiVersion: v1
 entries:
   stack:
   - apiVersion: v2
+    created: "2023-06-13T18:35:16.693253108Z"
+    dependencies:
+    - condition: logs.enabled
+      name: logs
+      repository: file://../internal/logs
+      version: 0.1.1
+    - condition: metrics.enabled
+      name: metrics
+      repository: file://../internal/metrics
+      version: 0.1.1
+    - condition: events.enabled
+      name: events
+      repository: file://../internal/events
+      version: 0.1.4
+    description: Observe Kubernetes agent stack
+    digest: aba877b74e397568e194ed4ceeb8b8a837ea3ec33a80a27a32f15d75cbbd802f
+    name: stack
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/stack-0.1.6/stack-0.1.6.tgz
+    version: 0.1.6
+  - apiVersion: v2
     created: "2023-05-04T20:12:14.500516066Z"
     dependencies:
     - condition: logs.enabled
@@ -83,6 +105,19 @@ entries:
     version: 0.1.0
   traces:
   - apiVersion: v2
+    created: "2023-06-13T18:35:16.877290217Z"
+    dependencies:
+    - name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.49.1
+    description: Observe OpenTelemetry trace collection
+    digest: 831431e0e5e82e76d2ba7d82cb93facaab742de1f87fd3e0c2bd04886274c7ff
+    name: traces
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.4/traces-0.1.4.tgz
+    version: 0.1.4
+  - apiVersion: v2
     created: "2023-06-05T20:34:10.71497304Z"
     dependencies:
     - name: opentelemetry-collector
@@ -136,4 +171,4 @@ entries:
     urls:
     - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.0/traces-0.1.0.tgz
     version: 0.1.0
-generated: "2023-06-05T20:34:10.71500424Z"
+generated: "2023-06-13T18:35:16.877512522Z"
