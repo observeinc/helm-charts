@@ -20,11 +20,12 @@ logs:
       mem_buf_limit: 10MB
 
 metrics:
-  agent:
-    resources:
-      limits:
-        cpu: 250m
-        memory: 2Gi
-      requests:
-        cpu: 250m
-        memory: 2Gi
+  grafana-agent:
+    agent:
+      resources:
+        limits:
+          cpu: 250m
+          memory: 2Gi
+        requests:
+          cpu: 250m
+          memory: 2Gi
