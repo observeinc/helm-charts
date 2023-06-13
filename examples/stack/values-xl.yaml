@@ -20,28 +20,29 @@ logs:
       mem_buf_limit: 30MB
 
 metrics:
-  controller:
-    type: daemonset
-    updateStrategy:
-      type: RollingUpdate
-      rollingUpdate:
-        maxUnavailable: "20%"
-    tolerations:
-      - operator: Exists
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-            - matchExpressions:
-                - {key: observeinc.com/unschedulable, operator: DoesNotExist}
-                - {key: eks.amazonaws.com/compute-type, operator: NotIn, values: [fargate]}
-                - {key: kubernetes.io/os, operator: NotIn, values: [windows]}
+  grafana-agent:
+    controller:
+      type: daemonset
+      updateStrategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: "20%"
+      tolerations:
+        - operator: Exists
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - {key: observeinc.com/unschedulable, operator: DoesNotExist}
+                  - {key: eks.amazonaws.com/compute-type, operator: NotIn, values: [fargate]}
+                  - {key: kubernetes.io/os, operator: NotIn, values: [windows]}
 
-  agent:
-    resources:
-      limits:
-        cpu: 200m
-        memory: 1Gi
-      requests:
-        cpu: 200m
-        memory: 1Gi
+    agent:
+      resources:
+        limits:
+          cpu: 200m
+          memory: 1Gi
+        requests:
+          cpu: 200m
+          memory: 1Gi
