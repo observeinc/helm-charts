@@ -93,18 +93,20 @@ helm install --namespace=observe --create-namespace \
 
 # Managing Secrets Manually
 
-If you do not wish to have Helm manage your token as a Kubernetes secret (for example,
-to prevent it from appearing when `helm get values observe-stack` is run), you can create
-it manually.
+If you do not wish to have Helm manage your token as a Kubernetes secret (which implies
+that it will be stored as a chart value), you can manage it manually. To prevent the chart
+from managing the secret, first set `observe.token.create` to `false`.
+
+Then, ensure a secret exists in the observe namespace with the correct name:
 
 ## Stack
 
 ```bash
-kubectl -n observe create secret generic credentials --from-literal=OBSERVE_TOKEN=<datastream token>
+kubectl -n observe create secret generic credentials --from-literal='OBSERVE_TOKEN=<datastream token>'
 ```
 
 ## Traces
 
 ```bash
-kubectl -n observe create secret generic otel-credentials --from-literal=OBSERVE_TOKEN=<datastream token>
+kubectl -n observe create secret generic otel-credentials --from-literal='OBSERVE_TOKEN=<datastream token>'
 ```
