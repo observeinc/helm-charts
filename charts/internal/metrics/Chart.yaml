@@ -2,8 +2,11 @@ apiVersion: v2
 name: metrics
 description: Observe metrics collection
 type: application
-version: 0.1.1
+version: 0.1.2
 dependencies:
   - name: grafana-agent
     version: 0.10.0
     repository: https://grafana.github.io/helm-charts
+  - name: endpoint
+    version: 0.1.0
+    repository: file://../endpoint

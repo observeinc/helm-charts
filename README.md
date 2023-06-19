@@ -1,6 +1,6 @@
 # Observe Helm Charts
 
-This repository contains Helm charts for installing the telemetry agents required for Observe Kubernetes apps.
+This repository contains Helm charts for installing the telemetry agents required for Observe apps on Kubernetes.
 
 Contents:
 * stack: Installs several agents required for the Kubernetes Observe app
@@ -19,19 +19,23 @@ helm repo update
 ```
 
 ## Required Values
-You must set `global.observe.customer`. To have Helm create a Kubernetes secret containing your
-datastream token, you must also set `observe.token.value`. Otherwise, you must set `observe.token.create`
-to `false`, and manually create the secrets (see [Managing Secrets Manually](#managing-secrets-manually)).
+You must set `global.observe.collectionEndpoint`, which is provided when configuring a connection in
+Observe. To have Helm create a Kubernetes secret containing your datastream token, you must also set
+`observe.token.value`. Otherwise, you must set `observe.token.create` to `false`, and manually create
+the secrets (see [Managing Secrets Manually](#managing-secrets-manually)).
 
 These values can be set in a custom values file:
 
 ```yaml
 global:
   observe:
-    customer: "123456789012"
+    # A unique URL associated with your customer ID, provided in the new connection installation instructions.
+    collectionEndpoint: "https://123456789012.collect.observeinc.com"
 
 observe:
   token:
+    # The Datastream token. This will typically be unique to each chart being installed, or each release of
+    # of a chart.
     value: <datastream token>
 ```
 
@@ -73,8 +77,8 @@ helm install --namespace=observe --create-namespace \
 
 # installing by setting values on the command line
 helm install --namespace=observe --create-namespace \
-  --set-json 'global.observe.customerID="123456789012"' \
-  --set-json 'observe.token.value="..."' \
+  --set global.observe.collectionEndpoint="..." \
+  --set observe.token.value="..." \
   observe-stack observe/stack
 ```
 
@@ -86,8 +90,8 @@ helm install --namespace=observe --create-namespace \
 
 # installing by setting values on the command line
 helm install --namespace=observe --create-namespace \
-  --set-json 'global.observe.customer="123456789012"' \
-  --set-json 'observe.token.value="..."' \
+  --set global.observe.collectionEndpoint="..." \
+  --set observe.token.value="..." \
   observe-stack observe/traces
 ```
 
@@ -102,11 +106,11 @@ Then, ensure a secret exists in the observe namespace with the correct name:
 ## Stack
 
 ```bash
-kubectl -n observe create secret generic credentials --from-literal='OBSERVE_TOKEN=<datastream token>'
+kubectl -n observe create secret generic credentials --from-literal='OBSERVE_TOKEN=<kubernetes datastream token>'
 ```
 
 ## Traces
 
 ```bash
-kubectl -n observe create secret generic otel-credentials --from-literal='OBSERVE_TOKEN=<datastream token>'
+kubectl -n observe create secret generic otel-credentials --from-literal='OBSERVE_TOKEN=<opentelemetry datastream token>'
 ```

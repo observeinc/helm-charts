@@ -1,10 +1,3 @@
-global:
-  observe:
-    customer: ""
-    collectorScheme: https
-    collectorHost: collect.observeinc.com
-    collectorPort: 443
-
 grafana-agent:
   nameOverride: metrics
   prom_config:
@@ -113,7 +106,7 @@ grafana-agent:
               wal_truncate_frequency: {{.Values.prom_config.wal_truncate_frequency}}
               remote_flush_deadline: {{.Values.prom_config.remote_flush_deadline}}
               remote_write:
-                - url: {{.Values.global.observe.collectorScheme}}://{{.Values.global.observe.customer}}.{{.Values.global.observe.collectorHost}}:{{.Values.global.observe.collectorPort}}/v1/prometheus
+                - url: {{ include "observe.collectionEndpoint" . }}/v1/prometheus
                   authorization:
                     credentials: ${OBSERVE_TOKEN}
                   remote_timeout: {{.Values.prom_config.remote_timeout}}

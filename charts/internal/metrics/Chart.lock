@@ -2,5 +2,8 @@ dependencies:
 - name: grafana-agent
   repository: https://grafana.github.io/helm-charts
   version: 0.10.0
-digest: sha256:2b0cb5416af2fc07fa414013411eab01137fba56a770b4bd5da71ee385db08e7
-generated: "2023-05-04T13:10:00.116563-07:00"
+- name: endpoint
+  repository: file://../endpoint
+  version: 0.1.0
+digest: sha256:1d2739ad0e7a038ccbbec39b53067cf8eb61d9f43ce0979977412efb57467d3e
+generated: "2023-06-26T19:46:16.732076-07:00"

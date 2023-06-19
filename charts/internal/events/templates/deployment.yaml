@@ -27,7 +27,7 @@ spec:
       serviceAccountName: {{ include "kube-events.serviceAccountName" . }}
       initContainers:
         - name: kube-cluster-info
-          image: {{ .Values.image.kube_cluster_info.repository }}:{{ default .Chart.AppVersion .Values.image.kube_cluster_info_tag }}
+          image: {{ .Values.image.kube_cluster_info.repository }}:{{ default .Chart.AppVersion .Values.image.kube_cluster_info.tag }}
           env:
             - name: NAMESPACE
               valueFrom:
@@ -35,11 +35,11 @@ spec:
                   fieldPath: metadata.namespace
       containers:
         - name: kube-state-events
-          image: {{ .Values.image.kube_state_events.repository }}:{{ default .Chart.AppVersion .Values.image.kube_state_events_tag }}
+          image: {{ .Values.image.kube_state_events.repository }}:{{ default .Chart.AppVersion .Values.image.kube_state_events.tag }}
           args:
             - -healthz-addr=:5171
             - -metrics-addr=:9090
-            - -o={{.Values.global.observe.collectorScheme}}://$(OBSERVE_TOKEN)@{{.Values.global.observe.customer}}.{{.Values.global.observe.collectorHost}}:{{.Values.global.observe.collectorPort}}/v1/http/kubernetes/events?clusterUid=$(OBSERVE_CLUSTER)
+            - -o={{ include "observe.collectionEndpointWithToken" . }}/v1/http/kubernetes/events?clusterUid=$(OBSERVE_CLUSTER)
             - v1
             - apps/v1
             - autoscaling/v1
