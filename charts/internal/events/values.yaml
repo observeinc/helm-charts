@@ -1,10 +1,3 @@
-global:
-  observe:
-    customer: ""
-    collectorScheme: https
-    collectorHost: collect.observeinc.com
-    collectorPort: 443
-
 image:
   kube_cluster_info:
     repository: observeinc/kube-cluster-info
