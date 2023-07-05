@@ -7,7 +7,9 @@ opentelemetry-collector:
   nameOverride: traces
   image:
     tag: "0.62.1"
-  mode: daemonset # daemonset or deployment
+  mode: "daemonset" # daemonset or deployment
+  service:
+    enabled: true
   command:
     extraArgs: ["--set=service.telemetry.metrics.address=:58888"]
   resources:

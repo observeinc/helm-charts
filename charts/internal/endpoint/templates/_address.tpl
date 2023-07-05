@@ -1,25 +1,3 @@
-# If a collection endpoint is provided, use that.
-# Otherwise, generate the endpoint using the legacy values.
-{{- define "observe.collectionEndpoint" -}}{{- with .Values.global.observe -}}
-    {{- if .collectionEndpoint -}}
-        {{- .collectionEndpoint -}}
-    {{- else -}}
-        {{- $noEndpoint := "One of global.observe.collectionEndpoint or global.observe.customer must be defined" -}}
-        {{- printf "%s://%s.%s:%s" .collectorScheme (required $noEndpoint .customer | toString) .collectorHost (.collectorPort | toString) -}}
-    {{- end -}}
-{{- end -}}{{- end -}}
-
-# Same as "observe.collectionEndpoint", but with the token provided as part of the URL.
-{{- define "observe.collectionEndpointWithToken" -}}{{- with .Values.global.observe -}}
-    {{- if .collectionEndpoint -}}
-        {{- with urlParse .collectionEndpoint -}}
-            {{- printf "%s://$(OBSERVE_TOKEN)@%s" .scheme .host -}}
-        {{- end -}}
-    {{- else -}}
-        {{- $noEndpoint := "One of global.observe.collectionEndpoint or global.observe.customer must be defined" -}}
-        {{- printf "%s://$(OBSERVE_TOKEN)@%s.%s:%s" .collectorScheme (required $noEndpoint .customer | toString) .collectorHost (.collectorPort | toString) -}}
-    {{- end -}}
-{{- end -}}{{- end -}}
 
 # If a collection endpoint is provided, parse the scheme from that.
 # Otherwise, fall back to legacy collectorScheme value.
@@ -29,12 +7,13 @@
             {{- .scheme -}}
         {{- end -}}
     {{- else -}}
-        {{- .collectorScheme -}}
+        {{- .collectorScheme | default "https" -}}
     {{- end -}}
 {{- end -}}{{- end -}}
 
 # If a collection endpoint is provided, parse the host from that and split the host from the port.
-# Otherwise, fall back to legacy collectorHost value.
+# Otherwise, use the legacy collectorHost value, the the customer part of the hostname prepended:
+# <customer_id>.<collectorHost>
 {{- define "observe.collectorHost" -}}{{- with .Values.global.observe -}}
     {{- if .collectionEndpoint -}}
         {{- with urlParse .collectionEndpoint -}}
@@ -42,7 +21,7 @@
         {{- end -}}
     {{- else -}}
         {{- $noEndpoint := "One of global.observe.collectionEndpoint or global.observe.customer must be defined" -}}
-        {{- required $noEndpoint .customer | toString -}}.{{- .collectorHost -}}
+        {{- required $noEndpoint .customer | toString -}}.{{- .collectorHost | default "collect.observeinc.com" -}}
     {{- end -}}
 {{- end -}}{{- end -}}
 
@@ -64,7 +43,7 @@
             {{- end -}}
         {{- end -}}
     {{- else -}}
-        {{- .collectorPort | toString -}}
+        {{- (.collectorPort | default 443) | toString -}}
     {{- end -}}
 {{- end -}}{{- end -}}
 
@@ -72,16 +51,37 @@
 # If a collection endpoint is not provided, look at the legacy collectorScheme value.
 {{- define "observe.useTLS" -}}{{- with .Values.global.observe -}}
     {{- if .collectionEndpoint -}}
-       {{- if eq "https" (urlParse .collectionEndpoint).scheme -}}
-            true
-        {{- else -}}
+       {{- if eq "http" (urlParse .collectionEndpoint).scheme -}}
             false
+        {{- else -}}
+            true
         {{- end -}}
     {{- else -}}
-        {{- if eq "https" .collectorScheme -}}
-            true
-        {{- else -}}
+        {{- if eq "http" .collectorScheme -}}
             false
+        {{- else -}}
+            true
         {{- end -}}
     {{- end -}}
 {{- end -}}{{- end -}}
+
+# If a collection endpoint is provided, use that.
+# Otherwise, generate the endpoint using the legacy values.
+{{- define "observe.collectionEndpoint" -}}
+    {{- if .Values.global.observe.collectionEndpoint -}}
+        {{- .Values.global.observe.collectionEndpoint -}}
+    {{- else -}}
+        {{- printf "%s://%s:%s" (include "observe.collectorScheme" .) (include "observe.collectorHost" .) (include "observe.collectorPort" .) -}}
+    {{- end -}}
+{{- end -}}
+
+# Same as "observe.collectionEndpoint", but with the token provided as part of the URL.
+{{- define "observe.collectionEndpointWithToken" -}}
+    {{- if .Values.global.observe.collectionEndpoint -}}
+        {{- with urlParse .Values.global.observe.collectionEndpoint -}}
+            {{- printf "%s://$(OBSERVE_TOKEN)@%s" .scheme .host -}}
+        {{- end -}}
+    {{- else -}}
+        {{- printf "%s://$(OBSERVE_TOKEN)@%s:%s" (include "observe.collectorScheme" .) (include "observe.collectorHost" .) (include "observe.collectorPort" .) -}}
+    {{- end -}}
+{{- end -}}
