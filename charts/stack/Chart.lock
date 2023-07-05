@@ -1,12 +1,12 @@
 dependencies:
 - name: logs
   repository: file://../internal/logs
-  version: 0.1.2
+  version: 0.1.3
 - name: metrics
   repository: file://../internal/metrics
-  version: 0.1.2
+  version: 0.1.3
 - name: events
   repository: file://../internal/events
-  version: 0.1.5
-digest: sha256:bdcf08f3ba67afc501b3827ca4fd94a6bb404ac66b8447f468e950249ac08a45
-generated: "2023-06-26T20:12:49.392708-07:00"
+  version: 0.1.6
+digest: sha256:7076f17add8182be137307914e4f2bf56862532da90b56cc434131b7d0deeb69
+generated: "2023-07-05T14:07:31.271817-07:00"
