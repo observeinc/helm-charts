@@ -69,7 +69,10 @@
 # Otherwise, generate the endpoint using the legacy values.
 {{- define "observe.collectionEndpoint" -}}
     {{- if .Values.global.observe.collectionEndpoint -}}
-        {{- .Values.global.observe.collectionEndpoint -}}
+        {{- with urlParse .Values.global.observe.collectionEndpoint -}}
+            # re-constructing the URL this way eliminates any path that was included in the value
+            {{- printf "%s://%s" .scheme .host -}}
+        {{- end -}}
     {{- else -}}
         {{- printf "%s://%s:%s" (include "observe.collectorScheme" .) (include "observe.collectorHost" .) (include "observe.collectorPort" .) -}}
     {{- end -}}
