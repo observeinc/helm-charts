@@ -9,4 +9,4 @@ dependencies:
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
   - name: endpoint
     version: 0.1.0
-    repository: file://../endpoint
+    repository: file://../internal/endpoint

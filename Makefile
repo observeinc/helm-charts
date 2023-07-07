@@ -15,3 +15,15 @@ build-deps:
 	@for chart in $(CHARTS); do \
 		helm dependency build --skip-refresh $$chart; \
 	done
+
+.PHONY: test
+test:
+	test/test.sh
+
+.PHONY: test-images
+test-images:
+	$(MAKE) -C test/cmd client.image collector.image
+
+.PHONY: test-stack
+test-stack:
+	helm install --namespace=testing --create-namespace test-stack charts/stack -f test/test-values.yaml

@@ -1,0 +1,14 @@
+global:
+  observe:
+    collectionEndpoint: "http://test-proxy.testing.svc.cluster.local:8080"
+
+observe:
+  token:
+    create: true
+    value: "fake-token"
+
+proxy:
+  enabled: true
+  image:
+    repository: test-collector
+    tag: latest

@@ -1,0 +1,5 @@
+apiVersion: v2
+name: proxy
+description: "Observe agent proxy (for testing only, do not use)"
+type: application
+version: 0.1.0
