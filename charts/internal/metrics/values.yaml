@@ -33,6 +33,12 @@ grafana-agent:
       scrape_pod_port_keep_regex: .*metrics
       scrape_pod_metric_drop_regex: .*bucket
       scrape_pod_metric_keep_regex: (.*)
+      scrape_endpoint_action: keep
+      scrape_endpoint_namespace_drop_regex: (.*istio.*|.*ingress.*|kube-system)
+      scrape_endpoint_namespace_keep_regex: (.*)
+      scrape_endpoint_port_keep_regex: .*metrics
+      scrape_endpoint_metric_drop_regex: .*bucket
+      scrape_endpoint_metric_keep_regex: (.*)
       scrape_resource_action: keep
       scrape_resource_metric_drop_regex: 
       scrape_resource_metric_keep_regex: (.*)
@@ -215,6 +221,99 @@ grafana-agent:
                         - __name__
                     - action: keep
                       regex: {{.Values.prom_config.scrape_pod_metric_keep_regex}}
+                      source_labels:
+                        - __name__
+                  tls_config:
+                    ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+                    insecure_skip_verify: false
+                    server_name: kubernetes
+
+                - job_name: "integrations/kubernetes/endpoints"
+                  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+                  sample_limit: {{.Values.prom_config.scrape_sample_limit}}
+                  body_size_limit: {{.Values.prom_config.scrape_body_size_limit}}
+                  kubernetes_sd_configs:
+                    - role: endpoints
+                  relabel_configs:
+                    - action: {{.Values.prom_config.scrape_endpoint_action}}
+                    # Drop anything matching the configured namespace.
+                    - action: 'drop'
+                      source_labels: ['__meta_kubernetes_namespace']
+                      regex: {{.Values.prom_config.scrape_endpoint_namespace_drop_regex}}
+                    # Drop anything not matching the configured namespace.
+                    - action: 'keep'
+                      source_labels: ['__meta_kubernetes_namespace']
+                      regex: {{.Values.prom_config.scrape_endpoint_namespace_keep_regex}}
+                    # Drop pods without a name label.
+                    # - action: 'drop'
+                    #   regex: ''
+                    #   source_labels: ['__meta_kubernetes_service_label_name']
+                    # Drop anything annotated with 'prometheus.io.scrape=false'.
+                    - action: 'drop'
+                      regex: 'false'
+                      source_labels: ['__meta_kubernetes_service_annotation_prometheus_io_scrape']
+                    # Drop anything annotated with 'observeinc.com.scrape=false'.
+                    - action: 'drop'
+                      regex: 'false'
+                      source_labels: ['__meta_kubernetes_service_annotation_observeinc_com_scrape']
+                    # Allow pods to override the scrape scheme with 'prometheus.io.scheme=https'.
+                    - action: 'replace'
+                      regex: '(https?)'
+                      replacement: '$1'
+                      source_labels: ['__meta_kubernetes_service_annotation_prometheus_io_scheme']
+                      target_label: '__scheme__'
+                    # Allow service to override the scrape path with 'prometheus.io.path=/other_metrics_path'.
+                    - action: 'replace'
+                      regex: '(.+)'
+                      replacement: '$1'
+                      source_labels: ['__meta_kubernetes_service_annotation_prometheus_io_path']
+                      target_label: '__metrics_path__'
+                    # Allow services to override the scrape port with 'prometheus.io.port=1234'.
+                    - action: 'replace'
+                      regex: '(.+?)(\:\d+)?;(\d+)'
+                      replacement: '$1:$3'
+                      source_labels: ['__address__', '__meta_kubernetes_service_annotation_prometheus_io_port']
+                      target_label: '__address__'
+                    # Map all K8s labels/annotations starting with
+                    # 'prometheus.io/param-' to URL params for Prometheus scraping.
+                    - action: 'labelmap'
+                      regex: '__meta_kubernetes_service_annotation_prometheus_io_param_(.+)'
+                      replacement: '__param_$1'
+                    # Map all K8s labels/annotations starting with
+                    # 'prometheus.io/label-' to Prometheus labels.
+                    - action: 'labelmap'
+                      regex: '__meta_kubernetes_service_label_prometheus_io_label_(.+)'
+                    - action: 'labelmap'
+                      regex: '__meta_kubernetes_service_annotation_prometheus_io_label_(.+)'
+                    # Rename jobs to be <namespace>/<name, from pod name label>.
+                    # - action: 'replace'
+                    #   separator: '/'
+                    #   source_labels: ['__meta_kubernetes_namespace', '__meta_kubernetes_service_label_name']
+                    #   target_label: 'job'
+                    #   replacement: '$1'
+                    # But also include the namespace, container, pod as separate labels,
+                    # for routing alerts and joining with cAdvisor metrics.
+                    - action: 'replace'
+                      source_labels: ['__meta_kubernetes_namespace']
+                      target_label: 'namespace'
+                    - action: 'replace'
+                      source_labels: ['__meta_kubernetes_service_name']
+                      # Not 'pod_name', which disappeared in K8s 1.16.
+                      target_label: 'pod'
+                    - action: 'replace'
+                      source_labels: ['__meta_kubernetes_service_container_name']
+                      # Not 'container_name', which disappeared in K8s 1.16.
+                      target_label: 'container'
+                    - action: 'replace'
+                      source_labels: ['__meta_kubernetes_service_node_name']
+                      target_label: 'node'
+                  metric_relabel_configs:
+                    - action: drop
+                      regex: {{.Values.prom_config.scrape_endpoint_metric_drop_regex}}
+                      source_labels:
+                        - __name__
+                    - action: keep
+                      regex: {{.Values.prom_config.scrape_endpoint_metric_keep_regex}}
                       source_labels:
                         - __name__
                   tls_config:
