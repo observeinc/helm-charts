@@ -50,8 +50,8 @@ jobs:
       - name: Push images to kind cluster
         if: steps.list-changed.outputs.changed == 'true'
         run: |
-          kind load docker-image test-client:latest
-          kind load docker-image test-collector:latest
+          kind load docker-image -n chart-testing test-client:latest
+          kind load docker-image -n chart-testing test-collector:latest
 
       - name: Run chart-testing (install)
         if: steps.list-changed.outputs.changed == 'true'
