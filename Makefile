@@ -24,6 +24,3 @@ test:
 test-images:
 	$(MAKE) -C test/cmd client.image collector.image
 
-.PHONY: test-stack
-test-stack:
-	helm install --namespace=testing --create-namespace test-stack charts/stack -f test/test-values.yaml
