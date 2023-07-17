@@ -7,9 +7,7 @@ data:
   # This syntax is based on the syntax used in the JMESPath docs, which describe queries as:
   # search(query, input) -> result
   queries: |
-    Path -> ^/v1/prometheus$
-    Path -> ^/v1/http/kubernetes/logs$
-    Path -> ^/v1/http/kubernetes/events$
+    Path -> ^/v1/otel/v1/traces$
 
 ---
 apiVersion: v1
