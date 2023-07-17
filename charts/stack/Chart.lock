@@ -8,5 +8,8 @@ dependencies:
 - name: events
   repository: file://../internal/events
   version: 0.1.8
-digest: sha256:89b0033dc26382e68c4ad9406e1973f6b2b6e6e53a419e934e1e5e3b5b81f16c
-generated: "2023-07-11T11:35:42.035217-07:00"
+- name: proxy
+  repository: file://../internal/proxy
+  version: 0.1.0
+digest: sha256:b0de258d740d40ee7ae544bd426a414a39ae407c4d6fcfcdec4f8f32ffe054e3
+generated: "2023-07-17T12:59:59.522271-07:00"

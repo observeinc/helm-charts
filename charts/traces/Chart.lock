@@ -5,5 +5,8 @@ dependencies:
 - name: endpoint
   repository: file://../internal/endpoint
   version: 0.1.3
-digest: sha256:2b5170dba4f067ca472a3b965d7c85b2b66ed2f3d3cd74eab092bdcdf16a531d
-generated: "2023-07-11T11:35:25.995729-07:00"
+- name: proxy
+  repository: file://../internal/proxy
+  version: 0.1.0
+digest: sha256:e8318b5ea7a01c932d88aac1aef9cf697e28c4b2e399dbfa9fa77385c5c87da5
+generated: "2023-07-17T12:59:53.261649-07:00"

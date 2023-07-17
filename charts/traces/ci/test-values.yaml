@@ -6,3 +6,9 @@ observe:
   token:
     create: true
     value: "fake-token"
+
+proxy:
+  enabled: true
+  image:
+    repository: test-collector
+    tag: latest

@@ -16,3 +16,7 @@ dependencies:
     version: 0.1.8
     repository: file://../internal/events
     condition: events.enabled
+  - name: proxy
+    version: 0.1.0
+    repository: file://../internal/proxy
+    condition: proxy.enabled

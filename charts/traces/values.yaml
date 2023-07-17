@@ -3,6 +3,9 @@ observe:
     create: true
     value: ""
 
+proxy:
+  enabled: false
+
 opentelemetry-collector:
   nameOverride: traces
   image:
