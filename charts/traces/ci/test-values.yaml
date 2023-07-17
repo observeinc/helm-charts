@@ -12,3 +12,4 @@ proxy:
   image:
     repository: test-collector
     tag: latest
+  fullnameOverride: collect

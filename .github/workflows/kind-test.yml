@@ -53,6 +53,10 @@ jobs:
           kind load docker-image -n chart-testing test-client:latest
           kind load docker-image -n chart-testing test-collector:latest
 
+      - name: Create testing namespace
+        if: steps.list-changed.outputs.changed == 'true'
+        run: kubectl create namespace testing
+
       - name: Run chart-testing (install)
         if: steps.list-changed.outputs.changed == 'true'
         run: ct install --namespace testing --target-branch ${{ github.event.repository.default_branch }} --charts charts/stack,charts/traces
