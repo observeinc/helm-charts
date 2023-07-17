@@ -55,4 +55,4 @@ jobs:
 
       - name: Run chart-testing (install)
         if: steps.list-changed.outputs.changed == 'true'
-        run: ct install --target-branch ${{ github.event.repository.default_branch }} --charts charts/stack,charts/traces
+        run: ct install --namespace testing --target-branch ${{ github.event.repository.default_branch }} --charts charts/stack,charts/traces
