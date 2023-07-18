@@ -93,6 +93,11 @@ opentelemetry-collector:
           - matchExpressions:
               - {key: observeinc.com/unschedulable, operator: DoesNotExist}
               - {key: kubernetes.io/os, operator: NotIn, values: [windows]}
+  livenessProbe:
+    initialDelaySeconds: 5
+  readinessProbe:
+    initialDelaySeconds: 10
+
   # opentelemetry-collector configuration
   config:
     exporters:

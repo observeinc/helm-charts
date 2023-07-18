@@ -68,9 +68,22 @@ func (req request) String() string {
 }
 
 func (buf *requestBuffer) dump(w http.ResponseWriter, req *http.Request) {
+	if buf.tracer != nil {
+		_, span := buf.tracer.Start(req.Context(), "dump")
+		defer span.End()
+	}
+
 	for _, req := range buf.requests {
 		fmt.Fprintln(w, req.String())
 	}
+}
+
+func (buf *requestBuffer) healthz(w http.ResponseWriter, req *http.Request) {
+	if buf.tracer != nil {
+		_, span := buf.tracer.Start(req.Context(), "healthz")
+		defer span.End()
+	}
+	fmt.Fprintln(w, "ok")
 }
 
 func main() {
@@ -96,6 +109,7 @@ func main() {
 
 	http.HandleFunc("/", buf.collect)
 	http.HandleFunc("/dump", buf.dump)
+	http.HandleFunc("/healthz", buf.healthz)
 	log.Printf("listening on %v", listen)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

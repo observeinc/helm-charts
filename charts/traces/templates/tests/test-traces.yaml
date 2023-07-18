@@ -11,6 +11,14 @@ data:
 
 ---
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-info
+data:
+  id: "fake-cluster-id"
+
+---
+apiVersion: v1
 kind: Pod
 metadata:
   name: "test-traces"

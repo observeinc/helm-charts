@@ -42,13 +42,15 @@ spec:
           env:
             {{- toYaml .Values.env | nindent 12 }}
           livenessProbe:
+            initialDelaySeconds: 3
             httpGet:
-              path: /
-              port: http
+              path: /healthz
+              port: {{ .Values.service.port }}
           readinessProbe:
+            initialDelaySeconds: 3
             httpGet:
-              path: /
-              port: http
+              path: /healthz
+              port: {{ .Values.service.port }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
