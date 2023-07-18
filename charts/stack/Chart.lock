@@ -1,15 +1,15 @@
 dependencies:
 - name: logs
-  repository: file://../internal/logs
+  repository: file://../logs
   version: 0.1.5
 - name: metrics
-  repository: file://../internal/metrics
+  repository: file://../metrics
   version: 0.1.5
 - name: events
-  repository: file://../internal/events
+  repository: file://../events
   version: 0.1.8
 - name: proxy
-  repository: file://../internal/proxy
+  repository: file://../proxy
   version: 0.1.0
-digest: sha256:b0de258d740d40ee7ae544bd426a414a39ae407c4d6fcfcdec4f8f32ffe054e3
-generated: "2023-07-17T12:59:59.522271-07:00"
+digest: sha256:3ec8741969affc098704ddc588b51d6c9e065b1a260f74599910a655b0efca19
+generated: "2023-07-18T12:11:11.686483-07:00"
