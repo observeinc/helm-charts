@@ -9,9 +9,12 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+
+	"go.opentelemetry.io/otel/trace"
 )
 
 type requestBuffer struct {
+	tracer   trace.Tracer
 	requests []request
 	size     int
 	maxSize  int
@@ -34,8 +37,10 @@ func formatHeader(h http.Header) string {
 }
 
 func (buf *requestBuffer) collect(w http.ResponseWriter, req *http.Request) {
-	_, span := tracer.Start(req.Context(), "collect")
-	defer span.End()
+	if buf.tracer != nil {
+		_, span := buf.tracer.Start(req.Context(), "collect")
+		defer span.End()
+	}
 
 	if buf.size >= buf.maxSize {
 		w.WriteHeader(http.StatusTooManyRequests)
@@ -69,17 +74,25 @@ func (buf *requestBuffer) dump(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	ctx := context.Background()
-	if err := installExportPipeline(ctx); err != nil {
-		log.Fatal(err)
-	}
-
 	buf := new(requestBuffer)
 
 	var listen string
+	var tracing bool
 	flag.StringVar(&listen, "listen", ":8080", "HTTP listen address")
 	flag.IntVar(&buf.maxSize, "max-size", 1000, "Maximum number of requests to record")
+	flag.BoolVar(&tracing, "trace", false, "enable tracing")
 	flag.Parse()
+
+	if tracing {
+		tracer, err := initTraceExporter()
+		if err != nil {
+			log.Fatal(err)
+		}
+		buf.tracer = tracer
+
+		_, span := tracer.Start(context.Background(), "test-span")
+		span.End()
+	}
 
 	http.HandleFunc("/", buf.collect)
 	http.HandleFunc("/dump", buf.dump)
