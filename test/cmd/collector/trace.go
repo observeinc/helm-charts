@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
@@ -12,7 +13,12 @@ import (
 )
 
 func initTraceExporter() (trace.Tracer, error) {
-	client := otlptracehttp.NewClient()
+	client := otlptracehttp.NewClient(otlptracehttp.WithRetry(otlptracehttp.RetryConfig{
+		Enabled:         true,
+		InitialInterval: 1 * time.Second,
+		MaxInterval:     10 * time.Second,
+		MaxElapsedTime:  30 * time.Second,
+	}))
 	exporter, err := otlptrace.New(context.Background(), client)
 	if err != nil {
 		return nil, fmt.Errorf("create OTLP trace exporter: %w", err)
