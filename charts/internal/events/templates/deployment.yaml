@@ -32,6 +32,7 @@ spec:
       initContainers:
         - name: kube-cluster-info
           image: {{ .Values.image.kube_cluster_info.repository }}:{{ default .Chart.AppVersion .Values.image.kube_cluster_info.tag }}
+          imagePullPolicy: {{ .Values.image.kube_cluster_info.imagePullPolicy | default "IfNotPresent" }}
           env:
             - name: NAMESPACE
               valueFrom:
@@ -40,6 +41,17 @@ spec:
       containers:
         - name: kube-state-events
           image: {{ .Values.image.kube_state_events.repository }}:{{ default .Chart.AppVersion .Values.image.kube_state_events.tag }}
+          imagePullPolicy: {{ .Values.image.kube_state_events.imagePullPolicy | default "IfNotPresent" }}
+          {{- if .Values.image.kube_state_events.command }}
+          command: {{- range .Values.image.kube_state_events.command }}
+          - {{ . }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.image.kube_state_events.args }}
+          args: {{- range .Values.image.kube_state_events.args }}
+          - {{ . }}
+          {{- end }}
+          {{- else }}
           args:
             - -healthz-addr=:5171
             - -metrics-addr=:9090
@@ -49,6 +61,7 @@ spec:
             - autoscaling/v1
             - batch/v1
             - networking.k8s.io/v1
+          {{- end}}
           ports:
             - containerPort: 5171
             - containerPort: 9090
