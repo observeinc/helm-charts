@@ -1,3 +1,7 @@
+global:
+  # https://github.com/helm/helm/issues/8489 workaround
+  observe: {}
+
 image:
   kube_cluster_info:
     repository: observeinc/kube-cluster-info

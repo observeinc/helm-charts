@@ -10,3 +10,6 @@ dependencies:
   - name: endpoint
     version: 0.1.3
     repository: file://../endpoint
+maintainers:
+  - name: Observe
+    email: support@observeinc.com
