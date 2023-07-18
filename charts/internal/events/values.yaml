@@ -33,3 +33,5 @@ resources:
     memory: 256Mi
 
 tolerations: {}
+
+extraEnv: []

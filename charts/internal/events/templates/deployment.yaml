@@ -72,6 +72,9 @@ spec:
                 configMapKeyRef:
                   name: cluster-info
                   key: id
+            {{- range .Values.extraEnv }}
+            - {{- toYaml . | nindent 14 }}
+            {{- end }}
           envFrom:
             - secretRef:
                 name: credentials
