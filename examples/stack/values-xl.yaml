@@ -21,6 +21,8 @@ logs:
 
 metrics:
   grafana-agent:
+    prom_config:
+      host_filter: "true"
     controller:
       type: daemonset
       updateStrategy:
@@ -39,8 +41,6 @@ metrics:
                   - {key: kubernetes.io/os, operator: NotIn, values: [windows]}
 
     agent:
-      prom_config:
-        host_filter: "true"
       resources:
         limits:
           cpu: 200m
