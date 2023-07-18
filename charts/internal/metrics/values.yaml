@@ -17,6 +17,7 @@ grafana-agent:
       scrape_timeout: 10s
       scrape_body_size_limit: 50MB
       scrape_cadvisor_action: keep
+      host_filter: "false"
       # the following metrics are exported with 0 values in default cadvisor installs
       # see
       # - https://github.com/kubernetes/kubernetes/issues/60279

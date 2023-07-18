@@ -21,6 +21,8 @@ logs:
 
 metrics:
   grafana-agent:
+    prom_config:
+      host_filter: "true"
     controller:
       type: daemonset
       updateStrategy:
