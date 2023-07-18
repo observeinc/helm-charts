@@ -1,13 +1,20 @@
+global:
+  observe:
+    customer: "123456789012"
+
 image:
   kube_cluster_info:
     repository: observeinc/kube-cluster-info
     # Overrides the image tag whose default is {{ .Chart.AppVersion }}
     tag: ""
+    imagePullPolicy:
   kube_state_events:
     repository: observeinc/kube-state-events
     # Overrides the image tag whose default is {{ .Chart.AppVersion }}
     tag: ""
-  pullPolicy: Always
+    imagePullPolicy:
+    command: []
+    args: []
 
 rbac:
   create: true
