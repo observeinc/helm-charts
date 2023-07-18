@@ -75,9 +75,11 @@ spec:
             {{- range .Values.extraEnv }}
             - {{- toYaml . | nindent 14 }}
             {{- end }}
+          {{- if .Values.useCredentialsSecret.enabled }}
           envFrom:
             - secretRef:
-                name: credentials
+                name: {{ .Values.useCredentialsSecret.secretName }}
+          {{- end}}
           readinessProbe:
             httpGet:
               path: /healthz
