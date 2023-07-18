@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -33,6 +34,9 @@ func formatHeader(h http.Header) string {
 }
 
 func (buf *requestBuffer) collect(w http.ResponseWriter, req *http.Request) {
+	_, span := tracer.Start(req.Context(), "collect")
+	defer span.End()
+
 	if buf.size >= buf.maxSize {
 		w.WriteHeader(http.StatusTooManyRequests)
 		fmt.Fprintln(w, "buffer full")
@@ -65,6 +69,11 @@ func (buf *requestBuffer) dump(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+	ctx := context.Background()
+	if err := installExportPipeline(ctx); err != nil {
+		log.Fatal(err)
+	}
+
 	buf := new(requestBuffer)
 
 	var listen string
@@ -72,8 +81,8 @@ func main() {
 	flag.IntVar(&buf.maxSize, "max-size", 1000, "Maximum number of requests to record")
 	flag.Parse()
 
-	http.HandleFunc("/dump", buf.dump)
 	http.HandleFunc("/", buf.collect)
+	http.HandleFunc("/dump", buf.dump)
 	log.Printf("listening on %v", listen)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

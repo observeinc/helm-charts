@@ -13,7 +13,7 @@ data:
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "test-stack"
+  name: "test-traces"
   annotations:
     "helm.sh/hook": test
 spec:
