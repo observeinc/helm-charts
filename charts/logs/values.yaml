@@ -1,3 +1,7 @@
+global:
+  # https://github.com/helm/helm/issues/8489 workaround
+  observe: {}
+
 fluent-bit:
   nameOverride: logs
   env:
@@ -39,8 +43,6 @@ fluent-bit:
     buffer_max_size: 256k
     dns_mode: UDP
     dns_resolver: LEGACY
-    docker_mode: On
-    docker_mode_flush: 4
     flush: 2
     grace: 10
     hc_errors_count: 5
@@ -50,14 +52,14 @@ fluent-bit:
     mem_buf_limit: 10MB
     node_log_include_path: /var/log/kube-apiserver-audit.log
     node_log_exclude_path: nomatch
-    read_from_head: True
+    read_from_head: "true"
     refresh_interval: 2
     retry_limit: 5
     rotate_wait: 5
-    storage_metrics: Off
+    storage_metrics: "off"
     grep_match_tag: "nothing"
     grep_exclude: "nomatch ^$"
-    inotify_watcher: true
+    inotify_watcher: "true"
 
     service: |
       [SERVICE]
@@ -170,7 +172,7 @@ fluent-bit:
           Header              Authorization Bearer ${OBSERVE_TOKEN}
           Compress            gzip
           Retry_Limit         {{.Values.config.retry_limit}}
-    
+
     customParsers: |
       [PARSER]
           Name        kube-custom

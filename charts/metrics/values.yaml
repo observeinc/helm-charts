@@ -1,44 +1,48 @@
+global:
+  # https://github.com/helm/helm/issues/8489 workaround
+  observe: {}
+
 grafana-agent:
   nameOverride: metrics
   prom_config:
-      batch_send_deadline: 5s
-      capacity: 15000
-      log_level: info
-      max_backoff: 30s
-      max_samples_per_send: 5000
-      max_shards: 10
-      max_wal_time: 30m
-      min_backoff: 1s
-      min_wal_time: 15s
-      observe_collector_insecure: false
-      remote_timeout: 30s
-      remote_flush_deadline: 1m
-      scrape_interval: 15s
-      scrape_timeout: 10s
-      scrape_body_size_limit: 50MB
-      scrape_cadvisor_action: keep
-      host_filter: "false"
-      # the following metrics are exported with 0 values in default cadvisor installs
-      # see
-      # - https://github.com/kubernetes/kubernetes/issues/60279
-      # - https://github.com/google/cadvisor/issues/1672
-      scrape_cadvisor_metric_drop_regex: container_(network_tcp_usage_total|network_udp_usage_total|tasks_state|cpu_load_average_10s)
-      # these are the metrics we use for our default boards
-      scrape_cadvisor_metric_keep_regex: container_(cpu_cfs_.*|spec_.*|cpu_cores|cpu_usage_seconds_total|memory_working_set_bytes|memory_usage_bytes|network_transmit_.*|network_receive_.*|fs_writes_total|fs_reads_total|file_descriptors)|machine_(cpu_cores|memory_bytes)
-      scrape_kubelet_action: drop
-      scrape_kubelet_metric_drop_regex: 
-      scrape_kubelet_metric_keep_regex: (.*)
-      scrape_pod_action: keep
-      scrape_pod_namespace_drop_regex: (.*istio.*|.*ingress.*|kube-system)
-      scrape_pod_namespace_keep_regex: (.*)
-      scrape_pod_port_keep_regex: .*metrics
-      scrape_pod_metric_drop_regex: .*bucket
-      scrape_pod_metric_keep_regex: (.*)
-      scrape_resource_action: keep
-      scrape_resource_metric_drop_regex: 
-      scrape_resource_metric_keep_regex: (.*)
-      scrape_sample_limit: 100000
-      wal_truncate_frequency: 30m
+    batch_send_deadline: 5s
+    capacity: 15000
+    log_level: info
+    max_backoff: 30s
+    max_samples_per_send: 5000
+    max_shards: 10
+    max_wal_time: 30m
+    min_backoff: 1s
+    min_wal_time: 15s
+    observe_collector_insecure: false
+    remote_timeout: 30s
+    remote_flush_deadline: 1m
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    scrape_body_size_limit: 50MB
+    scrape_cadvisor_action: keep
+    host_filter: "false"
+    # the following metrics are exported with 0 values in default cadvisor installs
+    # see
+    # - https://github.com/kubernetes/kubernetes/issues/60279
+    # - https://github.com/google/cadvisor/issues/1672
+    scrape_cadvisor_metric_drop_regex: container_(network_tcp_usage_total|network_udp_usage_total|tasks_state|cpu_load_average_10s)
+    # these are the metrics we use for our default boards
+    scrape_cadvisor_metric_keep_regex: container_(cpu_cfs_.*|spec_.*|cpu_cores|cpu_usage_seconds_total|memory_working_set_bytes|memory_usage_bytes|network_transmit_.*|network_receive_.*|fs_writes_total|fs_reads_total|file_descriptors)|machine_(cpu_cores|memory_bytes)
+    scrape_kubelet_action: drop
+    scrape_kubelet_metric_drop_regex:
+    scrape_kubelet_metric_keep_regex: (.*)
+    scrape_pod_action: keep
+    scrape_pod_namespace_drop_regex: (.*istio.*|.*ingress.*|kube-system)
+    scrape_pod_namespace_keep_regex: (.*)
+    scrape_pod_port_keep_regex: .*metrics
+    scrape_pod_metric_drop_regex: .*bucket
+    scrape_pod_metric_keep_regex: (.*)
+    scrape_resource_action: keep
+    scrape_resource_metric_drop_regex:
+    scrape_resource_metric_keep_regex: (.*)
+    scrape_sample_limit: 100000
+    wal_truncate_frequency: 30m
 
   controller:
     type: deployment

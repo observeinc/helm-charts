@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: queries
+data:
+  # Queries have the format <JMESPath query> -> <matching regexp>.
+  # This syntax is based on the syntax used in the JMESPath docs, which describe queries as:
+  # search(query, input) -> result
+  queries: |
+    Path -> ^/v1/prometheus$
+    Path -> ^/v1/http/kubernetes/logs$
+    Path -> ^/v1/http/kubernetes/events$
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "test-stack"
+  annotations:
+    "helm.sh/hook": test
+spec:
+  restartPolicy: Never
+  containers:
+    - name: check
+      image: test-client:latest
+      imagePullPolicy: Never
+      args: ['check', '-f', '/config/queries', 'http://test-stack-collector.testing.svc.cluster.local:8080/dump']
+      volumeMounts:
+      - name: queries
+        mountPath: "/config"
+        readOnly: true
+  volumes:
+  - name: queries
+    configMap:
+      name: queries
+      # An array of keys from the ConfigMap to create as files
+      items:
+      - key: "queries"
+        path: "queries"

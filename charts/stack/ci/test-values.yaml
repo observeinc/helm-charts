@@ -1,0 +1,24 @@
+global:
+  observe:
+    collectionEndpoint: "http://test-stack-collector.testing.svc.cluster.local:8080"
+
+observe:
+  token:
+    create: true
+    value: "fake-token"
+
+proxy:
+  enabled: true
+  nameOverride: collector
+  image:
+    repository: test-collector
+    tag: latest
+
+metrics:
+  grafana-agent:
+    agent:
+      resources:
+        limits:
+          memory: 256Mi
+        requests:
+          memory: 256Mi
