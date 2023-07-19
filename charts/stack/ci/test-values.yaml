@@ -13,5 +13,3 @@ proxy:
   image:
     repository: test-collector
     tag: latest
-  args:
-  - "-startup-ready-time=10s"

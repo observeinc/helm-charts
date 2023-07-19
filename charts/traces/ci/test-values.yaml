@@ -15,7 +15,6 @@ proxy:
     tag: latest
   args:
   - "-enable-tracing"
-  - "-startup-ready-time=10s"
   env:
   - name: OTEL_EXPORTER_OTLP_ENDPOINT
     value: "http://test-traces.testing.svc.cluster.local:4318"
