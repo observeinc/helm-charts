@@ -21,9 +21,9 @@ podlogs() {
 for chart in "$@"; do
     echo
     echo "Testing chart/$chart..."
-    sleep 1
 
     helm install -n $ns --wait test-$chart charts/$chart -f charts/$chart/ci/test-values.yaml
+    sleep 10 # allow some observations to come through once everything is ready
     echo
     helm test -n $ns --filter name=test-$chart test-$chart ||
         {
