@@ -1,5 +1,8 @@
 CHARTS := $(shell dirname `find . -name Chart.yaml`)
 
+.PHONY: all
+all: build-deps lint test
+
 .PHONY: update-deps
 update-deps:
 	helm repo up
@@ -22,7 +25,7 @@ test: load-test-images
 	test/test.sh
 
 .PHONY: lint
-lint: build-deps
+lint:
 	ct lint --all --helm-dependency-extra-args='--skip-refresh'
 
 .PHONY: clean
