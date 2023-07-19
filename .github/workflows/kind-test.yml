@@ -26,6 +26,9 @@ jobs:
         with:
           version: v3.8.0
   
+      - name: Set up chart dependencies
+        run: make build-deps
+
       - name: Lint charts
         run: make lint
    
