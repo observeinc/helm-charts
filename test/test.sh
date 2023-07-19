@@ -15,7 +15,16 @@ for chart in stack traces; do
 
     helm install -n testing --wait test-$chart charts/$chart -f charts/$chart/ci/test-values.yaml
     echo
-    helm test -n testing --filter name=test-$chart test-$chart
+    helm test -n testing --filter name=test-$chart test-$chart ||
+        {
+            echo
+            echo chart/$chart tests FAILED
+            echo 
+            echo results:
+            kubectl -n testing logs test-$chart
+            echo
+            exit 1
+        }
 
     echo
     echo chart/$chart tests PASSED
