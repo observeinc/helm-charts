@@ -22,7 +22,7 @@ build-deps:
 
 .PHONY: test
 test: load-test-images
-	test/test.sh
+	test/test.sh stack traces
 
 .PHONY: lint
 lint:
