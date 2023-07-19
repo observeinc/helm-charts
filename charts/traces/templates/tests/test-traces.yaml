@@ -30,7 +30,7 @@ spec:
     - name: check
       image: test-client:latest
       imagePullPolicy: Never
-      args: ['check', '-f', '/config/queries', 'http://collect.testing.svc.cluster.local:8080/dump']
+      args: ['check', '-f', '/config/queries', 'http://test-traces-collector.testing.svc.cluster.local:8080/dump']
       volumeMounts:
       - name: queries
         mountPath: "/config"

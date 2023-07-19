@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 
 	"go.opentelemetry.io/otel/trace"
 )
@@ -83,17 +84,31 @@ func (buf *requestBuffer) healthz(w http.ResponseWriter, req *http.Request) {
 		_, span := buf.tracer.Start(req.Context(), "healthz")
 		defer span.End()
 	}
+
+	// grace period, in case trace exporter pipeline is not ready yet.
+	if time.Since(start) < readyAfter {
+		w.WriteHeader(http.StatusServiceUnavailable)
+		return
+	}
 	fmt.Fprintln(w, "ok")
 }
 
+var (
+	start      time.Time
+	readyAfter time.Duration
+)
+
 func main() {
+	start = time.Now()
+
 	buf := new(requestBuffer)
 
 	var listen string
 	var tracing bool
 	flag.StringVar(&listen, "listen", ":8080", "HTTP listen address")
 	flag.IntVar(&buf.maxSize, "max-size", 1000, "Maximum number of requests to record")
-	flag.BoolVar(&tracing, "trace", false, "enable tracing")
+	flag.BoolVar(&tracing, "enable-tracing", false, "enable tracing")
+	flag.DurationVar(&readyAfter, "startup-ready-time", 0, "delay healthy readiness check response")
 	flag.Parse()
 
 	if tracing {

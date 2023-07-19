@@ -1,13 +1,29 @@
 #!/bin/sh
-set -ex
+
+set -e
 
 repo=$(git rev-parse --show-toplevel)
-make -C "$repo" build-deps
-ct lint --all
-make -C "$repo" test-images
-kind load docker-image -n chart-testing test-client:latest
-kind load docker-image -n chart-testing test-collector:latest
-kubectl create namespace testing || true
-ct install --namespace testing --charts charts/stack
-kubectl -n testing delete configmap/cluster-info
-ct install --namespace testing --charts charts/traces
+
+trap $repo/test/clean.sh EXIT
+
+kubectl create namespace testing 2>/dev/null || true
+
+for chart in stack traces; do
+    echo
+    echo "Testing chart/$chart..."
+    sleep 1
+
+    helm install -n testing --wait test-$chart charts/$chart -f charts/$chart/ci/test-values.yaml
+    echo
+    helm test -n testing --filter name=test-$chart test-$chart
+
+    echo
+    echo chart/$chart tests PASSED
+    echo 
+    echo results:
+    kubectl -n testing logs test-$chart
+    echo
+
+    helm uninstall --wait -n testing test-$chart 2>/dev/null
+    kubectl -n testing delete configmap/cluster-info 2>/dev/null || true
+done

@@ -1,6 +1,6 @@
 global:
   observe:
-    collectionEndpoint: "http://collect.testing.svc.cluster.local:8080"
+    collectionEndpoint: "http://test-stack-collector.testing.svc.cluster.local:8080"
 
 observe:
   token:
@@ -8,8 +8,8 @@ observe:
     value: "fake-token"
 
 proxy:
+  nameOverride: collector
   enabled: true
   image:
     repository: test-collector
     tag: latest
-  fullnameOverride: collect

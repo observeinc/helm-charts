@@ -1,23 +1,21 @@
 global:
   observe:
-    collectionEndpoint: "http://collect.testing.svc.cluster.local:8080"
+    collectionEndpoint: "http://test-traces-collector.testing.svc.cluster.local:8080"
 
 observe:
   token:
     create: true
     value: "fake-token"
 
-opentelemetry-collector:
-  fullnameOverride: traces
-
 proxy:
+  nameOverride: collector
   enabled: true
   image:
     repository: test-collector
     tag: latest
-  fullnameOverride: collect
   args:
-  - "-trace"
+  - "-enable-tracing"
+  - "-startup-ready-time=10s"
   env:
   - name: OTEL_EXPORTER_OTLP_ENDPOINT
-    value: "http://traces.testing.svc.cluster.local:4318"
+    value: "http://test-traces.testing.svc.cluster.local:4318"
