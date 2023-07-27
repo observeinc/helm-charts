@@ -1,3 +1,11 @@
+global:
+  observe:
+    collectionEndpoint: ""
+
+observe:
+  token:
+    value: ""
+
 opentelemetry-collector:
   resources:
     limits:

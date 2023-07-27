@@ -9,7 +9,7 @@ Contents:
   * events (kubernetes state events)
 * traces: Installs trace collection for the OpenTelemetry Observe app
 
-# Installation
+# Quick Start
 
 First, install and update the observe helm repository:
 
@@ -18,13 +18,65 @@ helm repo add observe https://observeinc.github.io/helm-charts
 helm repo update
 ```
 
+## Namespace
+
+We currently require that Observe charts are installed to an `observe` namespace.
+The namespace should further be annotated with a human-readable cluster name. Helm
+supports creating namespaces as a convenience feature, but does not support managing
+and configuring the namespace (that is, the `--create-namespace` option in `helm install`
+is equivalent to manually running `kubectl create namespace`). Thus it is recommended to
+manage the namespace externally to Helm. This can likely be done by following the same
+methodology you use to manage the creation of your Kubernetes clusters, and/or your other
+namespaces.
+
+You can also manage the namespace manually using the following commands:
+```
+CLUSTER_NAME="My Cluster"
+kubectl create namespace observe && \
+	kubectl annotate namespace observe observeinc.com/cluster-name="$CLUSTER_NAME"
+```
+
+## Installing Stack
+
+The values for `${OBSERVE_COLLECTION_ENDPOINT}` and `${OBSERVE_TOKEN}` are provided
+when you install the Kubernetes app in Observe, and set up a new connection.
+
+```
+helm install --namespace=observe observe-stack observe/stack \
+	--set global.observe.collectionEndpoint="${OBSERVE_COLLECTION_ENDPOINT}" \
+	--set observe.token.value="${OBSERVE_TOKEN}"
+
+# store values for further configuration and upgrades
+helm -n observe get values observe-stack -o yaml > observe-stack-values.yaml
+```
+
+## Installing Traces
+
+The values for `${OBSERVE_COLLECTION_ENDPOINT}` and `${OBSERVE_TOKEN}` are provided
+when you install the OpenTelemetry app in Observe, and set up a new connection.
+
+The same token should not be re-used for the `stack` (Kubernetes) and `traces` (OpenTelemetry)
+charts. Instead, create a new connection for the OpenTelemetry app, and provide the new token
+you are prompted to create.
+
+```
+helm install --namespace=observe observe-traces observe/traces \
+	--set global.observe.collectionEndpoint="${OBSERVE_COLLECTION_ENDPOINT}" \
+	--set observe.token.value="${OBSERVE_TOKEN}"
+
+# store values for further configuration and upgrades
+helm -n observe get values observe-traces -o yaml > observe-traces-values.yaml
+```
+
+# Configuration
+
 ## Required Values
 You must set `global.observe.collectionEndpoint`, which is provided when configuring a connection in
-Observe. To have Helm create a Kubernetes secret containing your datastream token, you must also set
+Observe. To have Helm manage a Kubernetes secret containing your datastream token, you must also set
 `observe.token.value`. Otherwise, you must set `observe.token.create` to `false`, and manually create
 the secrets (see [Managing Secrets Manually](#managing-secrets-manually)).
 
-These values can be set in a custom values file:
+These values should be persisted in a custom values file:
 
 ```yaml
 global:
@@ -39,20 +91,18 @@ observe:
     value: <datastream token>
 ```
 
-Or using the `--set` flag during installation.
-
 ## Sizing
 
-By default, we attempt to choose defaults which have a wide operating
-range. However, some clusters will inevitably fall outside this range. We
-provide example values files corresponding to several different use cases:
+While the default configuration of the observe charts are intended to be appropriate for a variety of use cases,
+additional example configurations are also provided for other cases:
 
-- [examples/stack/values-xs.yaml](https://github.com/observeinc/helm-charts/tree/main/examples/stack/values-xs.yaml) - intended to run on small clusters such as development environments, where resources are scarce and reliability is less of a concern
-- [examples/stack/values-m.yaml](https://github.com/observeinc/helm-charts/tree/main/examples/stack/values-m.yaml) - the default sizing, intended to run on clusters with hundreds of pods. Start here and adjust up or down accordingly.
+- [examples/stack/values-xs.yaml](https://github.com/observeinc/helm-charts/tree/main/examples/stack/values-xs.yaml) and [examples/traces/values-xs.yaml](https://github.com/observeinc/helm-charts/tree/main/examples/traces/values-xs.yaml) - intended to run on small clusters such as development environments, where resources are scarce and reliability is less of a concern
+- [examples/stack/values-m.yaml](https://github.com/observeinc/helm-charts/tree/main/examples/stack/values-m.yaml) and [examples/traces/values-m.yaml](https://github.com/observeinc/helm-charts/tree/main/examples/traces/values-m.yaml) - the default sizing, intended to run on clusters with hundreds of pods. Start here and adjust up or down accordingly.
 - [examples/stack/values-l.yaml](https://github.com/observeinc/helm-charts/tree/main/examples/stack/values-l.yaml) - used for similar sized clusters as `m`, but with higher throughput in logs, metrics or events. This may be due to verbose logging, high cardinality metrics or frequent cluster reconfiguration.
 - [examples/stack/values-xl.yaml](https://github.com/observeinc/helm-charts/tree/main/examples/stack/values-xl.yaml) - intended to run on large clusters with 100+ nodes. Collection is preferentially performed using daemonsets rather than deployments.
+- [examples/traces/values-deployment.yaml](https://github.com/observeinc/helm-charts/tree/main/examples/traces/values-deployment.yaml) - a sample configuration of a 10-replica deployment of the traces agent. Adjust the sizing and replica count as needed.
 
-Resource limits for each sizing is as follows:
+Resource allocations for each example configuration are as follows:
 
 |         |     `xs`     |      `m`      |      `l`      |     `xl`      |
 |--------:|:------------:|:-------------:|:-------------:|:-------------:|
@@ -60,42 +110,45 @@ Resource limits for each sizing is as follows:
 |    logs | 10m<br>64Mi  | 100m<br>128Mi | 200m<br>192Mi | 500m<br>256Mi |
 | metrics | 50m<br>256Mi |  250m<br>2Gi  |  500m<br>4Gi  | 200m *(ds)*<br>1Gi  |
 
-By default, the `logs` component is a daemonset, while `events` and `metrics` are
+
+|         |     `xs`     |      `m`      |       `deployment`      |
+|--------:|:------------:|:-------------:|:-----------------------:|
+|  traces | 50m *(ds)*<br>128Mi | 250m *(ds)*<br>256Mi |  250m *(x10)*<br>256Mi  |
+
+By default, `logs` and `traces` are daemonsets, while `events` and `metrics` are
 single-replica deployments. Some use cases may require scaling the `metrics`
 agent beyond a single replica; in this case we recommend using a daemonset.
-Configuration for this is provided in [values-xl.yaml](https://github.com/observeinc/helm-charts/tree/main/examples/stack/values-xl.yaml).
 
-## Installation
+## Advanced Configuration
 
-We recommend following the convention "observe-\<chart name\>" for release names.
+The subcharts managed by the parent `stack` and `traces` charts can be further configured according
+to the upstream charts. Refer to the documentation for these charts directly for advanced configuration:
+- [grafana-agent](https://github.com/grafana/agent/tree/helm-chart/0.10.0/operations/helm/charts/grafana-agent)
+- [fluent-bit](https://github.com/fluent/helm-charts/tree/fluent-bit-0.25.0/charts/fluent-bit)
+- [openetelemetry-collector](https://github.com/open-telemetry/opentelemetry-helm-charts/tree/opentelemetry-collector-0.61.2/charts/opentelemetry-collector)
+
+Keep in mind that these upstream charts are managed by Observe's parent charts, which provide
+the default configuration necessary to publish the data to Observe. This means that changes to
+the underlying upstream charts must be specified in the appropriate YAML blocks.
 
 Stack:
-```bash
-# installing with a custom values file
-helm install --namespace=observe --create-namespace \
-  observe-stack observe/stack -f my_values.yaml
+```
+logs:
+  fluent-bit:
+    # advanced fluent-bit configuration overrides begin at this level of indentation
 
-# installing by setting values on the command line
-helm install --namespace=observe --create-namespace \
-  --set global.observe.collectionEndpoint="..." \
-  --set observe.token.value="..." \
-  observe-stack observe/stack
+metrics:
+  grafana-agent:
+    # advanced grafana-agent configuration overrides begin at this level of indentation
 ```
 
 Traces:
-```bash
-# installing with a custom values file
-helm install --namespace=observe --create-namespace \
-  observe-traces observe/traces -f my_values.yaml
-
-# installing by setting values on the command line
-helm install --namespace=observe --create-namespace \
-  --set global.observe.collectionEndpoint="..." \
-  --set observe.token.value="..." \
-  observe-stack observe/traces
+```
+opentelemetry-collector:
+  # advanced opentelemetry-collector configuration overrides begin at this level of indentation
 ```
 
-# Managing Secrets Manually
+## Managing Secrets Manually
 
 If you do not wish to have Helm manage your token as a Kubernetes secret (which implies
 that it will be stored as a chart value), you can manage it manually. To prevent the chart
