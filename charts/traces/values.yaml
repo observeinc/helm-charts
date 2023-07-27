@@ -3,11 +3,14 @@ observe:
     create: true
     value: ""
 
+proxy:
+  enabled: false
+
 opentelemetry-collector:
   nameOverride: traces
   image:
     tag: "0.62.1"
-  mode: "daemonset" # daemonset or deployment
+  mode: "daemonset"  # daemonset or deployment
   service:
     enabled: true
   command:
@@ -19,7 +22,7 @@ opentelemetry-collector:
     requests:
       cpu: 250m
       memory: 256Mi
-  replicaCount: 10 # only used with deployment mode
+  replicaCount: 10  # only used with deployment mode
   clusterRole:
     create: true
     rules:
@@ -90,6 +93,11 @@ opentelemetry-collector:
           - matchExpressions:
               - {key: observeinc.com/unschedulable, operator: DoesNotExist}
               - {key: kubernetes.io/os, operator: NotIn, values: [windows]}
+  livenessProbe:
+    initialDelaySeconds: 5
+  readinessProbe:
+    initialDelaySeconds: 10
+
   # opentelemetry-collector configuration
   config:
     exporters:

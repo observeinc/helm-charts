@@ -12,3 +12,6 @@ metrics:
 
 logs:
   enabled: true
+
+proxy:
+  enabled: false

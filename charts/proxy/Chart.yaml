@@ -1,0 +1,8 @@
+apiVersion: v2
+name: proxy
+description: "Observe agent proxy (for testing only, do not use)"
+type: application
+version: 0.1.0
+maintainers:
+  - name: Observe
+    email: support@observeinc.com
