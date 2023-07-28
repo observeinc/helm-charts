@@ -1,3 +1,11 @@
+global:
+  observe:
+    collectionEndpoint: ""
+
+observe:
+  token:
+    value: ""
+
 events:
   resources:
     limits:
