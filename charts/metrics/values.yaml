@@ -101,8 +101,6 @@ grafana-agent:
           global:
             scrape_interval: {{.Values.prom_config.scrape_interval}}
             scrape_timeout: {{.Values.prom_config.scrape_timeout}}
-            external_labels:
-              clusterUid: ${OBSERVE_CLUSTER}
           configs:
             - name: integrations
               host_filter: {{.Values.prom_config.host_filter}}
@@ -111,7 +109,7 @@ grafana-agent:
               wal_truncate_frequency: {{.Values.prom_config.wal_truncate_frequency}}
               remote_flush_deadline: {{.Values.prom_config.remote_flush_deadline}}
               remote_write:
-                - url: {{ include "observe.collectionEndpoint" . }}/v1/prometheus
+                - url: {{ include "observe.collectionEndpoint" . }}/v1/prometheus?clusterUid=${OBSERVE_CLUSTER}
                   authorization:
                     credentials: ${OBSERVE_TOKEN}
                   remote_timeout: {{.Values.prom_config.remote_timeout}}
