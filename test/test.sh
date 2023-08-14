@@ -73,8 +73,16 @@ for chart in "$@"; do
     $kc delete configmap/cluster-info 2>/dev/null || true
 done
 
+# Verifies that the charts can be installed together (in series) without naming conflicts
 echo "Installing charts in series (without wait/cleanup): $*"
 for chart in "$@"; do
     echo "Installing charts/$chart:"
     $helm install --debug test-$chart $repo/charts/$chart -f $repo/charts/$chart/ci/test-values.yaml
+done
+
+echo "Uninstalling charts in series: $*"
+for chart in "$@"; do
+    echo "Uninstalling charts/$chart:"
+    $helm uninstall --wait test-$chart 2>/dev/null
+    $kc delete configmap/cluster-info 2>/dev/null || true
 done
