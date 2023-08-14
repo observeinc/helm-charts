@@ -72,3 +72,9 @@ for chart in "$@"; do
     $helm uninstall --wait test-$chart 2>/dev/null
     $kc delete configmap/cluster-info 2>/dev/null || true
 done
+
+echo "Installing charts in series (without wait/cleanup): $*"
+for chart in "$@"; do
+    echo "Installing charts/$chart:"
+    $helm install --debug test-$chart $repo/charts/$chart -f $repo/charts/$chart/ci/test-values.yaml
+done
