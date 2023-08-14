@@ -4,6 +4,7 @@ metadata:
   name: queries
   annotations:
     "helm.sh/hook": test
+    "helm.sh/hook-weight": "-1"
 data:
   # Queries have the format <JMESPath query> -> <matching regexp>.
   # This syntax is based on the syntax used in the JMESPath docs, which describe queries as:
