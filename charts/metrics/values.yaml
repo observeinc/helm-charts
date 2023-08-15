@@ -39,6 +39,9 @@ grafana-agent:
       # Note that each of the "drop" and "keep" actions are performed for each set
       # of metrics, so for a metric to be included, it must both *not* match the
       # "drop" regex, as well as match the "keep" regex.
+      #
+      # See https://prometheus.io/docs/prometheus/latest/configuration/configuration
+      # for details.
 
       kubelet_metric_drop_regex:
       kubelet_metric_keep_regex: (.*)
@@ -53,14 +56,16 @@ grafana-agent:
       resource_metric_drop_regex:
       resource_metric_keep_regex: (.*)
 
-      # https://prometheus.io/docs/prometheus/latest/configuration/configuration
-      # the following metrics are exported with 0 values in default cadvisor installs
-      # see
+      # The following metrics are exported with 0 values in default cadvisor installs.
       # - https://github.com/kubernetes/kubernetes/issues/60279
       # - https://github.com/google/cadvisor/issues/1672
       cadvisor_metric_drop_regex: container_(network_tcp_usage_total|network_udp_usage_total|tasks_state|cpu_load_average_10s)
-      # these are the metrics we use for our default boards
-      cadvisor_metric_keep_regex: container_(cpu_cfs_.*|spec_.*|cpu_cores|cpu_usage_seconds_total|memory_working_set_bytes|memory_usage_bytes|network_transmit_.*|network_receive_.*|fs_writes_total|fs_reads_total|file_descriptors)|machine_(cpu_cores|memory_bytes)
+      cadvisor_metric_keep_regex: container_(cpu_.*|spec_.*|memory_.*|network_.*|fs_.*|file_descriptors)|machine_(cpu_cores|memory_bytes)
+
+      # The following regex matches the minimal set of metrics that are used for the default
+      # Kubernetes board; `cadvisor_metric_keep_regex` can be set to this value if no additional
+      # cadvisor metrics are desired:
+      # container_(cpu_cfs_.*|spec_.*|cpu_cores|cpu_usage_seconds_total|memory_working_set_bytes|memory_usage_bytes|network_transmit_.*|network_receive_.*|fs_writes_total|fs_reads_total|file_descriptors)|machine_(cpu_cores|memory_bytes)
 
   controller:
     type: deployment
