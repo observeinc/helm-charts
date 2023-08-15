@@ -17,32 +17,55 @@ grafana-agent:
     observe_collector_insecure: false
     remote_timeout: 30s
     remote_flush_deadline: 1m
+    host_filter: "false"
+    wal_truncate_frequency: 30m
     scrape_interval: 15s
     scrape_timeout: 10s
-    scrape_body_size_limit: 50MB
-    scrape_cadvisor_action: keep
-    host_filter: "false"
-    # the following metrics are exported with 0 values in default cadvisor installs
-    # see
-    # - https://github.com/kubernetes/kubernetes/issues/60279
-    # - https://github.com/google/cadvisor/issues/1672
-    scrape_cadvisor_metric_drop_regex: container_(network_tcp_usage_total|network_udp_usage_total|tasks_state|cpu_load_average_10s)
-    # these are the metrics we use for our default boards
-    scrape_cadvisor_metric_keep_regex: container_(cpu_cfs_.*|spec_.*|cpu_cores|cpu_usage_seconds_total|memory_working_set_bytes|memory_usage_bytes|network_transmit_.*|network_receive_.*|fs_writes_total|fs_reads_total|file_descriptors)|machine_(cpu_cores|memory_bytes)
-    scrape_kubelet_action: drop
-    scrape_kubelet_metric_drop_regex:
-    scrape_kubelet_metric_keep_regex: (.*)
-    scrape_pod_action: keep
-    scrape_pod_namespace_drop_regex: (.*istio.*|.*ingress.*|kube-system)
-    scrape_pod_namespace_keep_regex: (.*)
-    scrape_pod_port_keep_regex: .*metrics
-    scrape_pod_metric_drop_regex: .*bucket
-    scrape_pod_metric_keep_regex: (.*)
-    scrape_resource_action: keep
-    scrape_resource_metric_drop_regex:
-    scrape_resource_metric_keep_regex: (.*)
-    scrape_sample_limit: 100000
-    wal_truncate_frequency: 30m
+    scrape_configs:
+      body_size_limit: 50MB
+      sample_limit: 100000
+
+      # The following block can be used to enable or disable entire prefix groups
+      # of metrics. See below for finer-grained filtering.
+      kubelet_action: drop  # drop all metrics matching kubelet_*
+      pod_action: keep  # keep all metrics matching pod_*
+      resource_action: keep  # keep all metrics matching resource_*
+      cadvisor_action: keep  # keep all metrics matching cadvisor_*
+
+      # For each prefix group of metrics, the following regex can be configured:
+      # *_drop_regex: Drop metrics for which regex matches the metric name.
+      # *_keep_regex: Drop metrics for which regex does not match the metric name.
+      #
+      # Note that each of the "drop" and "keep" actions are performed for each set
+      # of metrics, so for a metric to be included, it must both *not* match the
+      # "drop" regex, as well as match the "keep" regex.
+      #
+      # See https://prometheus.io/docs/prometheus/latest/configuration/configuration
+      # for details.
+
+      kubelet_metric_drop_regex:
+      kubelet_metric_keep_regex: (.*)
+
+      pod_namespace_drop_regex: (.*istio.*|.*ingress.*|kube-system)
+      pod_namespace_keep_regex: (.*)
+
+      pod_port_keep_regex: .*metrics
+      pod_metric_drop_regex: .*bucket
+      pod_metric_keep_regex: (.*)
+
+      resource_metric_drop_regex:
+      resource_metric_keep_regex: (.*)
+
+      # The following metrics are exported with 0 values in default cadvisor installs.
+      # - https://github.com/kubernetes/kubernetes/issues/60279
+      # - https://github.com/google/cadvisor/issues/1672
+      cadvisor_metric_drop_regex: container_(network_tcp_usage_total|network_udp_usage_total|tasks_state|cpu_load_average_10s)
+      cadvisor_metric_keep_regex: container_(cpu_.*|spec_.*|memory_.*|network_.*|fs_.*|file_descriptors)|machine_(cpu_cores|memory_bytes)
+
+      # The following regex matches the minimal set of metrics that are used for the default
+      # Kubernetes board; `cadvisor_metric_keep_regex` can be set to this value if no additional
+      # cadvisor metrics are desired:
+      # container_(cpu_cfs_.*|spec_.*|cpu_cores|cpu_usage_seconds_total|memory_working_set_bytes|memory_usage_bytes|network_transmit_.*|network_receive_.*|fs_writes_total|fs_reads_total|file_descriptors)|machine_(cpu_cores|memory_bytes)
 
   controller:
     type: deployment
@@ -93,57 +116,60 @@ grafana-agent:
 
     configMap:
       content: |
+        {{- $endpoint := include "observe.collectionEndpoint" . }}
+        {{- with .Values.prom_config}}
         server:
-          log_level: {{.Values.prom_config.log_level}}
+          log_level: {{.log_level}}
 
         metrics:
           wal_directory: /tmp/grafana-agent-wal
           global:
-            scrape_interval: {{.Values.prom_config.scrape_interval}}
-            scrape_timeout: {{.Values.prom_config.scrape_timeout}}
+            scrape_interval: {{.scrape_interval}}
+            scrape_timeout: {{.scrape_timeout}}
           configs:
             - name: integrations
-              host_filter: {{.Values.prom_config.host_filter}}
-              min_wal_time: {{.Values.prom_config.min_wal_time}}
-              max_wal_time: {{.Values.prom_config.max_wal_time}}
-              wal_truncate_frequency: {{.Values.prom_config.wal_truncate_frequency}}
-              remote_flush_deadline: {{.Values.prom_config.remote_flush_deadline}}
+              host_filter: {{.host_filter}}
+              min_wal_time: {{.min_wal_time}}
+              max_wal_time: {{.max_wal_time}}
+              wal_truncate_frequency: {{.wal_truncate_frequency}}
+              remote_flush_deadline: {{.remote_flush_deadline}}
               remote_write:
-                - url: {{ include "observe.collectionEndpoint" . }}/v1/prometheus?clusterUid=${OBSERVE_CLUSTER}
+                - url: {{ print $endpoint }}/v1/prometheus?clusterUid=${OBSERVE_CLUSTER}
                   authorization:
                     credentials: ${OBSERVE_TOKEN}
-                  remote_timeout: {{.Values.prom_config.remote_timeout}}
+                  remote_timeout: {{.remote_timeout}}
                   queue_config:
-                    batch_send_deadline: {{.Values.prom_config.batch_send_deadline}}
-                    min_backoff: {{.Values.prom_config.min_backoff}}
-                    max_backoff: {{.Values.prom_config.max_backoff}}
-                    max_shards: {{.Values.prom_config.max_shards}}
-                    max_samples_per_send: {{.Values.prom_config.max_samples_per_send}}
-                    capacity: {{.Values.prom_config.capacity}}
+                    batch_send_deadline: {{.batch_send_deadline}}
+                    min_backoff: {{.min_backoff}}
+                    max_backoff: {{.max_backoff}}
+                    max_shards: {{.max_shards}}
+                    max_samples_per_send: {{.max_samples_per_send}}
+                    capacity: {{.capacity}}
                   tls_config:
-                    insecure_skip_verify: {{.Values.prom_config.observe_collector_insecure}}
+                    insecure_skip_verify: {{.observe_collector_insecure}}
 
               scrape_configs:
+              {{- with .scrape_configs }}
                 - job_name: "integrations/kubernetes/pods"
                   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-                  sample_limit: {{.Values.prom_config.scrape_sample_limit}}
-                  body_size_limit: {{.Values.prom_config.scrape_body_size_limit}}
+                  sample_limit: {{.sample_limit}}
+                  body_size_limit: {{.body_size_limit}}
                   kubernetes_sd_configs:
                     - role: pod
                   relabel_configs:
-                    - action: {{.Values.prom_config.scrape_pod_action}}
+                    - action: {{.pod_action}}
                     # Drop anything matching the configured namespace.
                     - action: 'drop'
                       source_labels: ['__meta_kubernetes_namespace']
-                      regex: {{.Values.prom_config.scrape_pod_namespace_drop_regex}}
+                      regex: {{.pod_namespace_drop_regex}}
                     # Drop anything not matching the configured namespace.
                     - action: 'keep'
                       source_labels: ['__meta_kubernetes_namespace']
-                      regex: {{.Values.prom_config.scrape_pod_namespace_keep_regex}}
+                      regex: {{.pod_namespace_keep_regex}}
                     # Drop endpoints without one of: a port name suffixed with the configured regex, or an explicit prometheus port annotation.
                     - action: 'keep'
                       source_labels: ['__meta_kubernetes_pod_container_port_name', '__meta_kubernetes_pod_annotation_prometheus_io_port']
-                      regex: '({{.Values.prom_config.scrape_pod_port_keep_regex}};|.*;\d+)'
+                      regex: '({{.pod_port_keep_regex}};|.*;\d+)'
                     # Drop pods without a name label.
                     # - action: 'drop'
                     #   regex: ''
@@ -213,11 +239,11 @@ grafana-agent:
                       target_label: 'node'
                   metric_relabel_configs:
                     - action: drop
-                      regex: {{.Values.prom_config.scrape_pod_metric_drop_regex}}
+                      regex: {{.pod_metric_drop_regex}}
                       source_labels:
                         - __name__
                     - action: keep
-                      regex: {{.Values.prom_config.scrape_pod_metric_keep_regex}}
+                      regex: {{.pod_metric_keep_regex}}
                       source_labels:
                         - __name__
                   tls_config:
@@ -227,12 +253,12 @@ grafana-agent:
 
                 - job_name: "integrations/kubernetes/kubelet"
                   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-                  sample_limit: {{.Values.prom_config.scrape_sample_limit}}
-                  body_size_limit: {{.Values.prom_config.scrape_body_size_limit}}
+                  sample_limit: {{.sample_limit}}
+                  body_size_limit: {{.body_size_limit}}
                   kubernetes_sd_configs:
                     - role: node
                   relabel_configs:
-                    - action: {{.Values.prom_config.scrape_kubelet_action}}
+                    - action: {{.kubelet_action}}
                     - replacement: kubernetes.default.svc:443
                       target_label: __address__
                     - regex: (.+)
@@ -242,11 +268,11 @@ grafana-agent:
                       target_label: __metrics_path__
                   metric_relabel_configs:
                     - action: drop
-                      regex: {{.Values.prom_config.scrape_kubelet_metric_drop_regex}}
+                      regex: {{.kubelet_metric_drop_regex}}
                       source_labels:
                         - __name__
                     - action: keep
-                      regex: {{.Values.prom_config.scrape_kubelet_metric_keep_regex}}
+                      regex: {{.kubelet_metric_keep_regex}}
                       source_labels:
                         - __name__
                   scheme: https
@@ -257,12 +283,12 @@ grafana-agent:
 
                 - job_name: "integrations/kubernetes/resource"
                   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-                  sample_limit: {{.Values.prom_config.scrape_sample_limit}}
-                  body_size_limit: {{.Values.prom_config.scrape_body_size_limit}}
+                  sample_limit: {{.sample_limit}}
+                  body_size_limit: {{.body_size_limit}}
                   kubernetes_sd_configs:
                     - role: node
                   relabel_configs:
-                    - action: {{.Values.prom_config.scrape_resource_action}}
+                    - action: {{.resource_action}}
                     - replacement: kubernetes.default.svc:443
                       target_label: __address__
                     - regex: (.+)
@@ -272,11 +298,11 @@ grafana-agent:
                       target_label: __metrics_path__
                   metric_relabel_configs:
                     - action: drop
-                      regex: {{.Values.prom_config.scrape_resource_metric_drop_regex}}
+                      regex: {{.resource_metric_drop_regex}}
                       source_labels:
                         - __name__
                     - action: keep
-                      regex: {{.Values.prom_config.scrape_resource_metric_keep_regex}}
+                      regex: {{.resource_metric_keep_regex}}
                       source_labels:
                         - __name__
                   scheme: https
@@ -287,12 +313,12 @@ grafana-agent:
 
                 - job_name: "integrations/kubernetes/cadvisor"
                   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-                  sample_limit: {{.Values.prom_config.scrape_sample_limit}}
-                  body_size_limit: {{.Values.prom_config.scrape_body_size_limit}}
+                  sample_limit: {{.sample_limit}}
+                  body_size_limit: {{.body_size_limit}}
                   kubernetes_sd_configs:
                     - role: node
                   relabel_configs:
-                    - action: {{.Values.prom_config.scrape_cadvisor_action}}
+                    - action: {{.cadvisor_action}}
                     - replacement: kubernetes.default.svc:443
                       target_label: __address__
                     - regex: (.+)
@@ -308,11 +334,11 @@ grafana-agent:
                         - __name__
                         - image
                     - action: drop
-                      regex: {{.Values.prom_config.scrape_cadvisor_metric_drop_regex}}
+                      regex: {{.cadvisor_metric_drop_regex}}
                       source_labels:
                         - __name__
                     - action: keep
-                      regex: {{.Values.prom_config.scrape_cadvisor_metric_keep_regex}}
+                      regex: {{.cadvisor_metric_keep_regex}}
                       source_labels:
                         - __name__
                   scheme: https
@@ -320,3 +346,5 @@ grafana-agent:
                     ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
                     insecure_skip_verify: false
                     server_name: kubernetes
+              {{- end }}
+        {{- end }}
