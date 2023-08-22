@@ -18,13 +18,14 @@ func main() {
 		Use: "client",
 	}
 	checkCmd := &cobra.Command{
-		Use:   "check [-f queryfile] URL",
+		Use:   "check URL",
 		Short: "run queries from standard input against the response from the given URL",
 		Long:  "run queries from standard input against the response from the given URL",
 		Args:  cobra.MatchAll(cobra.ExactArgs(1)),
 		Run:   check,
 	}
-	checkCmd.Flags().StringP("queryfile", "f", "", "Read queries from the given file (if unset, queries will be read from stdin)")
+	checkCmd.Flags().StringSliceP("query", "q", []string{}, "specify query")
+	checkCmd.MarkFlagRequired("query")
 	clientCmd.AddCommand(checkCmd)
 
 	if err := clientCmd.Execute(); err != nil {
@@ -61,19 +62,15 @@ func check(cmd *cobra.Command, args []string) {
 		os.Exit(2)
 	}
 
-	f := os.Stdin
-	if fname, _ := cmd.Flags().GetString("queryfile"); fname != "" {
-		f, err = os.Open(fname)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "check: queryfile: %v\n", err)
-			os.Exit(2)
-		}
+	queries, err := cmd.Flags().GetStringSlice("query")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "check: load queries: %v\n", err)
+		os.Exit(2)
 	}
 
-	queryScanner := bufio.NewScanner(f)
 	status := 0
-	for queryScanner.Scan() {
-		query, err := newQuery(queryScanner.Text())
+	for _, query := range queries {
+		query, err := compileQuery(query)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "check: failed to compile query %s: %v\n", query, err)
 			os.Exit(2)
@@ -85,10 +82,6 @@ func check(cmd *cobra.Command, args []string) {
 			fmt.Printf("PASS: %d matches for %s\n", matches, query)
 		}
 	}
-	if err := queryScanner.Err(); err != nil {
-		fmt.Fprintf(os.Stderr, "check: scan queries: %v\n", err)
-		os.Exit(2)
-	}
 	os.Exit(status)
 }
 
@@ -99,7 +92,7 @@ type query struct {
 	patternCompiled *regexp.Regexp
 }
 
-func newQuery(s string) (*query, error) {
+func compileQuery(s string) (*query, error) {
 	var path, pattern string
 	n, err := fmt.Sscanf(s, "%s -> %s", &path, &pattern)
 	if err != nil {
