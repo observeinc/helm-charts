@@ -24,6 +24,6 @@ opentelemetry-collector:
         # to use percentagles instead of the _mib values
         limit_percentage: 75
         spike_limit_percentage: 20
-        # may need to explicitly unset default values specified
+        # must explicitly unset default values specified in the chart
         limit_mib: null
         spike_limit_mib: null
