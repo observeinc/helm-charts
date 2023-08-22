@@ -70,5 +70,4 @@ for chart in "$@"; do
     echo
 
     $helm uninstall --wait test-$chart 2>/dev/null
-    $kc delete configmap/cluster-info 2>/dev/null || true
 done
