@@ -21,7 +21,7 @@ opentelemetry-collector:
     processors:
       # https://github.com/open-telemetry/opentelemetry-collector/blob/main/processor/memorylimiterprocessor/README.md
       memory_limiter:
-        # to use percentagles instead of the _mib values
+        # to use percentages instead of the _mib values
         limit_percentage: 75
         spike_limit_percentage: 20
         # must explicitly unset default values specified in the chart
