@@ -1,0 +1,29 @@
+global:
+  observe:
+    collectionEndpoint: ""
+
+observe:
+  token:
+    value: ""
+
+opentelemetry-collector:
+  # overrides pod resource requests/limits
+  resources:
+    limits:
+      cpu: 250m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+  # overrides collector configuration
+  config:
+    processors:
+      # https://github.com/open-telemetry/opentelemetry-collector/blob/main/processor/memorylimiterprocessor/README.md
+      memory_limiter:
+        # to use percentages instead of the _mib values
+        limit_percentage: 75
+        spike_limit_percentage: 20
+        # must explicitly unset default values specified in the chart
+        limit_mib: null
+        spike_limit_mib: null
