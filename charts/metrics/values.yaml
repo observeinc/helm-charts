@@ -25,12 +25,12 @@ grafana-agent:
       body_size_limit: 50MB
       sample_limit: 100000
 
-      # The following block can be used to enable or disable entire prefix groups
-      # of metrics. See below for finer-grained filtering.
-      kubelet_action: drop  # drop all metrics matching kubelet_*
-      pod_action: keep  # keep all metrics matching pod_*
-      resource_action: keep  # keep all metrics matching resource_*
-      cadvisor_action: keep  # keep all metrics matching cadvisor_*
+      # The following block can be used to enable or disable scraping of metrics from
+      # the corresponding targets. See below for finer-grained filtering.
+      kubelet_action: drop  # set to "drop" to drop all kubelet metrics
+      pod_action: keep  # set to "drop" to drop all pod metrics
+      resource_action: keep  # set to "drop" to drop all resource metrics
+      cadvisor_action: keep  # set to "drop" to drop all cadvisor metrics
 
       # For each prefix group of metrics, the following regex can be configured:
       # *_drop_regex: Drop metrics for which regex matches the metric name.
@@ -66,6 +66,14 @@ grafana-agent:
       # Kubernetes board; `cadvisor_metric_keep_regex` can be set to this value if no additional
       # cadvisor metrics are desired:
       # container_(cpu_cfs_.*|spec_.*|cpu_cores|cpu_usage_seconds_total|memory_working_set_bytes|memory_usage_bytes|network_transmit_.*|network_receive_.*|fs_writes_total|fs_reads_total|file_descriptors)|machine_(cpu_cores|memory_bytes)
+
+    statsd_exporter:
+      # If enabled, the metrics service will listen for statsd metrics to republish to Observe.
+      enabled: false
+
+      # agent.extraPorts must also be updated when modifying these values.
+      protocol: udp  # allowed values are "udp" and "tcp"
+      port: 9125
 
   controller:
     type: deployment
@@ -107,6 +115,11 @@ grafana-agent:
             name: credentials
             key: OBSERVE_TOKEN
     listenPort: 12345
+    extraPorts:
+      - name: "statsd"
+        port: 9125
+        targetPort: 9125
+        protocol: "UDP"
     securityContext:
       runAsNonRoot: true
       runAsUser: 65534
@@ -120,6 +133,28 @@ grafana-agent:
         {{- with .Values.prom_config}}
         server:
           log_level: {{.log_level}}
+
+        {{ if .statsd_exporter.enabled -}}
+        integrations:
+          statsd_exporter:
+            enabled: true
+            scrape_integration: true
+            listen_{{ .statsd_exporter.protocol }}: ":{{ .statsd_exporter.port }}"
+          prometheus_remote_write:
+          - url: {{ print $endpoint }}/v1/prometheus?clusterUid=${OBSERVE_CLUSTER}
+            authorization:
+              credentials: ${OBSERVE_TOKEN}
+            remote_timeout: {{.remote_timeout}}
+            queue_config:
+              batch_send_deadline: {{.batch_send_deadline}}
+              min_backoff: {{.min_backoff}}
+              max_backoff: {{.max_backoff}}
+              max_shards: {{.max_shards}}
+              max_samples_per_send: {{.max_samples_per_send}}
+              capacity: {{.capacity}}
+            tls_config:
+              insecure_skip_verify: {{.observe_collector_insecure}}
+        {{ end -}}
 
         metrics:
           wal_directory: /tmp/grafana-agent-wal

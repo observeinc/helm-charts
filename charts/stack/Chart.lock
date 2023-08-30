@@ -4,12 +4,12 @@ dependencies:
   version: 0.1.5
 - name: metrics
   repository: file://../metrics
-  version: 0.1.7
+  version: 0.2.0
 - name: events
   repository: file://../events
   version: 0.1.8
 - name: proxy
   repository: file://../proxy
   version: 0.1.0
-digest: sha256:60d8d78cbaf489e3bd7a66b48ac319ab7a9690fb0809eaf1d4fd2d23fc6ab49a
-generated: "2023-08-14T16:09:37.082185-07:00"
+digest: sha256:aee2acbf3e653ef1488325c3b07a0332baa47dd2ab5582d0649a7e68bec5dcb1
+generated: "2023-08-29T17:25:36.61464-07:00"
