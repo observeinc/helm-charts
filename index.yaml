@@ -105,6 +105,35 @@ entries:
     version: 0.1.0
   stack:
   - apiVersion: v2
+    created: "2023-08-30T22:54:20.338013563Z"
+    dependencies:
+    - condition: logs.enabled
+      name: logs
+      repository: file://../logs
+      version: 0.1.5
+    - condition: metrics.enabled
+      name: metrics
+      repository: file://../metrics
+      version: 0.2.0
+    - condition: events.enabled
+      name: events
+      repository: file://../events
+      version: 0.1.8
+    - condition: proxy.enabled
+      name: proxy
+      repository: file://../proxy
+      version: 0.1.0
+    description: Observe Kubernetes agent stack
+    digest: 5716df0fd2def770621865cca954058c43613c97ffc09e19375e4c52921abec0
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: stack
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/stack-0.2.0/stack-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     created: "2023-08-22T23:45:13.775508366Z"
     dependencies:
     - condition: logs.enabled
@@ -559,4 +588,4 @@ entries:
     urls:
     - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.0/traces-0.1.0.tgz
     version: 0.1.0
-generated: "2023-08-22T23:45:13.931102966Z"
+generated: "2023-08-30T22:54:20.338166964Z"
