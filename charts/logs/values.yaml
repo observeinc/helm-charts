@@ -30,6 +30,8 @@ fluent-bit:
     requests:
       cpu: 100m
       memory: 128Mi
+  tolerations:
+    - operator: Exists
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
