@@ -1,7 +1,7 @@
 dependencies:
 - name: logs
   repository: file://../logs
-  version: 0.1.5
+  version: 0.1.6
 - name: metrics
   repository: file://../metrics
   version: 0.2.0
@@ -11,5 +11,5 @@ dependencies:
 - name: proxy
   repository: file://../proxy
   version: 0.1.0
-digest: sha256:aee2acbf3e653ef1488325c3b07a0332baa47dd2ab5582d0649a7e68bec5dcb1
-generated: "2023-08-29T17:25:36.61464-07:00"
+digest: sha256:c164f2e00b6d03630bcc953b334009d6741573888e3c248deee488e2754156bf
+generated: "2023-09-11T16:21:54.368678336-04:00"
