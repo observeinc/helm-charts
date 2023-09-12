@@ -19,6 +19,7 @@ Observe agent proxy (for testing only, do not use)
 | autoscaling.maxReplicas | int | `100` |  |
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
+| customLabels | object | `{}` |  |
 | fullnameOverride | string | `""` |  |
 | global.observe | object | `{}` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |

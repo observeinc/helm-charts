@@ -20,6 +20,7 @@ Observe kubernetes event collection
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| customLabels | object | `{}` |  |
 | global.observe | object | `{}` |  |
 | image.kube_cluster_info.repository | string | `"observeinc/kube-cluster-info"` |  |
 | image.kube_cluster_info.tag | string | `""` |  |

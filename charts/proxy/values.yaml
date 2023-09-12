@@ -2,6 +2,9 @@ global:
   # https://github.com/helm/helm/issues/8489 workaround
   observe: {}
 
+# Apply custom labels
+customLabels: {}
+
 replicaCount: 1
 
 image:
