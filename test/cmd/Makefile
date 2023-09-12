@@ -3,7 +3,7 @@ GOBUILD ?= true
 # Allows us to skip go build in CI, where the images will always be built anyway.
 # Locally, it's nice to skip rebuilding when there's been no changes, and having
 # the docker images depend on the go binaries means Make's incremental build
-# calculations work nicely. 
+# calculations work nicely.
 ifeq ($(GOBUILD), true)
 CLIENT_OUT = client.out
 COLLECTOR_OUT = collector.out
