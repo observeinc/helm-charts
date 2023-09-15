@@ -13,6 +13,8 @@ image:
     tag: ""
   pullPolicy: Always
 
+imagePullSecrets: []
+
 rbac:
   create: true
 

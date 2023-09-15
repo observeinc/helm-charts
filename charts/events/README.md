@@ -26,6 +26,7 @@ Observe kubernetes event collection
 | image.kube_state_events.repository | string | `"observeinc/kube-state-events"` |  |
 | image.kube_state_events.tag | string | `""` |  |
 | image.pullPolicy | string | `"Always"` |  |
+| imagePullSecrets | list | `[]` |  |
 | rbac.create | bool | `true` |  |
 | resources.limits.cpu | string | `"50m"` |  |
 | resources.limits.memory | string | `"256Mi"` |  |
