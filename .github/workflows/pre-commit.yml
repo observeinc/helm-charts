@@ -23,3 +23,25 @@ jobs:
       - uses: pre-commit/action@v3.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
+  check-chart-version-bump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.0.0
+
+      - name: Check if Chart.yaml versions are bumped if relevant
+        run: |
+          CHARTS="endpoint events logs metrics proxy stack traces"
+          for chart in $CHARTS; do
+            # Check if files within the chart directory have changed
+            if git diff --name-only origin/main...HEAD | grep -E "^charts/$chart/"; then
+              echo "Changes detected in charts/$chart/"
+
+              # Check if the Chart.yaml for this chart also has changes
+              if ! git diff --name-only origin/main...HEAD | grep -E "^charts/$chart/Chart.yaml"; then
+                echo "Error: Detected changes in charts/$chart/ but no changes in Chart.yaml."
+                exit 1
+              fi
+            fi
+          done
