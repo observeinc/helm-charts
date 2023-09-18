@@ -47,3 +47,13 @@ clean:
 .PHONY: build-test-images
 build-test-images:
 	make -C test/cmd all
+
+.PHONY: bump-version
+bump-version:
+	@for chart in $(CHARTS); do \
+		CHANGED_FILES=$$(git diff --name-only main...HEAD charts/$$chart/); \
+		if [ ! -z "$$CHANGED_FILES" ]; then \
+			echo "Files changed in charts/$$chart. Bumping version..."; \
+			./bump_version.sh charts/$$chart; \
+		fi; \
+	done
