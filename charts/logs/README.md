@@ -14,7 +14,7 @@ Observe logs collection
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../endpoint | endpoint | 0.1.4 |
+| file://../endpoint | endpoint | 0.1.5 |
 | https://fluent.github.io/helm-charts | fluent-bit | 0.25.0 |
 
 ## Values

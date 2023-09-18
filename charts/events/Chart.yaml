@@ -6,7 +6,7 @@ version: 0.1.10
 appVersion: v0.9.1
 dependencies:
   - name: endpoint
-    version: 0.1.4
+    version: 0.1.5
     repository: file://../endpoint
 maintainers:
   - name: Observe

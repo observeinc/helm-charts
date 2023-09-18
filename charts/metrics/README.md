@@ -14,7 +14,7 @@ Observe metrics collection
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../endpoint | endpoint | 0.1.4 |
+| file://../endpoint | endpoint | 0.1.5 |
 | https://grafana.github.io/helm-charts | grafana-agent | 0.10.0 |
 
 ## Values

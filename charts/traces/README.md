@@ -14,8 +14,8 @@ Observe OpenTelemetry trace collection
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../endpoint | endpoint | 0.1.4 |
-| file://../proxy | proxy | 0.1.1 |
+| file://../endpoint | endpoint | 0.1.5 |
+| file://../proxy | proxy | 0.1.2 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | opentelemetry-collector | 0.61.2 |
 
 ## Values

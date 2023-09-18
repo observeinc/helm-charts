@@ -14,7 +14,7 @@ Observe kubernetes event collection
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../endpoint | endpoint | 0.1.4 |
+| file://../endpoint | endpoint | 0.1.5 |
 
 ## Values
 
