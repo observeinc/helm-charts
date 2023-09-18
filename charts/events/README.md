@@ -1,6 +1,6 @@
 # events
 
-![Version: 0.1.9](https://img.shields.io/badge/Version-0.1.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.9.1](https://img.shields.io/badge/AppVersion-v0.9.1-informational?style=flat-square)
+![Version: 0.1.10](https://img.shields.io/badge/Version-0.1.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.9.1](https://img.shields.io/badge/AppVersion-v0.9.1-informational?style=flat-square)
 
 Observe kubernetes event collection
 
@@ -14,12 +14,13 @@ Observe kubernetes event collection
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../endpoint | endpoint | 0.1.4 |
+| file://../endpoint | endpoint | 0.1.5 |
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| customLabels | object | `{}` |  |
 | global.observe | object | `{}` |  |
 | image.kube_cluster_info.repository | string | `"observeinc/kube-cluster-info"` |  |
 | image.kube_cluster_info.tag | string | `""` |  |

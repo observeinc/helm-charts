@@ -2,6 +2,8 @@ global:
   # https://github.com/helm/helm/issues/8489 workaround
   observe: {}
 
+customLabels: {}
+
 image:
   kube_cluster_info:
     repository: observeinc/kube-cluster-info

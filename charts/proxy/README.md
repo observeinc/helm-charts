@@ -1,6 +1,6 @@
 # proxy
 
-![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.2](https://img.shields.io/badge/Version-0.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe agent proxy (for testing only, do not use)
 
@@ -19,6 +19,7 @@ Observe agent proxy (for testing only, do not use)
 | autoscaling.maxReplicas | int | `100` |  |
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
+| customLabels | object | `{}` |  |
 | fullnameOverride | string | `""` |  |
 | global.observe | object | `{}` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
