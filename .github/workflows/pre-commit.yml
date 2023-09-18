@@ -32,16 +32,4 @@ jobs:
 
       - name: Check if Chart.yaml versions are bumped if relevant
         run: |
-          CHARTS="endpoint events logs metrics proxy stack traces"
-          for chart in $CHARTS; do
-            # Check if files within the chart directory have changed
-            if git diff --name-only origin/main...HEAD | grep -E "^charts/$chart/"; then
-              echo "Changes detected in charts/$chart/"
-
-              # Check if the Chart.yaml for this chart also has changes
-              if ! git diff --name-only origin/main...HEAD | grep -E "^charts/$chart/Chart.yaml"; then
-                echo "Error: Detected changes in charts/$chart/ but no changes in Chart.yaml."
-                exit 1
-              fi
-            fi
-          done
+          make validate-chart-version
