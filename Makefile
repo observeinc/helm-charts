@@ -47,3 +47,26 @@ clean:
 .PHONY: build-test-images
 build-test-images:
 	make -C test/cmd all
+
+.PHONY: bump-version
+bump-version:
+	@for chart in $(CHARTS); do \
+		CHANGED_FILES=$$(git diff --name-only main...HEAD charts/$$chart/); \
+		if [ ! -z "$$CHANGED_FILES" ]; then \
+			echo "Files changed in charts/$$chart. Bumping version..."; \
+			./bump_version.sh charts/$$chart; \
+		fi; \
+	done
+
+.PHONY: validate-chart-version
+validate-chart-version:
+	@for chart in $(CHARTS); do \
+		CHANGED_FILES=$$(git diff --name-only origin/main...HEAD charts/$$chart/); \
+		if [ ! -z "$$CHANGED_FILES" ]; then \
+			CHART_VERSION_LINE=$$(git diff origin/main...HEAD charts/$$chart/Chart.yaml | grep '^+version:' | head -n 1); \
+			if [ -z "$$CHART_VERSION_LINE" ]; then \
+				echo "Error: charts/$$chart has changed, but Chart.yaml version has not been updated."; \
+				exit 1; \
+			fi; \
+		fi; \
+	done
