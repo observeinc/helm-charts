@@ -2,18 +2,18 @@ apiVersion: v2
 name: stack
 description: Observe Kubernetes agent stack
 type: application
-version: 0.3.3
+version: 0.3.4
 dependencies:
   - name: logs
-    version: 0.1.8
+    version: 0.1.9
     repository: file://../logs
     condition: logs.enabled
   - name: metrics
-    version: 0.3.2
+    version: 0.3.3
     repository: file://../metrics
     condition: metrics.enabled
   - name: events
-    version: 0.1.11
+    version: 0.1.12
     repository: file://../events
     condition: events.enabled
   - name: proxy
