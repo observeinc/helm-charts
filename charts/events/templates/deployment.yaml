@@ -73,7 +73,8 @@ spec:
             httpGet:
               path: /healthz
               port: 5171
-            timeoutSeconds: 5
-            failureThreshold: 10
+            initialDelaySeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 20
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

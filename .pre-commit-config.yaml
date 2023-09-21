@@ -10,7 +10,7 @@ repos:
   - id: check-merge-conflict
   - id: end-of-file-fixer
 - repo: https://github.com/norwoodj/helm-docs
-  rev: v1.2.0
+  rev: v1.11.2
   hooks:
     - id: helm-docs
       args:
