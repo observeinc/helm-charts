@@ -61,7 +61,7 @@ bump-version:
 .PHONY: validate-chart-version
 validate-chart-version:
 	@for chart in $(CHARTS); do \
-		CHANGED_FILES=$$(git diff --name-only origin/main...HEAD charts/$$chart/); \
+		CHANGED_FILES=$$(git diff --name-only origin/main...HEAD charts/$$chart/ | grep -v README.md); \
 		if [ ! -z "$$CHANGED_FILES" ]; then \
 			CHART_VERSION_LINE=$$(git diff origin/main...HEAD charts/$$chart/Chart.yaml | grep '^+version:' | head -n 1); \
 			if [ -z "$$CHART_VERSION_LINE" ]; then \
