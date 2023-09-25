@@ -2,7 +2,7 @@ apiVersion: v2
 name: stack
 description: Observe Kubernetes agent stack
 type: application
-version: 0.3.4
+version: 0.3.5
 dependencies:
   - name: logs
     version: 0.1.9
@@ -20,6 +20,10 @@ dependencies:
     version: 0.1.2
     repository: file://../proxy
     condition: proxy.enabled
+  - name: traces
+    version: 0.1.14
+    repository: file://../traces
+    condition: traces.enabled
 maintainers:
   - name: Observe
     email: support@observeinc.com
