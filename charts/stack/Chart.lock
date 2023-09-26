@@ -11,5 +11,8 @@ dependencies:
 - name: proxy
   repository: file://../proxy
   version: 0.1.2
-digest: sha256:a15cf6702e0566784f1397716cb39233eff50a1d7163aeb52ebb8abfee5c1b22
-generated: "2023-09-21T15:14:22.267192043-04:00"
+- name: traces
+  repository: file://../traces
+  version: 0.1.14
+digest: sha256:065d405d58ec55f58b498c154a6ee61d3451f30bc7f01cd5b0bf8866927bcd62
+generated: "2023-09-22T16:02:29.616241267-04:00"
