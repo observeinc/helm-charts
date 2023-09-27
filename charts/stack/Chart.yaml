@@ -13,7 +13,7 @@ dependencies:
     repository: file://../metrics
     condition: metrics.enabled
   - name: events
-    version: 0.1.12
+    version: 0.1.13
     repository: file://../events
     condition: events.enabled
   - name: proxy
