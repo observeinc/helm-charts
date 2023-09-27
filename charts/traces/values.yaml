@@ -112,10 +112,6 @@ opentelemetry-collector:
           queue_size: 100
         retry_on_failure:
           enabled: true
-      prometheusremotewrite:
-        endpoint: '{{ include "observe.collectionEndpoint" . }}/v1/prometheus'
-        headers:
-          authorization: "Bearer ${OBSERVE_TOKEN}"
     extensions:
       health_check: {}
       zpages: {}
@@ -161,4 +157,4 @@ opentelemetry-collector:
         metrics:
           receivers: [otlp]
           processors: [resource, k8sattributes, memory_limiter, batch]
-          exporters: [prometheusremotewrite, logging]
+          exporters: [otlphttp, logging]
