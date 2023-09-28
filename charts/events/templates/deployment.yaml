@@ -1,3 +1,4 @@
+{{- if not .Values.useJob }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -79,3 +80,4 @@ spec:
             failureThreshold: 20
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+{{- end}}

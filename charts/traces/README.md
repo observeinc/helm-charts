@@ -1,6 +1,6 @@
 # traces
 
-![Version: 0.1.14](https://img.shields.io/badge/Version-0.1.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.15](https://img.shields.io/badge/Version-0.1.15-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe OpenTelemetry trace collection
 
@@ -42,8 +42,6 @@ Observe OpenTelemetry trace collection
 | opentelemetry-collector.config.exporters.otlphttp.retry_on_failure.enabled | bool | `true` |  |
 | opentelemetry-collector.config.exporters.otlphttp.sending_queue.num_consumers | int | `4` |  |
 | opentelemetry-collector.config.exporters.otlphttp.sending_queue.queue_size | int | `100` |  |
-| opentelemetry-collector.config.exporters.prometheusremotewrite.endpoint | string | `"{{ include \"observe.collectionEndpoint\" . }}/v1/prometheus"` |  |
-| opentelemetry-collector.config.exporters.prometheusremotewrite.headers.authorization | string | `"Bearer ${OBSERVE_TOKEN}"` |  |
 | opentelemetry-collector.config.extensions.health_check | object | `{}` |  |
 | opentelemetry-collector.config.extensions.zpages | object | `{}` |  |
 | opentelemetry-collector.config.processors.batch | string | `nil` |  |
@@ -64,7 +62,7 @@ Observe OpenTelemetry trace collection
 | opentelemetry-collector.config.receivers.otlp.protocols.grpc | string | `nil` |  |
 | opentelemetry-collector.config.receivers.otlp.protocols.http | string | `nil` |  |
 | opentelemetry-collector.config.receivers.zipkin | string | `nil` |  |
-| opentelemetry-collector.config.service.pipelines.metrics.exporters[0] | string | `"prometheusremotewrite"` |  |
+| opentelemetry-collector.config.service.pipelines.metrics.exporters[0] | string | `"otlphttp"` |  |
 | opentelemetry-collector.config.service.pipelines.metrics.exporters[1] | string | `"logging"` |  |
 | opentelemetry-collector.config.service.pipelines.metrics.processors[0] | string | `"resource"` |  |
 | opentelemetry-collector.config.service.pipelines.metrics.processors[1] | string | `"k8sattributes"` |  |
