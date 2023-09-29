@@ -31,9 +31,19 @@ build-deps: add-repos
 test: build-deps build-test-images
 	test/test.sh stack traces
 
+# we need to re-run add-repos inside the docker container to lint correctly
+# also see https://github.com/helm/chart-testing/issues/464 about git safe.directory
 .PHONY: lint
 lint: build-deps
-	ct lint --all --helm-dependency-extra-args='--skip-refresh'
+	docker run --rm -v "$$(pwd):/workdir:cached" -w "/workdir/." quay.io/helmpack/chart-testing:latest /bin/bash -c "\
+		helm repo add observe https://observeinc.github.io/helm-charts ; \
+		helm repo add grafana https://grafana.github.io/helm-charts ; \
+		helm repo add fluent https://fluent.github.io/helm-charts ; \
+		helm repo add otel https://open-telemetry.github.io/opentelemetry-helm-charts ; \
+		helm repo up ; \
+		git config --global --add safe.directory /workdir ; \
+		ct lint --all --helm-dependency-extra-args='--skip-refresh' \
+		"
 
 .PHONY: clean
 clean:
