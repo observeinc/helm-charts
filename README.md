@@ -167,3 +167,11 @@ kubectl -n observe create secret generic credentials --from-literal='OBSERVE_TOK
 ```bash
 kubectl -n observe create secret generic otel-credentials --from-literal='OBSERVE_TOKEN=<opentelemetry datastream token>'
 ```
+
+# Build
+
+## Dependencies
+
+Kind needs to be installed in order to build and test this repository:
+
+https://kind.sigs.k8s.io/docs/user/quick-start/
