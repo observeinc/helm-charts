@@ -1,6 +1,6 @@
 # traces
 
-![Version: 0.1.15](https://img.shields.io/badge/Version-0.1.15-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe OpenTelemetry trace collection
 
@@ -62,6 +62,13 @@ Observe OpenTelemetry trace collection
 | opentelemetry-collector.config.receivers.otlp.protocols.grpc | string | `nil` |  |
 | opentelemetry-collector.config.receivers.otlp.protocols.http | string | `nil` |  |
 | opentelemetry-collector.config.receivers.zipkin | string | `nil` |  |
+| opentelemetry-collector.config.service.pipelines.logs.exporters[0] | string | `"otlphttp"` |  |
+| opentelemetry-collector.config.service.pipelines.logs.exporters[1] | string | `"logging"` |  |
+| opentelemetry-collector.config.service.pipelines.logs.processors[0] | string | `"resource"` |  |
+| opentelemetry-collector.config.service.pipelines.logs.processors[1] | string | `"k8sattributes"` |  |
+| opentelemetry-collector.config.service.pipelines.logs.processors[2] | string | `"memory_limiter"` |  |
+| opentelemetry-collector.config.service.pipelines.logs.processors[3] | string | `"batch"` |  |
+| opentelemetry-collector.config.service.pipelines.logs.receivers[0] | string | `"otlp"` |  |
 | opentelemetry-collector.config.service.pipelines.metrics.exporters[0] | string | `"otlphttp"` |  |
 | opentelemetry-collector.config.service.pipelines.metrics.exporters[1] | string | `"logging"` |  |
 | opentelemetry-collector.config.service.pipelines.metrics.processors[0] | string | `"resource"` |  |
