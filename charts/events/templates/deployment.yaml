@@ -25,6 +25,10 @@ spec:
       securityContext:
         runAsNonRoot: true
         runAsUser: 65534
+      {{- with .Values.tolerations }}
+      tolerations:
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
