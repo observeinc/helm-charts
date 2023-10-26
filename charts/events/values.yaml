@@ -11,11 +11,12 @@ image:
     repository: observeinc/kube-cluster-info
     # Overrides the image tag whose default is {{ .Chart.AppVersion }}
     tag: ""
+    pullPolicy: Always
   kube_state_events:
     repository: observeinc/kube-state-events
     # Overrides the image tag whose default is {{ .Chart.AppVersion }}
     tag: ""
-  pullPolicy: Always
+    pullPolicy: Always
 
 imagePullSecrets: []
 

@@ -22,11 +22,12 @@ Observe kubernetes event collection
 |-----|------|---------|-------------|
 | customLabels | object | `{}` |  |
 | global.observe | object | `{}` |  |
+| image.kube_cluster_info.pullPolicy | string | `"Always"` |  |
 | image.kube_cluster_info.repository | string | `"observeinc/kube-cluster-info"` |  |
 | image.kube_cluster_info.tag | string | `""` |  |
+| image.kube_state_events.pullPolicy | string | `"Always"` |  |
 | image.kube_state_events.repository | string | `"observeinc/kube-state-events"` |  |
 | image.kube_state_events.tag | string | `""` |  |
-| image.pullPolicy | string | `"Always"` |  |
 | imagePullSecrets | list | `[]` |  |
 | rbac.create | bool | `true` |  |
 | resources.limits.cpu | string | `"50m"` |  |
