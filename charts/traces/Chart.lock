@@ -7,6 +7,6 @@ dependencies:
   version: 0.1.6
 - name: proxy
   repository: file://../proxy
-  version: 0.1.2
-digest: sha256:47f04723f77c89ff7d56a3b5aa697e92bfbaf399a245dfcead6c45139db34a36
-generated: "2023-09-21T15:14:22.607797095-04:00"
+  version: 0.1.3
+digest: sha256:a4e81fd0864e1eff30d7f16cd7eafa069d9ce217e571f7deeccb0524bc7d37c4
+generated: "2023-10-31T10:43:26.113812146-04:00"
