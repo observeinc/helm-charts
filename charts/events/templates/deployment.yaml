@@ -25,6 +25,10 @@ spec:
       securityContext:
         runAsNonRoot: true
         runAsUser: 65534
+      {{- with .Values.tolerations }}
+      tolerations:
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -36,6 +40,7 @@ spec:
       initContainers:
         - name: kube-cluster-info
           image: {{ .Values.image.kube_cluster_info.repository }}:{{ default .Chart.AppVersion .Values.image.kube_cluster_info.tag }}
+          imagePullPolicy: {{ .Values.image.kube_cluster_info.pullPolicy }}
           env:
             - name: NAMESPACE
               valueFrom:
@@ -44,6 +49,7 @@ spec:
       containers:
         - name: kube-state-events
           image: {{ .Values.image.kube_state_events.repository }}:{{ default .Chart.AppVersion .Values.image.kube_state_events.tag }}
+          imagePullPolicy: {{ .Values.image.kube_state_events.pullPolicy }}
           args:
             - -healthz-addr=:5171
             - -metrics-addr=:9090
