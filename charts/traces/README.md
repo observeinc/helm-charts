@@ -1,6 +1,6 @@
 # traces
 
-![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.2.2](https://img.shields.io/badge/Version-0.2.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe OpenTelemetry trace collection
 
@@ -14,7 +14,7 @@ Observe OpenTelemetry trace collection
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../endpoint | endpoint | 0.1.6 |
+| file://../endpoint | endpoint | 0.1.7 |
 | file://../proxy | proxy | 0.1.3 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | opentelemetry-collector | 0.61.2 |
 
