@@ -1,0 +1,39 @@
+name: Bump Events Chart Version
+sources:
+  currentEventsVersion:
+    kind: githubrelease
+    spec:
+      owner: "observeinc"
+      repository: "helm-charts"
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      versionFilter:
+        kind: regex
+        pattern: "events-(.*)$"
+    transformers:
+      - trimprefix: "events-"
+conditions:
+  chartChanged:
+    name: "Check if charts/events/ has changes"
+    kind: shell
+    spec:
+      command: git diff --quiet --name-only origin/main...HEAD -- charts/events/ && git diff --quiet --name-only -- charts/events/ && exit 1 || exit 0
+    disablesourceinput: true
+targets:
+  updateEventsChart:
+    name: "Bump Patch Version"
+    kind: yaml
+    sourceid: currentEventsVersion
+    transformers:
+      - semverinc: "patch"
+    spec:
+      file: "charts/events/Chart.yaml"
+      key: "$.version"
+  updateStackChart:
+    name: "Update Stack Chart Dependency"
+    kind: yaml
+    sourceid: currentEventsVersion
+    transformers:
+      - semverinc: "patch"
+    spec:
+      file: "charts/stack/Chart.yaml"
+      key: "$.dependencies[2].version"

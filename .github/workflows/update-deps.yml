@@ -1,0 +1,46 @@
+name: Update via Updatecli
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0'  # Every Sunday at midnight
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Install and run updatecli
+      - name: Setup updatecli
+        uses: updatecli/updatecli-action@v2
+
+      - name: Run updatecli
+        run: make updatecli/all
+        env:
+          UPDATECLI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Use Peter Evans Pull Request Action to create a pull request
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore(deps): Update dependencies"
+          title: 'chore(deps): Update dependencies'
+          body: |
+            Updates dependencies using `updatecli`.
+
+            To force github actions to run add an empty commit to this branch
+
+            ```
+            git fetch
+            git checkout branch_name
+            git commit --allow-empty -m "Trigger GitHub Actions"
+            git push origin branch_name
+            ```
+          labels: automated-pr, update
+          draft: false

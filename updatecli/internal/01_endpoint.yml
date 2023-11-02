@@ -1,0 +1,67 @@
+name: Bump Endpoint Chart Version
+sources:
+  currentEndpointVersion:
+    kind: githubrelease
+    spec:
+      owner: "observeinc"
+      repository: "helm-charts"
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      versionFilter:
+        kind: regex
+        pattern: "endpoint-(.*)$"
+    transformers:
+      - trimprefix: "endpoint-"
+conditions:
+  chartChanged:
+    name: "Check if charts/endpoint/ has changes"
+    kind: shell
+    spec:
+      command: git diff --quiet --name-only origin/main...HEAD -- charts/endpoint/ && git diff --quiet --name-only -- charts/endpoint/ && exit 1 || exit 0
+
+    disablesourceinput: true
+targets:
+  updateEndpointChart:
+    name: "Bump Patch Version"
+    kind: yaml
+    sourceid: currentEndpointVersion
+    transformers:
+      - semverinc: "patch"
+    spec:
+      file: "charts/endpoint/Chart.yaml"
+      key: "$.version"
+  updateEventsChart:
+    name: "Update Events Chart Dependency"
+    kind: yaml
+    sourceid: currentEndpointVersion
+    transformers:
+      - semverinc: "patch"
+    spec:
+      file: "charts/events/Chart.yaml"
+      key: "$.dependencies[0].version"
+  updateLogsChart:
+    name: "Update Logs Chart Dependency"
+    kind: yaml
+    sourceid: currentEndpointVersion
+    transformers:
+      - semverinc: "patch"
+    spec:
+      file: "charts/logs/Chart.yaml"
+      key: "$.dependencies[1].version"
+  updateMetricsChart:
+    name: "Update Metrics Chart Dependency"
+    kind: yaml
+    sourceid: currentEndpointVersion
+    transformers:
+      - semverinc: "patch"
+    spec:
+      file: "charts/metrics/Chart.yaml"
+      key: "$.dependencies[1].version"
+  updateTracesChart:
+    name: "Update Traces Chart Dependency"
+    kind: yaml
+    sourceid: currentEndpointVersion
+    transformers:
+      - semverinc: "patch"
+    spec:
+      file: "charts/traces/Chart.yaml"
+      key: "$.dependencies[1].version"
