@@ -22,7 +22,7 @@ jobs:
           check-latest: true
 
       - name: Install chart-testing
-        uses: helm/chart-testing-action@v2.6.0
+        uses: helm/chart-testing-action@v2.6.1
         with:
           version: v3.8.0
 
