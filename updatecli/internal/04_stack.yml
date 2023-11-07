@@ -1,0 +1,30 @@
+name: Bump Stack Chart Version
+sources:
+  currentStackVersion:
+    kind: githubrelease
+    spec:
+      owner: "observeinc"
+      repository: "helm-charts"
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      versionFilter:
+        kind: regex
+        pattern: "stack-(.*)$"
+    transformers:
+      - trimprefix: "stack-"
+conditions:
+  chartChanged:
+    name: "Check if charts/stack/ has changes"
+    kind: shell
+    spec:
+      command: git diff --quiet --name-only origin/main...HEAD -- charts/stack/ && git diff --quiet --name-only -- charts/stack/ && exit 1 || exit 0
+    disablesourceinput: true
+targets:
+  updateStackChart:
+    name: "Bump Patch Version"
+    kind: yaml
+    sourceid: currentStackVersion
+    transformers:
+      - semverinc: "patch"
+    spec:
+      file: "charts/stack/Chart.yaml"
+      key: "$.version"

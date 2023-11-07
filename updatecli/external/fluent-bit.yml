@@ -1,0 +1,18 @@
+sources:
+  fluentBitChart:
+    kind: githubrelease
+    spec:
+      owner: "fluent"
+      repository: "helm-charts"
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      versionFilter:
+        kind: regex
+        pattern: "fluent-bit-(.*)$"
+    transformers:
+      - trimprefix: "fluent-bit-"
+targets:
+  updateFluentBitVersion:
+    kind: yaml
+    spec:
+      file: "charts/logs/Chart.yaml"
+      key: "$.dependencies[0].version"

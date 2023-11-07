@@ -1,0 +1,18 @@
+sources:
+  opentelemetryCollectorChart:
+    kind: githubrelease
+    spec:
+      owner: "open-telemetry"
+      repository: "opentelemetry-helm-charts"
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      versionFilter:
+        kind: regex
+        pattern: "opentelemetry-collector-(.*)$"
+    transformers:
+      - trimprefix: "opentelemetry-collector-"
+targets:
+  updateOpentelemetryCollectorVersion:
+    kind: yaml
+    spec:
+      file: "charts/traces/Chart.yaml"
+      key: "$.dependencies[0].version"

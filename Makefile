@@ -6,6 +6,25 @@ CHARTS := endpoint proxy events logs metrics stack traces
 .PHONY: all
 all: build-deps lint test
 
+.PHONY: updatecli/all
+updatecli/all: updatecli/external updatecli/internal
+
+.PHONY: updatecli/external
+updatecli/external:
+	@for file in updatecli/external/*.yml; do \
+		echo "Running updatecli for $$file..."; \
+		updatecli apply --config $$file; \
+	done
+	$(MAKE) update-deps
+
+.PHONY: updatecli/internal
+updatecli/internal:
+	@for file in updatecli/internal/*.yml; do \
+		echo "Running updatecli for $$file..."; \
+		updatecli apply --config $$file; \
+	done
+	$(MAKE) update-deps
+
 add-repos:
 	@helm repo add observe https://observeinc.github.io/helm-charts
 	@helm repo add grafana https://grafana.github.io/helm-charts

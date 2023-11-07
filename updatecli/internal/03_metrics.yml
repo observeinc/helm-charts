@@ -1,0 +1,39 @@
+name: Bump Metrics Chart Version
+sources:
+  currentMetricsVersion:
+    kind: githubrelease
+    spec:
+      owner: "observeinc"
+      repository: "helm-charts"
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      versionFilter:
+        kind: regex
+        pattern: "metrics-(.*)$"
+    transformers:
+      - trimprefix: "metrics-"
+conditions:
+  chartChanged:
+    name: "Check if charts/metrics/ has changes"
+    kind: shell
+    spec:
+      command: git diff --quiet --name-only origin/main...HEAD -- charts/metrics/ && git diff --quiet --name-only -- charts/metrics/ && exit 1 || exit 0
+    disablesourceinput: true
+targets:
+  updateMetricsChart:
+    name: "Bump Patch Version"
+    kind: yaml
+    sourceid: currentMetricsVersion
+    transformers:
+      - semverinc: "patch"
+    spec:
+      file: "charts/metrics/Chart.yaml"
+      key: "$.version"
+  updateStackChart:
+    name: "Update Stack Chart Dependency"
+    kind: yaml
+    sourceid: currentMetricsVersion
+    transformers:
+      - semverinc: "patch"
+    spec:
+      file: "charts/stack/Chart.yaml"
+      key: "$.dependencies[1].version"
