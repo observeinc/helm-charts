@@ -91,6 +91,13 @@ observe:
     value: <datastream token>
 ```
 
+## Kubernetes Event Batch Limits
+
+You can add `-collector-listerwatcher-limit batch_size` to the
+`kube-state-events` container args to adjust the batch size
+(default is 500). This can reduce initial memeory usage, which
+may allow you to run a smaller container.
+
 ## Sizing
 
 While the default configuration of the observe charts are intended to be appropriate for a variety of use cases,
