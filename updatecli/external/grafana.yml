@@ -7,7 +7,7 @@ sources:
       token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
       versionFilter:
         kind: regex
-        pattern: "grafana-agent-(.*)$"
+        pattern: '^grafana-agent-(\d+\.\d+\.\d+)$'
     transformers:
       - trimprefix: "grafana-agent-"
 targets:
