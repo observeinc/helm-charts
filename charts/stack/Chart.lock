@@ -7,12 +7,12 @@ dependencies:
   version: 0.3.6
 - name: events
   repository: file://../events
-  version: 0.1.17
+  version: 0.1.18
 - name: proxy
   repository: file://../proxy
   version: 0.1.3
 - name: traces
   repository: file://../traces
   version: 0.2.3
-digest: sha256:ef2814e6a2a92241ae1e9a6c65680eeae0bca2d0df0e0da6e28d4f06283dfe1d
-generated: "2023-11-08T13:25:12.286669039Z"
+digest: sha256:1b5d7badad8aab05b928e247b00373f3b773df9a788fd5959932e26ca6c51107
+generated: "2023-11-09T08:54:22.781964086-05:00"
