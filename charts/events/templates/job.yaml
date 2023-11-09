@@ -3,7 +3,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: kube-cluster-info-job-{{ randAlphaNum 5 | trunc 5 }}
+  name: kube-cluster-info-job-{{ randAlphaNum 5 | lower }}
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "kube-events.labels" . | nindent 4 }}
