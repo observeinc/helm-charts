@@ -20,6 +20,7 @@ proxy:
     value: "http://test-traces.testing.svc.cluster.local:4318"
 
 opentelemetry-collector:
+  fullnameOverride: "test-traces"
   mode: deployment
   replicaCount: 1
   resources:

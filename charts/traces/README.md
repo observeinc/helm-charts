@@ -1,6 +1,6 @@
 # traces
 
-![Version: 0.2.3](https://img.shields.io/badge/Version-0.2.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.2.4](https://img.shields.io/badge/Version-0.2.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe OpenTelemetry trace collection
 
@@ -93,6 +93,7 @@ Observe OpenTelemetry trace collection
 | opentelemetry-collector.extraEnvs[2].name | string | `"OBSERVE_TOKEN"` |  |
 | opentelemetry-collector.extraEnvs[2].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
 | opentelemetry-collector.extraEnvs[2].valueFrom.secretKeyRef.name | string | `"otel-credentials"` |  |
+| opentelemetry-collector.fullnameOverride | string | `"observe-traces"` |  |
 | opentelemetry-collector.image.tag | string | `"0.62.1"` |  |
 | opentelemetry-collector.livenessProbe.initialDelaySeconds | int | `5` |  |
 | opentelemetry-collector.mode | string | `"daemonset"` |  |
