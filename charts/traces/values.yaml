@@ -9,8 +9,6 @@ proxy:
 opentelemetry-collector:
   fullnameOverride: "observe-traces"
   nameOverride: traces
-  image:
-    tag: "0.62.1"
   mode: "daemonset"  # daemonset or deployment
   service:
     enabled: true
@@ -31,6 +29,7 @@ opentelemetry-collector:
           - ""
         resources:
           - pods
+          - namespaces
         verbs:
           - get
           - list
@@ -73,15 +72,6 @@ opentelemetry-collector:
     jaeger-grpc:
       enabled: false
   extraEnvs:
-    - name: NODE_NAME
-      valueFrom:
-        fieldRef:
-          fieldPath: spec.nodeName
-    - name: OBSERVE_CLUSTER
-      valueFrom:
-        configMapKeyRef:
-          name: cluster-info
-          key: id
     - name: OBSERVE_TOKEN
       valueFrom:
         secretKeyRef:
@@ -120,21 +110,20 @@ opentelemetry-collector:
       probabilistic_sampler:
         hash_seed: 22
         sampling_percentage: 100
-      resource:
-        attributes:
-          - key: k8s.cluster.uid
-            value: "${OBSERVE_CLUSTER}"
-            action: insert
       k8sattributes:
         passthrough: false
+        filter:
+          node_from_env_var: NODE_NAME
         extract:
           metadata:
             - k8s.pod.name
             - k8s.namespace.name
+            - k8s.cluster.uid
         pod_association:
-          - from: resource_attribute
-            name: k8s.pod.ip
-          - from: connection
+          - sources:
+              - from: resource_attribute
+                name: k8s.pod.ip
+              - from: connection
       batch:
       memory_limiter:
         # 80% of maximum memory up to 2G
@@ -153,13 +142,13 @@ opentelemetry-collector:
       pipelines:
         traces:
           receivers: [otlp, zipkin]
-          processors: [resource, probabilistic_sampler, k8sattributes, memory_limiter, batch]
+          processors: [probabilistic_sampler, k8sattributes, memory_limiter, batch]
           exporters: [otlphttp, logging]
         metrics:
           receivers: [otlp]
-          processors: [resource, k8sattributes, memory_limiter, batch]
+          processors: [k8sattributes, memory_limiter, batch]
           exporters: [otlphttp, logging]
         logs:
           receivers: [otlp]
-          processors: [resource, k8sattributes, memory_limiter, batch]
+          processors: [k8sattributes, memory_limiter, batch]
           exporters: [otlphttp, logging]

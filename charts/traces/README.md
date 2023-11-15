@@ -1,6 +1,6 @@
 # traces
 
-![Version: 0.2.4](https://img.shields.io/badge/Version-0.2.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.2.5](https://img.shields.io/badge/Version-0.2.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe OpenTelemetry trace collection
 
@@ -16,7 +16,7 @@ Observe OpenTelemetry trace collection
 |------------|------|---------|
 | file://../endpoint | endpoint | 0.1.7 |
 | file://../proxy | proxy | 0.1.3 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | opentelemetry-collector | 0.69.0 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | opentelemetry-collector | 0.73.1 |
 
 ## Values
 
@@ -32,6 +32,7 @@ Observe OpenTelemetry trace collection
 | opentelemetry-collector.clusterRole.create | bool | `true` |  |
 | opentelemetry-collector.clusterRole.rules[0].apiGroups[0] | string | `""` |  |
 | opentelemetry-collector.clusterRole.rules[0].resources[0] | string | `"pods"` |  |
+| opentelemetry-collector.clusterRole.rules[0].resources[1] | string | `"namespaces"` |  |
 | opentelemetry-collector.clusterRole.rules[0].verbs[0] | string | `"get"` |  |
 | opentelemetry-collector.clusterRole.rules[0].verbs[1] | string | `"list"` |  |
 | opentelemetry-collector.clusterRole.rules[0].verbs[2] | string | `"watch"` |  |
@@ -47,54 +48,44 @@ Observe OpenTelemetry trace collection
 | opentelemetry-collector.config.processors.batch | string | `nil` |  |
 | opentelemetry-collector.config.processors.k8sattributes.extract.metadata[0] | string | `"k8s.pod.name"` |  |
 | opentelemetry-collector.config.processors.k8sattributes.extract.metadata[1] | string | `"k8s.namespace.name"` |  |
+| opentelemetry-collector.config.processors.k8sattributes.extract.metadata[2] | string | `"k8s.cluster.uid"` |  |
+| opentelemetry-collector.config.processors.k8sattributes.filter.node_from_env_var | string | `"NODE_NAME"` |  |
 | opentelemetry-collector.config.processors.k8sattributes.passthrough | bool | `false` |  |
-| opentelemetry-collector.config.processors.k8sattributes.pod_association[0].from | string | `"resource_attribute"` |  |
-| opentelemetry-collector.config.processors.k8sattributes.pod_association[0].name | string | `"k8s.pod.ip"` |  |
-| opentelemetry-collector.config.processors.k8sattributes.pod_association[1].from | string | `"connection"` |  |
+| opentelemetry-collector.config.processors.k8sattributes.pod_association[0].sources[0].from | string | `"resource_attribute"` |  |
+| opentelemetry-collector.config.processors.k8sattributes.pod_association[0].sources[0].name | string | `"k8s.pod.ip"` |  |
+| opentelemetry-collector.config.processors.k8sattributes.pod_association[0].sources[1].from | string | `"connection"` |  |
 | opentelemetry-collector.config.processors.memory_limiter.check_interval | string | `"5s"` |  |
 | opentelemetry-collector.config.processors.memory_limiter.limit_mib | int | `192` |  |
 | opentelemetry-collector.config.processors.memory_limiter.spike_limit_mib | int | `100` |  |
 | opentelemetry-collector.config.processors.probabilistic_sampler.hash_seed | int | `22` |  |
 | opentelemetry-collector.config.processors.probabilistic_sampler.sampling_percentage | int | `100` |  |
-| opentelemetry-collector.config.processors.resource.attributes[0].action | string | `"insert"` |  |
-| opentelemetry-collector.config.processors.resource.attributes[0].key | string | `"k8s.cluster.uid"` |  |
-| opentelemetry-collector.config.processors.resource.attributes[0].value | string | `"${OBSERVE_CLUSTER}"` |  |
 | opentelemetry-collector.config.receivers.otlp.protocols.grpc | string | `nil` |  |
 | opentelemetry-collector.config.receivers.otlp.protocols.http | string | `nil` |  |
 | opentelemetry-collector.config.receivers.zipkin | string | `nil` |  |
 | opentelemetry-collector.config.service.pipelines.logs.exporters[0] | string | `"otlphttp"` |  |
 | opentelemetry-collector.config.service.pipelines.logs.exporters[1] | string | `"logging"` |  |
-| opentelemetry-collector.config.service.pipelines.logs.processors[0] | string | `"resource"` |  |
-| opentelemetry-collector.config.service.pipelines.logs.processors[1] | string | `"k8sattributes"` |  |
-| opentelemetry-collector.config.service.pipelines.logs.processors[2] | string | `"memory_limiter"` |  |
-| opentelemetry-collector.config.service.pipelines.logs.processors[3] | string | `"batch"` |  |
+| opentelemetry-collector.config.service.pipelines.logs.processors[0] | string | `"k8sattributes"` |  |
+| opentelemetry-collector.config.service.pipelines.logs.processors[1] | string | `"memory_limiter"` |  |
+| opentelemetry-collector.config.service.pipelines.logs.processors[2] | string | `"batch"` |  |
 | opentelemetry-collector.config.service.pipelines.logs.receivers[0] | string | `"otlp"` |  |
 | opentelemetry-collector.config.service.pipelines.metrics.exporters[0] | string | `"otlphttp"` |  |
 | opentelemetry-collector.config.service.pipelines.metrics.exporters[1] | string | `"logging"` |  |
-| opentelemetry-collector.config.service.pipelines.metrics.processors[0] | string | `"resource"` |  |
-| opentelemetry-collector.config.service.pipelines.metrics.processors[1] | string | `"k8sattributes"` |  |
-| opentelemetry-collector.config.service.pipelines.metrics.processors[2] | string | `"memory_limiter"` |  |
-| opentelemetry-collector.config.service.pipelines.metrics.processors[3] | string | `"batch"` |  |
+| opentelemetry-collector.config.service.pipelines.metrics.processors[0] | string | `"k8sattributes"` |  |
+| opentelemetry-collector.config.service.pipelines.metrics.processors[1] | string | `"memory_limiter"` |  |
+| opentelemetry-collector.config.service.pipelines.metrics.processors[2] | string | `"batch"` |  |
 | opentelemetry-collector.config.service.pipelines.metrics.receivers[0] | string | `"otlp"` |  |
 | opentelemetry-collector.config.service.pipelines.traces.exporters[0] | string | `"otlphttp"` |  |
 | opentelemetry-collector.config.service.pipelines.traces.exporters[1] | string | `"logging"` |  |
-| opentelemetry-collector.config.service.pipelines.traces.processors[0] | string | `"resource"` |  |
-| opentelemetry-collector.config.service.pipelines.traces.processors[1] | string | `"probabilistic_sampler"` |  |
-| opentelemetry-collector.config.service.pipelines.traces.processors[2] | string | `"k8sattributes"` |  |
-| opentelemetry-collector.config.service.pipelines.traces.processors[3] | string | `"memory_limiter"` |  |
-| opentelemetry-collector.config.service.pipelines.traces.processors[4] | string | `"batch"` |  |
+| opentelemetry-collector.config.service.pipelines.traces.processors[0] | string | `"probabilistic_sampler"` |  |
+| opentelemetry-collector.config.service.pipelines.traces.processors[1] | string | `"k8sattributes"` |  |
+| opentelemetry-collector.config.service.pipelines.traces.processors[2] | string | `"memory_limiter"` |  |
+| opentelemetry-collector.config.service.pipelines.traces.processors[3] | string | `"batch"` |  |
 | opentelemetry-collector.config.service.pipelines.traces.receivers[0] | string | `"otlp"` |  |
 | opentelemetry-collector.config.service.pipelines.traces.receivers[1] | string | `"zipkin"` |  |
-| opentelemetry-collector.extraEnvs[0].name | string | `"NODE_NAME"` |  |
-| opentelemetry-collector.extraEnvs[0].valueFrom.fieldRef.fieldPath | string | `"spec.nodeName"` |  |
-| opentelemetry-collector.extraEnvs[1].name | string | `"OBSERVE_CLUSTER"` |  |
-| opentelemetry-collector.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"id"` |  |
-| opentelemetry-collector.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
-| opentelemetry-collector.extraEnvs[2].name | string | `"OBSERVE_TOKEN"` |  |
-| opentelemetry-collector.extraEnvs[2].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
-| opentelemetry-collector.extraEnvs[2].valueFrom.secretKeyRef.name | string | `"otel-credentials"` |  |
+| opentelemetry-collector.extraEnvs[0].name | string | `"OBSERVE_TOKEN"` |  |
+| opentelemetry-collector.extraEnvs[0].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
+| opentelemetry-collector.extraEnvs[0].valueFrom.secretKeyRef.name | string | `"otel-credentials"` |  |
 | opentelemetry-collector.fullnameOverride | string | `"observe-traces"` |  |
-| opentelemetry-collector.image.tag | string | `"0.62.1"` |  |
 | opentelemetry-collector.livenessProbe.initialDelaySeconds | int | `5` |  |
 | opentelemetry-collector.mode | string | `"daemonset"` |  |
 | opentelemetry-collector.nameOverride | string | `"traces"` |  |
