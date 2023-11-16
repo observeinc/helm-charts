@@ -1,6 +1,6 @@
 # traces
 
-![Version: 0.2.5](https://img.shields.io/badge/Version-0.2.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.2.6](https://img.shields.io/badge/Version-0.2.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe OpenTelemetry trace collection
 
@@ -46,14 +46,14 @@ Observe OpenTelemetry trace collection
 | opentelemetry-collector.config.extensions.health_check | object | `{}` |  |
 | opentelemetry-collector.config.extensions.zpages | object | `{}` |  |
 | opentelemetry-collector.config.processors.batch | string | `nil` |  |
+| opentelemetry-collector.config.processors.k8sattributes.auth_type | string | `"serviceAccount"` |  |
 | opentelemetry-collector.config.processors.k8sattributes.extract.metadata[0] | string | `"k8s.pod.name"` |  |
 | opentelemetry-collector.config.processors.k8sattributes.extract.metadata[1] | string | `"k8s.namespace.name"` |  |
 | opentelemetry-collector.config.processors.k8sattributes.extract.metadata[2] | string | `"k8s.cluster.uid"` |  |
-| opentelemetry-collector.config.processors.k8sattributes.filter.node_from_env_var | string | `"NODE_NAME"` |  |
 | opentelemetry-collector.config.processors.k8sattributes.passthrough | bool | `false` |  |
 | opentelemetry-collector.config.processors.k8sattributes.pod_association[0].sources[0].from | string | `"resource_attribute"` |  |
 | opentelemetry-collector.config.processors.k8sattributes.pod_association[0].sources[0].name | string | `"k8s.pod.ip"` |  |
-| opentelemetry-collector.config.processors.k8sattributes.pod_association[0].sources[1].from | string | `"connection"` |  |
+| opentelemetry-collector.config.processors.k8sattributes.pod_association[1].sources[0].from | string | `"connection"` |  |
 | opentelemetry-collector.config.processors.memory_limiter.check_interval | string | `"5s"` |  |
 | opentelemetry-collector.config.processors.memory_limiter.limit_mib | int | `192` |  |
 | opentelemetry-collector.config.processors.memory_limiter.spike_limit_mib | int | `100` |  |
