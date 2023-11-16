@@ -111,9 +111,8 @@ opentelemetry-collector:
         hash_seed: 22
         sampling_percentage: 100
       k8sattributes:
+        auth_type: serviceAccount
         passthrough: false
-        filter:
-          node_from_env_var: NODE_NAME
         extract:
           metadata:
             - k8s.pod.name
@@ -123,6 +122,7 @@ opentelemetry-collector:
           - sources:
               - from: resource_attribute
                 name: k8s.pod.ip
+          - sources:
               - from: connection
       batch:
       memory_limiter:
