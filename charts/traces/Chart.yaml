@@ -5,7 +5,7 @@ type: application
 version: 0.2.7
 dependencies:
   - name: opentelemetry-collector
-    version: 0.74.0
+    version: 0.74.1
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
   - name: endpoint
     version: 0.1.7

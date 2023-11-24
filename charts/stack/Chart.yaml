@@ -9,7 +9,7 @@ dependencies:
     repository: file://../logs
     condition: logs.enabled
   - name: metrics
-    version: 0.3.6
+    version: 0.3.7
     repository: file://../metrics
     condition: metrics.enabled
   - name: events
