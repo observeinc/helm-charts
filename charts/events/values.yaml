@@ -4,8 +4,6 @@ global:
 
 customLabels: {}
 
-useJob: false
-
 image:
   kube_cluster_info:
     repository: observeinc/kube-cluster-info
