@@ -25,6 +25,11 @@ grafana-agent:
       body_size_limit: 50MB
       sample_limit: 100000
 
+      pod_interval: 60s
+      kubelet_interval:
+      resource_interval:
+      cadvisor_interval:
+
       # The following block can be used to enable or disable scraping of metrics from
       # the corresponding targets. See below for finer-grained filtering.
       kubelet_action: drop  # set to "drop" to drop all kubelet metrics
@@ -187,6 +192,7 @@ grafana-agent:
               {{- with .scrape_configs }}
                 - job_name: "integrations/kubernetes/pods"
                   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+                  scrape_interval: {{.pod_interval}}
                   sample_limit: {{.sample_limit}}
                   body_size_limit: {{.body_size_limit}}
                   kubernetes_sd_configs:
@@ -288,6 +294,7 @@ grafana-agent:
 
                 - job_name: "integrations/kubernetes/kubelet"
                   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+                  scrape_interval: {{.kubelet_interval}}
                   sample_limit: {{.sample_limit}}
                   body_size_limit: {{.body_size_limit}}
                   kubernetes_sd_configs:
@@ -318,6 +325,7 @@ grafana-agent:
 
                 - job_name: "integrations/kubernetes/resource"
                   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+                  scrape_interval: {{.resource_interval}}
                   sample_limit: {{.sample_limit}}
                   body_size_limit: {{.body_size_limit}}
                   kubernetes_sd_configs:
@@ -348,6 +356,7 @@ grafana-agent:
 
                 - job_name: "integrations/kubernetes/cadvisor"
                   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+                  scrape_interval: {{.cadvisor_interval}}
                   sample_limit: {{.sample_limit}}
                   body_size_limit: {{.body_size_limit}}
                   kubernetes_sd_configs:
