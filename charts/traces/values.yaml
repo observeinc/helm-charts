@@ -95,7 +95,7 @@ opentelemetry-collector:
       logging:
         loglevel: info
       otlphttp:
-        endpoint: '{{ include "observe.collectionEndpoint" . }}/v1/otel'
+        endpoint: '{{ include "observe.collectionEndpoint" . }}/v2/otel'
         headers:
           authorization: "Bearer ${OBSERVE_TOKEN}"
         sending_queue:
