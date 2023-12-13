@@ -1,6 +1,6 @@
 # traces
 
-![Version: 0.2.7](https://img.shields.io/badge/Version-0.2.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.2.8](https://img.shields.io/badge/Version-0.2.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe OpenTelemetry trace collection
 
@@ -38,7 +38,7 @@ Observe OpenTelemetry trace collection
 | opentelemetry-collector.clusterRole.rules[0].verbs[2] | string | `"watch"` |  |
 | opentelemetry-collector.command.extraArgs[0] | string | `"--set=service.telemetry.metrics.address=:58888"` |  |
 | opentelemetry-collector.config.exporters.logging.loglevel | string | `"info"` |  |
-| opentelemetry-collector.config.exporters.otlphttp.endpoint | string | `"{{ include \"observe.collectionEndpoint\" . }}/v1/otel"` |  |
+| opentelemetry-collector.config.exporters.otlphttp.endpoint | string | `"{{ include \"observe.collectionEndpoint\" . }}/v2/otel"` |  |
 | opentelemetry-collector.config.exporters.otlphttp.headers.authorization | string | `"Bearer ${OBSERVE_TOKEN}"` |  |
 | opentelemetry-collector.config.exporters.otlphttp.retry_on_failure.enabled | bool | `true` |  |
 | opentelemetry-collector.config.exporters.otlphttp.sending_queue.num_consumers | int | `4` |  |
