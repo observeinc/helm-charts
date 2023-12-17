@@ -1,12 +1,12 @@
 dependencies:
 - name: opentelemetry-collector
   repository: https://open-telemetry.github.io/opentelemetry-helm-charts
-  version: 0.74.1
+  version: 0.77.0
 - name: endpoint
   repository: file://../endpoint
   version: 0.1.7
 - name: proxy
   repository: file://../proxy
   version: 0.1.3
-digest: sha256:0a975eb395f7545823cc1d2bb4e3bec5b59df61897af7faa5a742c4709885e68
-generated: "2023-11-24T10:05:21.399034568-05:00"
+digest: sha256:8e3ab1a3b8e982cc1ac8f5638ca4a86ea991fe86b87bbf036059b29d807e0483
+generated: "2023-12-17T00:17:57.734344566Z"
