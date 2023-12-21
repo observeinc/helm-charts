@@ -4,9 +4,9 @@ dependencies:
   version: 0.77.0
 - name: endpoint
   repository: file://../endpoint
-  version: 0.1.7
+  version: 0.1.8
 - name: proxy
   repository: file://../proxy
-  version: 0.1.3
-digest: sha256:8e3ab1a3b8e982cc1ac8f5638ca4a86ea991fe86b87bbf036059b29d807e0483
-generated: "2023-12-17T00:17:57.734344566Z"
+  version: 0.1.4
+digest: sha256:3124a89fc2e459f135aa44ab98b9f24afcba688a7334c42a6900b2f56b4513ed
+generated: "2023-12-21T13:35:27.469319-08:00"
