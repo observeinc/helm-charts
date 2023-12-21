@@ -6,4 +6,4 @@ dependencies:
   repository: file://../endpoint
   version: 0.1.8
 digest: sha256:596eeaee92fec5f5379fe1b7253318d8b2f5c51d5ef55c7fcabe943ce37a4fb4
-generated: "2023-12-21T13:35:25.562042-08:00"
+generated: "2023-12-21T15:57:17.875581-08:00"

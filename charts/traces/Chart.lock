@@ -9,4 +9,4 @@ dependencies:
   repository: file://../proxy
   version: 0.1.4
 digest: sha256:3124a89fc2e459f135aa44ab98b9f24afcba688a7334c42a6900b2f56b4513ed
-generated: "2023-12-21T13:35:27.469319-08:00"
+generated: "2023-12-21T15:57:19.813099-08:00"
