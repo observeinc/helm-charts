@@ -2,11 +2,11 @@ apiVersion: v2
 name: events
 description: Observe kubernetes event collection
 type: application
-version: 0.1.19
-appVersion: v0.10.0
+version: 0.1.20
+appVersion: v0.11.1
 dependencies:
   - name: endpoint
-    version: 0.1.7
+    version: 0.1.8
     repository: file://../endpoint
 maintainers:
   - name: Observe
