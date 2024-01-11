@@ -1,6 +1,6 @@
 # logs
 
-![Version: 0.1.14](https://img.shields.io/badge/Version-0.1.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.15](https://img.shields.io/badge/Version-0.1.15-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe logs collection
 
@@ -15,7 +15,7 @@ Observe logs collection
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../endpoint | endpoint | 0.1.8 |
-| https://fluent.github.io/helm-charts | fluent-bit | 0.40.0 |
+| https://fluent.github.io/helm-charts | fluent-bit | 0.42.0 |
 
 ## Values
 
@@ -62,6 +62,7 @@ Observe logs collection
 | fluent-bit.env[2].valueFrom.fieldRef.fieldPath | string | `"spec.nodeName"` |  |
 | fluent-bit.env[3].name | string | `"NAMESPACE"` |  |
 | fluent-bit.env[3].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
+| fluent-bit.image.repository | string | `"fluent/fluent-bit"` |  |
 | fluent-bit.nameOverride | string | `"logs"` |  |
 | fluent-bit.resources.limits.cpu | string | `"100m"` |  |
 | fluent-bit.resources.limits.memory | string | `"128Mi"` |  |
