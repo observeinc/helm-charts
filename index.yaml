@@ -246,6 +246,25 @@ entries:
     version: 0.1.8
   logs:
   - apiVersion: v2
+    created: "2024-01-11T22:30:39.415753284Z"
+    dependencies:
+    - name: fluent-bit
+      repository: https://fluent.github.io/helm-charts
+      version: 0.42.0
+    - name: endpoint
+      repository: file://../endpoint
+      version: 0.1.8
+    description: Observe logs collection
+    digest: efd343c21e9009c94e96f0ad02b836a8f951aaa00b3314ee51c70be0fc8eb16d
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: logs
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/logs-0.1.15/logs-0.1.15.tgz
+    version: 0.1.15
+  - apiVersion: v2
     created: "2023-12-22T00:46:56.068297058Z"
     dependencies:
     - name: fluent-bit
@@ -398,6 +417,25 @@ entries:
     - https://github.com/observeinc/helm-charts/releases/download/logs-0.1.5/logs-0.1.5.tgz
     version: 0.1.5
   metrics:
+  - apiVersion: v2
+    created: "2024-01-11T22:30:39.687259417Z"
+    dependencies:
+    - name: grafana-agent
+      repository: https://grafana.github.io/helm-charts
+      version: 0.31.0
+    - name: endpoint
+      repository: file://../endpoint
+      version: 0.1.8
+    description: Observe metrics collection
+    digest: 55d8327b23a0d87790984838cdd5171dda5bd66eaab1cd58a15596ae2c80eacd
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: metrics
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/metrics-0.3.11/metrics-0.3.11.tgz
+    version: 0.3.11
   - apiVersion: v2
     created: "2023-12-22T00:46:56.195773795Z"
     dependencies:
@@ -688,6 +726,39 @@ entries:
     - https://github.com/observeinc/helm-charts/releases/download/proxy-0.1.0/proxy-0.1.0.tgz
     version: 0.1.0
   stack:
+  - apiVersion: v2
+    created: "2024-01-11T22:30:39.953222944Z"
+    dependencies:
+    - condition: logs.enabled
+      name: logs
+      repository: file://../logs
+      version: 0.1.15
+    - condition: metrics.enabled
+      name: metrics
+      repository: file://../metrics
+      version: 0.3.11
+    - condition: events.enabled
+      name: events
+      repository: file://../events
+      version: 0.1.20
+    - condition: proxy.enabled
+      name: proxy
+      repository: file://../proxy
+      version: 0.1.4
+    - condition: traces.enabled
+      name: traces
+      repository: file://../traces
+      version: 0.2.10
+    description: Observe Kubernetes agent stack
+    digest: eafe9a8633b7fc330b422673e4897f8322569a3f68f9619e68bc8227413829ac
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: stack
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/stack-0.4.15/stack-0.4.15.tgz
+    version: 0.4.15
   - apiVersion: v2
     created: "2023-12-22T00:46:56.46341527Z"
     dependencies:
@@ -1640,6 +1711,29 @@ entries:
     version: 0.1.0
   traces:
   - apiVersion: v2
+    created: "2024-01-11T22:30:40.312179253Z"
+    dependencies:
+    - name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.78.0
+    - name: endpoint
+      repository: file://../endpoint
+      version: 0.1.8
+    - condition: proxy.enabled
+      name: proxy
+      repository: file://../proxy
+      version: 0.1.4
+    description: Observe OpenTelemetry trace collection
+    digest: 837d8ca746bf229671a7930f1e09135e062fd78cbdaccb04019143627b53a5a8
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: traces
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/traces-0.2.10/traces-0.2.10.tgz
+    version: 0.2.10
+  - apiVersion: v2
     created: "2023-12-22T00:46:56.674190106Z"
     dependencies:
     - name: opentelemetry-collector
@@ -2115,4 +2209,4 @@ entries:
     urls:
     - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.0/traces-0.1.0.tgz
     version: 0.1.0
-generated: "2023-12-22T00:46:56.67465222Z"
+generated: "2024-01-11T22:30:40.312617759Z"
