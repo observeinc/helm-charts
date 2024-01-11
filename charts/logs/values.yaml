@@ -3,6 +3,8 @@ global:
   observe: {}
 
 fluent-bit:
+  image:
+    repository: fluent/fluent-bit
   nameOverride: logs
   env:
     - name: OBSERVE_CLUSTER
