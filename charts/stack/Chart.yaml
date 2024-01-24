@@ -21,7 +21,7 @@ dependencies:
     repository: file://../proxy
     condition: proxy.enabled
   - name: traces
-    version: 0.2.11
+    version: 0.2.12
     repository: file://../traces
     condition: traces.enabled
 maintainers:

@@ -18,7 +18,7 @@ Observe Kubernetes agent stack
 | file://../logs | logs | 0.1.15 |
 | file://../metrics | metrics | 0.3.13 |
 | file://../proxy | proxy | 0.1.4 |
-| file://../traces | traces | 0.2.11 |
+| file://../traces | traces | 0.2.12 |
 
 ## Values
 
