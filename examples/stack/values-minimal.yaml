@@ -1,0 +1,45 @@
+global:
+  observe:
+    collectionEndpoint: ""
+
+observe:
+  token:
+    value: ""
+
+events:
+  resources:
+    limits:
+      cpu: 50m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 256Mi
+
+logs:
+  fluent-bit:
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    config:
+      mem_buf_limit: 10MB
+
+metrics:
+  grafana-agent:
+    prom_config:
+    scrape_configs:
+      cadvisor_action: drop
+      kubelet_action: keep
+      pod_action: drop
+      resource_action: keep
+    agent:
+      resources:
+        limits:
+          cpu: 250m
+          memory: 2Gi
+        requests:
+          cpu: 250m
+          memory: 2Gi
