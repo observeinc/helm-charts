@@ -1,6 +1,6 @@
 # metrics
 
-![Version: 0.3.11](https://img.shields.io/badge/Version-0.3.11-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.3.13](https://img.shields.io/badge/Version-0.3.13-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe metrics collection
 
@@ -15,7 +15,7 @@ Observe metrics collection
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../endpoint | endpoint | 0.1.8 |
-| https://grafana.github.io/helm-charts | grafana-agent | 0.31.0 |
+| https://grafana.github.io/helm-charts | grafana-agent | 0.31.1 |
 
 ## Values
 
@@ -88,7 +88,7 @@ Observe metrics collection
 | grafana-agent.prom_config.scrape_configs.resource_metric_drop_regex | string | `nil` |  |
 | grafana-agent.prom_config.scrape_configs.resource_metric_keep_regex | string | `"(.*)"` |  |
 | grafana-agent.prom_config.scrape_configs.sample_limit | int | `100000` |  |
-| grafana-agent.prom_config.scrape_interval | string | `"15s"` |  |
+| grafana-agent.prom_config.scrape_interval | string | `"60s"` |  |
 | grafana-agent.prom_config.scrape_timeout | string | `"10s"` |  |
 | grafana-agent.prom_config.statsd_exporter.enabled | bool | `false` |  |
 | grafana-agent.prom_config.statsd_exporter.port | int | `9125` |  |
