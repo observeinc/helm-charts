@@ -30,6 +30,7 @@ logs:
 metrics:
   grafana-agent:
     prom_config:
+    scrape_interval: 60s
     scrape_configs:
       cadvisor_action: drop
       kubelet_action: keep
