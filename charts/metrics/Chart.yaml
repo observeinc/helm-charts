@@ -2,7 +2,7 @@ apiVersion: v2
 name: metrics
 description: Observe metrics collection
 type: application
-version: 0.3.12
+version: 0.3.13
 dependencies:
   - name: grafana-agent
     version: 0.31.1
