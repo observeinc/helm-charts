@@ -57,8 +57,8 @@ fluent-bit:
     node_log_include_path: /var/log/kube-apiserver-audit.log
     node_log_exclude_path: nomatch
     read_from_head: "true"
+    ignore_older: "2d"
     refresh_interval: 2
-     ignore_older: "2d"
     retry_limit: 5
     rotate_wait: 5
     storage_metrics: "off"
