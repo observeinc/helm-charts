@@ -57,7 +57,6 @@ fluent-bit:
     node_log_include_path: /var/log/kube-apiserver-audit.log
     node_log_exclude_path: nomatch
     read_from_head: "true"
-    ignore_older: "2d"
     refresh_interval: 2
     retry_limit: 5
     rotate_wait: 5
@@ -94,7 +93,6 @@ fluent-bit:
           DB                  /var/log/flb_kube_${NAMESPACE}.db
           Skip_Long_Lines     On
           Read_From_Head      {{.Values.config.read_from_head}}
-          Ignore_Older        {{.Values.config.ignore_older}}
           Mem_Buf_Limit       {{.Values.config.mem_buf_limit}}
           Buffer_Chunk_Size   {{.Values.config.buffer_chunk_size}}
           Buffer_Max_Size     {{.Values.config.buffer_max_size}}
@@ -112,7 +110,6 @@ fluent-bit:
           DB                  /var/log/flb_node_${NAMESPACE}.db
           Skip_Long_Lines     On
           Read_From_Head      {{.Values.config.read_from_head}}
-          Ignore_Older        {{.Values.config.ignore_older}}
           Mem_Buf_Limit       {{.Values.config.mem_buf_limit}}
           Buffer_Chunk_Size   {{.Values.config.buffer_chunk_size}}
           Buffer_Max_Size     {{.Values.config.buffer_max_size}}
