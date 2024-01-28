@@ -5,7 +5,7 @@ type: application
 version: 0.4.17
 dependencies:
   - name: logs
-    version: 0.1.15
+    version: 0.1.17
     repository: file://../logs
     condition: logs.enabled
   - name: metrics
