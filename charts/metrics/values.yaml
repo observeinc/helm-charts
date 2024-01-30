@@ -22,6 +22,8 @@ grafana-agent:
     scrape_interval: 60s
     scrape_timeout: 10s
     scrape_configs:
+      # https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config
+      honor_labels: "false"
       body_size_limit: 50MB
       sample_limit: 100000
 
@@ -193,6 +195,7 @@ grafana-agent:
                 - job_name: "integrations/kubernetes/pods"
                   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
                   scrape_interval: {{.pod_interval}}
+                  honor_labels: {{.honor_labels}}
                   sample_limit: {{.sample_limit}}
                   body_size_limit: {{.body_size_limit}}
                   kubernetes_sd_configs:
