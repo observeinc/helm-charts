@@ -1,6 +1,6 @@
 # metrics
 
-![Version: 0.3.13](https://img.shields.io/badge/Version-0.3.13-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.3.14](https://img.shields.io/badge/Version-0.3.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe metrics collection
 
@@ -76,7 +76,7 @@ Observe metrics collection
 | grafana-agent.prom_config.scrape_configs.kubelet_interval | string | `nil` |  |
 | grafana-agent.prom_config.scrape_configs.kubelet_metric_drop_regex | string | `nil` |  |
 | grafana-agent.prom_config.scrape_configs.kubelet_metric_keep_regex | string | `"(.*)"` |  |
-| grafana-agent.prom_config.scrape_configs.pod_action | string | `"keep"` |  |
+| grafana-agent.prom_config.scrape_configs.pod_action | string | `"drop"` |  |
 | grafana-agent.prom_config.scrape_configs.pod_interval | string | `nil` |  |
 | grafana-agent.prom_config.scrape_configs.pod_metric_drop_regex | string | `".*bucket"` |  |
 | grafana-agent.prom_config.scrape_configs.pod_metric_keep_regex | string | `"(.*)"` |  |

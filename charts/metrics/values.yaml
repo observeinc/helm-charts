@@ -33,7 +33,7 @@ grafana-agent:
       # The following block can be used to enable or disable scraping of metrics from
       # the corresponding targets. See below for finer-grained filtering.
       kubelet_action: drop  # set to "drop" to drop all kubelet metrics
-      pod_action: keep  # set to "drop" to drop all pod metrics
+      pod_action: drop  # set to "drop" to drop all pod metrics
       resource_action: keep  # set to "drop" to drop all resource metrics
       cadvisor_action: keep  # set to "drop" to drop all cadvisor metrics
 
