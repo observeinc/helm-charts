@@ -28,13 +28,10 @@ spec:
       tolerations:
       {{- toYaml . | nindent 6 }}
       {{- end }}
+      {{- with .Values.affinity }}
       affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - {key: observeinc.com/unschedulable, operator: DoesNotExist}
-                  - {key: kubernetes.io/os, operator: NotIn, values: [windows]}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ include "kube-events.serviceAccountName" . }}
       initContainers:
         - name: kube-cluster-info

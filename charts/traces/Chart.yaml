@@ -2,7 +2,7 @@ apiVersion: v2
 name: traces
 description: Observe OpenTelemetry trace collection
 type: application
-version: 0.2.12
+version: 0.2.13
 dependencies:
   - name: opentelemetry-collector
     version: 0.80.0

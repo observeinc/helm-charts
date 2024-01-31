@@ -35,3 +35,10 @@ resources:
     memory: 256Mi
 
 tolerations: {}
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - {key: observeinc.com/unschedulable, operator: DoesNotExist}
