@@ -1,6 +1,6 @@
 # metrics
 
-![Version: 0.3.14](https://img.shields.io/badge/Version-0.3.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.3.15](https://img.shields.io/badge/Version-0.3.15-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe metrics collection
 
@@ -71,7 +71,7 @@ Observe metrics collection
 | grafana-agent.prom_config.scrape_configs.cadvisor_action | string | `"keep"` |  |
 | grafana-agent.prom_config.scrape_configs.cadvisor_interval | string | `nil` |  |
 | grafana-agent.prom_config.scrape_configs.cadvisor_metric_drop_regex | string | `"container_(network_tcp_usage_total|network_udp_usage_total|tasks_state|cpu_load_average_10s)"` |  |
-| grafana-agent.prom_config.scrape_configs.cadvisor_metric_keep_regex | string | `"container_(cpu_.*|spec_.*|memory_.*|network_.*|fs_.*|file_descriptors)|machine_(cpu_cores|memory_bytes)"` |  |
+| grafana-agent.prom_config.scrape_configs.cadvisor_metric_keep_regex | string | `"container_(cpu_.*|spec_.*|memory_.*|network_.*|file_descriptors)|machine_(cpu_cores|memory_bytes)"` |  |
 | grafana-agent.prom_config.scrape_configs.kubelet_action | string | `"drop"` |  |
 | grafana-agent.prom_config.scrape_configs.kubelet_interval | string | `nil` |  |
 | grafana-agent.prom_config.scrape_configs.kubelet_metric_drop_regex | string | `nil` |  |
