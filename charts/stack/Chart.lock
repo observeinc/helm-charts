@@ -4,7 +4,7 @@ dependencies:
   version: 0.1.17
 - name: metrics
   repository: file://../metrics
-  version: 0.3.13
+  version: 0.3.14
 - name: events
   repository: file://../events
   version: 0.1.20
