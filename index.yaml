@@ -76,6 +76,23 @@ entries:
   events:
   - apiVersion: v2
     appVersion: v0.11.1
+    created: "2024-01-31T18:19:40.600554802Z"
+    dependencies:
+    - name: endpoint
+      repository: file://../endpoint
+      version: 0.1.8
+    description: Observe kubernetes event collection
+    digest: fef0c7a3562721cb707cdcc80583f67f251f275f8bdd33b85533ea819ab84ee0
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: events
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/events-0.1.21/events-0.1.21.tgz
+    version: 0.1.21
+  - apiVersion: v2
+    appVersion: v0.11.1
     created: "2023-12-22T00:46:55.944520722Z"
     dependencies:
     - name: endpoint
@@ -245,6 +262,25 @@ entries:
     - https://github.com/observeinc/helm-charts/releases/download/events-0.1.8/events-0.1.8.tgz
     version: 0.1.8
   logs:
+  - apiVersion: v2
+    created: "2024-01-31T18:19:40.723145436Z"
+    dependencies:
+    - name: fluent-bit
+      repository: https://fluent.github.io/helm-charts
+      version: 0.43.0
+    - name: endpoint
+      repository: file://../endpoint
+      version: 0.1.8
+    description: Observe logs collection
+    digest: fbff02953b9a4618c74f969a9e432c2e9400d2103025be0bba373fef67171323
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: logs
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/logs-0.1.18/logs-0.1.18.tgz
+    version: 0.1.18
   - apiVersion: v2
     created: "2024-01-29T16:53:47.582388708Z"
     dependencies:
@@ -783,6 +819,39 @@ entries:
     - https://github.com/observeinc/helm-charts/releases/download/proxy-0.1.0/proxy-0.1.0.tgz
     version: 0.1.0
   stack:
+  - apiVersion: v2
+    created: "2024-01-31T18:19:40.851450725Z"
+    dependencies:
+    - condition: logs.enabled
+      name: logs
+      repository: file://../logs
+      version: 0.1.18
+    - condition: metrics.enabled
+      name: metrics
+      repository: file://../metrics
+      version: 0.3.13
+    - condition: events.enabled
+      name: events
+      repository: file://../events
+      version: 0.1.21
+    - condition: proxy.enabled
+      name: proxy
+      repository: file://../proxy
+      version: 0.1.4
+    - condition: traces.enabled
+      name: traces
+      repository: file://../traces
+      version: 0.2.13
+    description: Observe Kubernetes agent stack
+    digest: ee0cf6fd38c19b259d7613f0723bbb88d159ff93721dc5cbbc62b4cd31c76f15
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: stack
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/stack-0.4.18/stack-0.4.18.tgz
+    version: 0.4.18
   - apiVersion: v2
     created: "2024-01-29T16:53:47.866274918Z"
     dependencies:
@@ -1834,6 +1903,29 @@ entries:
     version: 0.1.0
   traces:
   - apiVersion: v2
+    created: "2024-01-31T18:19:40.968861431Z"
+    dependencies:
+    - name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.80.0
+    - name: endpoint
+      repository: file://../endpoint
+      version: 0.1.8
+    - condition: proxy.enabled
+      name: proxy
+      repository: file://../proxy
+      version: 0.1.4
+    description: Observe OpenTelemetry trace collection
+    digest: 086331bd2855a6ef26d15d16cad661852af7ea6557a0ae361b923df398850f7a
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: traces
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/traces-0.2.13/traces-0.2.13.tgz
+    version: 0.2.13
+  - apiVersion: v2
     created: "2024-01-29T16:53:47.967591125Z"
     dependencies:
     - name: opentelemetry-collector
@@ -2378,4 +2470,4 @@ entries:
     urls:
     - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.0/traces-0.1.0.tgz
     version: 0.1.0
-generated: "2024-01-29T16:53:47.968279458Z"
+generated: "2024-01-31T18:19:40.969309636Z"
