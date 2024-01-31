@@ -65,7 +65,7 @@ grafana-agent:
       # - https://github.com/kubernetes/kubernetes/issues/60279
       # - https://github.com/google/cadvisor/issues/1672
       cadvisor_metric_drop_regex: container_(network_tcp_usage_total|network_udp_usage_total|tasks_state|cpu_load_average_10s)
-      cadvisor_metric_keep_regex: container_(cpu_.*|spec_.*|memory_.*|network_.*|fs_.*|file_descriptors)|machine_(cpu_cores|memory_bytes)
+      cadvisor_metric_keep_regex: container_(cpu_.*|spec_.*|memory_.*|network_.*|file_descriptors)|machine_(cpu_cores|memory_bytes)
 
       # The following regex matches the minimal set of metrics that are used for the default
       # Kubernetes board; `cadvisor_metric_keep_regex` can be set to this value if no additional
