@@ -124,7 +124,7 @@ opentelemetry-collector:
                 name: k8s.pod.ip
           - sources:
               - from: connection
-      batch:
+      batch: {}
       memory_limiter:
         # 80% of maximum memory up to 2G
         # Must be less than limit or gc will never run
@@ -133,11 +133,8 @@ opentelemetry-collector:
         spike_limit_mib: 100
         check_interval: 5s
     receivers:
-      zipkin: null
-      otlp:
-        protocols:
-          grpc:
-          http:
+      zipkin: {}
+         
     service:
       pipelines:
         traces:
