@@ -1,3 +1,7 @@
+gloabal:
+  observe:
+    otelPath: "/v1/otel"
+
 observe:
   token:
     create: true
@@ -95,7 +99,7 @@ opentelemetry-collector:
       logging:
         loglevel: info
       otlphttp:
-        endpoint: '{{ include "observe.collectionEndpoint" . }}/v1/otel'
+        endpoint: '{{ include "observe.collectionEndpoint" . }}{{ .Values.global.observe.otelPath }}'
         headers:
           authorization: "Bearer ${OBSERVE_TOKEN}"
         sending_queue:
