@@ -1,4 +1,4 @@
-gloabal:
+global:
   observe:
     otelPath: "/v1/otel"
 
