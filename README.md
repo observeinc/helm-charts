@@ -79,7 +79,7 @@ For example:
 ```
 helm install --namespace=observe observe-traces observe/traces \
 	--set global.observe.collectionEndpoint="${OBSERVE_COLLECTION_ENDPOINT}" \
-	--set global.observe.collectionEndpoint="/v2/otel" \
+	--set global.observe.otelPath="/v2/otel" \
 	--set observe.token.value="${OBSERVE_TOKEN}"
 ```
 
