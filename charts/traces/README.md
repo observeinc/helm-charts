@@ -1,6 +1,6 @@
 # traces
 
-![Version: 0.2.13](https://img.shields.io/badge/Version-0.2.13-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.2.14](https://img.shields.io/badge/Version-0.2.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe OpenTelemetry trace collection
 
@@ -22,6 +22,7 @@ Observe OpenTelemetry trace collection
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| global.observe.otelPath | string | `"/v1/otel"` |  |
 | observe.token.create | bool | `true` |  |
 | observe.token.value | string | `""` |  |
 | opentelemetry-collector.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
@@ -38,7 +39,7 @@ Observe OpenTelemetry trace collection
 | opentelemetry-collector.clusterRole.rules[0].verbs[2] | string | `"watch"` |  |
 | opentelemetry-collector.command.extraArgs[0] | string | `"--set=service.telemetry.metrics.address=:58888"` |  |
 | opentelemetry-collector.config.exporters.logging.loglevel | string | `"info"` |  |
-| opentelemetry-collector.config.exporters.otlphttp.endpoint | string | `"{{ include \"observe.collectionEndpoint\" . }}/v1/otel"` |  |
+| opentelemetry-collector.config.exporters.otlphttp.endpoint | string | `"{{ include \"observe.collectionEndpoint\" . }}{{ .Values.global.observe.otelPath }}"` |  |
 | opentelemetry-collector.config.exporters.otlphttp.headers.authorization | string | `"Bearer ${OBSERVE_TOKEN}"` |  |
 | opentelemetry-collector.config.exporters.otlphttp.retry_on_failure.enabled | bool | `true` |  |
 | opentelemetry-collector.config.exporters.otlphttp.sending_queue.num_consumers | int | `4` |  |
