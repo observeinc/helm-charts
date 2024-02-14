@@ -2,7 +2,7 @@ apiVersion: v2
 name: stack
 description: Observe Kubernetes agent stack
 type: application
-version: 0.4.22
+version: 0.4.23
 dependencies:
   - name: logs
     version: 0.1.19
