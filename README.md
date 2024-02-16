@@ -184,6 +184,39 @@ Then, ensure a secret exists in the observe namespace with the correct name:
 kubectl -n observe create secret generic credentials --from-literal='OBSERVE_TOKEN=<kubernetes datastream token>'
 ```
 
+## Extra configuration files for fluent-bit
+
+You can also add extra fluent-bit configuration files like this:
+```
+logs:
+  fluent-bit:
+    config:
+      extraFiles:
+        systemd.conf: |
+          [INPUT]
+              Name                systemd
+              Tag                 systemd
+              Read_From_Tail      on
+```
+
+Every file in the `extraFiles` section will be mounted in the `/fluent-bit/etc/custom-configs` directory.
+These files will be included in the main `fluent-bit.conf` file by `@INCLUDE` directive which is configured
+as part of `outputs` default configuration value (for some reason fluent-bit subchart doesn't include these files by default).
+
+If you're overriding the `outputs` default configuration, you can include the extra files in your custom configuration file like this:
+
+```
+logs:
+  fluent-bit:
+    config:
+      outputs: |
+        [OUTPUT]
+            Name                http
+            # other output configuration...
+
+        {{- include "observe.includeExtraFiles" . }}
+```
+
 ## Traces
 
 ```bash

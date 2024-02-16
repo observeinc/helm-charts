@@ -179,6 +179,8 @@ fluent-bit:
           Compress            gzip
           Retry_Limit         {{.Values.config.retry_limit}}
 
+      {{- include "observe.includeExtraFiles" . }}
+
     customParsers: |
       [PARSER]
           Name        kube-custom
