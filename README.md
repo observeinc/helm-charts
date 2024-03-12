@@ -90,13 +90,6 @@ helm upgrade --namespace=observe observe-traces observe/traces --reuse-values \
 	--set global.observe.otelPath="/v2/otel"
 ```
 
-When upgrading the `stack` chart:
-
-```
-helm upgrade --namespace=observe observe-stack observe/stack --reuse-values \
-	--set global.observe.otelPath="/v2/otel"
-```
-
 # Configuration
 
 ## Required Values
