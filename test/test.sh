@@ -36,7 +36,7 @@ for chart in "$@"; do
     echo
 
     $helm install --debug --wait test-$chart $repo/charts/$chart -f $repo/charts/$chart/ci/test-values.yaml
-    sleep 10 # allow some observations to come through once everything is ready
+    sleep 30 # allow some observations to come through once everything is ready
     echo
     $helm test --filter name=test-$chart test-$chart ||
         {
