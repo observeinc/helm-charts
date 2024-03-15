@@ -1,6 +1,6 @@
 # metrics
 
-![Version: 0.3.16](https://img.shields.io/badge/Version-0.3.16-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.3.17](https://img.shields.io/badge/Version-0.3.17-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe metrics collection
 
@@ -14,7 +14,7 @@ Observe metrics collection
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../endpoint | endpoint | 0.1.9 |
+| file://../endpoint | endpoint | 0.1.10 |
 | https://grafana.github.io/helm-charts | grafana-agent | 0.31.1 |
 
 ## Values
@@ -52,6 +52,7 @@ Observe metrics collection
 | grafana-agent.controller.podLabels.name | string | `"metrics"` |  |
 | grafana-agent.controller.replicas | int | `1` |  |
 | grafana-agent.controller.type | string | `"deployment"` |  |
+| grafana-agent.crds.create | bool | `false` |  |
 | grafana-agent.image.tag | string | `"latest"` |  |
 | grafana-agent.nameOverride | string | `"metrics"` |  |
 | grafana-agent.prom_config.batch_send_deadline | string | `"5s"` |  |

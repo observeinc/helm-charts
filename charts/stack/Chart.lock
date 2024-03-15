@@ -1,18 +1,18 @@
 dependencies:
 - name: logs
   repository: file://../logs
-  version: 0.1.21
+  version: 0.1.22
 - name: metrics
   repository: file://../metrics
-  version: 0.3.16
+  version: 0.3.17
 - name: events
   repository: file://../events
-  version: 0.1.22
+  version: 0.1.23
 - name: proxy
   repository: file://../proxy
-  version: 0.1.5
+  version: 0.1.6
 - name: traces
   repository: file://../traces
-  version: 0.2.16
-digest: sha256:43d750c124a8e71b6195d8bbf99249fa565a27c260874d9cc86011aebe7a97eb
-generated: "2024-03-11T15:32:53.310977-07:00"
+  version: 0.2.17
+digest: sha256:0d5293b83b8546611a4a7e4c5d4936eaffd12d8dd9a8780b7d61ed2a80a30883
+generated: "2024-03-15T15:08:50.220545-04:00"
