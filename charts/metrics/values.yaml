@@ -4,6 +4,8 @@ global:
 
 grafana-agent:
   nameOverride: metrics
+  crds:
+    create: false
   prom_config:
     batch_send_deadline: 5s
     capacity: 15000
