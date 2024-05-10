@@ -65,6 +65,12 @@ fluent-bit:
     grep_match_tag: "nothing"
     grep_exclude: "nomatch ^$"
     inotify_watcher: "true"
+    workers: 2
+    connect_timeout: 10
+    keepalive: "on"
+    keepalive_idle_timeout: 30
+    keepalive_max_recycle: 2000
+    max_worker_connections: 25
 
     service: |
       [SERVICE]
@@ -164,6 +170,12 @@ fluent-bit:
           Header              Authorization Bearer ${OBSERVE_TOKEN}
           Compress            gzip
           Retry_Limit         {{.Values.config.retry_limit}}
+          Workers             {{.Values.config.workers}}
+          net.connect_timeout         {{.Values.config.connect_timeout}}
+          net.keepalive               {{.Values.config.keepalive}}
+          net.keepalive_idle_timeout  {{.Values.config.keepalive_idle_timeout}}
+          net.keepalive_max_recycle   {{.Values.config.keepalive_max_recycle}}
+          net.max_worker_connections  {{.Values.config.max_worker_connections}}
 
       [OUTPUT]
           Name                http
@@ -178,6 +190,12 @@ fluent-bit:
           Header              Authorization Bearer ${OBSERVE_TOKEN}
           Compress            gzip
           Retry_Limit         {{.Values.config.retry_limit}}
+          Workers             {{.Values.config.workers}}
+          net.connect_timeout         {{.Values.config.connect_timeout}}
+          net.keepalive               {{.Values.config.keepalive}}
+          net.keepalive_idle_timeout  {{.Values.config.keepalive_idle_timeout}}
+          net.keepalive_max_recycle   {{.Values.config.keepalive_max_recycle}}
+          net.max_worker_connections  {{.Values.config.max_worker_connections}}
 
       {{- include "observe.includeExtraFiles" . }}
 
