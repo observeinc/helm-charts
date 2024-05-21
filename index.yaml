@@ -321,6 +321,25 @@ entries:
     version: 0.1.8
   logs:
   - apiVersion: v2
+    created: "2024-05-21T23:50:49.468472725Z"
+    dependencies:
+    - name: fluent-bit
+      repository: https://fluent.github.io/helm-charts
+      version: 0.46.7
+    - name: endpoint
+      repository: file://../endpoint
+      version: 0.1.10
+    description: Observe logs collection
+    digest: a8d93bde7b60f2febf6cb61aed40f42616a845c8e9f8d3e87ff38167b4c4890a
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: logs
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/logs-0.1.24/logs-0.1.24.tgz
+    version: 0.1.24
+  - apiVersion: v2
     created: "2024-05-10T21:09:44.815591582Z"
     dependencies:
     - name: fluent-bit
@@ -1072,6 +1091,39 @@ entries:
     - https://github.com/observeinc/helm-charts/releases/download/proxy-0.1.0/proxy-0.1.0.tgz
     version: 0.1.0
   stack:
+  - apiVersion: v2
+    created: "2024-05-21T23:50:49.638158681Z"
+    dependencies:
+    - condition: logs.enabled
+      name: logs
+      repository: file://../logs
+      version: 0.1.24
+    - condition: metrics.enabled
+      name: metrics
+      repository: file://../metrics
+      version: 0.3.17
+    - condition: events.enabled
+      name: events
+      repository: file://../events
+      version: 0.1.23
+    - condition: proxy.enabled
+      name: proxy
+      repository: file://../proxy
+      version: 0.1.6
+    - condition: traces.enabled
+      name: traces
+      repository: file://../traces
+      version: 0.2.17
+    description: Observe Kubernetes agent stack
+    digest: 850e35e7d352fb4078450e285d3d96b4e3d7a123fa3d51f601fd661e075f4ab7
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: stack
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/stack-0.4.28/stack-0.4.28.tgz
+    version: 0.4.28
   - apiVersion: v2
     created: "2024-05-10T21:09:44.976998154Z"
     dependencies:
@@ -3112,4 +3164,4 @@ entries:
     urls:
     - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.0/traces-0.1.0.tgz
     version: 0.1.0
-generated: "2024-05-10T21:09:44.97740855Z"
+generated: "2024-05-21T23:50:49.63860675Z"
