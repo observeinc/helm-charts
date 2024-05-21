@@ -15,7 +15,7 @@ Observe Kubernetes agent stack
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../events | events | 0.1.23 |
-| file://../logs | logs | 0.1.23 |
+| file://../logs | logs | 0.1.24 |
 | file://../metrics | metrics | 0.3.17 |
 | file://../proxy | proxy | 0.1.6 |
 | file://../traces | traces | 0.2.17 |

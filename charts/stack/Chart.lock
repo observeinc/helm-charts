@@ -1,7 +1,7 @@
 dependencies:
 - name: logs
   repository: file://../logs
-  version: 0.1.23
+  version: 0.1.24
 - name: metrics
   repository: file://../metrics
   version: 0.3.17
