@@ -1,6 +1,6 @@
 # metrics
 
-![Version: 0.3.18](https://img.shields.io/badge/Version-0.3.18-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.3.19](https://img.shields.io/badge/Version-0.3.19-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe metrics collection
 
@@ -54,7 +54,6 @@ Observe metrics collection
 | grafana-agent.controller.replicas | int | `1` |  |
 | grafana-agent.controller.type | string | `"deployment"` |  |
 | grafana-agent.crds.create | bool | `false` |  |
-| grafana-agent.image.tag | string | `"latest"` |  |
 | grafana-agent.nameOverride | string | `"metrics"` |  |
 | grafana-agent.prom_config.batch_send_deadline | string | `"5s"` |  |
 | grafana-agent.prom_config.capacity | int | `15000` |  |

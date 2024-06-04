@@ -95,9 +95,6 @@ grafana-agent:
                 - {key: observeinc.com/unschedulable, operator: DoesNotExist}
                 - {key: kubernetes.io/os, operator: NotIn, values: [windows]}
 
-  image:
-    tag: latest
-
   agent:
     mode: static
     enableReporting: false
