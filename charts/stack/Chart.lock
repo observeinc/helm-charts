@@ -4,7 +4,7 @@ dependencies:
   version: 0.1.24
 - name: metrics
   repository: file://../metrics
-  version: 0.3.17
+  version: 0.3.18
 - name: events
   repository: file://../events
   version: 0.1.23
@@ -14,5 +14,5 @@ dependencies:
 - name: traces
   repository: file://../traces
   version: 0.2.17
-digest: sha256:958df606a4949781f9261e7bb97a72a65a152d0c3a4c456bd49955b9594d6bc7
-generated: "2024-05-21T18:46:38.084748-04:00"
+digest: sha256:4430c9dd31d4f1b0145837c3fa98746ce481b9d21c52e37ecbb67376f030d974
+generated: "2024-06-04T13:16:09.174412-04:00"

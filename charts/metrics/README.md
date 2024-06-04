@@ -1,6 +1,6 @@
 # metrics
 
-![Version: 0.3.17](https://img.shields.io/badge/Version-0.3.17-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.3.18](https://img.shields.io/badge/Version-0.3.18-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe metrics collection
 
@@ -15,7 +15,7 @@ Observe metrics collection
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../endpoint | endpoint | 0.1.10 |
-| https://grafana.github.io/helm-charts | grafana-agent | 0.31.1 |
+| https://grafana.github.io/helm-charts | grafana-agent | 0.40.0 |
 
 ## Values
 
@@ -41,6 +41,7 @@ Observe metrics collection
 | grafana-agent.agent.resources.limits.memory | string | `"2Gi"` |  |
 | grafana-agent.agent.resources.requests.cpu | string | `"250m"` |  |
 | grafana-agent.agent.resources.requests.memory | string | `"2Gi"` |  |
+| grafana-agent.agent.securityContext.capabilities.add[0] | string | `"NET_BIND_SERVICE"` |  |
 | grafana-agent.agent.securityContext.capabilities.drop[0] | string | `"all"` |  |
 | grafana-agent.agent.securityContext.runAsNonRoot | bool | `true` |  |
 | grafana-agent.agent.securityContext.runAsUser | int | `65534` |  |
