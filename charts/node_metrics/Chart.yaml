@@ -1,0 +1,19 @@
+apiVersion: v2
+name: node-metrics
+description: Observe OpenTelemetry node metrics collection
+type: application
+version: 0.1.00
+dependencies:
+  - name: opentelemetry-collector
+    version: 0.103.0
+    repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+  - name: endpoint
+    version: 0.1.10
+    repository: file://../endpoint
+  - name: proxy
+    version: 0.1.6
+    repository: file://../proxy
+    condition: proxy.enabled
+maintainers:
+  - name: Observe
+    email: support@observeinc.com

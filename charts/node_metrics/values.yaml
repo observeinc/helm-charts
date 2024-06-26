@@ -1,0 +1,154 @@
+global:
+  observe:
+    otelPath: "/v2/otel"
+
+observe:
+  token:
+    create: true
+    value: ""
+
+proxy:
+  enabled: false
+
+opentelemetry-collector:
+  fullnameOverride: "observe-node-metrics"
+  nameOverride: node-metrics
+  mode: "daemonset"  # daemonset or deployment
+  service:
+    enabled: true
+  command:
+    extraArgs: ["--set=service.telemetry.metrics.address=:58888"]
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  presets:
+    kubernetesAttributes:
+      enabled: true
+    hostMetrics:
+      enabled: true
+
+  extraEnvs:
+    - name: OBSERVE_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: otel-node-credentials
+          key: OBSERVE_TOKEN
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - {key: observeinc.com/unschedulable, operator: DoesNotExist}
+              - {key: kubernetes.io/os, operator: NotIn, values: [windows]}
+  livenessProbe:
+    initialDelaySeconds: 5
+  readinessProbe:
+    initialDelaySeconds: 10
+
+  # opentelemetry-collector configuration
+  config:
+    extensions:
+      # https://github.com/open-telemetry/opentelemetry-helm-charts/issues/816
+      health_check:
+          endpoint: "0.0.0.0:13133"
+      zpages: {}
+    receivers:
+      hostmetrics:
+        collection_interval: 10s
+        root_path: /hostfs
+        scrapers:
+          cpu: null
+          disk: null
+          filesystem:
+            metrics:
+              system.filesystem.utilization:
+                enabled: true
+            exclude_fs_types:
+              fs_types:
+              - autofs
+              - binfmt_misc
+              - bpf
+              - cgroup2
+              - configfs
+              - debugfs
+              - devpts
+              - devtmpfs
+              - fusectl
+              - hugetlbfs
+              - iso9660
+              - mqueue
+              - nsfs
+              - overlay
+              - proc
+              - procfs
+              - pstore
+              - rpc_pipefs
+              - securityfs
+              - selinuxfs
+              - squashfs
+              - sysfs
+              - tracefs
+              match_type: strict
+            exclude_mount_points:
+              match_type: regexp
+              mount_points:
+              - /dev/*
+              - /proc/*
+              - /sys/*
+              - /run/k3s/containerd/*
+              - /var/lib/docker/*
+              - /var/lib/kubelet/*
+              - /snap/*
+          load: null
+          memory: null
+          network: null
+      jaeger:
+      otlp:
+      zipkin:
+      prometheus:
+    exporters:
+      logging:
+        loglevel: info
+      otlphttp:
+        endpoint: '{{ include "observe.collectionEndpoint" . }}{{ .Values.global.observe.otelPath }}'
+        headers:
+          authorization: "Bearer ${OBSERVE_TOKEN}"
+        sending_queue:
+          num_consumers: 4
+          queue_size: 100
+        retry_on_failure:
+          enabled: true
+    processors:
+      resourcedetection/cloud:
+        detectors: ["gcp", "ecs", "ec2", "azure"]
+        timeout: 2s
+        override: false
+      batch: {}
+      memory_limiter:
+        # 80% of maximum memory up to 2G
+        # Must be less than limit or gc will never run
+        limit_mib: 192
+        # 25% of limit up to 2G
+        spike_limit_mib: 100
+        check_interval: 5s
+
+    service:
+      telemetry:
+      pipelines:
+        logs:
+        traces:
+        metrics:
+          processors:
+          - k8sattributes
+          - memory_limiter
+          - batch
+          - resourcedetection/cloud
+          exporters: 
+          # - otlphttp/observe
+          - prometheusremotewrite
+          receivers:
+          - hostmetrics
