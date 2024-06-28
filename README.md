@@ -62,7 +62,10 @@ you are prompted to create.
 ```
 helm install --namespace=observe observe-traces observe/traces \
 	--set global.observe.collectionEndpoint="${OBSERVE_COLLECTION_ENDPOINT}" \
-	--set observe.token.value="${OBSERVE_TOKEN}"
+  --set observe.token.value="${OBSERVE_TOKEN}" \
+  --set opentelemetry-collector.image.repository=otel/opentelemetry-collector-contrib \
+  --create-namespace
+
 
 # store values for further configuration and upgrades
 helm -n observe get values observe-traces -o yaml > observe-traces-values.yaml
@@ -229,6 +232,12 @@ logs:
 ```bash
 kubectl -n observe create secret generic otel-credentials --from-literal='OBSERVE_TOKEN=<opentelemetry datastream token>'
 ```
+
+## Uninstall Stack
+```helm -n observe uninstall observe-stack```
+
+## Uninstall Traces
+```helm -n observe uninstall observe-traces```
 
 # Build
 
