@@ -1,6 +1,6 @@
 # traces
 
-![Version: 0.2.17](https://img.shields.io/badge/Version-0.2.17-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.2.20](https://img.shields.io/badge/Version-0.2.20-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe OpenTelemetry trace collection
 
@@ -16,7 +16,7 @@ Observe OpenTelemetry trace collection
 |------------|------|---------|
 | file://../endpoint | endpoint | 0.1.10 |
 | file://../proxy | proxy | 0.1.6 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | opentelemetry-collector | 0.80.0 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | opentelemetry-collector | 0.96.0 |
 
 ## Values
 
@@ -87,6 +87,7 @@ Observe OpenTelemetry trace collection
 | opentelemetry-collector.extraEnvs[0].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
 | opentelemetry-collector.extraEnvs[0].valueFrom.secretKeyRef.name | string | `"otel-credentials"` |  |
 | opentelemetry-collector.fullnameOverride | string | `"observe-traces"` |  |
+| opentelemetry-collector.image.repository | string | `"otel/opentelemetry-collector-contrib"` |  |
 | opentelemetry-collector.livenessProbe.initialDelaySeconds | int | `5` |  |
 | opentelemetry-collector.mode | string | `"daemonset"` |  |
 | opentelemetry-collector.nameOverride | string | `"traces"` |  |

@@ -63,7 +63,6 @@ you are prompted to create.
 helm install --namespace=observe observe-traces observe/traces \
 	--set global.observe.collectionEndpoint="${OBSERVE_COLLECTION_ENDPOINT}" \
   --set observe.token.value="${OBSERVE_TOKEN}" \
-  --set opentelemetry-collector.image.repository=otel/opentelemetry-collector-contrib \
   --create-namespace
 
 
