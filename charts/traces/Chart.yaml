@@ -2,10 +2,10 @@ apiVersion: v2
 name: traces
 description: Observe OpenTelemetry trace collection
 type: application
-version: 0.2.19
+version: 0.2.20
 dependencies:
   - name: opentelemetry-collector
-    version: 0.96.0
+    version: 0.97.1
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
   - name: endpoint
     version: 0.1.10
