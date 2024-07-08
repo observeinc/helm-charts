@@ -16,6 +16,8 @@ opentelemetry-collector:
   mode: "daemonset"  # daemonset or deployment
   service:
     enabled: true
+  image:
+    repository: "otel/opentelemetry-collector-contrib"
   command:
     extraArgs: ["--set=service.telemetry.metrics.address=:58888"]
   resources:

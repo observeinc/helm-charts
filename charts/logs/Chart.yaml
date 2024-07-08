@@ -2,7 +2,7 @@ apiVersion: v2
 name: logs
 description: Observe logs collection
 type: application
-version: 0.1.25
+version: 0.1.26
 dependencies:
   - name: fluent-bit
     version: 0.46.11
