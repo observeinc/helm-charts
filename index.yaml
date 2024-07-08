@@ -321,6 +321,25 @@ entries:
     version: 0.1.8
   logs:
   - apiVersion: v2
+    created: "2024-07-08T18:19:22.967447036Z"
+    dependencies:
+    - name: fluent-bit
+      repository: https://fluent.github.io/helm-charts
+      version: 0.46.11
+    - name: endpoint
+      repository: file://../endpoint
+      version: 0.1.10
+    description: Observe logs collection
+    digest: 3baf10f64658596bee211e1e0a372543f0e89a064a51e7abac20dc9f36b7a8eb
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: logs
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/logs-0.1.26/logs-0.1.26.tgz
+    version: 0.1.26
+  - apiVersion: v2
     created: "2024-06-17T15:03:21.17702027Z"
     dependencies:
     - name: fluent-bit
@@ -663,6 +682,25 @@ entries:
     - https://github.com/observeinc/helm-charts/releases/download/logs-0.1.5/logs-0.1.5.tgz
     version: 0.1.5
   metrics:
+  - apiVersion: v2
+    created: "2024-07-08T18:19:23.074607997Z"
+    dependencies:
+    - name: grafana-agent
+      repository: https://grafana.github.io/helm-charts
+      version: 0.41.0
+    - name: endpoint
+      repository: file://../endpoint
+      version: 0.1.10
+    description: Observe metrics collection
+    digest: 03c22d659fcaa53363d90651c1806facaec4a3bf387397d3212813013cb0f90d
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: metrics
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/metrics-0.3.21/metrics-0.3.21.tgz
+    version: 0.3.21
   - apiVersion: v2
     created: "2024-06-17T15:03:21.381726144Z"
     dependencies:
@@ -1167,6 +1205,39 @@ entries:
     - https://github.com/observeinc/helm-charts/releases/download/proxy-0.1.0/proxy-0.1.0.tgz
     version: 0.1.0
   stack:
+  - apiVersion: v2
+    created: "2024-07-08T18:19:23.202690365Z"
+    dependencies:
+    - condition: logs.enabled
+      name: logs
+      repository: file://../logs
+      version: 0.1.26
+    - condition: metrics.enabled
+      name: metrics
+      repository: file://../metrics
+      version: 0.3.21
+    - condition: events.enabled
+      name: events
+      repository: file://../events
+      version: 0.1.23
+    - condition: proxy.enabled
+      name: proxy
+      repository: file://../proxy
+      version: 0.1.6
+    - condition: traces.enabled
+      name: traces
+      repository: file://../traces
+      version: 0.2.20
+    description: Observe Kubernetes agent stack
+    digest: 27e9eacaa4b235fd65a1a047fa5683530a2e2bbd46b536eacf4a1d58b3eb2c7a
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: stack
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/stack-0.4.33/stack-0.4.33.tgz
+    version: 0.4.33
   - apiVersion: v2
     created: "2024-07-04T19:03:53.198859569Z"
     dependencies:
@@ -2713,6 +2784,29 @@ entries:
     version: 0.1.0
   traces:
   - apiVersion: v2
+    created: "2024-07-08T18:19:23.302301147Z"
+    dependencies:
+    - name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.96.0
+    - name: endpoint
+      repository: file://../endpoint
+      version: 0.1.10
+    - condition: proxy.enabled
+      name: proxy
+      repository: file://../proxy
+      version: 0.1.6
+    description: Observe OpenTelemetry trace collection
+    digest: 6f319c3b2556403e80d2a0325a05c60e7d93f21428e4616f28490959914fd405
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: traces
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/traces-0.2.20/traces-0.2.20.tgz
+    version: 0.2.20
+  - apiVersion: v2
     created: "2024-07-04T19:03:53.374523609Z"
     dependencies:
     - name: opentelemetry-collector
@@ -3418,4 +3512,4 @@ entries:
     urls:
     - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.0/traces-0.1.0.tgz
     version: 0.1.0
-generated: "2024-07-04T19:03:53.37495402Z"
+generated: "2024-07-08T18:19:23.302881065Z"
