@@ -28,11 +28,11 @@ observeAgent: |
 
   host_monitoring:
     enabled: false
-    logs: 
+    logs:
       enabled: false
     metrics:
       enabled: false
-  
+
   otel_config_overrides:
     extensions:
       health_check:
