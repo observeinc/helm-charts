@@ -1,0 +1,9 @@
+dependencies:
+- name: daemonset
+  repository: file://charts/daemonset
+  version: 0.1.0
+- name: deployment
+  repository: file://charts/deployment
+  version: 0.1.0
+digest: sha256:49c95b9320624a1ee7b17b38a353d0d048110ea558860390da1cec90a9377f53
+generated: "2024-07-03T14:35:27.376405-07:00"

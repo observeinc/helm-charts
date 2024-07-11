@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: observe-agent
+  namespace: observe
+data:
+  relay:
+    {{ toYaml .Values.observeAgent }}
