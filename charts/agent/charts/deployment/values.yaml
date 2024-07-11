@@ -28,11 +28,11 @@ deployment:
           - key: "relay"
             path: "observe-agent.yaml"
         defaultMode: 420
-  
+
   extraVolumeMounts:
     - name: observe-agent-deployment-config
       mountPath: /conf
-  
+
   configMap:
     create: false
 

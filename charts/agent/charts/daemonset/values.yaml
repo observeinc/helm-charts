@@ -28,11 +28,11 @@ daemonset:
           - key: "relay"
             path: "observe-agent.yaml"
         defaultMode: 420
-  
+
   extraVolumeMounts:
     - name: observe-agent-daemonset-config
       mountPath: /conf
-    
+
   configMap:
     create: false
 
