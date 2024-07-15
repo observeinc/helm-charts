@@ -1,6 +1,6 @@
 # traces
 
-![Version: 0.2.23](https://img.shields.io/badge/Version-0.2.23-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe OpenTelemetry trace collection
 
@@ -22,7 +22,7 @@ Observe OpenTelemetry trace collection
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| global.observe.otelPath | string | `"/v1/otel"` |  |
+| global.observe.otelPath | string | `"/v2/otel"` |  |
 | observe.token.create | bool | `true` |  |
 | observe.token.value | string | `""` |  |
 | opentelemetry-collector.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
