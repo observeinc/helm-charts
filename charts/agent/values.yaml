@@ -1,0 +1,20 @@
+deployment:
+  # Resource settings
+  deployment:
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+daemonset:
+  daemonset:
+    # Resource settings
+    resources:
+      limits:
+        cpu: 250m
+        memory: 256Mi
+      requests:
+        cpu: 250m
+        memory: 256Mi

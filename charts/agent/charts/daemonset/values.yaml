@@ -1,0 +1,54 @@
+daemonset:
+  mode: daemonset
+
+  nameOverride: "observe-agent-daemonset"
+  fullnameOverride: "observe"
+  namespaceOverride: "observe"
+
+  image:
+    repository: observeinc/observe-agent
+    # Overrides the image tag whose default is the chart appVersion.
+    # The service's name will be applied to the end of this value.
+    tag: "0.7.0"
+    pullPolicy: IfNotPresent
+
+  command:
+    name: "observe-agent"
+    extraArgs: ["start", "--config=/conf/observe-agent.yaml"]
+
+  serviceAccount:
+    create: false
+    name: "observe-agent-service-account"
+
+  extraVolumes:
+    - name: "observe-agent-daemonset-config"
+      configMap:
+        name: "observe-agent"
+        items:
+          - key: "relay"
+            path: "observe-agent.yaml"
+        defaultMode: 420
+
+  extraVolumeMounts:
+    - name: observe-agent-daemonset-config
+      mountPath: /conf
+
+  configMap:
+    create: false
+
+  livenessProbe:
+    httpGet:
+      port: 13133
+      path: /status
+    initialDelaySeconds: 10
+    periodSeconds: 5
+  readinessProbe:
+    httpGet:
+      port: 13133
+      path: /status
+    initialDelaySeconds: 10
+    periodSeconds: 5
+
+  networkPolicy:
+    enabled: true
+    egressRules: [{}]

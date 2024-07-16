@@ -1,0 +1,16 @@
+apiVersion: v2
+name: agent
+description: Chart to install K8s collection stack based on Observe Agent
+type: application
+version: 0.1.0
+appVersion: "0.6.0"
+dependencies:
+  - name: daemonset
+    version: 0.1.0
+    repository: file://charts/daemonset
+  - name: deployment
+    version: 0.1.0
+    repository: file://charts/deployment
+maintainers:
+  - name: Observe
+    email: support@observeinc.com
