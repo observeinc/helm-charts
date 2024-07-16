@@ -1,5 +1,26 @@
 apiVersion: v1
 entries:
+  agent:
+  - apiVersion: v2
+    appVersion: 0.6.0
+    created: "2024-07-16T20:07:07.976969758Z"
+    dependencies:
+    - name: daemonset
+      repository: file://charts/daemonset
+      version: 0.1.0
+    - name: deployment
+      repository: file://charts/deployment
+      version: 0.1.0
+    description: Chart to install K8s collection stack based on Observe Agent
+    digest: bad3846b78d3c721e278ad696eb6391b368e58f4e031241139f78ab323af1a99
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: agent
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/agent-0.1.0/agent-0.1.0.tgz
+    version: 0.1.0
   endpoint:
   - apiVersion: v2
     created: "2024-07-09T15:24:45.959882066Z"
@@ -3647,4 +3668,4 @@ entries:
     urls:
     - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.0/traces-0.1.0.tgz
     version: 0.1.0
-generated: "2024-07-09T15:24:46.753666746Z"
+generated: "2024-07-16T20:07:07.977230818Z"
