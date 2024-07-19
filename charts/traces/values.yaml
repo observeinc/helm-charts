@@ -139,7 +139,7 @@ opentelemetry-collector:
         spike_limit_mib: 100
         check_interval: 5s
       transform/fix-span-name:
-        # Address missing operations for some instrumentations
+        # Address missing operations for some instrumentations (e.g. Next.js framework with Node.js)
         error_mode: ignore
         trace_statements:
           - context: span
