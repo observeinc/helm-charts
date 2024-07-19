@@ -138,7 +138,17 @@ opentelemetry-collector:
         # 25% of limit up to 2G
         spike_limit_mib: 100
         check_interval: 5s
-    receivers:
+      transform/fix-span-name:
+        # Address missing operations for some instrumentations
+        error_mode: ignore
+        trace_statements:
+          - context: span
+            statements:
+              - set(attributes["http.route"], attributes["http.target"])
+              - replace_pattern(attributes["http.route"], "\\?.*", "")
+              - replace_match("/api/products/*", "/api/products/{productId}")
+              - set(name, Concat([attributes["http.method"], attributes["http.route"]], " ")) where name == "GET" or name == "POST" or name == "HTTP GET" or name == "HTTP POST"
+        receivers:
       zipkin: {}
       otlp:
         protocols:
@@ -148,7 +158,7 @@ opentelemetry-collector:
       pipelines:
         traces:
           receivers: [otlp, zipkin]
-          processors: [probabilistic_sampler, k8sattributes, memory_limiter, batch]
+          processors: [probabilistic_sampler, k8sattributes, memory_limiter, batch, transform/fix-span-name]
           exporters: [otlphttp, logging]
         metrics:
           receivers: [otlp]
