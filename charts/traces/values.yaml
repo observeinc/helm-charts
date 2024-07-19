@@ -148,7 +148,7 @@ opentelemetry-collector:
               - replace_pattern(attributes["http.route"], "\\?.*", "")
               - replace_match("/api/products/*", "/api/products/{productId}")
               - set(name, Concat([attributes["http.method"], attributes["http.route"]], " ")) where name == "GET" or name == "POST" or name == "HTTP GET" or name == "HTTP POST"
-        receivers:
+    receivers:
       zipkin: {}
       otlp:
         protocols:
