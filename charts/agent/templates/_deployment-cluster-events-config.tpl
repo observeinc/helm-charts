@@ -70,6 +70,7 @@ receivers:
       - {name: clusterrolebindings, mode: watch}
       - {name: serviceaccounts, mode: watch}
 processors:
+  # needs to come after transform/watch_objects in pipelines
   observek8sattributes:
   batch/k8s:
     send_batch_size: 100
@@ -151,9 +152,6 @@ processors:
       # Comment logic
       - context: log
         statements:
-          # unwrapping for the object_watch stream
-          - set(attributes["observe_transform"]["control"]["isDelete"], true) where attributes["objectSource"] == "object_watch" and body["type"] == "DELETED"
-          - set(body, body["object"]) where attributes["objectSource"] == "object_watch"
           # native columns: valid_from, valid_to, kind
           - set(attributes["observe_transform"]["valid_from"], observed_time_unix_nano)
           - set(attributes["observe_transform"]["valid_to"], Int(observed_time_unix_nano) + 5400000000000)
@@ -182,7 +180,6 @@ processors:
         statements:
           - set(attributes["observe_transform"]["identifiers"]["podName"], body["metadata"]["name"])
           - set(attributes["observe_transform"]["facets"]["phase"], body["status"]["phase"])
-          - set(attributes["observe_transform"]["facets"]["status"], attributes["observe_transform.facets.status"])
           - set(attributes["observe_transform"]["facets"]["podIP"], body["status"]["podIP"])
           - set(attributes["observe_transform"]["facets"]["qosClass"], body["status"]["qosClass"])
           - set(attributes["observe_transform"]["facets"]["startTime"], body["status"]["startTime"])
@@ -237,6 +234,16 @@ processors:
           - delete_key(attributes["observe_transform"]["identifiers"], "name")
           - delete_key(attributes["observe_transform"]["identifiers"], "nodeName")
           - delete_key(attributes["observe_transform"]["identifiers"], "uid")
+  # transform for watch objects
+  transform/watch_objects:
+    error_mode: ignore
+    log_statements:
+      # For watch events, unwrap the object field into the body
+      - context: log
+        statements:
+          # unwrapping for the object_watch stream
+          - set(attributes["observe_transform"]["control"]["isDelete"], true) where attributes["objectSource"] == "object_watch" and body["type"] == "DELETED"
+          - set(body, body["object"]) where attributes["objectSource"] == "object_watch"
   #########################
 # use set command line arguments
 exporters:
@@ -251,15 +258,15 @@ service:
   pipelines:
     logs/objects_watch:
       receivers: [k8sobjects/objects_watch]
-      processors: [memory_limiter, batch/k8s, attributes/observe_object_watch, observek8sattributes]
+      processors: [memory_limiter, batch/k8s, attributes/observe_object_watch]
       exporters: [forward/watch]
     logs/objects_pull:
       receivers: [k8sobjects/objects_pull]
-      processors: [memory_limiter, batch/k8s, attributes/observe_object_pull, observek8sattributes]
+      processors: [memory_limiter, batch/k8s, attributes/observe_object_pull]
       exporters: [forward/pull]
     logs:
       receivers: [forward/pull,forward/watch]
-      processors: [memory_limiter, batch/k8s, resourcedetection/cloud, k8sattributes, attributes/observe_common, attributes/observe_object_final, attributes/observe_filter, transform/object]
+      processors: [memory_limiter, batch/k8s, resourcedetection/cloud, k8sattributes, attributes/observe_common, attributes/observe_object_final, attributes/observe_filter, transform/watch_objects, observek8sattributes, transform/object]
       exporters: [otlphttp/observe]
     logs/cluster:
       receivers: [k8sobjects/cluster]
