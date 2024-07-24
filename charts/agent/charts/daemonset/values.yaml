@@ -1,15 +1,14 @@
 daemonset:
   mode: daemonset
 
-  nameOverride: "observe-agent-daemonset"
-  fullnameOverride: "observe"
-  namespaceOverride: "observe"
+  nameOverride: "daemonset"
+  namespaceOverride: "k8sexplorer"
 
   image:
-    repository: observeinc/observe-agent
+    repository: observe-agent
     # Overrides the image tag whose default is the chart appVersion.
     # The service's name will be applied to the end of this value.
-    tag: "0.7.0"
+    tag: "test-k8s"
     pullPolicy: IfNotPresent
 
   command:

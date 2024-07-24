@@ -1,10 +1,10 @@
-deployment:
-  # Resource settings
-  deployment:
+deployment-cluster-events:
+  deployment-cluster-events:
+    # Resource settings
     resources:
       limits:
         cpu: 250m
-        memory: 256Mi
+        memory: 512Mi
       requests:
         cpu: 250m
         memory: 256Mi
