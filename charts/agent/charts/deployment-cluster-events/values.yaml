@@ -50,12 +50,9 @@ deployment-cluster-events:
     egressRules: [{}]
 
   resources:
-    limits:
-      cpu: 250m
-      memory: 512Mi
     requests:
-      cpu: 50m
-      memory: 64Mi
+      cpu: 250m
+      memory: 256Mi
   podAnnotations: {
     observe_monitor_purpose: observecollection,
     observe_monitor_scrape: 'true',

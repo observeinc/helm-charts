@@ -89,10 +89,8 @@ A Helm chart for Kubernetes
 | deployment-cluster-events.readinessProbe.httpGet.port | int | `13133` |  |
 | deployment-cluster-events.readinessProbe.initialDelaySeconds | int | `10` |  |
 | deployment-cluster-events.readinessProbe.periodSeconds | int | `5` |  |
-| deployment-cluster-events.resources.limits.cpu | string | `"250m"` |  |
-| deployment-cluster-events.resources.limits.memory | string | `"512Mi"` |  |
-| deployment-cluster-events.resources.requests.cpu | string | `"50m"` |  |
-| deployment-cluster-events.resources.requests.memory | string | `"64Mi"` |  |
+| deployment-cluster-events.resources.requests.cpu | string | `"250m"` |  |
+| deployment-cluster-events.resources.requests.memory | string | `"256Mi"` |  |
 | deployment-cluster-events.serviceAccount.create | bool | `false` |  |
 | deployment-cluster-events.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 
