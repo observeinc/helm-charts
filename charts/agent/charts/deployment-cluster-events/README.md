@@ -62,7 +62,7 @@ A Helm chart for Kubernetes
 | deployment-cluster-events.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
 | deployment-cluster-events.image.pullPolicy | string | `"IfNotPresent"` |  |
 | deployment-cluster-events.image.repository | string | `"observe-agent"` |  |
-| deployment-cluster-events.image.tag | string | `"test-k8s"` |  |
+| deployment-cluster-events.image.tag | string | `"0.9.0"` |  |
 | deployment-cluster-events.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | deployment-cluster-events.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | deployment-cluster-events.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.1"` |  |

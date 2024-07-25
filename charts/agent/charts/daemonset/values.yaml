@@ -8,7 +8,7 @@ daemonset:
     repository: observe-agent
     # Overrides the image tag whose default is the chart appVersion.
     # The service's name will be applied to the end of this value.
-    tag: "test-k8s"
+    tag: "0.9.0"
     pullPolicy: IfNotPresent
 
   command:
