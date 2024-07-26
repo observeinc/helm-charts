@@ -1,6 +1,7 @@
 global:
   observe:
     collectionEndpoint: "http://test-traces-collector.testing.svc.cluster.local:8080"
+    otelPath: "/v2/otel"
 
 observe:
   token:
