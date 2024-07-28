@@ -1,16 +1,12 @@
-name: Bump Metrics Chart Version
+name: Bump Metrics Chart Patch Version
 sources:
   currentMetricsVersion:
-    kind: githubrelease
+    kind: helmchart
     spec:
-      owner: "observeinc"
-      repository: "helm-charts"
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
-      versionFilter:
-        kind: regex
-        pattern: "metrics-(.*)$"
-    transformers:
-      - trimprefix: "metrics-"
+      url: https://observeinc.github.io/helm-charts
+      name: metrics
+      versionfilter:
+        kind: "latest"
 conditions:
   chartChanged:
     name: "Check if charts/metrics/ has changes"
@@ -18,8 +14,20 @@ conditions:
     spec:
       command: git diff --quiet --name-only origin/main...HEAD -- charts/metrics/ && git diff --quiet --name-only -- charts/metrics/ && exit 1 || exit 0
     disablesourceinput: true
+  nonBreakingChanges:
+    name: "Check if commit is non-breaking"
+    kind: shell
+    spec:
+      command: git log -1 --no-merges --pretty=%s | tail -n 1 | grep -v "BREAKING CHANGE"
+    disablesourceinput: true
+  isAFixCommit:
+    name: "Check if commit is a fix"
+    kind: shell
+    spec:
+      command: git log -1 --no-merges --pretty=%s | tail -n 1 | grep "fix"
+    disablesourceinput: true
 targets:
-  updateMetricsChart:
+  updateMetricsChartPatch:
     name: "Bump Patch Version"
     kind: yaml
     sourceid: currentMetricsVersion
@@ -28,7 +36,7 @@ targets:
     spec:
       file: "charts/metrics/Chart.yaml"
       key: "$.version"
-  updateStackChart:
+  updateStackChartPatch:
     name: "Update Stack Chart Dependency"
     kind: yaml
     sourceid: currentMetricsVersion

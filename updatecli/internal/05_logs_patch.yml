@@ -1,16 +1,12 @@
-name: Bump Logs Chart Version
+name: Bump Logs Chart Patch Version
 sources:
   currentLogsVersion:
-    kind: githubrelease
+    kind: helmchart
     spec:
-      owner: "observeinc"
-      repository: "helm-charts"
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
-      versionFilter:
-        kind: regex
-        pattern: "logs-(.*)$"
-    transformers:
-      - trimprefix: "logs-"
+      url: https://observeinc.github.io/helm-charts
+      name: logs
+      versionfilter:
+        kind: "latest"
 conditions:
   chartChanged:
     name: "Check if charts/logs/ has changes"
@@ -18,8 +14,20 @@ conditions:
     spec:
       command: git diff --quiet --name-only origin/main...HEAD -- charts/logs/ && git diff --quiet --name-only -- charts/logs/ && exit 1 || exit 0
     disablesourceinput: true
+  nonBreakingChanges:
+    name: "Check if commit is non-breaking"
+    kind: shell
+    spec:
+      command: git log -1 --no-merges --pretty=%s | tail -n 1 | grep -v "BREAKING CHANGE"
+    disablesourceinput: true
+  isAFixCommit:
+    name: "Check if commit is a fix"
+    kind: shell
+    spec:
+      command: git log -1 --no-merges --pretty=%s | tail -n 1 | grep "fix"
+    disablesourceinput: true
 targets:
-  updateLogsChart:
+  updateLogsChartPatch:
     name: "Bump Patch Version"
     kind: yaml
     sourceid: currentLogsVersion
@@ -28,7 +36,7 @@ targets:
     spec:
       file: "charts/logs/Chart.yaml"
       key: "$.version"
-  updateStackChart:
+  updateStackChartPatch:
     name: "Update Stack Chart Dependency"
     kind: yaml
     sourceid: currentLogsVersion

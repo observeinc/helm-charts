@@ -1,0 +1,47 @@
+name: Bump Events Chart Minor Version
+sources:
+  currentEventsVersion:
+    kind: helmchart
+    spec:
+      url: https://observeinc.github.io/helm-charts
+      name: events
+      versionfilter:
+        kind: "latest"
+conditions:
+  chartChanged:
+    name: "Check if charts/events/ has changes"
+    kind: shell
+    spec:
+      command: git diff --quiet --name-only origin/main...HEAD -- charts/events/ && git diff --quiet --name-only -- charts/events/ && exit 1 || exit 0
+    disablesourceinput: true
+  nonBreakingChanges:
+    name: "Check if commit is non-breaking"
+    kind: shell
+    spec:
+      command: git log -1 --no-merges --pretty=%s | tail -n 1 | grep -v "BREAKING CHANGE"
+    disablesourceinput: true
+  isAFeatCommit:
+    name: "Check if commit is a feature"
+    kind: shell
+    spec:
+      command: git log -1 --no-merges --pretty=%s | tail -n 1 | grep "feat"
+    disablesourceinput: true
+targets:
+  updateEventsChartMinor:
+    name: "Bump Minor Version"
+    kind: yaml
+    sourceid: currentEventsVersion
+    transformers:
+      - semverinc: "minor"
+    spec:
+      file: "charts/events/Chart.yaml"
+      key: "$.version"
+  updateStackChartMinor:
+    name: "Update Stack Chart Dependency"
+    kind: yaml
+    sourceid: currentEventsVersion
+    transformers:
+      - semverinc: "minor"
+    spec:
+      file: "charts/stack/Chart.yaml"
+      key: "$.dependencies[2].version"
