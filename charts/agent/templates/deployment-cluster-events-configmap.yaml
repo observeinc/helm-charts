@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: deployment-cluster-events
-  namespace: k8sexplorer
+  namespace: observe
 data:
   relay: |
       {{- include "observe.deployment.clusterEvents.config" . | nindent 4 -}}

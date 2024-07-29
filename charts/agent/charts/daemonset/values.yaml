@@ -2,7 +2,7 @@ daemonset:
   mode: daemonset
 
   nameOverride: "daemonset"
-  namespaceOverride: "k8sexplorer"
+  namespaceOverride: "observe"
 
   image:
     repository: observeinc/observe-agent

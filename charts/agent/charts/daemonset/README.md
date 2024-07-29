@@ -34,7 +34,7 @@ A Helm chart for Kubernetes
 | daemonset.livenessProbe.periodSeconds | int | `5` |  |
 | daemonset.mode | string | `"daemonset"` |  |
 | daemonset.nameOverride | string | `"daemonset"` |  |
-| daemonset.namespaceOverride | string | `"k8sexplorer"` |  |
+| daemonset.namespaceOverride | string | `"observe"` |  |
 | daemonset.networkPolicy.egressRules[0] | object | `{}` |  |
 | daemonset.networkPolicy.enabled | bool | `true` |  |
 | daemonset.readinessProbe.httpGet.path | string | `"/status"` |  |

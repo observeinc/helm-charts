@@ -72,7 +72,7 @@ A Helm chart for Kubernetes
 | deployment-cluster-events.livenessProbe.periodSeconds | int | `5` |  |
 | deployment-cluster-events.mode | string | `"deployment"` |  |
 | deployment-cluster-events.nameOverride | string | `"deployment-cluster-events"` |  |
-| deployment-cluster-events.namespaceOverride | string | `"k8sexplorer"` |  |
+| deployment-cluster-events.namespaceOverride | string | `"observe"` |  |
 | deployment-cluster-events.networkPolicy.egressRules[0] | object | `{}` |  |
 | deployment-cluster-events.networkPolicy.enabled | bool | `true` |  |
 | deployment-cluster-events.podAnnotations.observe_monitor_path | string | `"/metrics"` |  |
