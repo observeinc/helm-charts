@@ -70,28 +70,6 @@ helm install --namespace=observe observe-traces observe/traces \
 helm -n observe get values observe-traces -o yaml > observe-traces-values.yaml
 ```
 
-### Using v2 of OpenTelemetry collection endpoint
-
-If you are using the 1.0.0 release of the OpenTelemetry Observe app or newer, you should use the v2 collection endpoint which
-provides a more efficient representation of trace observations in the datastream. To use the v2 collection endpoint,
-set `global.observe.otelPath` to `/v2/otel`. The default value is `/v1/otel`.
-
-If you are installing the `traces` chart:
-
-```
-helm install --namespace=observe observe-traces observe/traces \
-	--set global.observe.collectionEndpoint="${OBSERVE_COLLECTION_ENDPOINT}" \
-	--set global.observe.otelPath="/v2/otel" \
-	--set observe.token.value="${OBSERVE_TOKEN}"
-```
-
-When upgrading the `traces` chart:
-
-```
-helm upgrade --namespace=observe observe-traces observe/traces --reuse-values \
-	--set global.observe.otelPath="/v2/otel"
-```
-
 # Configuration
 
 ## Required Values

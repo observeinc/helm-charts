@@ -1,6 +1,6 @@
 global:
   observe:
-    otelPath: "/v1/otel"
+    otelPath: "/v2/otel"
 
 observe:
   token:
