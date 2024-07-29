@@ -246,11 +246,7 @@ processors:
           - set(body, body["object"]) where attributes["objectSource"] == "object_watch"
   #########################
 # use set command line arguments
-exporters:
-  otlphttp/observe:
-    endpoint: "https://101.collect.observe-eng.com/v2/otel"
-    headers:
-      authorization: "Bearer ds1PWYJz3K8ZagZfrjd8:JzTQrGzdg0bJtMjH1dEAHtRxxn3iXuf_"
+# auth + endpoint inserted into base observe-agent otel collector config
 connectors:
   forward/watch:
   forward/pull:

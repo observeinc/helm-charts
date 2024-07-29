@@ -5,7 +5,7 @@ deployment-cluster-events:
   namespaceOverride: "k8sexplorer"
 
   image:
-    repository: observe-agent
+    repository: observeinc/observe-agent
     # Overrides the image tag whose default is the chart appVersion.
     # The service's name will be applied to the end of this value.
     tag: "0.9.0"
@@ -13,24 +13,11 @@ deployment-cluster-events:
 
   command:
     name: "observe-agent"
-    extraArgs: ["start", "--config=/conf/observe-agent.yaml", "--otel-config=/conf/relay.yaml"]
+    extraArgs: ["start", "--config=/observe-agent-conf/observe-agent.yaml", "--otel-config=/conf/relay.yaml"]
 
   serviceAccount:
     create: false
     name: "observe-agent-service-account"
-
-  extraVolumes:
-    - name: "observe-agent-deployment-config"
-      configMap:
-        name: "observe-agent"
-        items:
-          - key: "relay"
-            path: "observe-agent.yaml"
-        defaultMode: 420
-
-  extraVolumeMounts:
-    - name: observe-agent-deployment-config
-      mountPath: /conf
 
   livenessProbe:
     httpGet:
@@ -90,10 +77,19 @@ deployment-cluster-events:
           name: cluster-info
           key: id
   extraEnvsFrom: []
-  # This also supports template content, which will eventually be converted to yaml.
-  extraVolumes: []
-  # This also supports template content, which will eventually be converted to yaml.
-  extraVolumeMounts: []
+  extraVolumes:
+    - name: "observe-agent-deployment-config"
+      configMap:
+        name: "observe-agent"
+        items:
+          - key: "relay"
+            path: "observe-agent.yaml"
+        defaultMode: 420
+
+  extraVolumeMounts:
+    - name: observe-agent-deployment-config
+      mountPath: /observe-agent-conf
+
   # presets set permissions
 
   configMap:

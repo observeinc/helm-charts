@@ -1,3 +1,7 @@
+observe:
+  token:
+  collectionEndpoint:
+
 deployment-cluster-events:
   deployment-cluster-events:
     # Resource settings

@@ -26,7 +26,7 @@ A Helm chart for Kubernetes
 | daemonset.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | daemonset.extraVolumes[0].name | string | `"observe-agent-daemonset-config"` |  |
 | daemonset.image.pullPolicy | string | `"IfNotPresent"` |  |
-| daemonset.image.repository | string | `"observe-agent"` |  |
+| daemonset.image.repository | string | `"observeinc/observe-agent"` |  |
 | daemonset.image.tag | string | `"0.9.0"` |  |
 | daemonset.livenessProbe.httpGet.path | string | `"/status"` |  |
 | daemonset.livenessProbe.httpGet.port | int | `13133` |  |
