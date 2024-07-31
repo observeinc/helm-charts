@@ -1,0 +1,51 @@
+name: Bump Traces Chart Patch Version
+sources:
+  currentTracesVersion:
+    kind: githubrelease
+    spec:
+      owner: "observeinc"
+      repository: "helm-charts"
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      versionFilter:
+        kind: regex
+        pattern: "traces-(.*)$"
+    transformers:
+      - trimprefix: "traces-"
+conditions:
+  chartChanged:
+    name: "Check if charts/traces/ has changes"
+    kind: shell
+    spec:
+      command: git diff --quiet --name-only origin/main...HEAD -- charts/traces/ && git diff --quiet --name-only -- charts/traces/ && exit 1 || exit 0
+    disablesourceinput: true
+  nonBreakingChanges:
+    name: "Check if commit is non-breaking"
+    kind: shell
+    spec:
+      command: git -P show -s --format=%s | grep -iv "BREAKING CHANGE"
+    disablesourceinput: true
+  isAFixCommit:
+    name: "Check if commit is a fix"
+    kind: shell
+    spec:
+      command: git -P show -s --format=%s | grep -i "fix" && exit 1 || exit 0
+    disablesourceinput: true
+targets:
+  updateTracesChartPatch:
+    name: "Bump Patch Version"
+    kind: yaml
+    sourceid: currentTracesVersion
+    transformers:
+      - semverinc: "patch"
+    spec:
+      file: "charts/traces/Chart.yaml"
+      key: "$.version"
+  updateStackChartPatch:
+    name: "Update Stack Chart Dependency"
+    kind: yaml
+    sourceid: currentTracesVersion
+    transformers:
+      - semverinc: "patch"
+    spec:
+      file: "charts/stack/Chart.yaml"
+      key: "$.dependencies[4].version"

@@ -1,0 +1,45 @@
+name: Bump Traces Chart Major Version
+sources:
+  currentTracesVersion:
+    kind: githubrelease
+    spec:
+      owner: "observeinc"
+      repository: "helm-charts"
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      versionFilter:
+        kind: regex
+        pattern: "traces-(.*)$"
+    transformers:
+      - trimprefix: "traces-"
+conditions:
+  chartChanged:
+    name: "Check if charts/traces/ has changes"
+    kind: shell
+    spec:
+      command: git diff --quiet --name-only origin/main...HEAD -- charts/traces/ && git diff --quiet --name-only -- charts/traces/ && exit 1 || exit 0
+    disablesourceinput: true
+  breakingChanges:
+    name: "Check if commit is a breaking change"
+    kind: shell
+    spec:
+      command: git -P show -s --format=%s | grep -i "BREAKING CHANGE"
+    disablesourceinput: true
+targets:
+  updateTracesChartMajor:
+    name: "Bump Major Version"
+    kind: yaml
+    sourceid: currentTracesVersion
+    transformers:
+      - semverinc: "major"
+    spec:
+      file: "charts/traces/Chart.yaml"
+      key: "$.version"
+  updateStackChartMajor:
+    name: "Update Stack Chart Dependency"
+    kind: yaml
+    sourceid: currentTracesVersion
+    transformers:
+      - semverinc: "major"
+    spec:
+      file: "charts/stack/Chart.yaml"
+      key: "$.dependencies[4].version"

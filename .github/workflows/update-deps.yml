@@ -29,8 +29,8 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore(deps): Update dependencies"
-          title: 'chore(deps): Update dependencies'
+          commit-message: "fix(deps): Update dependencies"
+          title: 'fix(deps): Update dependencies'
           body: |
             Updates dependencies using `updatecli`.
 

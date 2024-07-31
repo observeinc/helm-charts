@@ -1,0 +1,45 @@
+name: Bump Logs Chart Minor Version
+sources:
+  currentLogsVersion:
+    kind: githubrelease
+    spec:
+      owner: "observeinc"
+      repository: "helm-charts"
+      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
+      versionFilter:
+        kind: regex
+        pattern: "logs-(.*)$"
+    transformers:
+      - trimprefix: "logs-"
+conditions:
+  chartChanged:
+    name: "Check if charts/logs/ has changes"
+    kind: shell
+    spec:
+      command: git diff --quiet --name-only origin/main...HEAD -- charts/logs/ && git diff --quiet --name-only -- charts/logs/ && exit 1 || exit 0
+    disablesourceinput: true
+  nonBreakingChanges:
+    name: "Check if commit is a feature"
+    kind: shell
+    spec:
+      command: git -P show -s --format=%s | grep -iv "BREAKING CHANGE" && git -P show -s --format=%s | grep -i "feat"
+    disablesourceinput: true
+targets:
+  updateLogsChartMinor:
+    name: "Bump Minor Version"
+    kind: yaml
+    sourceid: currentLogsVersion
+    transformers:
+      - semverinc: "minor"
+    spec:
+      file: "charts/logs/Chart.yaml"
+      key: "$.version"
+  updateStackChartMinor:
+    name: "Update Stack Chart Dependency"
+    kind: yaml
+    sourceid: currentLogsVersion
+    transformers:
+      - semverinc: "minor"
+    spec:
+      file: "charts/stack/Chart.yaml"
+      key: "$.dependencies[0].version"
