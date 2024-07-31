@@ -9,10 +9,3 @@ deployment-cluster-events:
       requests:
         cpu: 250m
         memory: 256Mi
-daemonset:
-  daemonset:
-    # Resource settings
-    resources:
-      requests:
-        cpu: 250m
-        memory: 256Mi
