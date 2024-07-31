@@ -1,9 +1,6 @@
 dependencies:
-- name: daemonset
-  repository: file://charts/daemonset
-  version: 0.1.0
 - name: deployment-cluster-events
   repository: file://charts/deployment-cluster-events
   version: 0.1.0
-digest: sha256:1b9b410195a7a44360ddd24a74433e4949b645e5c9132d44ccf87afa3fe33e71
-generated: "2024-07-23T11:26:22.520378-07:00"
+digest: sha256:d1d1fd1f833488c430d498f64f390170fbc21da958b7e2bc6c4d2245118d0404
+generated: "2024-07-31T14:54:47.199303-07:00"
