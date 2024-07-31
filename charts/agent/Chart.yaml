@@ -3,14 +3,14 @@ name: agent
 description: Chart to install K8s collection stack based on Observe Agent
 type: application
 version: 0.1.0
-appVersion: "0.6.0"
+appVersion: "0.9.0"
 dependencies:
   - name: daemonset
     version: 0.1.0
     repository: file://charts/daemonset
-  - name: deployment
+  - name: deployment-cluster-events
     version: 0.1.0
-    repository: file://charts/deployment
+    repository: file://charts/deployment-cluster-events
 maintainers:
   - name: Observe
     email: support@observeinc.com

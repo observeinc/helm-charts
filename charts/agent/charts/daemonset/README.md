@@ -1,6 +1,6 @@
 # daemonset
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.6.0](https://img.shields.io/badge/AppVersion-0.6.0-informational?style=flat-square)
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.9.0](https://img.shields.io/badge/AppVersion-0.9.0-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -25,16 +25,15 @@ A Helm chart for Kubernetes
 | daemonset.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | daemonset.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | daemonset.extraVolumes[0].name | string | `"observe-agent-daemonset-config"` |  |
-| daemonset.fullnameOverride | string | `"observe"` |  |
 | daemonset.image.pullPolicy | string | `"IfNotPresent"` |  |
 | daemonset.image.repository | string | `"observeinc/observe-agent"` |  |
-| daemonset.image.tag | string | `"0.7.0"` |  |
+| daemonset.image.tag | string | `"0.9.0"` |  |
 | daemonset.livenessProbe.httpGet.path | string | `"/status"` |  |
 | daemonset.livenessProbe.httpGet.port | int | `13133` |  |
 | daemonset.livenessProbe.initialDelaySeconds | int | `10` |  |
 | daemonset.livenessProbe.periodSeconds | int | `5` |  |
 | daemonset.mode | string | `"daemonset"` |  |
-| daemonset.nameOverride | string | `"observe-agent-daemonset"` |  |
+| daemonset.nameOverride | string | `"daemonset"` |  |
 | daemonset.namespaceOverride | string | `"observe"` |  |
 | daemonset.networkPolicy.egressRules[0] | object | `{}` |  |
 | daemonset.networkPolicy.enabled | bool | `true` |  |

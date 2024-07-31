@@ -4,5 +4,5 @@ metadata:
   name: observe-agent
   namespace: observe
 data:
-  relay:
-    {{ toYaml .Values.observeAgent }}
+  relay: |
+      {{- include "observe.observe-agent" . | nindent 4 }}
