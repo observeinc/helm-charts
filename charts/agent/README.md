@@ -17,15 +17,12 @@ Chart to install K8s collection stack based on Observe Agent
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://charts/daemonset | daemonset | 0.1.0 |
 | file://charts/deployment-cluster-events | deployment-cluster-events | 0.1.0 |
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| daemonset.daemonset.resources.requests.cpu | string | `"250m"` |  |
-| daemonset.daemonset.resources.requests.memory | string | `"256Mi"` |  |
 | deployment-cluster-events.deployment-cluster-events.resources.requests.cpu | string | `"250m"` |  |
 | deployment-cluster-events.deployment-cluster-events.resources.requests.memory | string | `"256Mi"` |  |
 | observe.collectionEndpoint | string | `nil` |  |

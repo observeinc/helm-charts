@@ -1,0 +1,23 @@
+{{ template "chart.header" . }}
+{{ template "chart.deprecationWarning" . }}
+
+{{ template "chart.badgesSection" . }}
+
+> [!CAUTION]
+> This chart is under active development and is not meant to be installed yet.
+
+{{ template "chart.description" . }}
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "chart.maintainersSection" . }}
+
+{{ template "chart.sourcesSection" . }}
+
+{{ template "chart.requirementsSection" . }}
+
+{{ template "chart.valuesSection" . }}
+
+{{- if not .SkipVersionFooter }}
+{{ template "helm-docs.versionFooter" . }}
+{{- end }}
