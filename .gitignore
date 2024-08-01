@@ -1,3 +1,5 @@
 *.tgz
 demo
 .kubeconfig
+.idea
+helm-charts.iml
