@@ -1,4 +1,4 @@
-name: Bump Stack Chart Major Version
+name: Bump Stack Chart Minor Version
 sources:
   currentStackVersion:
     kind: helmchart
@@ -14,19 +14,25 @@ conditions:
     spec:
       command: git diff --quiet --name-only origin/main...HEAD -- charts/stack/ && git diff --quiet --name-only -- charts/stack/ && exit 1 || exit 0
     disablesourceinput: true
-  breakingChanges:
-    name: "Check if commit message is a breaking change"
+  nonBreakingChanges:
+    name: "Check if commit is non-breaking"
     kind: shell
     spec:
-      command: git log -1 --no-merges --pretty=%s | tail -n 1 | grep "BREAKING CHANGE"
+      command: git log -1 --no-merges --pretty=%s | tail -n 1 | grep -v "BREAKING CHANGE"
+    disablesourceinput: true
+  isAFeatCommit:
+    name: "Check if commit is a feature"
+    kind: shell
+    spec:
+      command: git log -1 --no-merges --pretty=%s | tail -n 1 | grep "feat"
     disablesourceinput: true
 targets:
-  updateStackChartMajor:
-    name: "Bump Patch Version"
+  updateStackChartMinor:
+    name: "Bump Minor Version"
     kind: yaml
     sourceid: currentStackVersion
     transformers:
-      - semverinc: "major"
+      - semverinc: "minor"
     spec:
       file: "charts/stack/Chart.yaml"
       key: "$.version"

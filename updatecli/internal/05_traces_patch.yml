@@ -1,16 +1,12 @@
-name: Bump Traces Chart Version
+name: Bump Traces Chart Patch Version
 sources:
   currentTracesVersion:
-    kind: githubrelease
+    kind: helmchart
     spec:
-      owner: "observeinc"
-      repository: "helm-charts"
-      token: '{{ requiredEnv "UPDATECLI_GITHUB_TOKEN" }}'
-      versionFilter:
-        kind: regex
-        pattern: "traces-(.*)$"
-    transformers:
-      - trimprefix: "traces-"
+      url: https://observeinc.github.io/helm-charts
+      name: traces
+      versionfilter:
+        kind: "latest"
 conditions:
   chartChanged:
     name: "Check if charts/traces/ has changes"
@@ -18,8 +14,20 @@ conditions:
     spec:
       command: git diff --quiet --name-only origin/main...HEAD -- charts/traces/ && git diff --quiet --name-only -- charts/traces/ && exit 1 || exit 0
     disablesourceinput: true
+  nonBreakingChanges:
+    name: "Check if commit is non-breaking"
+    kind: shell
+    spec:
+      command: git log -1 --no-merges --pretty=%s | tail -n 1 | grep -v "BREAKING CHANGE"
+    disablesourceinput: true
+  isAFixCommit:
+    name: "Check if commit is a fix"
+    kind: shell
+    spec:
+      command: git log -1 --no-merges --pretty=%s | tail -n 1 | grep "fix"
+    disablesourceinput: true
 targets:
-  updateTracesChart:
+  updateTracesChartPatch:
     name: "Bump Patch Version"
     kind: yaml
     sourceid: currentTracesVersion
@@ -28,7 +36,7 @@ targets:
     spec:
       file: "charts/traces/Chart.yaml"
       key: "$.version"
-  updateStackChart:
+  updateStackChartPatch:
     name: "Update Stack Chart Dependency"
     kind: yaml
     sourceid: currentTracesVersion
