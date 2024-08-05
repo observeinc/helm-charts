@@ -5,9 +5,10 @@ type: application
 version: 0.2.0
 appVersion: "0.9.0"
 dependencies:
-  - name: deployment-cluster-events
-    version: 0.2.0
-    repository: file://charts/deployment-cluster-events
+  - name: opentelemetry-collector
+    version: 0.101.1
+    repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+    alias: deployment-cluster-events
 maintainers:
   - name: Observe
     email: support@observeinc.com
