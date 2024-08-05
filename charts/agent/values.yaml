@@ -3,9 +3,147 @@ observe:
   collectionEndpoint:
 
 deployment-cluster-events:
-  deployment-cluster-events:
-    # Resource settings
-    resources:
-      requests:
-        cpu: 250m
-        memory: 256Mi
+  mode: deployment
+
+  nameOverride: "deployment-cluster-events"
+  namespaceOverride: "observe"
+
+  image:
+    repository: observeinc/observe-agent
+    # Overrides the image tag whose default is the chart appVersion.
+    # The service's name will be applied to the end of this value.
+    tag: "0.9.0"
+    pullPolicy: IfNotPresent
+
+  command:
+    name: "observe-agent"
+    extraArgs: ["start", "--config=/observe-agent-conf/observe-agent.yaml", "--otel-config=/conf/relay.yaml"]
+
+  serviceAccount:
+    create: false
+    name: "observe-agent-service-account"
+
+  livenessProbe:
+    httpGet:
+      port: 13133
+      path: /status
+    initialDelaySeconds: 10
+    periodSeconds: 5
+  readinessProbe:
+    httpGet:
+      port: 13133
+      path: /status
+    initialDelaySeconds: 10
+    periodSeconds: 5
+
+  networkPolicy:
+    enabled: true
+    egressRules: [{}]
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  podAnnotations: {
+    observe_monitor_purpose: observecollection,
+    observe_monitor_scrape: 'true',
+    observe_monitor_path: '/metrics',
+    observe_monitor_port: '8888',
+  }
+  ports:
+    metrics:
+      # The metrics port is disabled by default. However you need to enable the port
+      # in order to use the ServiceMonitor (serviceMonitor.enabled) or PodMonitor (podMonitor.enabled).
+      enabled: true
+      containerPort: 8888
+      servicePort: 8888
+      protocol: TCP
+  # this init container provides the cluster uid (kube-system namespace) as config map
+  initContainers:
+    - name: kube-cluster-info
+      image: observeinc/kube-cluster-info:v0.11.1
+      imagePullPolicy: Always
+      env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+  # extract clusteruid from configmap create by init container
+  extraEnvs:
+    - name: OBSERVE_CLUSTER_NAME
+      valueFrom:
+        configMapKeyRef:
+          name: cluster-name
+          key: name
+    - name: OBSERVE_CLUSTER_UID
+      valueFrom:
+        configMapKeyRef:
+          name: cluster-info
+          key: id
+  extraEnvsFrom: []
+  extraVolumes:
+    - name: "observe-agent-deployment-config"
+      configMap:
+        name: "observe-agent"
+        items:
+          - key: "relay"
+            path: "observe-agent.yaml"
+        defaultMode: 420
+
+  extraVolumeMounts:
+    - name: observe-agent-deployment-config
+      mountPath: /observe-agent-conf
+
+  # presets set permissions
+
+  configMap:
+    create: false
+    existingName: "deployment-cluster-events"
+
+  clusterRole:
+    # Specifies whether a clusterRole should be created
+    # Some presets also trigger the creation of a cluster role and cluster role binding.
+    # If using one of those presets, this field is no-op.
+    create: true
+    # Annotations to add to the clusterRole
+    # Can be used in combination with presets that create a cluster role.
+    annotations: {}
+    # The name of the clusterRole to use.
+    # If not set a name is generated using the fullname template
+    # Can be used in combination with presets that create a cluster role.
+    name: ""
+    # A set of rules as documented here : https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+    # Can be used in combination with presets that create a cluster role to add additional rules.
+    # need this rule for init container to create config map
+    rules:
+    - apiGroups: [""]
+      verbs: ["create", "get"]
+      resources:
+        - configmaps
+    # this likely needs refinement for least priviledge
+    - apiGroups:
+      - ""
+      - "*"
+      - "apps"
+      - "authorization.k8s.io"
+      - "autoscaling"
+      - "batch"
+      - "networking.k8s.io"
+      - "events.k8s.io"
+      - "rbac.authorization.k8s.io"
+      - "storage.k8s.io"
+      - "vpcresources.k8s.aws"
+      resources:
+      - "*"
+      verbs:
+      - get
+      - list
+      - watch
+    clusterRoleBinding:
+      # Annotations to add to the clusterRoleBinding
+      # Can be used in combination with presets that create a cluster role binding.
+      annotations: {}
+      # The name of the clusterRoleBinding to use.
+      # If not set a name is generated using the fullname template
+      # Can be used in combination with presets that create a cluster role binding.
+      name: ""
