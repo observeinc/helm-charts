@@ -2,6 +2,8 @@ observe:
   token:
   collectionEndpoint:
 
+namespaceOverride:
+
 deployment-cluster-events:
   mode: deployment
 
