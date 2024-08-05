@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.9.0](https://img.shields.io/badge/AppVersion-0.9.0-informational?style=flat-square)
+![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.9.0](https://img.shields.io/badge/AppVersion-0.9.0-informational?style=flat-square)
 
 > [!CAUTION]
 > This chart is under active development and is not meant to be installed yet.
@@ -17,7 +17,7 @@ Chart to install K8s collection stack based on Observe Agent
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://charts/deployment-cluster-events | deployment-cluster-events | 0.1.0 |
+| file://charts/deployment-cluster-events | deployment-cluster-events | 0.2.0 |
 
 ## Values
 

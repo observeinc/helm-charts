@@ -1,6 +1,6 @@
 dependencies:
 - name: deployment-cluster-events
   repository: file://charts/deployment-cluster-events
-  version: 0.1.0
-digest: sha256:d1d1fd1f833488c430d498f64f390170fbc21da958b7e2bc6c4d2245118d0404
-generated: "2024-07-31T14:54:47.199303-07:00"
+  version: 0.2.0
+digest: sha256:7a76d3d662ecd58b84656c2668ca46587b1a60c24cbd6063df0dc756d3ee9e6d
+generated: "2024-08-05T13:19:32.575103-07:00"
