@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.9.0](https://img.shields.io/badge/AppVersion-0.9.0-informational?style=flat-square)
+![Version: 0.4.0](https://img.shields.io/badge/Version-0.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.9.0](https://img.shields.io/badge/AppVersion-0.9.0-informational?style=flat-square)
 
 > [!CAUTION]
 > This chart is under active development and is not meant to be installed yet.
@@ -100,6 +100,7 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-cluster-events.resources.requests.memory | string | `"256Mi"` |  |
 | deployment-cluster-events.serviceAccount.create | bool | `false` |  |
 | deployment-cluster-events.serviceAccount.name | string | `"observe-agent-service-account"` |  |
+| namespaceOverride | string | `nil` |  |
 | observe.collectionEndpoint | string | `nil` |  |
 | observe.token | string | `nil` |  |
 
