@@ -2,6 +2,23 @@ apiVersion: v1
 entries:
   agent:
   - apiVersion: v2
+    appVersion: 0.9.0
+    created: "2024-08-05T20:24:22.372034764Z"
+    dependencies:
+    - name: deployment-cluster-events
+      repository: file://charts/deployment-cluster-events
+      version: 0.2.0
+    description: Chart to install K8s collection stack based on Observe Agent
+    digest: d4b14f2ab23a220dd6c47103a8e7ef75d4d710ea042e06a5dcacac320003d7fa
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: agent
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/agent-0.2.0/agent-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     appVersion: 0.6.0
     created: "2024-07-16T20:07:07.976969758Z"
     dependencies:
@@ -3874,4 +3891,4 @@ entries:
     urls:
     - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.0/traces-0.1.0.tgz
     version: 0.1.0
-generated: "2024-07-26T18:47:47.461351475Z"
+generated: "2024-08-05T20:24:22.372304998Z"
