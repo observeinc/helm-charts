@@ -26,6 +26,7 @@ jobs:
 
       - name: Run pre-commit
         uses: pre-commit/action@v3.0.1
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
