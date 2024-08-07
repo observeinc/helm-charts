@@ -24,6 +24,11 @@ jobs:
         env:
           UPDATECLI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Run pre-commit
+        uses: pre-commit/action@v3.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       # Use Peter Evans Pull Request Action to create a pull request
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
