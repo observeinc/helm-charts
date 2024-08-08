@@ -1,0 +1,32 @@
+global:
+  observe:
+    collectionEndpoint: "http://test-traces-collector.testing.svc.cluster.local:8080"
+
+observe:
+  token:
+    create: true
+    value: "fake-token"
+
+proxy:
+  enabled: true
+  nameOverride: collector
+  image:
+    repository: test-collector
+    tag: latest
+  args:
+  - "-enable-tracing"
+  env:
+  - name: OTEL_EXPORTER_OTLP_ENDPOINT
+    value: "http://test-traces.testing.svc.cluster.local:4318"
+
+opentelemetry-collector:
+  fullnameOverride: "test-traces"
+  mode: deployment
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
