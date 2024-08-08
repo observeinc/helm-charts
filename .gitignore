@@ -1,3 +1,14 @@
 *.tgz
 demo
 .kubeconfig
+
+
+#terraform
+integration/.terraform
+.terraform/
+*.tfstate*
+terraform.tfvars
+*.auto.tfvars
+tfplan
+.terraform.lock.hcl
+*_override.tf
