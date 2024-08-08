@@ -7,12 +7,12 @@ terraform {
     }
   }
   backend "s3" {
-    bucket = "observe-agent-terraform-state"
-    key    = "modules/setup_aws/.tfstate"
+    bucket = "helm-charts-agent-terraform-state"
+    key    = "modules/setup_aws_eks/.tfstate"
     region = "us-west-1"
     assume_role = {
       #role_arn = "arn:aws:iam::767397788203:role/OrganizationAccountAccessRole"
-      role_arn = "arn:aws:iam::767397788203:role/gh-observe_agent-repo"
+      role_arn = "arn:aws:iam::767397788203:role/gh-helm-charts-repo"
     }
   }
   required_version = ">= 1.2"
@@ -23,6 +23,6 @@ provider "aws" {
   profile = "blunderdome"
   assume_role {
     #role_arn = "arn:aws:iam::767397788203:role/OrganizationAccountAccessRole"
-    role_arn = "arn:aws:iam::767397788203:role/gh-observe_agent-repo"
+    role_arn = "arn:aws:iam::767397788203:role/gh-helm-charts-repo"
   }
 }
