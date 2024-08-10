@@ -2,6 +2,22 @@ observe:
   token:
   collectionEndpoint:
 
+cluster:
+  name: observe-monitored-cluster
+  events:
+    pullInterval: 20m
+
+config:
+  global:
+    processors:
+      batch:
+        send_batch_size: 100
+        send_batch_max_size: 100
+    service:
+      telemetry:
+        metrics_level: normal
+        logging_level: WARN
+
 namespaceOverride:
 
 deployment-cluster-events:

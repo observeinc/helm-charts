@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-name
+  namespace: {{ template "observe-agent.namespace" . }}
+data:
+  name: {{ .Values.cluster.name }}
