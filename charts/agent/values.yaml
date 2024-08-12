@@ -26,6 +26,10 @@ deployment-cluster-events:
   nameOverride: "deployment-cluster-events"
   namespaceOverride: "observe"
 
+  configMap:
+    create: false
+    existingName: "deployment-cluster-events"
+
   image:
     # repository: "otel/opentelemetry-collector-contrib"
     # tag: "0.104.0"
@@ -120,11 +124,113 @@ deployment-cluster-events:
     - name: observe-agent-deployment-config
       mountPath: /observe-agent-conf
 
-  # presets set permissions
+deployment-cluster-metrics:
+  mode: deployment
+
+  nameOverride: "deployment-cluster-metrics"
+  namespaceOverride: "observe"
 
   configMap:
     create: false
-    existingName: "deployment-cluster-events"
+    existingName: "deployment-cluster-metrics"
+
+  image:
+    repository: "otel/opentelemetry-collector-contrib"
+    tag: "0.104.0"
+    # repository: observeinc/observe-agent
+    # # Overrides the image tag whose default is the chart appVersion.
+    # # The service's name will be applied to the end of this value.
+    # tag: "0.9.0"
+    pullPolicy: IfNotPresent
+
+  # command:
+  #   name: "observe-agent"
+  #   extraArgs: ["start", "--config=/observe-agent-conf/observe-agent.yaml", "--otel-config=/conf/relay.yaml"]
+
+  serviceAccount:
+    create: false
+    name: "observe-agent-service-account"
+
+  clusterRole:
+    create: false
+    name: "observe-agent-cluster-role"
+
+  livenessProbe:
+    httpGet:
+      port: 13133
+      path: /
+      # path: /status
+    initialDelaySeconds: 30
+    periodSeconds: 5
+  readinessProbe:
+    httpGet:
+      port: 13133
+      path: /
+      # path: /status
+    initialDelaySeconds: 30
+    periodSeconds: 5
+
+  networkPolicy:
+    enabled: true
+    egressRules: [{}]
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  podAnnotations: {
+    observe_monitor_purpose: observecollection,
+    observe_monitor_scrape: 'true',
+    observe_monitor_path: '/metrics',
+    observe_monitor_port: '8888',
+  }
+  ports:
+    metrics:
+      # The metrics port is disabled by default. However you need to enable the port
+      # in order to use the ServiceMonitor (serviceMonitor.enabled) or PodMonitor (podMonitor.enabled).
+      enabled: true
+      containerPort: 8888
+      servicePort: 8888
+      protocol: TCP
+  # this init container provides the cluster uid (kube-system namespace) as config map
+  initContainers:
+    - name: kube-cluster-info
+      image: observeinc/kube-cluster-info:v0.11.1
+      imagePullPolicy: Always
+      env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+  # extract clusteruid from configmap create by init container
+  extraEnvs:
+    - name: OBSERVE_CLUSTER_NAME
+      valueFrom:
+        configMapKeyRef:
+          name: cluster-name
+          key: name
+    - name: OBSERVE_CLUSTER_UID
+      valueFrom:
+        configMapKeyRef:
+          name: cluster-info
+          key: id
+  extraEnvsFrom: []
+  extraVolumes:
+    - name: "observe-agent-deployment-config"
+      configMap:
+        name: "observe-agent"
+        items:
+          - key: "relay"
+            path: "observe-agent.yaml"
+        defaultMode: 420
+
+  extraVolumeMounts:
+    - name: observe-agent-deployment-config
+      mountPath: /observe-agent-conf
+
+
+
+
 
 
 

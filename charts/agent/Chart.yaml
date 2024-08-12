@@ -9,6 +9,10 @@ dependencies:
     version: 0.101.1
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     alias: deployment-cluster-events
+  - name: opentelemetry-collector
+    version: 0.101.1
+    repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+    alias: deployment-cluster-metrics
 maintainers:
   - name: Observe
     email: support@observeinc.com
