@@ -24,11 +24,10 @@ jobs:
         env:
           UPDATECLI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run pre-commit
-        uses: pre-commit/action@v3.0.1
-        continue-on-error: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run helm-docs
+        uses: losisin/helm-docs-github-action@v1
+        with:
+          git-push: false
 
       # Use Peter Evans Pull Request Action to create a pull request
       - name: Create Pull Request
