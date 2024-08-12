@@ -27,7 +27,6 @@ terraform {
     region = "us-west-1"
     assume_role = {
       role_arn = "arn:aws:iam::767397788203:role/OrganizationAccountAccessRole"
-      #role_arn = "arn:aws:iam::767397788203:role/gh-helm-charts-repo"
     }
   }
   required_version = ">= 1.3"
@@ -37,7 +36,6 @@ provider "aws" {
   region = var.region # Specify the AWS region
   profile = "blunderdome"
   assume_role {
-    role_arn = "arn:aws:iam::767397788203:role/OrganizationAccountAccessRole"
-    #role_arn = "arn:aws:iam::767397788203:role/gh-helm-charts-repo"
+    role_arn = "arn:aws:iam::767397788203:role/OrganizationAccountAccessRole"   
   }
 }
