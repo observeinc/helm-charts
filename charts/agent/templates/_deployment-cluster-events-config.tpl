@@ -4,6 +4,7 @@ extensions:
 {{- include "config.extensions.health_check" . | nindent 2 }}
 
 exporters:
+{{- include "config.exporters.debug" . | nindent 2 }}
 {{- include "config.exporters.otlphttp.observe" . | nindent 2 }}
 
 receivers:
@@ -75,25 +76,13 @@ processors:
 
 {{- include "config.processors.batch" . | nindent 2 }}
 
-{{- include "config.processors.k8sattributes" . | nindent 2 }}
+{{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
 
 {{- include "config.processors.attributes.observe_common" . | nindent 2 }}
 
-  k8sattributes/podcontroller:
-    extract:
-      metadata:
-      - k8s.deployment.name
-      - k8s.statefulset.name
-      - k8s.replicaset.name
-      - k8s.daemonset.name
-      - k8s.cronjob.name
-      - k8s.job.name
-    pod_association:
-      - sources:
-          - from: resource_attribute
-            name: k8s.pod.name
-          - from: resource_attribute
-            name: k8s.namespace.name
+{{- include "config.processors.attributes.observek8sattributes" . | nindent 2 }}
+
+{{- include "config.processors.attributes.k8sattributes.podcontroller" . | nindent 2 }}
 
   transform/podcontroller:
     error_mode: ignore
@@ -259,15 +248,17 @@ processors:
           - set(body, "")
 
 service:
+  extensions:
+    - health_check
   pipelines:
       logs/objects:
         receivers: [k8sobjects/objects]
-        processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, transform/object]
-        exporters: [otlphttp/observe]
+        processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, transform/object, observek8sattributes]
+        exporters: [otlphttp/observe, debug]
       logs/cluster:
         receivers: [k8sobjects/cluster]
         processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, filter/cluster, transform/cluster]
-        exporters: [otlphttp/observe] 
+        exporters: [otlphttp/observe, debug] 
 {{- include "config.service.telemetry" . | nindent 2 }}
 
  {{- end }}

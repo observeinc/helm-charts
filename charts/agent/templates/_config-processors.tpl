@@ -11,7 +11,7 @@ batch:
   send_batch_max_size: {{ .Values.config.global.processors.batch.send_batch_max_size }}
 {{- end -}}
 
-{{- define "config.processors.k8sattributes" -}}
+{{- define "config.processors.attributes.k8sattributes" -}}
 k8sattributes:
   extract:
     annotations:
@@ -36,6 +36,24 @@ k8sattributes:
     - k8s.cluster.uid
     - k8s.node.name
     - k8s.node.uid
+{{- end -}}
+
+{{- define "config.processors.attributes.k8sattributes.podcontroller" -}}
+k8sattributes/podcontroller:
+  extract:
+    metadata:
+    - k8s.deployment.name
+    - k8s.statefulset.name
+    - k8s.replicaset.name
+    - k8s.daemonset.name
+    - k8s.cronjob.name
+    - k8s.job.name
+  pod_association:
+    - sources:
+        - from: resource_attribute
+          name: k8s.pod.name
+        - from: resource_attribute
+          name: k8s.namespace.name
 {{- end -}}
 
 {{- define "config.processors.attributes.observe_common" -}}
@@ -69,4 +87,9 @@ memory_limiter:
   # For instance setting of 25% with the total memory of 1GiB will result in the spike limit of 250MiB. 
   # This option is intended to be used only with limit_percentage.
   spike_limit_percentage: 25
+{{- end -}}
+
+{{- define "config.processors.attributes.observek8sattributes" -}}
+# needs to come after transform/watch_objects in pipelines
+observek8sattributes:
 {{- end -}}

@@ -6,5 +6,5 @@
   {{- end -}}
 {{- end -}}
 {{- define "config.local_host" -}}
-0.0.0.0
+${env:MY_POD_IP}
 {{- end -}}
