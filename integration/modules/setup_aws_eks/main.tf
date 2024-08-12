@@ -57,6 +57,25 @@ module "eks" {
   cluster_name    = local.cluster_name
   cluster_version = "1.29"
 
+
+  access_entries = {
+    # One access entry with a policy associated
+    example = {
+      kubernetes_groups = []
+      principal_arn     = "arn:aws:iam::767397788203:role/gh-helm-charts-repo"
+
+      policy_associations = {
+        example = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type       = "cluster"
+          }
+        }
+      }
+    }
+  }
+ 
+
   cluster_endpoint_public_access           = true
   enable_cluster_creator_admin_permissions = true
 
