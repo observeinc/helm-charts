@@ -7,7 +7,6 @@ data "aws_eks_cluster_auth" "cluster" {
 }
 
 resource "helm_release" "observe-stack" {
-  depends_on = [ data.aws_eks_cluster.cluster, data.aws_eks_cluster_auth.cluster ]
   name       = "observe-stack"
   chart      = "${path.module}/../../../charts/stack"
   create_namespace = true
