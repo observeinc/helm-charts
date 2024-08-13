@@ -4,6 +4,7 @@ extensions:
 {{- include "config.extensions.health_check" . | nindent 2 }}
 
 exporters:
+{{- include "config.exporters.debug" . | nindent 2 }}
 {{- include "config.exporters.prometheusremotewrite" . | nindent 2 }}
 
 receivers:
@@ -44,7 +45,7 @@ service:
       metrics:
         receivers: [k8s_cluster]
         processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, attributes/observe_cluster_metrics]
-        exporters: [prometheusremotewrite]
+        exporters: [prometheusremotewrite, debug]
 {{- include "config.service.telemetry" . | nindent 2 }}
 
  {{- end }}

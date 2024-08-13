@@ -2,7 +2,7 @@ apiVersion: v2
 name: agent
 description: Chart to install K8s collection stack based on Observe Agent
 type: application
-version: 0.4.0
+version: 0.4.1
 appVersion: "0.9.0"
 dependencies:
   - name: opentelemetry-collector
@@ -13,6 +13,10 @@ dependencies:
     version: 0.101.1
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     alias: deployment-cluster-metrics
+  - name: opentelemetry-collector
+    version: 0.101.1
+    repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+    alias: daemonset-logs-metrics
 maintainers:
   - name: Observe
     email: support@observeinc.com

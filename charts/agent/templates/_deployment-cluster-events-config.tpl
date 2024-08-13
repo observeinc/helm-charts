@@ -248,8 +248,7 @@ processors:
           - set(body, "")
 
 service:
-  extensions:
-    - health_check
+  extensions: [health_check]
   pipelines:
       logs/objects:
         receivers: [k8sobjects/objects]
@@ -258,7 +257,7 @@ service:
       logs/cluster:
         receivers: [k8sobjects/cluster]
         processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, filter/cluster, transform/cluster]
-        exporters: [otlphttp/observe, debug] 
+        exporters: [otlphttp/observe, debug]
 {{- include "config.service.telemetry" . | nindent 2 }}
 
  {{- end }}

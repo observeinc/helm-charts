@@ -5,7 +5,7 @@ metadata:
   labels:
     app.kubernetes.io/name: observe-agent-cluster-role
     app.kubernetes.io/instance: observe-agent
- 
+
 rules:
   - apiGroups:
     - ""
@@ -40,7 +40,7 @@ metadata:
   labels:
     app.kubernetes.io/name: observe-agent-cluster-role-binding
     app.kubernetes.io/instance: observe-agent
-    
+
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
