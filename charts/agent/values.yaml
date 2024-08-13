@@ -2,13 +2,44 @@ observe:
   token:
   collectionEndpoint:
 
+cluster:
+  name: observe-agent-monitored-cluster
+  events:
+    pullInterval: 20m
+
+config:
+  global:
+    processors:
+      batch:
+        send_batch_size: 100
+        send_batch_max_size: 100
+    service:
+      telemetry:
+        metrics_level: normal
+        logging_level: WARN
+
 namespaceOverride:
 
+################################################
 deployment-cluster-events:
   mode: deployment
 
+  #-----------------------------------------#
+  # Different for each deployment/daemonset #
   nameOverride: "deployment-cluster-events"
   namespaceOverride: "observe"
+
+  configMap:
+    create: false
+    existingName: "deployment-cluster-events"
+  #-----------------------------------------#
+
+  #-----------------------------------------#
+  # Same for each deployment/daemonset      #
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
 
   image:
     repository: observeinc/observe-agent
@@ -25,27 +56,28 @@ deployment-cluster-events:
     create: false
     name: "observe-agent-service-account"
 
+  clusterRole:
+    create: false
+    name: "observe-agent-cluster-role"
+
   livenessProbe:
     httpGet:
       port: 13133
       path: /status
-    initialDelaySeconds: 10
+    initialDelaySeconds: 30
     periodSeconds: 5
   readinessProbe:
     httpGet:
       port: 13133
       path: /status
-    initialDelaySeconds: 10
+    initialDelaySeconds: 30
     periodSeconds: 5
 
   networkPolicy:
     enabled: true
     egressRules: [{}]
 
-  resources:
-    requests:
-      cpu: 250m
-      memory: 256Mi
+
   podAnnotations: {
     observe_monitor_purpose: observecollection,
     observe_monitor_scrape: 'true',
@@ -95,57 +127,245 @@ deployment-cluster-events:
   extraVolumeMounts:
     - name: observe-agent-deployment-config
       mountPath: /observe-agent-conf
+  #-----------------------------------------#
 
-  # presets set permissions
+################################################
+deployment-cluster-metrics:
+  mode: deployment
+  #-----------------------------------------#
+  # Different for each deployment/daemonset #
+  nameOverride: "deployment-cluster-metrics"
+  namespaceOverride: "observe"
 
   configMap:
     create: false
-    existingName: "deployment-cluster-events"
+    existingName: "deployment-cluster-metrics"
+  #-----------------------------------------#
 
+  #-----------------------------------------#
+  # Same for each deployment/daemonset      #
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+  image:
+    repository: observeinc/observe-agent
+    # # Overrides the image tag whose default is the chart appVersion.
+    # # The service's name will be applied to the end of this value.
+    tag: "0.9.0"
+    pullPolicy: IfNotPresent
+
+  command:
+    name: "observe-agent"
+    extraArgs: ["start", "--config=/observe-agent-conf/observe-agent.yaml", "--otel-config=/conf/relay.yaml"]
+
+  serviceAccount:
+    create: false
+    name: "observe-agent-service-account"
   clusterRole:
-    # Specifies whether a clusterRole should be created
-    # Some presets also trigger the creation of a cluster role and cluster role binding.
-    # If using one of those presets, this field is no-op.
-    create: true
-    # Annotations to add to the clusterRole
-    # Can be used in combination with presets that create a cluster role.
-    annotations: {}
-    # The name of the clusterRole to use.
-    # If not set a name is generated using the fullname template
-    # Can be used in combination with presets that create a cluster role.
-    name: ""
-    # A set of rules as documented here : https://kubernetes.io/docs/reference/access-authn-authz/rbac/
-    # Can be used in combination with presets that create a cluster role to add additional rules.
-    # need this rule for init container to create config map
-    rules:
-    - apiGroups: [""]
-      verbs: ["create", "get"]
-      resources:
-        - configmaps
-    # this likely needs refinement for least priviledge
-    - apiGroups:
-      - ""
-      - "*"
-      - "apps"
-      - "authorization.k8s.io"
-      - "autoscaling"
-      - "batch"
-      - "networking.k8s.io"
-      - "events.k8s.io"
-      - "rbac.authorization.k8s.io"
-      - "storage.k8s.io"
-      - "vpcresources.k8s.aws"
-      resources:
-      - "*"
-      verbs:
-      - get
-      - list
-      - watch
-    clusterRoleBinding:
-      # Annotations to add to the clusterRoleBinding
-      # Can be used in combination with presets that create a cluster role binding.
-      annotations: {}
-      # The name of the clusterRoleBinding to use.
-      # If not set a name is generated using the fullname template
-      # Can be used in combination with presets that create a cluster role binding.
-      name: ""
+    create: false
+    name: "observe-agent-cluster-role"
+
+  livenessProbe:
+    httpGet:
+      port: 13133
+      path: /
+    initialDelaySeconds: 30
+    periodSeconds: 5
+
+  readinessProbe:
+    httpGet:
+      port: 13133
+      path: /
+    initialDelaySeconds: 30
+    periodSeconds: 5
+
+  networkPolicy:
+    enabled: true
+    egressRules: [{}]
+
+  podAnnotations: {
+    observe_monitor_purpose: observecollection,
+    observe_monitor_scrape: 'true',
+    observe_monitor_path: '/metrics',
+    observe_monitor_port: '8888',
+  }
+  ports:
+    metrics:
+      # The metrics port is disabled by default. However you need to enable the port
+      # in order to use the ServiceMonitor (serviceMonitor.enabled) or PodMonitor (podMonitor.enabled).
+      enabled: true
+      containerPort: 8888
+      servicePort: 8888
+      protocol: TCP
+  # this init container provides the cluster uid (kube-system namespace) as config map
+  initContainers:
+    - name: kube-cluster-info
+      image: observeinc/kube-cluster-info:v0.11.1
+      imagePullPolicy: Always
+      env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+  # extract clusteruid from configmap create by init container
+  extraEnvs:
+    - name: OBSERVE_CLUSTER_NAME
+      valueFrom:
+        configMapKeyRef:
+          name: cluster-name
+          key: name
+    - name: OBSERVE_CLUSTER_UID
+      valueFrom:
+        configMapKeyRef:
+          name: cluster-info
+          key: id
+
+  extraEnvsFrom: []
+  extraVolumes:
+    - name: "observe-agent-deployment-config"
+      configMap:
+        name: "observe-agent"
+        items:
+          - key: "relay"
+            path: "observe-agent.yaml"
+        defaultMode: 420
+  extraVolumeMounts:
+    - name: observe-agent-deployment-config
+      mountPath: /observe-agent-conf
+  #-----------------------------------------#
+
+################################################
+daemonset-logs-metrics:
+  mode: daemonset
+  #-----------------------------------------#
+  # Different for each deployment/daemonset #
+  nameOverride: "daemonset-logs-metrics"
+  namespaceOverride: "observe"
+
+  configMap:
+    create: false
+    existingName: "daemonset-logs-metrics"
+  #-----------------------------------------#
+
+  #-----------------------------------------#
+  # Same for each deployment/daemonset      #
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+  image:
+    repository: observeinc/observe-agent
+    # # Overrides the image tag whose default is the chart appVersion.
+    # # The service's name will be applied to the end of this value.
+    tag: "0.9.0"
+    pullPolicy: IfNotPresent
+
+  command:
+    name: "observe-agent"
+    extraArgs: ["start", "--config=/observe-agent-conf/observe-agent.yaml", "--otel-config=/conf/relay.yaml"]
+
+  serviceAccount:
+    create: false
+    name: "observe-agent-service-account"
+  clusterRole:
+    create: false
+    name: "observe-agent-cluster-role"
+
+  livenessProbe:
+    httpGet:
+      port: 13133
+      path: /
+    initialDelaySeconds: 30
+    periodSeconds: 5
+
+  readinessProbe:
+    httpGet:
+      port: 13133
+      path: /
+    initialDelaySeconds: 30
+    periodSeconds: 5
+
+  networkPolicy:
+    enabled: true
+    egressRules: [{}]
+
+  podAnnotations: {
+    observe_monitor_purpose: observecollection,
+    observe_monitor_scrape: 'true',
+    observe_monitor_path: '/metrics',
+    observe_monitor_port: '8888',
+  }
+  ports:
+    metrics:
+      # The metrics port is disabled by default. However you need to enable the port
+      # in order to use the ServiceMonitor (serviceMonitor.enabled) or PodMonitor (podMonitor.enabled).
+      enabled: true
+      containerPort: 8888
+      servicePort: 8888
+      protocol: TCP
+  # this init container provides the cluster uid (kube-system namespace) as config map
+  initContainers:
+    - name: kube-cluster-info
+      image: observeinc/kube-cluster-info:v0.11.1
+      imagePullPolicy: Always
+      env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+  # extract clusteruid from configmap create by init container
+  extraEnvs:
+    - name: OBSERVE_CLUSTER_NAME
+      valueFrom:
+        configMapKeyRef:
+          name: cluster-name
+          key: name
+    - name: OBSERVE_CLUSTER_UID
+      valueFrom:
+        configMapKeyRef:
+          name: cluster-info
+          key: id
+    - name: K8S_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+  extraEnvsFrom: []
+  extraVolumes:
+    - name: "observe-agent-deployment-config"
+      configMap:
+        name: "observe-agent"
+        items:
+          - key: "relay"
+            path: "observe-agent.yaml"
+        defaultMode: 420
+    - name: varlogpods
+      hostPath:
+        path: /var/log/pods
+    - name: varlibdockercontainers
+      hostPath:
+        path: /var/lib/docker/containers
+    - name: varlibotelcol
+      hostPath:
+        path: /var/lib/otelcol
+        type: DirectoryOrCreate
+
+
+  extraVolumeMounts:
+    - name: observe-agent-deployment-config
+      mountPath: /observe-agent-conf
+    - mountPath: /var/log/pods
+      name: varlogpods
+      readOnly: true
+    - mountPath: /var/lib/docker/containers
+      name: varlibdockercontainers
+      readOnly: true
+    - mountPath: /var/lib/otelcol
+      name: varlibotelcol
+
+  securityContext:
+    runAsUser: 0
+    runAsGroup: 0
+  #-----------------------------------------#
