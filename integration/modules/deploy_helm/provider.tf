@@ -17,14 +17,14 @@ terraform {
 }
 
 
-
 provider "helm" {
   kubernetes {
     host                   = data.aws_eks_cluster.cluster.endpoint
     cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
     exec {
       api_version = "client.authentication.k8s.io/v1beta1"
-      args        = ["eks", "get-token", "--cluster-name", data.aws_eks_cluster.cluster.name]
+      args        = ["eks", "get-token", "--cluster-name", data.aws_eks_cluster.cluster.name, "--role-arn", var.cluster_role_arn]
+      #args        = ["eks", "get-token", "--cluster-name", data.aws_eks_cluster.cluster.name]
       command     = "aws"
     }
   }
@@ -35,18 +35,20 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
-    args        = ["eks", "get-token", "--cluster-name", data.aws_eks_cluster.cluster.name]
+    args        = ["eks", "get-token", "--cluster-name", data.aws_eks_cluster.cluster.name, "--role-arn", var.cluster_role_arn]
+    #args        = ["eks", "get-token", "--cluster-name", data.aws_eks_cluster.cluster.name]
     command     = "aws"
   }
 }
 
+# Create provider_override.tf with the following for local use 
+# provider "aws" {
+#   region = var.region # Specify the AWS region
+#   profile = "blunderdome"
+#   assume_role {
+#     role_arn = var.cluster_role_arn
+#   }
+# }
 
-provider "aws" {
-  region = var.region # Specify the AWS region
-  profile = "blunderdome"
-  assume_role {
-    role_arn = "arn:aws:iam::767397788203:role/gh-helm-charts-repo"   
-  }
-}
-
+provider "aws" {}
 
