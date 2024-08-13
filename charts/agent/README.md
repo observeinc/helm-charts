@@ -83,7 +83,7 @@ Chart to install K8s collection stack based on Observe Agent
 | daemonset-logs-metrics.livenessProbe.initialDelaySeconds | int | `30` |  |
 | daemonset-logs-metrics.livenessProbe.periodSeconds | int | `5` |  |
 | daemonset-logs-metrics.mode | string | `"daemonset"` |  |
-| daemonset-logs-metrics.nameOverride | string | `"daemonset-logs-metrics"` |  |
+| daemonset-logs-metrics.nameOverride | string | `"daemonset-logs-metrics"` | --------------------------------------- # Different for each deployment/daemonset # |
 | daemonset-logs-metrics.namespaceOverride | string | `"observe"` |  |
 | daemonset-logs-metrics.networkPolicy.egressRules[0] | object | `{}` |  |
 | daemonset-logs-metrics.networkPolicy.enabled | bool | `true` |  |
@@ -99,8 +99,7 @@ Chart to install K8s collection stack based on Observe Agent
 | daemonset-logs-metrics.readinessProbe.httpGet.port | int | `13133` |  |
 | daemonset-logs-metrics.readinessProbe.initialDelaySeconds | int | `30` |  |
 | daemonset-logs-metrics.readinessProbe.periodSeconds | int | `5` |  |
-| daemonset-logs-metrics.resources.requests.cpu | string | `"250m"` |  |
-| daemonset-logs-metrics.resources.requests.memory | string | `"256Mi"` |  |
+| daemonset-logs-metrics.resources | object | `{"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | daemonset-logs-metrics.securityContext.runAsGroup | int | `0` |  |
 | daemonset-logs-metrics.securityContext.runAsUser | int | `0` |  |
 | daemonset-logs-metrics.serviceAccount.create | bool | `false` |  |
@@ -140,7 +139,7 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-cluster-events.livenessProbe.initialDelaySeconds | int | `30` |  |
 | deployment-cluster-events.livenessProbe.periodSeconds | int | `5` |  |
 | deployment-cluster-events.mode | string | `"deployment"` |  |
-| deployment-cluster-events.nameOverride | string | `"deployment-cluster-events"` |  |
+| deployment-cluster-events.nameOverride | string | `"deployment-cluster-events"` | --------------------------------------- # Different for each deployment/daemonset # |
 | deployment-cluster-events.namespaceOverride | string | `"observe"` |  |
 | deployment-cluster-events.networkPolicy.egressRules[0] | object | `{}` |  |
 | deployment-cluster-events.networkPolicy.enabled | bool | `true` |  |
@@ -156,8 +155,7 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-cluster-events.readinessProbe.httpGet.port | int | `13133` |  |
 | deployment-cluster-events.readinessProbe.initialDelaySeconds | int | `30` |  |
 | deployment-cluster-events.readinessProbe.periodSeconds | int | `5` |  |
-| deployment-cluster-events.resources.requests.cpu | string | `"250m"` |  |
-| deployment-cluster-events.resources.requests.memory | string | `"256Mi"` |  |
+| deployment-cluster-events.resources | object | `{"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | deployment-cluster-events.serviceAccount.create | bool | `false` |  |
 | deployment-cluster-events.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | deployment-cluster-metrics.clusterRole.create | bool | `false` |  |
@@ -195,7 +193,7 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-cluster-metrics.livenessProbe.initialDelaySeconds | int | `30` |  |
 | deployment-cluster-metrics.livenessProbe.periodSeconds | int | `5` |  |
 | deployment-cluster-metrics.mode | string | `"deployment"` |  |
-| deployment-cluster-metrics.nameOverride | string | `"deployment-cluster-metrics"` |  |
+| deployment-cluster-metrics.nameOverride | string | `"deployment-cluster-metrics"` | --------------------------------------- # Different for each deployment/daemonset # |
 | deployment-cluster-metrics.namespaceOverride | string | `"observe"` |  |
 | deployment-cluster-metrics.networkPolicy.egressRules[0] | object | `{}` |  |
 | deployment-cluster-metrics.networkPolicy.enabled | bool | `true` |  |
@@ -211,10 +209,12 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-cluster-metrics.readinessProbe.httpGet.port | int | `13133` |  |
 | deployment-cluster-metrics.readinessProbe.initialDelaySeconds | int | `30` |  |
 | deployment-cluster-metrics.readinessProbe.periodSeconds | int | `5` |  |
-| deployment-cluster-metrics.resources.requests.cpu | string | `"250m"` |  |
-| deployment-cluster-metrics.resources.requests.memory | string | `"256Mi"` |  |
+| deployment-cluster-metrics.resources | object | `{"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | deployment-cluster-metrics.serviceAccount.create | bool | `false` |  |
 | deployment-cluster-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | namespaceOverride | string | `nil` |  |
 | observe.collectionEndpoint | string | `nil` |  |
 | observe.token | string | `nil` |  |
+
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)
