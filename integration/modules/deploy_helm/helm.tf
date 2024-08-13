@@ -11,9 +11,13 @@ resource "helm_release" "observe-stack" {
   chart      = "${path.module}/../../../charts/stack"
   create_namespace = true
   namespace = "observe"
-
-
-#   values = [
-#     file("${path.module}/nginx-values.yaml")
-#   ]
+  timeout = 300 #This is default 
+  set {
+    name = "global.observe.collectionEndpoint"
+    value = "https://143958683374.collect.observe-staging.com/"
+  }
+  set {
+    name = "observe.token.value"
+    value = "ds13aZa5kaTPlP45ELKH:K3NIKVfTIJ94xh5DkFKCM9BNTgyRpXph"
+  }
 }
