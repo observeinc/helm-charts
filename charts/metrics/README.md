@@ -1,6 +1,6 @@
 # metrics
 
-![Version: 0.3.22](https://img.shields.io/badge/Version-0.3.22-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.3.23](https://img.shields.io/badge/Version-0.3.23-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe metrics collection
 
@@ -15,7 +15,7 @@ Observe metrics collection
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../endpoint | endpoint | 0.1.11 |
-| https://grafana.github.io/helm-charts | grafana-agent | 0.41.0 |
+| https://grafana.github.io/helm-charts | grafana-agent | 0.42.0 |
 
 ## Values
 
