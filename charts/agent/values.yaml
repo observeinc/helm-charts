@@ -24,7 +24,7 @@ namespaceOverride:
 deployment-cluster-events:
   mode: deployment
 
-  #-----------------------------------------#
+  # ----------------------------------------- #
   # Different for each deployment/daemonset #
   nameOverride: "deployment-cluster-events"
   namespaceOverride: "observe"
@@ -32,9 +32,9 @@ deployment-cluster-events:
   configMap:
     create: false
     existingName: "deployment-cluster-events"
-  #-----------------------------------------#
+  # ----------------------------------------- #
 
-  #-----------------------------------------#
+  # ----------------------------------------- #
   # Same for each deployment/daemonset      #
   resources:
     requests:
@@ -127,12 +127,12 @@ deployment-cluster-events:
   extraVolumeMounts:
     - name: observe-agent-deployment-config
       mountPath: /observe-agent-conf
-  #-----------------------------------------#
+  # ----------------------------------------- #
 
 ################################################
 deployment-cluster-metrics:
   mode: deployment
-  #-----------------------------------------#
+  # ----------------------------------------- #
   # Different for each deployment/daemonset #
   nameOverride: "deployment-cluster-metrics"
   namespaceOverride: "observe"
@@ -140,9 +140,9 @@ deployment-cluster-metrics:
   configMap:
     create: false
     existingName: "deployment-cluster-metrics"
-  #-----------------------------------------#
+  # ----------------------------------------- #
 
-  #-----------------------------------------#
+  # ----------------------------------------- #
   # Same for each deployment/daemonset      #
   resources:
     requests:
@@ -234,12 +234,12 @@ deployment-cluster-metrics:
   extraVolumeMounts:
     - name: observe-agent-deployment-config
       mountPath: /observe-agent-conf
-  #-----------------------------------------#
+  # ----------------------------------------- #
 
 ################################################
 daemonset-logs-metrics:
   mode: daemonset
-  #-----------------------------------------#
+  # ----------------------------------------- #
   # Different for each deployment/daemonset #
   nameOverride: "daemonset-logs-metrics"
   namespaceOverride: "observe"
@@ -247,9 +247,9 @@ daemonset-logs-metrics:
   configMap:
     create: false
     existingName: "daemonset-logs-metrics"
-  #-----------------------------------------#
+  # ----------------------------------------- #
 
-  #-----------------------------------------#
+  # ----------------------------------------- #
   # Same for each deployment/daemonset      #
   resources:
     requests:
@@ -368,4 +368,4 @@ daemonset-logs-metrics:
   securityContext:
     runAsUser: 0
     runAsGroup: 0
-  #-----------------------------------------#
+  # ----------------------------------------- #
