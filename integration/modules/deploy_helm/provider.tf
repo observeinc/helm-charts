@@ -24,7 +24,6 @@ provider "helm" {
     exec {
       api_version = "client.authentication.k8s.io/v1beta1"
       args        = ["eks", "get-token", "--cluster-name", data.aws_eks_cluster.cluster.name, "--role-arn", var.cluster_role_arn]
-      #args        = ["eks", "get-token", "--cluster-name", data.aws_eks_cluster.cluster.name]
       command     = "aws"
     }
   }
@@ -36,7 +35,6 @@ provider "kubernetes" {
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
     args        = ["eks", "get-token", "--cluster-name", data.aws_eks_cluster.cluster.name, "--role-arn", var.cluster_role_arn]
-    #args        = ["eks", "get-token", "--cluster-name", data.aws_eks_cluster.cluster.name]
     command     = "aws"
   }
 }

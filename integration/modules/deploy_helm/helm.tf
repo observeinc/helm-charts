@@ -12,7 +12,7 @@ resource "helm_release" "observe-stack" {
   create_namespace = true
   namespace = "observe"
   dependency_update = true 
-  timeout = 300 #This is default 
+  timeout = 90 #This is default 
   set {
     name = "global.observe.collectionEndpoint"
     value = var.OBSERVE_URL
@@ -33,10 +33,10 @@ resource "helm_release" "observe-stack" {
 #   timeout = 300 #This is default 
 #   set {
 #     name = "global.observe.collectionEndpoint"
-#     value = "https://143958683374.collect.observe-staging.com/"
+#     value = var.OBSERVE_URL
 #   }
 #   set {
 #     name = "observe.token.value"
-#     value = "ds13aZa5kaTPlP45ELKH:K3NIKVfTIJ94xh5DkFKCM9BNTgyRpXph"
+#     value = var.OBSERVE_TOKEN
 #   }
 # }
