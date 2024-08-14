@@ -7,7 +7,7 @@ extensions:
 
 exporters:
 {{- include "config.exporters.debug" . | nindent 2 }}
-{{- include "config.exporters.otlphttp.observe" . | nindent 2 }}
+{{- include "config.exporters.otlphttp.observe.base" . | nindent 2 }}
 {{- include "config.exporters.prometheusremotewrite" . | nindent 2 }}
 
 receivers:
@@ -96,14 +96,14 @@ processors:
 {{- include "config.processors.attributes.observe_common" . | nindent 2 }}
 
   # attributes to append to objects
-  attributes/observe_pod_logs:
+  attributes/debug_objectSource_pod_logs:
     actions:
-      - key: observe_filter
+      - key: debug_objectSource
         action: insert
         value: pod_logs
-  attributes/observe_kublet_metrics:
+  attributes/debug_objectSource_kublet_metrics:
     actions:
-      - key: observe_filter
+      - key: debug_objectSource
         action: insert
         value: kubeletstats_metrics
 
@@ -112,12 +112,12 @@ service:
   pipelines:
       logs:
         receivers: [filelog]
-        processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, attributes/observe_pod_logs]
-        exporters: [otlphttp/observe, debug]
+        processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, attributes/debug_objectSource_pod_logs]
+        exporters: [otlphttp/observe/base, debug/override]
       metrics:
         receivers: [hostmetrics, kubeletstats]
-        processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, attributes/observe_kublet_metrics]
-        exporters: [prometheusremotewrite, debug]
+        processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, attributes/debug_objectSource_kublet_metrics]
+        exporters: [prometheusremotewrite, debug/override]
 
 {{- include "config.service.telemetry" . | nindent 2 }}
 
