@@ -6,8 +6,8 @@ data "aws_eks_cluster_auth" "cluster" {
   name = "helm-charts-agent-eks"
 }
 
-resource "helm_release" "observe-stack" {
-  name       = "observe-stack"
+resource "helm_release" "observe-agent" {
+  name       = "observe-agent"
   chart      = "${path.module}/../../../charts/stack"
   create_namespace = true
   namespace = "observe"
