@@ -76,27 +76,9 @@ processors:
 
 {{- include "config.processors.batch" . | nindent 2 }}
 
-{{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
-
 {{- include "config.processors.attributes.observe_common" . | nindent 2 }}
 
 {{- include "config.processors.attributes.observek8sattributes" . | nindent 2 }}
-
-{{- include "config.processors.attributes.k8sattributes.podcontroller" . | nindent 2 }}
-
-  transform/podcontroller:
-    error_mode: ignore
-    log_statements:
-      - context: log
-        conditions:
-          - body["kind"] == "Pod"
-        statements:
-          - set(attributes["observe_transform"]["facets"]["deploymentName"], resource.attributes["k8s.deployment.name"])
-          - set(attributes["observe_transform"]["facets"]["replicasetName"], resource.attributes["k8s.replicaset.name"])
-          - set(attributes["observe_transform"]["facets"]["statefulsetName"], resource.attributes["k8s.statefulset.name"])
-          - set(attributes["observe_transform"]["facets"]["daemonsetName"], resource.attributes["k8s.daemonset.name"])
-          - set(attributes["observe_transform"]["facets"]["cronjobName"], resource.attributes["k8s.cronjob.name"])
-          - set(attributes["observe_transform"]["facets"]["jobName"], resource.attributes["k8s.job.name"])
 
   # transform for k8s objects
   transform/object:
@@ -128,7 +110,9 @@ processors:
           # facets
           - set(attributes["observe_transform"]["facets"]["creationTimestamp"], body["metadata"]["creationTimestamp"])
           - set(attributes["observe_transform"]["facets"]["deletionTimestamp"], body["metadata"]["deletionTimestamp"])
-          # - set(attributes["observe_transform"]["facets"]["ownerReferences"], body["metadata"]["ownerReferences"])
+          # - set(attributes["observe_transform"]["facets"]["ownerReference"], body["metadata"]["ownerReferences"][0])
+          - set(attributes["observe_transform"]["facets"]["ownerRefKind"], body["metadata"]["ownerReferences"][0]["kind"])
+          - set(attributes["observe_transform"]["facets"]["ownerRefName"], body["metadata"]["ownerReferences"][0]["name"])
           - set(attributes["observe_transform"]["facets"]["labels"], body["metadata"]["labels"])
           - set(attributes["observe_transform"]["facets"]["annotations"], body["metadata"]["annotations"])
       # For Pod
@@ -143,8 +127,14 @@ processors:
           - set(attributes["observe_transform"]["facets"]["startTime"], body["status"]["startTime"])
           - set(attributes["observe_transform"]["facets"]["readinessGates"], body["object"]["spec"]["readinessGates"])
           - set(attributes["observe_transform"]["facets"]["nodeName"], body["spec"]["nodeName"])
-          - set(resource.attributes["k8s.pod.name"], body["metadata"]["name"])
-          - set(resource.attributes["k8s.namespace.name"], body["metadata"]["namespace"])
+          # controllers
+          - set(attributes["observe_transform"]["facets"]["replicasetName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "ReplicaSet"
+          - set(attributes["observe_transform"]["facets"]["daemonsetName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "DaemonSet"
+          - set(attributes["observe_transform"]["facets"]["jobName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "Job"
+          - set(attributes["observe_transform"]["facets"]["statefulsetName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "StatefulSet"
+          - set(attributes["observe_transform"]["facets"]["deploymentName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "ReplicaSet"
+          - replace_pattern(attributes["observe_transform"]["facets"]["deploymentName"], "^(.*)-[0-9a-f]+$$", "$$1")
+
       # For Namespace
       - context: log
         conditions:
@@ -252,11 +242,11 @@ service:
   pipelines:
       logs/objects:
         receivers: [k8sobjects/objects]
-        processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, transform/object, observek8sattributes]
+        processors: [memory_limiter, batch, resourcedetection/cloud, attributes/observe_common, transform/object, observek8sattributes]
         exporters: [otlphttp/observe, debug]
       logs/cluster:
         receivers: [k8sobjects/cluster]
-        processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, filter/cluster, transform/cluster]
+        processors: [memory_limiter, batch, resourcedetection/cloud, attributes/observe_common, filter/cluster, transform/cluster]
         exporters: [otlphttp/observe, debug]
 {{- include "config.service.telemetry" . | nindent 2 }}
 

@@ -58,6 +58,10 @@ Chart to install K8s collection stack based on Observe Agent
 | daemonset-logs-metrics.extraVolumeMounts[2].readOnly | bool | `true` |  |
 | daemonset-logs-metrics.extraVolumeMounts[3].mountPath | string | `"/var/lib/otelcol"` |  |
 | daemonset-logs-metrics.extraVolumeMounts[3].name | string | `"varlibotelcol"` |  |
+| daemonset-logs-metrics.extraVolumeMounts[4].mountPath | string | `"/hostfs"` |  |
+| daemonset-logs-metrics.extraVolumeMounts[4].mountPropagation | string | `"HostToContainer"` |  |
+| daemonset-logs-metrics.extraVolumeMounts[4].name | string | `"hostfs"` |  |
+| daemonset-logs-metrics.extraVolumeMounts[4].readOnly | bool | `true` |  |
 | daemonset-logs-metrics.extraVolumes[0].configMap.defaultMode | int | `420` |  |
 | daemonset-logs-metrics.extraVolumes[0].configMap.items[0].key | string | `"relay"` |  |
 | daemonset-logs-metrics.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
@@ -70,6 +74,8 @@ Chart to install K8s collection stack based on Observe Agent
 | daemonset-logs-metrics.extraVolumes[3].hostPath.path | string | `"/var/lib/otelcol"` |  |
 | daemonset-logs-metrics.extraVolumes[3].hostPath.type | string | `"DirectoryOrCreate"` |  |
 | daemonset-logs-metrics.extraVolumes[3].name | string | `"varlibotelcol"` |  |
+| daemonset-logs-metrics.extraVolumes[4].hostPath.path | string | `"/"` |  |
+| daemonset-logs-metrics.extraVolumes[4].name | string | `"hostfs"` |  |
 | daemonset-logs-metrics.image.pullPolicy | string | `"IfNotPresent"` |  |
 | daemonset-logs-metrics.image.repository | string | `"observeinc/observe-agent"` |  |
 | daemonset-logs-metrics.image.tag | string | `"0.11.0"` |  |

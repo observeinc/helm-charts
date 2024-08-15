@@ -30,8 +30,6 @@ processors:
 
 {{- include "config.processors.attributes.observe_common" . | nindent 2 }}
 
-{{- include "config.processors.attributes.k8sattributes.podcontroller" . | nindent 2 }}
-
   # attributes to append to objects
   attributes/observe_cluster_metrics:
     actions:
