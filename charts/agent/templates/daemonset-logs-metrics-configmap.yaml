@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: daemonset-logs-metrics
+  namespace: {{ template "observe-agent.namespace" . }}
+data:
+  relay: |
+      {{- include "observe.daemonset.logsMetrics.config" . | nindent 4 -}}
