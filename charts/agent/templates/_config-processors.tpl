@@ -25,6 +25,7 @@ k8sattributes:
     metadata:
     - k8s.namespace.name
     - k8s.deployment.name
+    - k8s.replicaset.name
     - k8s.statefulset.name
     - k8s.daemonset.name
     - k8s.cronjob.name
@@ -36,6 +37,16 @@ k8sattributes:
     - k8s.cluster.uid
     - k8s.node.name
     - k8s.node.uid
+  passthrough: false
+  pod_association:
+  - sources:
+    - from: resource_attribute
+      name: k8s.pod.ip
+  - sources:
+    - from: resource_attribute
+      name: k8s.pod.uid
+  - sources:
+    - from: connection
 {{- end -}}
 
 {{- define "config.processors.attributes.k8sattributes.podcontroller" -}}

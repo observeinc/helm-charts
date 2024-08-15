@@ -11,6 +11,53 @@ exporters:
 {{- include "config.exporters.prometheusremotewrite" . | nindent 2 }}
 
 receivers:
+  hostmetrics:
+    collection_interval: 10s
+    root_path: /hostfs
+    scrapers:
+      cpu: null
+      disk: null
+      filesystem:
+        exclude_fs_types:
+          fs_types:
+          - autofs
+          - binfmt_misc
+          - bpf
+          - cgroup2
+          - configfs
+          - debugfs
+          - devpts
+          - devtmpfs
+          - fusectl
+          - hugetlbfs
+          - iso9660
+          - mqueue
+          - nsfs
+          - overlay
+          - proc
+          - procfs
+          - pstore
+          - rpc_pipefs
+          - securityfs
+          - selinuxfs
+          - squashfs
+          - sysfs
+          - tracefs
+          match_type: strict
+        exclude_mount_points:
+          match_type: regexp
+          mount_points:
+          - /dev/*
+          - /proc/*
+          - /sys/*
+          - /run/k3s/containerd/*
+          - /var/lib/docker/*
+          - /var/lib/kubelet/*
+          - /snap/*
+      load: null
+      memory: null
+      network: null
+
   kubeletstats:
     collection_interval: 10s
     auth_type: 'serviceAccount'
@@ -20,7 +67,6 @@ receivers:
       - node
       - pod
       - container
-
 
   filelog:
     exclude: []
@@ -49,8 +95,6 @@ processors:
 
 {{- include "config.processors.attributes.observe_common" . | nindent 2 }}
 
-{{- include "config.processors.attributes.k8sattributes.podcontroller" . | nindent 2 }}
-
   # attributes to append to objects
   attributes/observe_pod_logs:
     actions:
@@ -71,7 +115,7 @@ service:
         processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, attributes/observe_pod_logs]
         exporters: [otlphttp/observe, debug]
       metrics:
-        receivers: [kubeletstats]
+        receivers: [hostmetrics, kubeletstats]
         processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, attributes/observe_kublet_metrics]
         exporters: [prometheusremotewrite, debug]
 

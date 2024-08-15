@@ -40,7 +40,6 @@ metadata:
   labels:
     app.kubernetes.io/name: observe-agent-cluster-role-binding
     app.kubernetes.io/instance: observe-agent
-
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -48,4 +47,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: observe-agent-service-account
-  namespace: observe
+  namespace: {{ template "observe-agent.namespace" . }}

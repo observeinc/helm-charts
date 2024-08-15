@@ -351,19 +351,24 @@ daemonset-logs-metrics:
       hostPath:
         path: /var/lib/otelcol
         type: DirectoryOrCreate
-
-
+    - name: hostfs
+      hostPath:
+        path: /
   extraVolumeMounts:
     - name: observe-agent-deployment-config
       mountPath: /observe-agent-conf
-    - mountPath: /var/log/pods
-      name: varlogpods
+    - name: varlogpods
+      mountPath: /var/log/pods
       readOnly: true
-    - mountPath: /var/lib/docker/containers
-      name: varlibdockercontainers
+    - name: varlibdockercontainers
+      mountPath: /var/lib/docker/containers
       readOnly: true
-    - mountPath: /var/lib/otelcol
-      name: varlibotelcol
+    - name: varlibotelcol
+      mountPath: /var/lib/otelcol
+    - name: hostfs
+      mountPath: /hostfs
+      readOnly: true
+      mountPropagation: HostToContainer
 
   securityContext:
     runAsUser: 0
