@@ -8,17 +8,17 @@ data "aws_eks_cluster_auth" "cluster" {
 
 resource "helm_release" "observe-agent" {
   name       = "observe-agent"
-  chart      = "${path.module}/../../../charts/stack"
+  chart      = "${path.module}/../../../charts/agent"
   create_namespace = true
   namespace = "observe"
   dependency_update = true 
-  timeout = 90 #This is default 
+  timeout = 90 #k8s timeout
   set {
-    name = "global.observe.collectionEndpoint"
+    name = "observe.collectionEndpoint"
     value = var.OBSERVE_URL
   }
   set {
-    name = "observe.token.value"
+    name = "observe.token"
     value = var.OBSERVE_TOKEN
   }
 }
