@@ -5,7 +5,10 @@ extensions:
 
 exporters:
 {{- include "config.exporters.debug" . | nindent 2 }}
-{{- include "config.exporters.otlphttp.observe" . | nindent 2 }}
+{{ if .Values.observe.entityToken }}
+{{- include "config.exporters.otlphttp.observe.entity" . | nindent 2 }}
+{{ end }}
+{{- include "config.exporters.otlphttp.observe.base" . | nindent 2 }}
 
 receivers:
   # this is used to create a cluster resource by pulling namespaces and then dropping all but kube-system with filter processor
@@ -243,11 +246,22 @@ service:
       logs/objects:
         receivers: [k8sobjects/objects]
         processors: [memory_limiter, batch, resourcedetection/cloud, attributes/observe_common, transform/object, observek8sattributes]
-        exporters: [otlphttp/observe, debug]
+        exporters: [otlphttp/observe/base, debug/override]
       logs/cluster:
         receivers: [k8sobjects/cluster]
         processors: [memory_limiter, batch, resourcedetection/cloud, attributes/observe_common, filter/cluster, transform/cluster]
-        exporters: [otlphttp/observe, debug]
+        exporters: [otlphttp/observe/base, debug/override]
+      {{ if .Values.observe.entityToken  -}}
+      logs/entity:
+        receivers: [k8sobjects/objects]
+        processors: [memory_limiter, batch, resourcedetection/cloud, attributes/observe_common, transform/object, observek8sattributes]
+        exporters: [otlphttp/observe/entity, debug/override]
+      logs/cluster/entity:
+        receivers: [k8sobjects/cluster]
+        processors: [memory_limiter, batch, resourcedetection/cloud, attributes/observe_common, filter/cluster, transform/cluster]
+        exporters: [otlphttp/observe/entity, debug/override]
+      {{- end }}
+
 {{- include "config.service.telemetry" . | nindent 2 }}
 
  {{- end }}

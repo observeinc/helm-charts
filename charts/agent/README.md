@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.11.0](https://img.shields.io/badge/AppVersion-0.11.0-informational?style=flat-square)
+![Version: 0.5.1](https://img.shields.io/badge/Version-0.5.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.11.0](https://img.shields.io/badge/AppVersion-0.11.0-informational?style=flat-square)
 
 > [!CAUTION]
 > This chart is under active development and is not meant to be installed yet.
@@ -27,6 +27,7 @@ Chart to install K8s collection stack based on Observe Agent
 |-----|------|---------|-------------|
 | cluster.events.pullInterval | string | `"20m"` |  |
 | cluster.name | string | `"observe-agent-monitored-cluster"` |  |
+| config.global.debug.verbosity | string | `"basic"` |  |
 | config.global.processors.batch.send_batch_max_size | int | `100` |  |
 | config.global.processors.batch.send_batch_size | int | `100` |  |
 | config.global.service.telemetry.logging_level | string | `"WARN"` |  |
@@ -84,7 +85,7 @@ Chart to install K8s collection stack based on Observe Agent
 | daemonset-logs-metrics.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.1"` |  |
 | daemonset-logs-metrics.initContainers[0].imagePullPolicy | string | `"Always"` |  |
 | daemonset-logs-metrics.initContainers[0].name | string | `"kube-cluster-info"` |  |
-| daemonset-logs-metrics.livenessProbe.httpGet.path | string | `"/"` |  |
+| daemonset-logs-metrics.livenessProbe.httpGet.path | string | `"/status"` |  |
 | daemonset-logs-metrics.livenessProbe.httpGet.port | int | `13133` |  |
 | daemonset-logs-metrics.livenessProbe.initialDelaySeconds | int | `30` |  |
 | daemonset-logs-metrics.livenessProbe.periodSeconds | int | `5` |  |
@@ -101,7 +102,7 @@ Chart to install K8s collection stack based on Observe Agent
 | daemonset-logs-metrics.ports.metrics.enabled | bool | `true` |  |
 | daemonset-logs-metrics.ports.metrics.protocol | string | `"TCP"` |  |
 | daemonset-logs-metrics.ports.metrics.servicePort | int | `8888` |  |
-| daemonset-logs-metrics.readinessProbe.httpGet.path | string | `"/"` |  |
+| daemonset-logs-metrics.readinessProbe.httpGet.path | string | `"/status"` |  |
 | daemonset-logs-metrics.readinessProbe.httpGet.port | int | `13133` |  |
 | daemonset-logs-metrics.readinessProbe.initialDelaySeconds | int | `30` |  |
 | daemonset-logs-metrics.readinessProbe.periodSeconds | int | `5` |  |
@@ -194,7 +195,7 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-cluster-metrics.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.1"` |  |
 | deployment-cluster-metrics.initContainers[0].imagePullPolicy | string | `"Always"` |  |
 | deployment-cluster-metrics.initContainers[0].name | string | `"kube-cluster-info"` |  |
-| deployment-cluster-metrics.livenessProbe.httpGet.path | string | `"/"` |  |
+| deployment-cluster-metrics.livenessProbe.httpGet.path | string | `"/status"` |  |
 | deployment-cluster-metrics.livenessProbe.httpGet.port | int | `13133` |  |
 | deployment-cluster-metrics.livenessProbe.initialDelaySeconds | int | `30` |  |
 | deployment-cluster-metrics.livenessProbe.periodSeconds | int | `5` |  |
@@ -211,7 +212,7 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-cluster-metrics.ports.metrics.enabled | bool | `true` |  |
 | deployment-cluster-metrics.ports.metrics.protocol | string | `"TCP"` |  |
 | deployment-cluster-metrics.ports.metrics.servicePort | int | `8888` |  |
-| deployment-cluster-metrics.readinessProbe.httpGet.path | string | `"/"` |  |
+| deployment-cluster-metrics.readinessProbe.httpGet.path | string | `"/status"` |  |
 | deployment-cluster-metrics.readinessProbe.httpGet.port | int | `13133` |  |
 | deployment-cluster-metrics.readinessProbe.initialDelaySeconds | int | `30` |  |
 | deployment-cluster-metrics.readinessProbe.periodSeconds | int | `5` |  |
@@ -220,6 +221,7 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-cluster-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | namespaceOverride | string | `nil` |  |
 | observe.collectionEndpoint | string | `nil` |  |
+| observe.entityToken | string | `nil` |  |
 | observe.token | string | `nil` |  |
 
 ----------------------------------------------
