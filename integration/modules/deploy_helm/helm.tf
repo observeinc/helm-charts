@@ -5,14 +5,26 @@ data "aws_eks_cluster" "cluster" {
 data "aws_eks_cluster_auth" "cluster" {
   name = "helm-charts-agent-eks"
 }
+# Random String for naming
+resource "random_string" "unique_id" {
+  length  = 6
+  special = false
+  upper = false
+}
+
 
 resource "helm_release" "observe-agent" {
-  name       = "observe-agent"
+  #name = "observe-agent"
+  name       = "observe-agent-${random_string.unique_id.result}"
   chart      = "${path.module}/../../../charts/agent"
-  create_namespace = true
   namespace = "observe"
+
+  atomic = true
+  cleanup_on_fail = true
+  create_namespace = true
   dependency_update = true 
   timeout = 90 #k8s timeout
+
   set {
     name = "observe.collectionEndpoint"
     value = var.OBSERVE_URL
