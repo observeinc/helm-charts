@@ -117,7 +117,7 @@ data "aws_iam_policy_document" "eks" {
     ]
     condition {
       test     = "ForAnyValue:StringEquals"
-      variable = "eks:Region"
+      variable = "aws:RequestedRegion"
       values   = ["us-west-1", "us-west-2"]
     }
   }
