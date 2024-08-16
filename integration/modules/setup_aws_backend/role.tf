@@ -34,6 +34,14 @@ data "aws_iam_policy_document" "assume_role" {
     }
   }
 
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::767397788203:role/gh-helm-charts-repo"]
+    }
+  }
+
   #Root Blunderome (460044344528)
   statement {
     actions = ["sts:AssumeRoleWithWebIdentity"]
