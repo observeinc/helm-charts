@@ -66,6 +66,4 @@ jobs:
         - name: Terraform apply
           id: apply
           run: |  
-            #aws sts get-caller-identity      
-            #aws eks get-token --cluster-name helm-charts-agent-eks --role-arn "arn:aws:iam::767397788203:role/gh-helm-charts-repo"      
             terraform apply --auto-approve 
