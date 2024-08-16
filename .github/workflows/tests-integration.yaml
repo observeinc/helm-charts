@@ -17,6 +17,7 @@ permissions:
 env:
     TF_VAR_OBSERVE_URL: ${{secrets.OBSERVE_URL}}
     TF_VAR_OBSERVE_TOKEN: ${{secrets.OBSERVE_TOKEN}}
+    TF_VAR_CLUSTER_ROLE_ARN: ${{ secrets.AWS_ROLE_TO_ASSUME }}
 
 jobs: 
 
