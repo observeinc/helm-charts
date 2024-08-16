@@ -2,6 +2,8 @@ observe:
   token:
   collectionEndpoint:
 
+  entityToken:
+
 cluster:
   name: observe-agent-monitored-cluster
   events:
@@ -17,6 +19,9 @@ config:
       telemetry:
         metrics_level: normal
         logging_level: WARN
+    debug:
+      # values basic, normal, detailed
+      verbosity: basic
 
 namespaceOverride:
 
@@ -114,6 +119,7 @@ deployment-cluster-events:
         configMapKeyRef:
           name: cluster-info
           key: id
+
   extraEnvsFrom: []
   extraVolumes:
     - name: "observe-agent-deployment-config"
@@ -170,14 +176,14 @@ deployment-cluster-metrics:
   livenessProbe:
     httpGet:
       port: 13133
-      path: /
+      path: /status
     initialDelaySeconds: 30
     periodSeconds: 5
 
   readinessProbe:
     httpGet:
       port: 13133
-      path: /
+      path: /status
     initialDelaySeconds: 30
     periodSeconds: 5
 
@@ -277,14 +283,14 @@ daemonset-logs-metrics:
   livenessProbe:
     httpGet:
       port: 13133
-      path: /
+      path: /status
     initialDelaySeconds: 30
     periodSeconds: 5
 
   readinessProbe:
     httpGet:
       port: 13133
-      path: /
+      path: /status
     initialDelaySeconds: 30
     periodSeconds: 5
 
