@@ -15,9 +15,9 @@ resource "random_string" "unique_id" {
 
 resource "helm_release" "observe-agent" {
   #name = "observe-agent"
-  name       = "observe-agent-${random_string.unique_id.result}"
+  name       = "helm-chart-agent-test-${random_string.unique_id.result}"
   chart      = "${path.module}/../../../charts/agent"
-  namespace = "observe"
+  namespace = "helm-chart-agent-test-ns-${random_string.unique_id.result}"
 
   atomic = true
   cleanup_on_fail = true
