@@ -4,6 +4,13 @@
 #   - reading and writing to S3 state bucket, restricted to a specific prefix
 #   - reading and writing to a single SecretsManager secret
 #
+data "aws_caller_identity" "current" {}
+
+locals{
+  role_name        = "gh-helm-charts-repo"
+  role_arn         = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.role_name}"
+}
+
 data "aws_iam_policy_document" "assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -95,7 +102,7 @@ data "aws_iam_policy_document" "s3_access" {
       "s3:ListBucket",
     ]
     resources = [
-      "arn:aws:s3:::helm-charts-agent-terraform-state",
+      local.role_arn,
     ]
   }
 }
@@ -120,7 +127,7 @@ data "aws_iam_policy_document" "eks" {
 
 
 resource "aws_iam_role" "access" {
-  name = "gh-helm-charts-repo"
+  name = local.role_name
   #path        = var.iam_path
   description         = <<-EOF
     Role for github terraform account access for helm-charts repo
