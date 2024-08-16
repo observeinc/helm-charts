@@ -6,9 +6,8 @@
 #
 data "aws_caller_identity" "current" {}
 
-locals{
-  role_name        = "gh-helm-charts-repo"
-  role_arn         = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.role_name}"
+locals {
+  gh_role_name = "gh-helm-charts-repo"
 }
 
 data "aws_iam_policy_document" "assume_role" {
@@ -34,18 +33,18 @@ data "aws_iam_policy_document" "assume_role" {
     }
   }
   statement {
-    actions = ["sts:AssumeRole"]
+    actions = ["sts:AssumeRole"] #Allow member account's admin role assumption 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::767397788203:role/OrganizationAccountAccessRole"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/OrganizationAccountAccessRole"]
     }
   }
 
   statement {
-    actions = ["sts:AssumeRole"]
+    actions = ["sts:AssumeRole"] #Allow self-assumption 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::767397788203:role/gh-helm-charts-repo"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.gh_role_name}"]
     }
   }
 
@@ -102,7 +101,7 @@ data "aws_iam_policy_document" "s3_access" {
       "s3:ListBucket",
     ]
     resources = [
-      local.role_arn,
+      "arn:aws:s3:::helm-charts-agent-terraform-state",
     ]
   }
 }
@@ -127,7 +126,7 @@ data "aws_iam_policy_document" "eks" {
 
 
 resource "aws_iam_role" "access" {
-  name = local.role_name
+  name = local.gh_role_name
   #path        = var.iam_path
   description         = <<-EOF
     Role for github terraform account access for helm-charts repo
