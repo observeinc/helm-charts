@@ -17,6 +17,7 @@ locals {
   helm_chart_agent_test_name      = "helm-chart-agent-test-${random_string.unique_id.result}"
 }
 
+#TODO: Figure out how to auto delete namespace after destroy 
 resource "helm_release" "observe-agent" {
   name      = local.helm_chart_agent_test_name
   chart     = "${path.module}/../../../charts/agent"
@@ -26,7 +27,7 @@ resource "helm_release" "observe-agent" {
   cleanup_on_fail   = true
   create_namespace  = true
   dependency_update = true
-  timeout           = 90 #k8s timeout
+  timeout           = 120 #k8s timeout
 
   set {
     name  = "observe.collectionEndpoint"
@@ -60,6 +61,14 @@ resource "helm_release" "observe-agent" {
   # }
 }
 
+
+resource "null_resource" "example" {
+  provisioner "local-exec" {
+    command = "echo Hello World!"
+    when = destroy
+  }
+  depends_on = [ helm_release.observe-agent ]
+}
 
 
 # resource "null_resource" "post_destroy_command" {
