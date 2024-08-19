@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.5.1](https://img.shields.io/badge/Version-0.5.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.11.0](https://img.shields.io/badge/AppVersion-0.11.0-informational?style=flat-square)
+![Version: 0.5.2](https://img.shields.io/badge/Version-0.5.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.11.0](https://img.shields.io/badge/AppVersion-0.11.0-informational?style=flat-square)
 
 > [!CAUTION]
 > This chart is under active development and is not meant to be installed yet.
@@ -20,6 +20,7 @@ Chart to install K8s collection stack based on Observe Agent
 | https://open-telemetry.github.io/opentelemetry-helm-charts | deployment-cluster-events(opentelemetry-collector) | 0.101.1 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | deployment-cluster-metrics(opentelemetry-collector) | 0.101.1 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | daemonset-logs-metrics(opentelemetry-collector) | 0.101.1 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | deployment-agent-monitor(opentelemetry-collector) | 0.101.1 |
 
 ## Values
 
@@ -111,6 +112,60 @@ Chart to install K8s collection stack based on Observe Agent
 | daemonset-logs-metrics.securityContext.runAsUser | int | `0` |  |
 | daemonset-logs-metrics.serviceAccount.create | bool | `false` |  |
 | daemonset-logs-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
+| deployment-agent-monitor.clusterRole.create | bool | `false` |  |
+| deployment-agent-monitor.clusterRole.name | string | `"observe-agent-cluster-role"` |  |
+| deployment-agent-monitor.command.extraArgs[0] | string | `"start"` |  |
+| deployment-agent-monitor.command.extraArgs[1] | string | `"--config=/observe-agent-conf/observe-agent.yaml"` |  |
+| deployment-agent-monitor.command.extraArgs[2] | string | `"--otel-config=/conf/relay.yaml"` |  |
+| deployment-agent-monitor.command.name | string | `"observe-agent"` |  |
+| deployment-agent-monitor.configMap.create | bool | `false` |  |
+| deployment-agent-monitor.configMap.existingName | string | `"deployment-agent-monitor"` |  |
+| deployment-agent-monitor.extraEnvsFrom | list | `[]` |  |
+| deployment-agent-monitor.extraEnvs[0].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
+| deployment-agent-monitor.extraEnvs[0].valueFrom.configMapKeyRef.key | string | `"name"` |  |
+| deployment-agent-monitor.extraEnvs[0].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
+| deployment-agent-monitor.extraEnvs[1].name | string | `"OBSERVE_CLUSTER_UID"` |  |
+| deployment-agent-monitor.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"id"` |  |
+| deployment-agent-monitor.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
+| deployment-agent-monitor.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
+| deployment-agent-monitor.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
+| deployment-agent-monitor.extraVolumes[0].configMap.defaultMode | int | `420` |  |
+| deployment-agent-monitor.extraVolumes[0].configMap.items[0].key | string | `"relay"` |  |
+| deployment-agent-monitor.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
+| deployment-agent-monitor.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
+| deployment-agent-monitor.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
+| deployment-agent-monitor.image.pullPolicy | string | `"IfNotPresent"` |  |
+| deployment-agent-monitor.image.repository | string | `"observeinc/observe-agent"` |  |
+| deployment-agent-monitor.image.tag | string | `"0.11.0"` |  |
+| deployment-agent-monitor.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
+| deployment-agent-monitor.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
+| deployment-agent-monitor.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.1"` |  |
+| deployment-agent-monitor.initContainers[0].imagePullPolicy | string | `"Always"` |  |
+| deployment-agent-monitor.initContainers[0].name | string | `"kube-cluster-info"` |  |
+| deployment-agent-monitor.livenessProbe.httpGet.path | string | `"/status"` |  |
+| deployment-agent-monitor.livenessProbe.httpGet.port | int | `13133` |  |
+| deployment-agent-monitor.livenessProbe.initialDelaySeconds | int | `30` |  |
+| deployment-agent-monitor.livenessProbe.periodSeconds | int | `5` |  |
+| deployment-agent-monitor.mode | string | `"deployment"` |  |
+| deployment-agent-monitor.nameOverride | string | `"deployment-agent-monitor"` | --------------------------------------- # Different for each deployment/daemonset # |
+| deployment-agent-monitor.namespaceOverride | string | `"observe"` |  |
+| deployment-agent-monitor.networkPolicy.egressRules[0] | object | `{}` |  |
+| deployment-agent-monitor.networkPolicy.enabled | bool | `true` |  |
+| deployment-agent-monitor.podAnnotations.observe_monitor_path | string | `"/metrics"` |  |
+| deployment-agent-monitor.podAnnotations.observe_monitor_port | string | `"8888"` |  |
+| deployment-agent-monitor.podAnnotations.observe_monitor_purpose | string | `"observecollection"` |  |
+| deployment-agent-monitor.podAnnotations.observe_monitor_scrape | string | `"false"` |  |
+| deployment-agent-monitor.ports.metrics.containerPort | int | `8888` |  |
+| deployment-agent-monitor.ports.metrics.enabled | bool | `true` |  |
+| deployment-agent-monitor.ports.metrics.protocol | string | `"TCP"` |  |
+| deployment-agent-monitor.ports.metrics.servicePort | int | `8888` |  |
+| deployment-agent-monitor.readinessProbe.httpGet.path | string | `"/status"` |  |
+| deployment-agent-monitor.readinessProbe.httpGet.port | int | `13133` |  |
+| deployment-agent-monitor.readinessProbe.initialDelaySeconds | int | `30` |  |
+| deployment-agent-monitor.readinessProbe.periodSeconds | int | `5` |  |
+| deployment-agent-monitor.resources | object | `{"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| deployment-agent-monitor.serviceAccount.create | bool | `false` |  |
+| deployment-agent-monitor.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | deployment-cluster-events.clusterRole.create | bool | `false` |  |
 | deployment-cluster-events.clusterRole.name | string | `"observe-agent-cluster-role"` |  |
 | deployment-cluster-events.command.extraArgs[0] | string | `"start"` |  |
