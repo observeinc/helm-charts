@@ -1,10 +1,11 @@
-data "aws_eks_cluster" "cluster" {
-  name = "helm-charts-agent-eks"
+
+locals {
+  helm_chart_agent_test_namespace = "helm-chart-agent-test-ns-${random_string.unique_id.result}"
+  helm_chart_agent_test_release_name      = "helm-chart-agent-test-${random_string.unique_id.result}"
 }
 
-data "aws_eks_cluster_auth" "cluster" {
-  name = "helm-charts-agent-eks"
-}
+
+
 # Random String for naming
 resource "random_string" "unique_id" {
   length  = 6
@@ -12,20 +13,24 @@ resource "random_string" "unique_id" {
   upper   = false
 }
 
-locals {
-  helm_chart_agent_test_namespace = "helm-chart-agent-test-ns-${random_string.unique_id.result}"
-  helm_chart_agent_test_name      = "helm-chart-agent-test-${random_string.unique_id.result}"
+data "aws_eks_cluster" "cluster" {
+  name = "helm-charts-agent-eks"
 }
 
-#TODO: Figure out how to auto delete namespace after destroy 
+resource "kubernetes_namespace" "helm_namespace" {
+  metadata {
+    name = local.helm_chart_agent_test_namespace
+  }
+}
+
 resource "helm_release" "observe-agent" {
-  name      = local.helm_chart_agent_test_name
+  name      = local.helm_chart_agent_test_release_name
   chart     = "${path.module}/../../../charts/agent"
-  namespace = local.helm_chart_agent_test_namespace
+  namespace = kubernetes_namespace.helm_namespace.metadata[0].name
 
   atomic            = true
   cleanup_on_fail   = true
-  create_namespace  = true
+  create_namespace  = false #Handled by k8s resource 
   dependency_update = true
   timeout           = 120 #k8s timeout
 
@@ -53,38 +58,9 @@ resource "helm_release" "observe-agent" {
     name  = "daemonset-logs-metrics.namespaceOverride"
     value = local.helm_chart_agent_test_namespace
   }
-
-  # provisioner "local-exec" {
-  #   command = "echo 'Deleting namespace ${self.metadata[0].namespace}' && kubectl delete namespace ${self.metadata[0].namespace}"
-  #   when = destroy
-  #   #on_failure = continue
-  # }
+  
 }
 
-
-resource "null_resource" "example" {
-  provisioner "local-exec" {
-    command = "echo Hello World!"
-    when = destroy
-  }
-  depends_on = [ helm_release.observe-agent ]
-}
-
-
-# resource "null_resource" "post_destroy_command" {
-#   # Force Terraform to run this resource after destroying a specific resource
-#   triggers = {
-#     always_run = "${timestamp()}" # This will ensure the null_resource runs each time
-#   }
-#   provisioner "local-exec" {
-#     command = "echo 'Deleting namespace ${helm-release.observe-agent.metadata[0].namespace}' && kubectl delete namespace ${helm-release.observe-agent.metadata[0].namespace}"
-#   }
-
-#   # Ensure this runs after your main resource is destroyed
-#   depends_on = [
-#     helm-release.observe-agent_destroyed 
-#   ]
-# }
 
 
 
