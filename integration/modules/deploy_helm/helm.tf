@@ -58,7 +58,12 @@ resource "helm_release" "observe-agent" {
     name  = "daemonset-logs-metrics.namespaceOverride"
     value = local.helm_chart_agent_test_namespace
   }
-  
+  set {
+    name  = "deployment-agent-monitor.namespaceOverride"
+    value = local.helm_chart_agent_test_namespace
+  }
+
+  #Also need to set cluster role name & service account name to be unique per namespace 
 }
 
 

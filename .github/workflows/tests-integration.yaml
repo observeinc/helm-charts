@@ -67,5 +67,5 @@ jobs:
           id: apply
           run: |  
             terraform apply --auto-approve 
-            sleep 30
+            sleep 300 
             terraform destroy --auto-approve
