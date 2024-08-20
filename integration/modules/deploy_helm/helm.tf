@@ -2,6 +2,8 @@
 locals {
   helm_chart_agent_test_namespace = "helm-chart-agent-test-ns-${random_string.unique_id.result}"
   helm_chart_agent_test_release_name      = "helm-chart-agent-test-${random_string.unique_id.result}"
+  helm_chart_agent_test_cluster_role = "observe-agent-cluster-role-${random_string.unique_id.result}"
+  helm_chart_agent_test_cluster_role_binding = "observe-agent-cluster-role-binding-${random_string.unique_id.result}"
 }
 
 
@@ -63,7 +65,15 @@ resource "helm_release" "observe-agent" {
     value = local.helm_chart_agent_test_namespace
   }
 
-  #Also need to set cluster role name & service account name to be unique per namespace 
+  set {
+    name = "cluster.role.name"
+    value = local.helm_chart_agent_test_cluster_role
+  }
+
+  set {
+    name = "cluster.roleBinding.name"
+    value = local.helm_chart_agent_test_cluster_role_binding
+  }   
 }
 
 

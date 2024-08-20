@@ -8,6 +8,10 @@ cluster:
   name: observe-agent-monitored-cluster
   events:
     pullInterval: 20m
+  role:
+    name: observe-agent-cluster-role
+  roleBinding:
+    name: observe-agent-cluster-role-binding
 
 config:
   global:
@@ -63,7 +67,6 @@ deployment-cluster-events:
 
   clusterRole:
     create: false
-    name: "observe-agent-cluster-role"
 
   livenessProbe:
     httpGet:
@@ -171,7 +174,6 @@ deployment-cluster-metrics:
     name: "observe-agent-service-account"
   clusterRole:
     create: false
-    name: "observe-agent-cluster-role"
 
   livenessProbe:
     httpGet:
@@ -278,7 +280,6 @@ daemonset-logs-metrics:
     name: "observe-agent-service-account"
   clusterRole:
     create: false
-    name: "observe-agent-cluster-role"
 
   livenessProbe:
     httpGet:
@@ -417,7 +418,6 @@ deployment-agent-monitor:
     name: "observe-agent-service-account"
   clusterRole:
     create: false
-    name: "observe-agent-cluster-role"
 
   livenessProbe:
     httpGet:
