@@ -122,7 +122,6 @@ deployment-cluster-events:
         configMapKeyRef:
           name: cluster-info
           key: id
-
   affinity: {}
   extraEnvsFrom: []
   extraVolumes:
@@ -230,7 +229,6 @@ deployment-cluster-metrics:
         configMapKeyRef:
           name: cluster-info
           key: id
-  
   affinity: {}
   extraEnvsFrom: []
   extraVolumes:
@@ -341,7 +339,7 @@ daemonset-logs-metrics:
       valueFrom:
         fieldRef:
           fieldPath: spec.nodeName
-  affinity: {}
+  affinity: {}  
   extraEnvsFrom: []
   extraVolumes:
     - name: "observe-agent-deployment-config"

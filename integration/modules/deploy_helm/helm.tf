@@ -30,50 +30,76 @@ resource "helm_release" "observe-agent" {
   chart     = "${path.module}/../../../charts/agent"
   namespace = kubernetes_namespace.helm_namespace.metadata[0].name
 
-  atomic            = true
+  #atomic            = true
   cleanup_on_fail   = true
   create_namespace  = false #Handled by k8s resource 
   dependency_update = true
   timeout           = 120 #k8s timeout
+  values = [
+    <<-EOT
+    observe:
+      collectionEndpoint: ${var.OBSERVE_URL}
+      token: ${var.OBSERVE_TOKEN}
+    namespaceOverride: ${local.helm_chart_agent_test_namespace}
+    deployment-cluster-events:
+      namespaceOverride: ${local.helm_chart_agent_test_namespace}      
+    deployment-cluster-metrics:
+      namespaceOverride: ${local.helm_chart_agent_test_namespace}       
+    daemonset-logs-metrics:
+      namespaceOverride: ${local.helm_chart_agent_test_namespace}       
+    deployment-agent-monitor:
+      namespaceOverride: ${local.helm_chart_agent_test_namespace}      
+    cluster:  
+      role:
+        name: ${local.helm_chart_agent_test_cluster_role}
+      roleBinding: 
+        name: ${local.helm_chart_agent_test_cluster_role_binding}
+    EOT
+  ]
 
-  set {
-    name  = "observe.collectionEndpoint"
-    value = var.OBSERVE_URL
-  }
-  set {
-    name  = "observe.token"
-    value = var.OBSERVE_TOKEN
-  }
-  set {
-    name  = "namespaceOverride"
-    value = local.helm_chart_agent_test_namespace
-  }
-  set {
-    name  = "deployment-cluster-events.namespaceOverride"
-    value = local.helm_chart_agent_test_namespace
-  }
-  set {
-    name  = "deployment-cluster-metrics.namespaceOverride"
-    value = local.helm_chart_agent_test_namespace
-  }
-  set {
-    name  = "daemonset-logs-metrics.namespaceOverride"
-    value = local.helm_chart_agent_test_namespace
-  }
-  set {
-    name  = "deployment-agent-monitor.namespaceOverride"
-    value = local.helm_chart_agent_test_namespace
-  }
+  # set {
+  #   name  = "observe.collectionEndpoint"
+  #   value = var.OBSERVE_URL
+  # }
+  # set {
+  #   name  = "observe.token"
+  #   value = var.OBSERVE_TOKEN
+  # }
+  # set {
+  #   name  = "namespaceOverride"
+  #   value = local.helm_chart_agent_test_namespace
+  # }
+  # set {
+  #   name  = "deployment-cluster-events.namespaceOverride"
+  #   value = local.helm_chart_agent_test_namespace
+  # }
+  # set {
+  #   name  = "deployment-cluster-metrics.namespaceOverride"
+  #   value = local.helm_chart_agent_test_namespace
+  # }
+  # set {
+  #   name  = "daemonset-logs-metrics.namespaceOverride"
+  #   value = local.helm_chart_agent_test_namespace
+  # }
+  # set {
+  #   name  = "deployment-agent-monitor.namespaceOverride"
+  #   value = local.helm_chart_agent_test_namespace
+  # }
 
-  set {
-    name = "cluster.role.name"
-    value = local.helm_chart_agent_test_cluster_role
-  }
+  # set {
+  #   name = "cluster.role.name"
+  #   value = local.helm_chart_agent_test_cluster_role
+  # }
 
-  set {
-    name = "cluster.roleBinding.name"
-    value = local.helm_chart_agent_test_cluster_role_binding
-  }   
+  # set {
+  #   name = "cluster.roleBinding.name"
+  #   value = local.helm_chart_agent_test_cluster_role_binding
+  # }   
+
+  # set {
+  #   name = "daemonset-logs-metrics.affinity"
+  #   value = local.helm_chart_agent_test_cluster_role
+  # }
 }
 
 

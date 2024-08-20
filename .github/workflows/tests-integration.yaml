@@ -73,5 +73,5 @@ jobs:
           id: destroy
           if: always()
           run: |  
-            sleep 180 # wait 3 mins and destroy 
+            sleep 180 # wait 3 mins and destroy, still need to cleanup namespace if helm chart fails  
             terraform destroy --auto-approve
