@@ -71,6 +71,7 @@ jobs:
 
         - name: Terraform destroy 
           id: destroy
+          if: always()
           run: |  
             sleep 180 # wait 3 mins and destroy 
             terraform destroy --auto-approve
