@@ -11,5 +11,8 @@ host_monitoring:
   logs:
     enabled: false
   metrics:
-    enabled: false
+    host:
+      enabled: false
+    process:
+      enabled: false
 {{- end }}
