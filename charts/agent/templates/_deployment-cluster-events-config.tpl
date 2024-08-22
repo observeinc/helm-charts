@@ -154,7 +154,6 @@ processors:
           - set(attributes["observe_transform"]["facets"]["kubeletVersion"], body["status"]["nodeInfo"]["kubeletVersion"])
           - set(attributes["observe_transform"]["facets"]["osImage"], body["status"]["nodeInfo"]["osImage"])
           - set(attributes["observe_transform"]["facets"]["taints"], body["spec"]["taints"])
-          - set(attributes["observe_transform"]["facets"]["podCIDR"], body["spec"]["podCIDR"])
       # For Deployment
       - context: log
         conditions:
