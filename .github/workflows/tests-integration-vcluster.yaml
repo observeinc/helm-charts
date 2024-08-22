@@ -61,6 +61,16 @@ jobs:
             vcluster --version
             vcluster list 
 
+        - name: Vcluster connect
+          run: |            
+            vcluster connect tf-vcluster
+        
+        - name: Check in vcluster
+          run: |
+            kubectl config view 
+            kubectl get namespaces 
+           
+
 
         # - name: Terraform Init
         #   id: init
