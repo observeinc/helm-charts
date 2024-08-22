@@ -55,17 +55,19 @@ jobs:
             version: v0.20.0
             kubectl-install: false
 
-        - name: Setup additional terraform variable
-          run:  echo "TF_VAR_vcluster_name=$(echo pr-${{ github.event.pull_request.number }}-${{ github.sha }}-${{ github.run_id }})" >> $GITHUB_ENV
+        - name: Set vCluster Name
+          run: |
+           calculatedSha=$(git rev-parse --short ${{ github.sha }})
+           echo "VCLUSTER_NAME=$(echo pr-${{ github.event.pull_request.number }}-${{ github.run_id }}-$calculatedSha)" >> $GITHUB_ENV
             
         - name: Create & Connect to vCluster 
           run: |            
             aws eks update-kubeconfig --region us-west-2 --name helm-charts-agent-eks
-            vcluster create ${{env.TF_VAR_vcluster_name}}
+            vcluster create ${{env.VCLUSTER_NAME}} -n ${{env.VCLUSTER_NAME}} --connect=false 
 
         - name: Vcluster connect
           run: |            
-            vcluster connect  ${{env.TF_VAR_vcluster_name}}
+            vcluster connect ${{env.VCLUSTER_NAME}} -n ${{env.VCLUSTER_NAME}} 
             vcluster list 
         
         - name: Check in vcluster
