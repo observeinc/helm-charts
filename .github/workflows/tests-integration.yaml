@@ -57,7 +57,7 @@ jobs:
 
         - name: Set vCluster Name
           run: |
-           calculatedSha=$(git rev-parse --short ${{ github.sha }})
+           calculatedSha=${{github.event.workflow_run.head_sha}}
            echo "VCLUSTER_NAME=$(echo pr-${{ github.event.pull_request.number }}-${{ github.run_id }}-$calculatedSha)" >> $GITHUB_ENV
             
         - name: Create & Connect to vCluster 
@@ -67,8 +67,7 @@ jobs:
 
         - name: Vcluster connect
           run: |            
-            vcluster connect ${{env.VCLUSTER_NAME}} -n ${{env.VCLUSTER_NAME}} 
-            vcluster list 
+            vcluster connect ${{env.VCLUSTER_NAME}} 
         
         - name: Check in vcluster
           run: |
@@ -79,8 +78,7 @@ jobs:
           if: always()
           run: |
             sleep 60
-            vcluster delete  ${{env.TF_VAR_vcluster_name}}
-
+            vcluster delete ${{env.VCLUSTER_NAME}}
 
 
         # - name: Terraform Init
