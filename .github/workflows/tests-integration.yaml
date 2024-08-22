@@ -78,8 +78,10 @@ jobs:
         - name: Delete vCluster
           if: steps.create-cluster.outcome != 'failure'
           run: |
-            sleep 60
+            sleep 15
             vcluster delete ${{env.VCLUSTER_NAME}} --auto-delete-namespace=false 
+            kubectl delete namespace ${{env.VCLUSTER_NAME}} --grace-period=0 --force
+
 
 
         # - name: Terraform Init
