@@ -79,7 +79,7 @@ jobs:
           if: steps.create-cluster.outcome != 'failure'
           run: |
             sleep 60
-            vcluster delete ${{env.VCLUSTER_NAME}} --delete-namespace   
+            vcluster delete ${{env.VCLUSTER_NAME}} --auto-delete-namespace=false 
 
 
         # - name: Terraform Init
