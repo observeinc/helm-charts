@@ -105,7 +105,7 @@ module "eks" {
       instance_types = ["t3.medium"]
 
       min_size     = 1
-      max_size     = 3
+      max_size     = 10
       desired_size = 2
     }
 
@@ -115,7 +115,7 @@ module "eks" {
       instance_types = ["t3.medium"]
 
       min_size     = 1
-      max_size     = 2
+      max_size     = 10
       desired_size = 1
     }
   }
@@ -137,3 +137,4 @@ module "irsa-ebs-csi" {
   role_policy_arns              = [data.aws_iam_policy.ebs_csi_policy.arn]
   oidc_fully_qualified_subjects = ["system:serviceaccount:kube-system:ebs-csi-controller-sa"]
 }
+

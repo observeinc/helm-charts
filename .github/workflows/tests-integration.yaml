@@ -2,7 +2,7 @@ name: Helm Charts Agent - Integration Tests
 
 on:
   workflow_dispatch:
-  #pull_request:
+  pull_request:
   push:
     branches:
       - main
@@ -15,6 +15,7 @@ permissions:
     pull-requests: write
 
 env:
+    TF_VAR_vcluster_name: pr-${{ github.event.pull_request.number }}-${{ github.sha }}-${{ github.run_id }}
     TF_VAR_OBSERVE_URL: ${{secrets.OBSERVE_URL}}
     TF_VAR_OBSERVE_TOKEN: ${{secrets.OBSERVE_TOKEN}}
     TF_VAR_cluster_role_arn: ${{ secrets.AWS_ROLE_TO_ASSUME }}
@@ -26,11 +27,10 @@ jobs:
     runs-on: ubuntu-latest      
     defaults:
         run:
-            working-directory: integration/modules/deploy_helm #Terrafrom commands and tests are ran from integration directory
+            working-directory: integration #Terrafrom commands and tests are ran from integration directory
     steps:
         - name: Checkout code
           uses: actions/checkout@v4        
-        - run: git branch && df -h
         - name: Configure AWS Credentials ## Terraform provider automatically uses these creds 
           uses: aws-actions/configure-aws-credentials@v4
           with:
@@ -48,30 +48,59 @@ jobs:
           uses: hashicorp/setup-terraform@v3
           with:
             terraform_version: 1.8.5
-            
-        - name: Terraform Init
-          id: init
-          run: terraform init
 
-        - name: Terraform Validate
-          id: validate
-          run: terraform validate -no-color
+        - name: Install vCluster CLI
+          uses: loft-sh/setup-vcluster@main
+          with:
+            version: v0.20.0
+            kubectl-install: false
 
-        - name: Terraform plan
-          id: plan
-          run: |               
-            terraform plan 
-        
-        
-        - name: Terraform apply
-          id: apply
-          run: |  
-            terraform apply --auto-approve 
-        
+        - name: Create & Connect to vCluster 
+          run: |            
+            aws eks update-kubeconfig --region us-west-2 --name helm-charts-agent-eks
+            vcluster create ${{env.TF_VAR_vcluster_name}}
 
-        - name: Terraform destroy 
-          id: destroy
+        - name: Vcluster connect
+          run: |            
+            vcluster connect  ${{env.TF_VAR_vcluster_name}}
+            vcluster list 
+        
+        - name: Check in vcluster
+          run: |
+            kubectl config view 
+            kubectl get namespaces 
+
+        - name: Delete vCluster
           if: always()
-          run: |  
-            sleep 180 # wait 3 mins and destroy, still need to cleanup namespace if helm chart fails  
-            terraform destroy --auto-approve
+          run: |
+            sleep 60
+            vcluster delete  ${{env.TF_VAR_vcluster_name}}
+
+
+
+        # - name: Terraform Init
+        #   id: init
+        #   run: terraform init
+
+        # - name: Terraform Validate
+        #   id: validate
+        #   run: terraform validate -no-color
+
+        # - name: Terraform plan
+        #   id: plan
+        #   run: |               
+        #     terraform plan 
+        
+        
+        # - name: Terraform apply
+        #   id: apply
+        #   run: |  
+        #     terraform apply --auto-approve 
+        
+
+        # - name: Terraform destroy 
+        #   id: destroy
+        #   if: always()
+        #   run: |  
+        #     sleep 180 # wait 3 mins and destroy, still need to cleanup namespace if helm chart fails  
+        #     terraform destroy --auto-approve

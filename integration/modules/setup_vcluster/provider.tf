@@ -16,20 +16,6 @@ terraform {
   required_version = "~> 1.3"
 }
 
-provider "helm" {
-  alias = "helm_vcluster"
-  kubernetes {
-    config_path = "~/.kube/config"
-    config_context = "vcluster"
-  }
-
-}
-provider "kubernetes" {
-  alias       = "kubernetes_vcluster"
-  config_path = "~/.kube/config"
-  config_context = "vcluster"
-}
-
 
 provider "helm" {
   kubernetes {
