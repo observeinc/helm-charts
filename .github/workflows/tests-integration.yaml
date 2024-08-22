@@ -61,6 +61,7 @@ jobs:
            echo "VCLUSTER_NAME=$(echo pr-${{ github.event.pull_request.number }}-${{ github.run_id }}-$calculatedSha)" >> $GITHUB_ENV
             
         - name: Create & Connect to vCluster 
+          id: create-cluster
           run: |            
             aws eks update-kubeconfig --region us-west-2 --name helm-charts-agent-eks
             vcluster create ${{env.VCLUSTER_NAME}} -n ${{env.VCLUSTER_NAME}} --connect=false 
@@ -75,7 +76,7 @@ jobs:
             kubectl get namespaces 
 
         - name: Delete vCluster
-          if: always()
+          if: steps.create-cluster.outcome != 'failure'
           run: |
             sleep 60
             vcluster delete ${{env.VCLUSTER_NAME}}
