@@ -1,8 +1,8 @@
-name: Helm Charts Agent - Integration Tests
+name: vcluster - Helm Charts Agent - Integration Tests
 
 on:
   workflow_dispatch:
-  #pull_request:
+  pull_request:
   push:
     branches:
       - main
@@ -48,30 +48,43 @@ jobs:
           uses: hashicorp/setup-terraform@v3
           with:
             terraform_version: 1.8.5
-            
-        - name: Terraform Init
-          id: init
-          run: terraform init
 
-        - name: Terraform Validate
-          id: validate
-          run: terraform validate -no-color
+        - name: Install vCluster CLI
+          uses: loft-sh/setup-vcluster@main
+          with:
+            version: v0.20.0
+            kubectl-install: false
 
-        - name: Terraform plan
-          id: plan
-          run: |               
-            terraform plan 
+        - name: Show Version
+          run: |
+            vcluster --version
+            vcluster list 
+            aws eks update-kubeconfig --region us-west-2 --name helm-charts-agent-eks
+
+
+        # - name: Terraform Init
+        #   id: init
+        #   run: terraform init
+
+        # - name: Terraform Validate
+        #   id: validate
+        #   run: terraform validate -no-color
+
+        # - name: Terraform plan
+        #   id: plan
+        #   run: |               
+        #     terraform plan 
         
         
-        - name: Terraform apply
-          id: apply
-          run: |  
-            terraform apply --auto-approve 
+        # - name: Terraform apply
+        #   id: apply
+        #   run: |  
+        #     terraform apply --auto-approve 
         
 
-        - name: Terraform destroy 
-          id: destroy
-          if: always()
-          run: |  
-            sleep 180 # wait 3 mins and destroy, still need to cleanup namespace if helm chart fails  
-            terraform destroy --auto-approve
+        # - name: Terraform destroy 
+        #   id: destroy
+        #   if: always()
+        #   run: |  
+        #     sleep 180 # wait 3 mins and destroy, still need to cleanup namespace if helm chart fails  
+        #     terraform destroy --auto-approve
