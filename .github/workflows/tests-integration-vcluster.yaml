@@ -56,10 +56,10 @@ jobs:
             kubectl-install: false
 
         - name: Show Version
-          run: |
+          run: |            
+            aws eks update-kubeconfig --region us-west-2 --name helm-charts-agent-eks
             vcluster --version
             vcluster list 
-            aws eks update-kubeconfig --region us-west-2 --name helm-charts-agent-eks
 
 
         # - name: Terraform Init
