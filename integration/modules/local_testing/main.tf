@@ -8,5 +8,4 @@ module "deploy_helm" {
   observe_url = var.observe_token
   observe_token = var.observe_url
   values_file = "default.yaml" #This is the default values file 
-  depends_on = [ module.setup_kind_cluster ]
 }
