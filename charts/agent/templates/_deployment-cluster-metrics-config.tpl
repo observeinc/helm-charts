@@ -15,6 +15,11 @@ receivers:
     - Ready
     - MemoryPressure
     - DiskPressure
+    allocatable_types_to_report:
+    - cpu
+    - memory
+    - storage
+    - ephemeral-storage
     metrics:
       k8s.node.condition:
         enabled: true
