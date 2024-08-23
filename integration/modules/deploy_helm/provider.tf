@@ -7,10 +7,10 @@ terraform {
     kubernetes = {
       source  = "hashicorp/kubernetes"
       version = "~> 2.17.0"
-    }
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 4.52.0"
+    }    
+    kind = {
+      source = "tehcyx/kind"
+      version = "0.6.0"
     }
   }
   required_version = "~> 1.3"
@@ -18,23 +18,12 @@ terraform {
 
 provider "helm" {
   kubernetes {
-    config_path = "~/.kube/config"
+    config_path = pathexpand(var.cluster_config_path)
   }
 }
 
-
 provider "kubernetes" {
-  config_path = "~/.kube/config"
+  config_path = pathexpand(var.cluster_config_path)
 }
 
-# Create provider_override.tf with the following for local use 
-# provider "aws" {
-#   region = var.region # Specify the AWS region
-#   profile = "blunderdome"
-#   assume_role {
-#     role_arn = var.cluster_role_arn
-#   }
-# }
-
-provider "aws" {}
-
+provider "kind" {}
