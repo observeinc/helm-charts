@@ -63,10 +63,29 @@ receivers:
     auth_type: 'serviceAccount'
     endpoint: '${env:K8S_NODE_NAME}:10250'
     insecure_skip_verify: true
+    k8s_api_config:
+        auth_type: serviceAccount
     metric_groups:
       - node
       - pod
       - container
+    metrics:
+      k8s.container.cpu.node.utilization:
+        enabled: true
+      k8s.pod.cpu.node.utilization:
+        enabled: true
+      k8s.container.memory.node.utilization:
+        enabled: true
+      k8s.pod.memory.node.utilization:
+        enabled: true
+      k8s.container.cpu.node.usage:
+        enabled: true
+      k8s.pod.cpu.node.usage:
+        enabled: true
+      k8s.container.memory.node.usage:
+        enabled: true
+      k8s.pod.memory.node.usage:
+        enabled: true
 
   filelog:
     exclude: []
