@@ -1,12 +1,5 @@
-variable "vcluster_prefix" {
-  description = "Name of the vcluster to create"
-  type        = string
-  default     = "tf-vcluster"
-}
-
-
 variable "region" {
-  description = "The region where the host cluster exists"
+  description = "The region to deploy helm chart in"
   type        = string
   default     = "us-west-2"
 }

@@ -44,5 +44,22 @@
 #     ingressClasses:
 #       enabled: true
 
+controlPlane:
+  proxy:
+    extraSANs:
+    - demo.vcluster.local 
 
 
+sync:
+  fromHost:
+    nodes:
+      enabled: true 
+      selector:
+        all: true
+  toHost:
+    serviceAccounts:  
+      enabled: true 
+    configMaps:
+      enabled: true
+      all: true 
+    

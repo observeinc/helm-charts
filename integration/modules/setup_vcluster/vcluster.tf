@@ -6,11 +6,15 @@ resource "random_string" "unique_id" {
 }
 
 
-locals {
-  vcluster_name      = "${var.vcluster_prefix}-${random_string.unique_id.result}"
-  vcluster_namespace = "${var.vcluster_prefix}-${random_string.unique_id.result}"
-}
+# locals {
+#   vcluster_name      = "${var.vcluster_prefix}-${random_string.unique_id.result}"
+#   vcluster_namespace = "${var.vcluster_prefix}-${random_string.unique_id.result}"
+# }
 
+locals {
+  vcluster_name      = "tf-vcluster"
+  vcluster_namespace = "tf-vcluster"
+}
 
 
 data "aws_eks_cluster" "cluster" {
@@ -18,7 +22,17 @@ data "aws_eks_cluster" "cluster" {
 }
 
 
+resource "kubernetes_manifest" "ingress" {
+
+  manifest = yamldecode(templatefile("manifests/ingresses/ingress.yaml", {
+    vcluster_name      = local.vcluster_name,
+    vcluster_namespace = local.vcluster_namespace
+  }))
+}
 resource "helm_release" "my_vcluster" {
+  depends_on = [
+    kubernetes_manifest.ingress
+  ]
   name             = local.vcluster_name
   namespace        = local.vcluster_namespace
   create_namespace = true
@@ -34,10 +48,5 @@ resource "helm_release" "my_vcluster" {
         vcluster_namespace = local.vcluster_namespace
     })
   ]
-  # provisioner "local-exec" {
-  #   when = create 
-  #   command = "nohup vcluster connect ${local.vcluster_name} --print > /tmp/vcluster.kubeconfig &"
-  # }
 }
-
 

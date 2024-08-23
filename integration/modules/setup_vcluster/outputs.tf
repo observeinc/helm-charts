@@ -13,7 +13,7 @@ output "status" {
   value       = helm_release.my_vcluster.status
 }
 
-output "vcluster_name"{
-  value = local.vcluster_name
-  description = "Deployed vcluster name" 
+output "vcluster_name" {
+  value       = local.vcluster_name
+  description = "Deployed vcluster name"
 }

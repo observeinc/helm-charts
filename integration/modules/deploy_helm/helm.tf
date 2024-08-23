@@ -7,6 +7,10 @@
 # }
 
 
+locals {
+  helm_chart_agent_test_namespace = "observe"
+  helm_chart_agent_test_release_name      = "helm-chart-agent-test"
+}
 
 # # Random String for naming
 # resource "random_string" "unique_id" {
@@ -19,75 +23,74 @@
 #   name = "helm-charts-agent-eks"
 # }
 
-# resource "kubernetes_namespace" "helm_namespace" {
-#   metadata {
-#     name = local.helm_chart_agent_test_namespace
-#   }
-# }
+resource "kubernetes_namespace" "helm_namespace" {
+  metadata {
+    name = local.helm_chart_agent_test_namespace
+  }
+}
 
-# resource "helm_release" "observe-agent" {
-#   name      = local.helm_chart_agent_test_release_name
-#   chart     = "${path.module}/../../../charts/agent"
-#   namespace = kubernetes_namespace.helm_namespace.metadata[0].name
+resource "helm_release" "observe-agent" {
+  name      = local.helm_chart_agent_test_release_name
+  chart     = "${path.module}/../../../charts/agent"
+  namespace = kubernetes_namespace.helm_namespace.metadata[0].name
 
-#   atomic            = true
-#   cleanup_on_fail   = true
-#   create_namespace  = false #Handled by k8s resource 
-#   dependency_update = true
-#   timeout           = 120 #k8s timeout
-#   values = [
-#     <<-EOT
-#     observe:
-#       collectionEndpoint: ${var.OBSERVE_URL}
-#       token: ${var.OBSERVE_TOKEN}
-#     namespaceOverride: ${local.helm_chart_agent_test_namespace}
-#     deployment-cluster-events:
-#       namespaceOverride: ${local.helm_chart_agent_test_namespace}      
-#     deployment-cluster-metrics:
-#       namespaceOverride: ${local.helm_chart_agent_test_namespace}       
-#     daemonset-logs-metrics:
-#       namespaceOverride: ${local.helm_chart_agent_test_namespace}       
-#       affinity:
-#        podAntiAffinity:
-#           requiredDuringSchedulingIgnoredDuringExecution:
-#             - labelSelector:
-#                 matchExpressions:
-#                   - key: app.kubernetes.io/name
-#                     operator: In
-#                     values:
-#                       - daemonset-logs-metrics
-#               topologyKey: "kubernetes.io/hostname"
-#     deployment-agent-monitor:
-#       namespaceOverride: ${local.helm_chart_agent_test_namespace}      
-#     cluster:  
+  #atomic            = true
+  #cleanup_on_fail   = true
+  create_namespace  = false #Handled by k8s resource 
+  dependency_update = true
+  timeout           = 120 #k8s timeout
+  values = [
+    <<-EOT
+    observe:
+      collectionEndpoint: ${var.OBSERVE_URL}
+      token: ${var.OBSERVE_TOKEN}
+    namespaceOverride: ${local.helm_chart_agent_test_namespace}
+    deployment-cluster-events:
+      namespaceOverride: ${local.helm_chart_agent_test_namespace}      
+    deployment-cluster-metrics:
+      namespaceOverride: ${local.helm_chart_agent_test_namespace}       
+    daemonset-logs-metrics:
+      namespaceOverride: ${local.helm_chart_agent_test_namespace}       
+      affinity:
+       podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - daemonset-logs-metrics
+              topologyKey: "kubernetes.io/hostname"
+    deployment-agent-monitor:
+      namespaceOverride: ${local.helm_chart_agent_test_namespace}      
+    EOT
+  ]  
+}
+
+# cluster:  
 #       role:
 #         name: ${local.helm_chart_agent_test_cluster_role}
 #       roleBinding: 
 #         name: ${local.helm_chart_agent_test_cluster_role_binding}
-#     EOT
-#   ]  
+
+
+
+
+
+# resource "helm_release" "observe-stack-repo" {
+#   name       = "observe-stack"
+#   repository = "https://observeinc.github.io/helm-charts"
+#   chart      = "stack"
+#   create_namespace = true
+#   dependency_update = true 
+#   namespace = "observe"
+#   timeout = 300 #This is default 
+#   set {
+#     name = "global.observe.collectionEndpoint"
+#     value = var.OBSERVE_URL
+#   }
+#   set {
+#     name = "observe.token.value"
+#     value = var.OBSERVE_TOKEN
+#   }
 # }
-
-
-
-
-
-
-
-# # resource "helm_release" "observe-stack-repo" {
-# #   name       = "observe-stack"
-# #   repository = "https://observeinc.github.io/helm-charts"
-# #   chart      = "stack"
-# #   create_namespace = true
-# #   dependency_update = true 
-# #   namespace = "observe"
-# #   timeout = 300 #This is default 
-# #   set {
-# #     name = "global.observe.collectionEndpoint"
-# #     value = var.OBSERVE_URL
-# #   }
-# #   set {
-# #     name = "observe.token.value"
-# #     value = var.OBSERVE_TOKEN
-# #   }
-# # }
