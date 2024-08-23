@@ -1,5 +1,6 @@
 ## setup_aws_eks
 
+> **_NOTE:_**  PREVIEW: This module will be used in the future when testing against real EKS Cluster 
 
 This module sets up the EKS cluster and its relevant resources for the integration tests, in us-west-2. It's meant to be only setup once for integration tests to use when installing and deleting helm charts. 
 

@@ -26,4 +26,3 @@ provider "kubernetes" {
   config_path = pathexpand(var.cluster_config_path)
 }
 
-provider "kind" {}

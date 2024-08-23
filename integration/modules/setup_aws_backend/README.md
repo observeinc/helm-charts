@@ -1,5 +1,8 @@
 ## setup_aws_backend module
 
+> **_NOTE:_**  PREVIEW: This module will be used in the future when testing against real EKS Cluster 
+
+
 The module performs the following actions in `us-west-1` region. It's meant to be only used once as an initial setup for state management.
 
 - Sets up an S3 bucket `helm-charts-agent-terraform-state` to store state information related to helm-charts repo 
