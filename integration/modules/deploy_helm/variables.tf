@@ -3,7 +3,6 @@ variable "cluster_config_path"{
   default = "~/.kube/config"
   description = "Config Path to use for cluster where helm will be deployed"
 }
-
 variable "values_file" {
   type=string
   default = "default.yaml"

@@ -22,18 +22,17 @@ resource "kind_cluster" "cluster" {
   }
 }
 
-resource "null_resource" "wait_for_all_nodes" {
-  triggers = {
-    key = uuid()
-  }
+# resource "null_resource" "wait_for_all_nodes" {
+#   triggers = {
+#     key = uuid()
+#   }
 
-  provisioner "local-exec" {
-    command = <<EOF
-      printf "\nWaiting for all nodes to become ready...\n"
-      kubectl wait --for=condition=Ready nodes --all --timeout=60s
-      sleep 15
-    EOF
-  }
+#   provisioner "local-exec" {
+#     command = <<EOF
+#       printf "\nWaiting for all nodes to become ready...\n"
+#       kubectl wait --for=condition=Ready nodes --all --timeout=60s      
+#     EOF
+#   }
 
-  depends_on = [kind_cluster.cluster]
-}
+#   depends_on = [kind_cluster.cluster]
+# }

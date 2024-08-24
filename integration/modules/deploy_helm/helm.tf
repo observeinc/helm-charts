@@ -29,6 +29,9 @@ resource "helm_release" "observe-agent" {
 
 
 
+
+
+
 # resource "helm_release" "observe-stack-repo" {
 #   name       = "observe-stack"
 #   repository = "https://observeinc.github.io/helm-charts"
