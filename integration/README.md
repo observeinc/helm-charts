@@ -24,3 +24,10 @@ observe_token = "your-secure-observe-token"
 ```
 
 Note that the kubernetes and helm providers are automatically specified to use your `~/.kube/config` file by default, when using the context created by the kind cluster. 
+
+
+### Local sandboxing
+
+To manually setup a kind cluster and install the helm chart WITHOUT running tests, refer to [local sandbox module](modules/local_sandbox/README.md)
+
+After creation of cluster and helm-chart installation, any of the python scripts in `/scripts` directory can be tested by running them directly against the local kind cluster. 
