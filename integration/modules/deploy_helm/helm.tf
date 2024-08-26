@@ -10,8 +10,8 @@ resource "helm_release" "observe-agent" {
   #namespace = kubernetes_namespace.helm_namespace.metadata[0].name
   namespace = var.helm_chart_agent_test_namespace
 
-  atomic            = true
-  cleanup_on_fail   = true
+  #atomic            = true
+  #cleanup_on_fail   = true
   create_namespace  = true #Handled by k8s resource 
   dependency_update = true
   timeout           = 180 #k8s timeout
