@@ -12,3 +12,8 @@ terraform.tfvars
 tfplan
 .terraform.lock.hcl
 *_override.tf
+
+#python 
+venv 
+__pycache__
+.pytest_*
