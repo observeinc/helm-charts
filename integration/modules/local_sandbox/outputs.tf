@@ -8,6 +8,11 @@ output "kind_cluster_config_path" {
   description = "Kind cluster config path" 
   value       = module.setup_kind_cluster.kind_cluster_config_path
 }
+
+output "kind_cluster_endpoint" {
+  description = "Kind Cluster Endpoint"
+  value       = module.setup_kind_cluster.kind_cluster_endpoint
+}
 output "helm_chart_agent_test_release_name" {
   description = "Helm_chart_agent_test_release_name"
   value       = module.deploy_helm.helm_chart_agent_test_release_name
