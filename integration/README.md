@@ -8,9 +8,9 @@ The tests are run using the `terraform test -verbose` command from this folder `
 When the above command is run, the tests in the `integration/tests` directory are ran using the variables provided. The tests are ran in the order of the run blocks provided in `<test>.tftest.hcl` 
 
 Generally a test will do the following 
-- Create a local kind K8s cluster
-- Install the `agent` helm chart in the cluster 
-- Run a test using `observeinc/collection/aws//modules/testing/exec` module to accept python scripts located at `integration/tests/scripts` These scripts test the various flow of the helm chart installation
+- Create a local kind K8s cluster (`modules/create_kind_cluster`)
+- Install the `agent` helm chart in the cluster (`modules/deploy_helm`)
+- Run a test using `observeinc/collection/aws//modules/testing/exec` module to accept python scripts located at `integration/tests/scripts` These scripts test the various flows of the helm chart installation
 
 
 ### Variables 
