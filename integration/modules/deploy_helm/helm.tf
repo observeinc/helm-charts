@@ -14,7 +14,7 @@ resource "helm_release" "observe-agent" {
   cleanup_on_fail   = true
   create_namespace  = true #Handled by k8s resource 
   dependency_update = true
-  timeout           = 120 #k8s timeout
+  timeout           = 180 #k8s timeout
 
    values = [
     templatefile("${path.module}/values/${var.values_file}",
