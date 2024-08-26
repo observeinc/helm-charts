@@ -67,7 +67,6 @@ jobs:
           id: tf-apply 
           run: |
             echo $KUBECONFIG
-            ls ~/.kube/config
 
             terraform init 
             terraform apply --auto-approve
@@ -76,7 +75,6 @@ jobs:
 
         - run: |
             echo $KUBECONFIG
-            ls ~/.kube/config
             
             kubectl describe deployments --namespace=observe    
 
