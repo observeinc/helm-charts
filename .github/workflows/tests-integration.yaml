@@ -72,8 +72,10 @@ jobs:
             terraform apply --auto-approve
             sleep 10
         
-
-        - run: |
+        - name: Debug
+          if: always() 
+          run: |
+            
             echo $KUBECONFIG
             
             kubectl describe deployments --namespace=observe    
