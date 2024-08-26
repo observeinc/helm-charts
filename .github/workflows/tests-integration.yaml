@@ -75,11 +75,14 @@ jobs:
           working-directory: integration/modules/deploy_helm
           id: tf-apply-2
           run: |
-            terraform init
-            terraform apply --auto-approve
-            sleep 20
-            kubectl config set-context --current --namespace=observe 
-            kubectl describe pods --namespace=observe
+            kubectl config view
+            kubectl config current-context
+
+            # terraform init
+            # terraform apply --auto-approve
+            # sleep 20
+            # kubectl config set-context --current --namespace=observe 
+            # kubectl describe pods --namespace=observe
           
       
         # - name: Terraform Test
