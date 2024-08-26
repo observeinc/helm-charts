@@ -14,14 +14,6 @@ batch:
 {{- define "config.processors.attributes.k8sattributes" -}}
 k8sattributes:
   extract:
-    annotations:
-    - from: pod
-      key_regex: (.*)
-      tag_name: $$1
-    labels:
-    - from: pod
-      key_regex: (.*)
-      tag_name: $$1
     metadata:
     - k8s.namespace.name
     - k8s.deployment.name
@@ -33,7 +25,6 @@ k8sattributes:
     - k8s.node.name
     - k8s.pod.name
     - k8s.pod.uid
-    - k8s.pod.start_time
     - k8s.cluster.uid
     - k8s.node.name
     - k8s.node.uid
@@ -47,24 +38,6 @@ k8sattributes:
       name: k8s.pod.uid
   - sources:
     - from: connection
-{{- end -}}
-
-{{- define "config.processors.attributes.k8sattributes.podcontroller" -}}
-k8sattributes/podcontroller:
-  extract:
-    metadata:
-    - k8s.deployment.name
-    - k8s.statefulset.name
-    - k8s.replicaset.name
-    - k8s.daemonset.name
-    - k8s.cronjob.name
-    - k8s.job.name
-  pod_association:
-    - sources:
-        - from: resource_attribute
-          name: k8s.pod.name
-        - from: resource_attribute
-          name: k8s.namespace.name
 {{- end -}}
 
 {{- define "config.processors.attributes.observe_common" -}}
