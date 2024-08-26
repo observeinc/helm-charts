@@ -66,6 +66,7 @@ jobs:
           working-directory: integration/modules/local_sandbox
           id: tf-apply 
           run: |
+            terraform init 
             terraform apply --auto-approve
             sleep 10
             kubectl get nodes 
