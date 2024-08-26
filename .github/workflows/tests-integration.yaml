@@ -51,32 +51,42 @@ jobs:
           with:
             terraform_version: 1.8.5
 
-        - name: Terraform Init
-          working-directory: integration/modules/setup_kind_cluster 
-          id: init
-          run: terraform init
+        # - name: Terraform Init
+        #   working-directory: integration/modules/setup_kind_cluster 
+        #   id: init
+        #   run: terraform init
 
-        - name: Terraform Validate
-          working-directory: integration/modules/setup_kind_cluster 
-          id: validate
-          run: terraform validate -no-color
+        # - name: Terraform Validate
+        #   working-directory: integration/modules/setup_kind_cluster 
+        #   id: validate
+        #   run: terraform validate -no-color
 
                     
         - name: Terraform Apply 
           working-directory: integration/modules/local_sandbox
           id: tf-apply 
           run: |
+            echo $KUBECONFIG
+            ls ~/.kube/config
+
             terraform init 
             terraform apply --auto-approve
             sleep 10
-            kubectl get nodes 
-            kubectl describe pods --namespace=observe
+        
 
+        - run: |
+            echo $KUBECONFIG
+            ls ~/.kube/config
+            
+            kubectl describe deployments --namespace=observe    
+
+            kubectl describe pods --namespace=observe    
         
         # - name: Terraform Apply 
         #   working-directory: integration/modules/setup_kind_cluster 
         #   id: tf-apply 
         #   run: |
+        #     terraform init 
         #     terraform apply --auto-approve
         #     sleep 10
         #     kubectl get nodes 
