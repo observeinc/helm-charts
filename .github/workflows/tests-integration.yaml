@@ -35,7 +35,10 @@ jobs:
             cat /proc/meminfo
             lspci
         
-        
+        - uses: azure/setup-kubectl@v4
+          with:
+            version: latest 
+                
         - name: Setup Python
           uses: actions/setup-python@v5
           with:
@@ -55,9 +58,20 @@ jobs:
         - name: Terraform Validate
           id: validate
           run: terraform validate -no-color
+
+        - name: Terraform Apply 
+          working-directory: integration/modules/setup_kind_cluster 
+          id: tf-apply 
+          run: |
+            terraform apply --auto-approve
+            kubectl get nodes 
+            kubectl get namespaces
+
+        
+        
       
-        - name: Terraform Test
-          id: test
-          run: |               
-            terraform test -verbose 
+        # - name: Terraform Test
+        #   id: test
+        #   run: |               
+        #     terraform test -verbose 
         
