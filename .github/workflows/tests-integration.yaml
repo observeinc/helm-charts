@@ -25,7 +25,8 @@ jobs:
     runs-on: ubuntu-latest      
     defaults:
         run:
-            working-directory: integration #Terrafrom commands and tests are ran from integration directory
+            #working-directory: integration 
+            working-directory: integration/modules/setup_kind_cluster 
     steps:
         - name: Checkout code
           uses: actions/checkout@v4        
@@ -60,7 +61,6 @@ jobs:
           run: terraform validate -no-color
 
         - name: Terraform Apply 
-          working-directory: integration/modules/setup_kind_cluster 
           id: tf-apply 
           run: |
             terraform apply --auto-approve
