@@ -2,7 +2,7 @@ name: Helm Charts Agent - Integration Tests
 
 on:
   workflow_dispatch:
-  #pull_request:
+  pull_request:
   push:
     branches:
       - main
@@ -15,10 +15,8 @@ permissions:
     pull-requests: write
 
 env:
-    #TF_VAR_vcluster_name: pr-${{ github.event.pull_request.number }}-${{ github.sha }}-${{ github.run_id }}
-    TF_VAR_OBSERVE_URL: ${{secrets.OBSERVE_URL}}
-    TF_VAR_OBSERVE_TOKEN: ${{secrets.OBSERVE_TOKEN}}
-    TF_VAR_cluster_role_arn: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+    TF_VAR_observe_url: ${{secrets.OBSERVE_URL}}
+    TF_VAR_observe_token: ${{secrets.OBSERVE_TOKEN}}
 
 jobs: 
 
@@ -31,82 +29,30 @@ jobs:
     steps:
         - name: Checkout code
           uses: actions/checkout@v4        
-        - name: Configure AWS Credentials ## Terraform provider automatically uses these creds 
-          uses: aws-actions/configure-aws-credentials@v4
-          with:
-            role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-            role-session-name: ${{ github.sha }}
-            aws-region: ${{ secrets.AWS_REGION }}
+   
         
         - name: Setup Python
           uses: actions/setup-python@v5
           with:
             python-version: '3.10' 
-        #- run: pip install -r scripts/requirements.txt           
+            
+        - run: pip install -r scripts/requirements.txt           
 
         - name: Setup Terraform
           uses: hashicorp/setup-terraform@v3
           with:
             terraform_version: 1.8.5
 
-        - name: Install vCluster CLI
-          uses: loft-sh/setup-vcluster@main
-          with:
-            version: v0.20.0
-            kubectl-install: false
+        - name: Terraform Init
+          id: init
+          run: terraform init
 
-        - name: Set vCluster Name
-          run: |
-           calculatedSha=$(git rev-parse --short ${{ github.event.pull_request.head.sha || github.sha }})
-           echo "VCLUSTER_NAME=$(echo pr-${{ github.event.pull_request.number }}-${{ github.run_id }}-$calculatedSha)" >> $GITHUB_ENV
-            
-        - name: Create & Connect to vCluster 
-          id: create-cluster
-          run: |            
-            aws eks update-kubeconfig --region us-west-2 --name helm-charts-agent-eks
-            vcluster create ${{env.VCLUSTER_NAME}} -n ${{env.VCLUSTER_NAME}} --connect=false #-kube-context
-
-        - name: Vcluster connect
-          run: |            
-            vcluster connect ${{env.VCLUSTER_NAME}} 
+        - name: Terraform Validate
+          id: validate
+          run: terraform validate -no-color
+      
+        - name: Terraform Test
+          id: test
+          run: |               
+            terraform test -verbose 
         
-        - name: Check in vcluster & run tests 
-          run: |
-            kubectl config view 
-            kubectl config current-context
-            kubectl get namespaces 
-
-        - name: Delete vCluster
-          if: steps.create-cluster.outcome != 'failure'
-          run: |
-            sleep 15
-            vcluster delete ${{env.VCLUSTER_NAME}} 
-
-
-
-        # - name: Terraform Init
-        #   id: init
-        #   run: terraform init
-
-        # - name: Terraform Validate
-        #   id: validate
-        #   run: terraform validate -no-color
-
-        # - name: Terraform plan
-        #   id: plan
-        #   run: |               
-        #     terraform plan 
-        
-        
-        # - name: Terraform apply
-        #   id: apply
-        #   run: |  
-        #     terraform apply --auto-approve 
-        
-
-        # - name: Terraform destroy 
-        #   id: destroy
-        #   if: always()
-        #   run: |  
-        #     sleep 180 # wait 3 mins and destroy, still need to cleanup namespace if helm chart fails  
-        #     terraform destroy --auto-approve
