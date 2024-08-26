@@ -75,8 +75,6 @@ receivers:
 processors:
 {{- include "config.processors.memory_limiter" . | nindent 2 }}
 
-{{- include "config.processors.resource_detection.cloud" . | nindent 2 }}
-
 {{- include "config.processors.batch" . | nindent 2 }}
 
 {{- include "config.processors.attributes.observe_common" . | nindent 2 }}
@@ -93,8 +91,8 @@ processors:
           - set(attributes["observe_filter"], "objects_pull_watch")
           # unwrapping for the object_watch stream
           - set(attributes["observe_transform"]["control"]["isDelete"], true) where body["object"] != nil and body["type"] == "DELETED"
-          - set(attributes["observe_transform"]["control"]["debug_objectSource"], "watch") where body["object"] != nil and body["type"] != nil
-          - set(attributes["observe_transform"]["control"]["debug_objectSource"], "pull") where body["object"] == nil or body["type"] == nil
+          - set(attributes["observe_transform"]["control"]["debug_source"], "watch") where body["object"] != nil and body["type"] != nil
+          - set(attributes["observe_transform"]["control"]["debug_source"], "pull") where body["object"] == nil or body["type"] == nil
           - set(body, body["object"]) where body["object"] != nil and body["type"] != nil
           # native columns: valid_from, valid_to, kind
           - set(attributes["observe_transform"]["valid_from"], observed_time_unix_nano)
@@ -218,8 +216,8 @@ processors:
           - set(attributes["observe_filter"], "objects_pull_watch")
           # unwrap the object out of the watch stream
           - set(attributes["observe_transform"]["control"]["isDelete"], true) where body["object"] != nil and body["type"] == "DELETED"
-          - set(attributes["observe_transform"]["control"]["debug_objectSource"], "watch") where body["object"] != nil and body["type"] != nil
-          - set(attributes["observe_transform"]["control"]["debug_objectSource"], "pull") where body["object"] == nil or body["type"] == nil
+          - set(attributes["observe_transform"]["control"]["debug_source"], "watch") where body["object"] != nil and body["type"] != nil
+          - set(attributes["observe_transform"]["control"]["debug_source"], "pull") where body["object"] == nil or body["type"] == nil
           - set(body, body["object"]) where body["object"] != nil and body["type"] != nil
           # native columns: valid_from, valid_to, kind
           - set(attributes["observe_transform"]["valid_from"], observed_time_unix_nano)
@@ -246,20 +244,20 @@ service:
   pipelines:
       logs/objects:
         receivers: [k8sobjects/objects]
-        processors: [memory_limiter, batch, resourcedetection/cloud, attributes/observe_common, transform/object, observek8sattributes]
+        processors: [memory_limiter, batch, attributes/observe_common, transform/object, observek8sattributes]
         exporters: [otlphttp/observe/base, debug/override]
       logs/cluster:
         receivers: [k8sobjects/cluster]
-        processors: [memory_limiter, batch, resourcedetection/cloud, attributes/observe_common, filter/cluster, transform/cluster]
+        processors: [memory_limiter, batch, attributes/observe_common, filter/cluster, transform/cluster]
         exporters: [otlphttp/observe/base, debug/override]
       {{ if .Values.observe.entityToken  -}}
       logs/entity:
         receivers: [k8sobjects/objects]
-        processors: [memory_limiter, batch, resourcedetection/cloud, attributes/observe_common, transform/object, observek8sattributes]
+        processors: [memory_limiter, batch, attributes/observe_common, transform/object, observek8sattributes]
         exporters: [otlphttp/observe/entity, debug/override]
       logs/cluster/entity:
         receivers: [k8sobjects/cluster]
-        processors: [memory_limiter, batch, resourcedetection/cloud, attributes/observe_common, filter/cluster, transform/cluster]
+        processors: [memory_limiter, batch, attributes/observe_common, filter/cluster, transform/cluster]
         exporters: [otlphttp/observe/entity, debug/override]
       {{- end }}
 
