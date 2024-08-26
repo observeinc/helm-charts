@@ -25,8 +25,7 @@ jobs:
     runs-on: ubuntu-latest      
     defaults:
         run:
-            #working-directory: integration 
-            working-directory: integration/modules/setup_kind_cluster 
+            working-directory: integration #Terrafrom commands and tests are ran from integration directory
     steps:
         - name: Checkout code
           uses: actions/checkout@v4        
@@ -53,21 +52,23 @@ jobs:
             terraform_version: 1.8.5
 
         - name: Terraform Init
+          working-directory: integration/modules/setup_kind_cluster 
           id: init
           run: terraform init
 
         - name: Terraform Validate
+          working-directory: integration/modules/setup_kind_cluster 
           id: validate
           run: terraform validate -no-color
 
         - name: Terraform Apply 
+          working-directory: integration/modules/setup_kind_cluster 
           id: tf-apply 
           run: |
             terraform apply --auto-approve
             kubectl get nodes 
             kubectl get namespaces
-
-        
+      
         
       
         # - name: Terraform Test
