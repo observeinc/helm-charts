@@ -46,13 +46,11 @@ jobs:
           with:
             terraform_version: 1.8.5
 
-        - name: Terraform Init
-          working-directory: integration/modules/setup_kind_cluster 
+        - name: Terraform Init        
           id: init
           run: terraform init
 
-        - name: Terraform Validate
-          working-directory: integration/modules/setup_kind_cluster 
+        - name: Terraform Validate         
           id: validate
           run: terraform validate -no-color
 
