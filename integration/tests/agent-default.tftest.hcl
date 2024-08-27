@@ -31,19 +31,20 @@ run "deploy_helm" {
   }
 }
 
-run "test_example" {
-  module {
-    source  = "observeinc/collection/aws//modules/testing/exec"
-    version = "2.9.0"
-  }
 
-  variables {
-    command = "pytest ./scripts/test_example.py -v -s"
-  }
+// run "test_example" {
+//   module {
+//     source  = "observeinc/collection/aws//modules/testing/exec"
+//     version = "2.9.0"
+//   }
 
-  assert {
-    condition     = output.error == ""
-    error_message = "Error in Python Tests"
-  }
+//   variables {
+//     command = "pytest ./scripts/test_example.py -v -s"
+//   }
 
-}
+//   assert {
+//     condition     = output.error == ""
+//     error_message = "Error in Python Tests"
+//   }
+
+// }

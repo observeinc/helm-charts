@@ -11,3 +11,13 @@ terraform {
   }
   required_version = "~> 1.3"
 }
+
+# provider "helm" {
+#   kubernetes {
+#     config_path = pathexpand("~/.kube/config") 
+#   }
+# }
+
+# provider "kubernetes" {
+#   config_path = pathexpand("~/.kube/config") 
+# }
