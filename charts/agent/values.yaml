@@ -1,8 +1,18 @@
-observe:
-  token:
-  collectionEndpoint:
 
+namespaceOverride: &namespaceOverride "observe"
+
+observe:
+  #If create = false it is assumed that a secret named agent-credentials with key: OBSERVE_TOKEN already exists
+  token:
+    create: true
+    value: ""
+  # ex -  https://12345678.collect.observeinc.com
+  collectionEndpoint:
+    value: ""
+  # this is temporary and will be removed
   entityToken:
+    create: false
+    value: ""
 
 cluster:
   name: observe-agent-monitored-cluster
@@ -23,7 +33,6 @@ config:
       # values basic, normal, detailed
       verbosity: basic
 
-namespaceOverride:
 
 ################################################
 deployment-cluster-events:
@@ -32,7 +41,7 @@ deployment-cluster-events:
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
   nameOverride: "deployment-cluster-events"
-  namespaceOverride: "observe"
+  namespaceOverride: *namespaceOverride
 
   configMap:
     create: false
@@ -119,7 +128,11 @@ deployment-cluster-events:
         configMapKeyRef:
           name: cluster-info
           key: id
-
+    - name: TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: agent-credentials
+          key: OBSERVE_TOKEN
   extraEnvsFrom: []
   extraVolumes:
     - name: "observe-agent-deployment-config"
@@ -141,7 +154,7 @@ deployment-cluster-metrics:
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
   nameOverride: "deployment-cluster-metrics"
-  namespaceOverride: "observe"
+  namespaceOverride: *namespaceOverride
 
   configMap:
     create: false
@@ -227,6 +240,11 @@ deployment-cluster-metrics:
         configMapKeyRef:
           name: cluster-info
           key: id
+    - name: TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: agent-credentials
+          key: OBSERVE_TOKEN
 
   extraEnvsFrom: []
   extraVolumes:
@@ -248,7 +266,7 @@ daemonset-logs-metrics:
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
   nameOverride: "daemonset-logs-metrics"
-  namespaceOverride: "observe"
+  namespaceOverride: *namespaceOverride
 
   configMap:
     create: false
@@ -338,6 +356,11 @@ daemonset-logs-metrics:
       valueFrom:
         fieldRef:
           fieldPath: spec.nodeName
+    - name: TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: agent-credentials
+          key: OBSERVE_TOKEN
   extraEnvsFrom: []
   extraVolumes:
     - name: "observe-agent-deployment-config"
@@ -387,7 +410,7 @@ deployment-agent-monitor:
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
   nameOverride: "deployment-agent-monitor"
-  namespaceOverride: "observe"
+  namespaceOverride: *namespaceOverride
 
   configMap:
     create: false
@@ -473,7 +496,11 @@ deployment-agent-monitor:
         configMapKeyRef:
           name: cluster-info
           key: id
-
+    - name: TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: agent-credentials
+          key: OBSERVE_TOKEN
   extraEnvsFrom: []
   extraVolumes:
     - name: "observe-agent-deployment-config"
