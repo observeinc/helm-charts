@@ -75,8 +75,6 @@ receivers:
 processors:
 {{- include "config.processors.memory_limiter" . | nindent 2 }}
 
-{{- include "config.processors.resource_detection.cloud" . | nindent 2 }}
-
 {{- include "config.processors.batch" . | nindent 2 }}
 
 {{- include "config.processors.attributes.observe_common" . | nindent 2 }}
@@ -93,8 +91,8 @@ processors:
           - set(attributes["observe_filter"], "objects_pull_watch")
           # unwrapping for the object_watch stream
           - set(attributes["observe_transform"]["control"]["isDelete"], true) where body["object"] != nil and body["type"] == "DELETED"
-          - set(attributes["observe_transform"]["control"]["debug_objectSource"], "watch") where body["object"] != nil and body["type"] != nil
-          - set(attributes["observe_transform"]["control"]["debug_objectSource"], "pull") where body["object"] == nil or body["type"] == nil
+          - set(attributes["observe_transform"]["control"]["debug_source"], "watch") where body["object"] != nil and body["type"] != nil
+          - set(attributes["observe_transform"]["control"]["debug_source"], "pull") where body["object"] == nil or body["type"] == nil
           - set(body, body["object"]) where body["object"] != nil and body["type"] != nil
           # native columns: valid_from, valid_to, kind
           - set(attributes["observe_transform"]["valid_from"], observed_time_unix_nano)
@@ -113,11 +111,18 @@ processors:
           # facets
           - set(attributes["observe_transform"]["facets"]["creationTimestamp"], body["metadata"]["creationTimestamp"])
           - set(attributes["observe_transform"]["facets"]["deletionTimestamp"], body["metadata"]["deletionTimestamp"])
-          # - set(attributes["observe_transform"]["facets"]["ownerReference"], body["metadata"]["ownerReferences"][0])
           - set(attributes["observe_transform"]["facets"]["ownerRefKind"], body["metadata"]["ownerReferences"][0]["kind"])
           - set(attributes["observe_transform"]["facets"]["ownerRefName"], body["metadata"]["ownerReferences"][0]["name"])
           - set(attributes["observe_transform"]["facets"]["labels"], body["metadata"]["labels"])
           - set(attributes["observe_transform"]["facets"]["annotations"], body["metadata"]["annotations"])
+          # controllers with correlation tags
+          - set(attributes["observe_transform"]["facets"]["replicasetName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "ReplicaSet"
+          - set(attributes["observe_transform"]["facets"]["daemonsetName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "DaemonSet"
+          - set(attributes["observe_transform"]["facets"]["jobName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "Job"
+          - set(attributes["observe_transform"]["facets"]["statefulsetName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "StatefulSet"
+          - set(attributes["observe_transform"]["facets"]["deploymentName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "ReplicaSet"
+          - replace_pattern(attributes["observe_transform"]["facets"]["deploymentName"], "^(.*)-[0-9a-f]+$$", "$$1")
+          - set(attributes["observe_transform"]["facets"]["deploymentName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "Deployment"
       # For Pod
       - context: log
         conditions:
@@ -130,14 +135,6 @@ processors:
           - set(attributes["observe_transform"]["facets"]["startTime"], body["status"]["startTime"])
           - set(attributes["observe_transform"]["facets"]["readinessGates"], body["object"]["spec"]["readinessGates"])
           - set(attributes["observe_transform"]["facets"]["nodeName"], body["spec"]["nodeName"])
-          # controllers
-          - set(attributes["observe_transform"]["facets"]["replicasetName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "ReplicaSet"
-          - set(attributes["observe_transform"]["facets"]["daemonsetName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "DaemonSet"
-          - set(attributes["observe_transform"]["facets"]["jobName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "Job"
-          - set(attributes["observe_transform"]["facets"]["statefulsetName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "StatefulSet"
-          - set(attributes["observe_transform"]["facets"]["deploymentName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "ReplicaSet"
-          - replace_pattern(attributes["observe_transform"]["facets"]["deploymentName"], "^(.*)-[0-9a-f]+$$", "$$1")
-
       # For Namespace
       - context: log
         conditions:
@@ -160,33 +157,22 @@ processors:
           - body["kind"] == "Deployment"
         statements:
           - set(attributes["observe_transform"]["facets"]["selector"], body["spec"]["selector"]["matchLabels"])
-          - set(attributes["observe_transform"]["facets"]["revision"], body["metadata"]["annotations"]["deployment.kubernetes.io/revision"])
-          - set(attributes["observe_transform"]["facets"]["desired"], body["spec"]["replicas"])
-          - set(attributes["observe_transform"]["facets"]["updated"], body["status"]["updatedReplicas"])
-          - set(attributes["observe_transform"]["facets"]["total"], body["status"]["replicas"])
-          - set(attributes["observe_transform"]["facets"]["available"], body["status"]["availableReplicas"])
-          - set(attributes["observe_transform"]["facets"]["unavailable"], body["status"]["unavailableReplicas"])
-          - set(attributes["observe_transform"]["facets"]["ready"], body["status"]["readyReplicas"])
-          - set(attributes["observe_transform"]["facets"]["ready"], 0) where attributes["observe_transform"]["facets"]["ready"] == nil
+          - set(attributes["observe_transform"]["facets"]["desiredReplicas"], body["spec"]["replicas"])
+          - set(attributes["observe_transform"]["facets"]["updatedReplicas"], body["status"]["updatedReplicas"])
+          - set(attributes["observe_transform"]["facets"]["availableReplicas"], body["status"]["availableReplicas"])
+          - set(attributes["observe_transform"]["facets"]["readyReplicas"], body["status"]["readyReplicas"])
+          - set(attributes["observe_transform"]["facets"]["readyReplicas"], 0) where attributes["observe_transform"]["facets"]["readyReplicas"] == nil
+          - set(attributes["observe_transform"]["facets"]["unavailableReplicas"], body["status"]["unavailableReplicas"])
       # For ReplicaSet
       - context: log
         conditions:
           - body["kind"] == "ReplicaSet"
         statements:
-          - set(cache["ownerReferences"], body["metadata"]["ownerReferences"])
-          - flatten(cache, depth=3)
-          - set(attributes["observe_transform"]["facets"]["deployment"], cache["ownerReferences.0"]["name"])
-          - set(attributes["observe_transform"]["facets"]["revision"], body["metadata"]["annotations"]["deployment.kubernetes.io/revision"])
-          - set(attributes["observe_transform"]["facets"]["desired"], body["spec"]["replicas"])
-          - set(attributes["observe_transform"]["facets"]["current"], body["status"]["replicas"])
-          - set(attributes["observe_transform"]["facets"]["ready"], body["status"]["readyReplicas"])
-          - set(attributes["observe_transform"]["facets"]["ready"], 0) where attributes["observe_transform"]["facets"]["ready"] == nil
-      # For ConfigMap
-      - context: log
-        conditions:
-          - body["kind"] == "ConfigMap"
-        statements:
-          - set(attributes["observe_transform"]["facets"]["data"], body["data"])
+          - set(attributes["observe_transform"]["facets"]["desiredReplicas"], body["spec"]["replicas"])
+          - set(attributes["observe_transform"]["facets"]["currentReplicas"], body["status"]["replicas"])
+          - set(attributes["observe_transform"]["facets"]["availableReplicas"], body["status"]["availableReplicas"])
+          - set(attributes["observe_transform"]["facets"]["readyReplicas"], body["status"]["readyReplicas"])
+          - set(attributes["observe_transform"]["facets"]["readyReplicas"], 0) where attributes["observe_transform"]["facets"]["readyReplicas"] == nil
       # For Event
       - context: log
         conditions:
@@ -217,8 +203,8 @@ processors:
           - set(attributes["observe_filter"], "objects_pull_watch")
           # unwrap the object out of the watch stream
           - set(attributes["observe_transform"]["control"]["isDelete"], true) where body["object"] != nil and body["type"] == "DELETED"
-          - set(attributes["observe_transform"]["control"]["debug_objectSource"], "watch") where body["object"] != nil and body["type"] != nil
-          - set(attributes["observe_transform"]["control"]["debug_objectSource"], "pull") where body["object"] == nil or body["type"] == nil
+          - set(attributes["observe_transform"]["control"]["debug_source"], "watch") where body["object"] != nil and body["type"] != nil
+          - set(attributes["observe_transform"]["control"]["debug_source"], "pull") where body["object"] == nil or body["type"] == nil
           - set(body, body["object"]) where body["object"] != nil and body["type"] != nil
           # native columns: valid_from, valid_to, kind
           - set(attributes["observe_transform"]["valid_from"], observed_time_unix_nano)
@@ -245,20 +231,20 @@ service:
   pipelines:
       logs/objects:
         receivers: [k8sobjects/objects]
-        processors: [memory_limiter, batch, resourcedetection/cloud, attributes/observe_common, transform/object, observek8sattributes]
+        processors: [memory_limiter, batch, attributes/observe_common, transform/object, observek8sattributes]
         exporters: [otlphttp/observe/base, debug/override]
       logs/cluster:
         receivers: [k8sobjects/cluster]
-        processors: [memory_limiter, batch, resourcedetection/cloud, attributes/observe_common, filter/cluster, transform/cluster]
+        processors: [memory_limiter, batch, attributes/observe_common, filter/cluster, transform/cluster]
         exporters: [otlphttp/observe/base, debug/override]
       {{ if .Values.observe.entityToken  -}}
       logs/entity:
         receivers: [k8sobjects/objects]
-        processors: [memory_limiter, batch, resourcedetection/cloud, attributes/observe_common, transform/object, observek8sattributes]
+        processors: [memory_limiter, batch, attributes/observe_common, transform/object, observek8sattributes]
         exporters: [otlphttp/observe/entity, debug/override]
       logs/cluster/entity:
         receivers: [k8sobjects/cluster]
-        processors: [memory_limiter, batch, resourcedetection/cloud, attributes/observe_common, filter/cluster, transform/cluster]
+        processors: [memory_limiter, batch, attributes/observe_common, filter/cluster, transform/cluster]
         exporters: [otlphttp/observe/entity, debug/override]
       {{- end }}
 

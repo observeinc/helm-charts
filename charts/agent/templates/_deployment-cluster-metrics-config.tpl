@@ -15,14 +15,17 @@ receivers:
     - Ready
     - MemoryPressure
     - DiskPressure
+    allocatable_types_to_report:
+    - cpu
+    - memory
+    - storage
+    - ephemeral-storage
     metrics:
       k8s.node.condition:
         enabled: true
 
 processors:
 {{- include "config.processors.memory_limiter" . | nindent 2 }}
-
-{{- include "config.processors.resource_detection.cloud" . | nindent 2 }}
 
 {{- include "config.processors.batch" . | nindent 2 }}
 
@@ -31,9 +34,9 @@ processors:
 {{- include "config.processors.attributes.observe_common" . | nindent 2 }}
 
   # attributes to append to objects
-  attributes/debug_objectSource_cluster_metrics:
+  attributes/debug_source_cluster_metrics:
     actions:
-      - key: debug_objectSource
+      - key: debug_source
         action: insert
         value: cluster_metrics
 
@@ -42,7 +45,7 @@ service:
   pipelines:
       metrics:
         receivers: [k8s_cluster]
-        processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, attributes/debug_objectSource_cluster_metrics]
+        processors: [memory_limiter, batch, k8sattributes, attributes/observe_common, attributes/debug_source_cluster_metrics]
         exporters: [prometheusremotewrite, debug/override]
 {{- include "config.service.telemetry" . | nindent 2 }}
 
