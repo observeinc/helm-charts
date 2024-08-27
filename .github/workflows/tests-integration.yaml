@@ -28,13 +28,8 @@ jobs:
             working-directory: integration #Terrafrom commands and tests are ran from integration directory
     steps:
         - name: Checkout code
-          uses: actions/checkout@v4        
-        
-        - run: |
-            cat /proc/cpuinfo
-            cat /proc/meminfo
-            lspci
-        
+          uses: actions/checkout@v4                
+       
         - uses: azure/setup-kubectl@v4
           with:
             version: latest 
@@ -51,42 +46,48 @@ jobs:
           with:
             terraform_version: 1.8.5
 
-        # - name: Terraform Init
-        #   working-directory: integration/modules/setup_kind_cluster 
-        #   id: init
-        #   run: terraform init
+        - name: Terraform Init
+          working-directory: integration/modules/setup_kind_cluster 
+          id: init
+          run: terraform init
 
-        # - name: Terraform Validate
-        #   working-directory: integration/modules/setup_kind_cluster 
-        #   id: validate
-        #   run: terraform validate -no-color
+        - name: Terraform Validate
+          working-directory: integration/modules/setup_kind_cluster 
+          id: validate
+          run: terraform validate -no-color
 
-                    
-        - name: Terraform Apply 
-          working-directory: integration/modules/local_sandbox
-          id: tf-apply 
-          run: |
-            echo $KUBECONFIG
-
-            terraform init 
-            terraform apply --auto-approve
-            sleep 10
         
-        - name: Debug
-          if: always() 
-          run: |
+        - name: Terraform Test
+          id: test
+          run: |               
+            terraform test -verbose 
+        
+
+        # - name: Terraform Apply 
+        #   working-directory: integration/modules/local_sandbox
+        #   id: tf-apply 
+        #   run: |
+        #     echo $KUBECONFIG
+
+        #     terraform init 
+        #     terraform apply --auto-approve
+        #     sleep 10
+        
+        # - name: Debug
+        #   if: always() 
+        #   run: |
             
-            echo $KUBECONFIG
-            kubectl logs -l app.kubernetes.io/name=daemonset-logs-metrics --namespace=observe --all-containers=true --timestamps 
+        #     echo $KUBECONFIG
+        #     kubectl logs -l app.kubernetes.io/name=daemonset-logs-metrics --namespace=observe --all-containers=true --timestamps 
 
-            kubectl get pods --namespace=observe
+        #     kubectl get pods --namespace=observe
             
-            kubectl events --namespace=observe 
+        #     kubectl events --namespace=observe 
 
-            # kubectl describe deployments --namespace=observe  
-            # kubectl describe pods --namespace=observe    
+        #     # kubectl describe deployments --namespace=observe  
+        #     # kubectl describe pods --namespace=observe    
 
-            # kubectl describe nodes --namespace=observe 
+        #     # kubectl describe nodes --namespace=observe 
         
         # - name: Terraform Apply 
         #   working-directory: integration/modules/setup_kind_cluster 
@@ -113,8 +114,3 @@ jobs:
         #     # 
           
       
-        # - name: Terraform Test
-        #   id: test
-        #   run: |               
-        #     terraform test -verbose 
-        
