@@ -77,13 +77,15 @@ jobs:
           run: |
             
             echo $KUBECONFIG
-
+            
             kubectl get pods --namespace=observe
             
             kubectl events --namespace=observe 
 
             kubectl describe deployments --namespace=observe  
             kubectl describe pods --namespace=observe    
+
+            kubectl describe nodes --namespace=observe 
         
         # - name: Terraform Apply 
         #   working-directory: integration/modules/setup_kind_cluster 
