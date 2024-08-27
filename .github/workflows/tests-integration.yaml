@@ -2,10 +2,10 @@ name: Helm Charts Agent - Integration Tests
 
 on:
   workflow_dispatch:
-  pull_request:
+  #pull_request:
   push:
-    branches:
-      - main
+   # branches:
+    #  - main
   
 
 #Special permissions required for OIDC authentication
