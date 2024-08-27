@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.6.0](https://img.shields.io/badge/Version-0.6.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 0.6.1](https://img.shields.io/badge/Version-0.6.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 > [!CAUTION]
 > This chart is under active development and is not meant to be installed yet.
@@ -50,6 +50,9 @@ Chart to install K8s collection stack based on Observe Agent
 | daemonset-logs-metrics.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
 | daemonset-logs-metrics.extraEnvs[2].name | string | `"K8S_NODE_NAME"` |  |
 | daemonset-logs-metrics.extraEnvs[2].valueFrom.fieldRef.fieldPath | string | `"spec.nodeName"` |  |
+| daemonset-logs-metrics.extraEnvs[3].name | string | `"TOKEN"` |  |
+| daemonset-logs-metrics.extraEnvs[3].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
+| daemonset-logs-metrics.extraEnvs[3].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
 | daemonset-logs-metrics.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | daemonset-logs-metrics.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | daemonset-logs-metrics.extraVolumeMounts[1].mountPath | string | `"/var/log/pods"` |  |
@@ -127,6 +130,9 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-agent-monitor.extraEnvs[1].name | string | `"OBSERVE_CLUSTER_UID"` |  |
 | deployment-agent-monitor.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"id"` |  |
 | deployment-agent-monitor.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
+| deployment-agent-monitor.extraEnvs[2].name | string | `"TOKEN"` |  |
+| deployment-agent-monitor.extraEnvs[2].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
+| deployment-agent-monitor.extraEnvs[2].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
 | deployment-agent-monitor.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | deployment-agent-monitor.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | deployment-agent-monitor.extraVolumes[0].configMap.defaultMode | int | `420` |  |
@@ -181,6 +187,9 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-cluster-events.extraEnvs[1].name | string | `"OBSERVE_CLUSTER_UID"` |  |
 | deployment-cluster-events.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"id"` |  |
 | deployment-cluster-events.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
+| deployment-cluster-events.extraEnvs[2].name | string | `"TOKEN"` |  |
+| deployment-cluster-events.extraEnvs[2].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
+| deployment-cluster-events.extraEnvs[2].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
 | deployment-cluster-events.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | deployment-cluster-events.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | deployment-cluster-events.extraVolumes[0].configMap.defaultMode | int | `420` |  |
@@ -235,6 +244,9 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-cluster-metrics.extraEnvs[1].name | string | `"OBSERVE_CLUSTER_UID"` |  |
 | deployment-cluster-metrics.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"id"` |  |
 | deployment-cluster-metrics.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
+| deployment-cluster-metrics.extraEnvs[2].name | string | `"TOKEN"` |  |
+| deployment-cluster-metrics.extraEnvs[2].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
+| deployment-cluster-metrics.extraEnvs[2].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
 | deployment-cluster-metrics.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | deployment-cluster-metrics.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | deployment-cluster-metrics.extraVolumes[0].configMap.defaultMode | int | `420` |  |
@@ -274,10 +286,12 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-cluster-metrics.resources | object | `{"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | deployment-cluster-metrics.serviceAccount.create | bool | `false` |  |
 | deployment-cluster-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
-| namespaceOverride | string | `nil` |  |
-| observe.collectionEndpoint | string | `nil` |  |
-| observe.entityToken | string | `nil` |  |
-| observe.token | string | `nil` |  |
+| namespaceOverride | string | `"observe"` |  |
+| observe.collectionEndpoint.value | string | `""` |  |
+| observe.entityToken.create | bool | `false` |  |
+| observe.entityToken.value | string | `""` |  |
+| observe.token.create | bool | `true` |  |
+| observe.token.value | string | `""` |  |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

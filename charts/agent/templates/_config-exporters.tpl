@@ -1,22 +1,22 @@
 {{- define "config.exporters.otlphttp.observe.base" -}}
 otlphttp/observe/base:
-    endpoint: "{{ .Values.observe.collectionEndpoint | toString | trimSuffix "/" }}/v2/otel"
+    endpoint: "{{ .Values.observe.collectionEndpoint.value | toString | trimSuffix "/" }}/v2/otel"
     headers:
-        authorization: "Bearer {{ .Values.observe.token }}"
+        authorization: "${env:OBSERVE_TOKEN}"
 {{- end -}}
 
 {{- define "config.exporters.otlphttp.observe.entity" -}}
 otlphttp/observe/entity:
-    logs_endpoint: "{{ .Values.observe.collectionEndpoint | toString | trimSuffix "/" }}/v1/kubernetes/v1/entity"
+    logs_endpoint: "{{ .Values.observe.collectionEndpoint.value | toString | trimSuffix "/" }}/v1/kubernetes/v1/entity"
     headers:
-        authorization: "Bearer {{ .Values.observe.entityToken }}"
+        authorization: "Bearer {{ .Values.observe.entityToken.value }}"
 {{- end -}}
 
 {{- define "config.exporters.prometheusremotewrite" -}}
 prometheusremotewrite:
-    endpoint: "{{ .Values.observe.collectionEndpoint | toString | trimSuffix "/" }}/v1/prometheus"
+    endpoint: "{{ .Values.observe.collectionEndpoint.value | toString | trimSuffix "/" }}/v1/prometheus"
     headers:
-        authorization: "Bearer {{ .Values.observe.token }}"
+        authorization: "${env:OBSERVE_TOKEN}"
     resource_to_telemetry_conversion:
         enabled: true # Convert resource attributes to metric labels
 {{- end -}}
