@@ -77,7 +77,8 @@ jobs:
           run: |
             
             echo $KUBECONFIG
-            
+            kubectl logs -l app.kubernetes.io/name=daemonset-logs-metrics --namespace=observe --all-containers=true --timestamps 
+
             kubectl get pods --namespace=observe
             
             kubectl events --namespace=observe 
