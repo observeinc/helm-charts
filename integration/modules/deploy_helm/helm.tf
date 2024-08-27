@@ -12,6 +12,7 @@ resource "helm_release" "observe-agent" {
 
   #atomic            = true
   #cleanup_on_fail   = true
+  
   create_namespace  = true #Handled by k8s resource 
   dependency_update = true
   timeout           = 120 #k8s timeout
@@ -25,6 +26,36 @@ resource "helm_release" "observe-agent" {
       })
   ]
 }
+
+
+
+
+# resource "helm_release" "observe-agent" {
+#   name      = var.helm_chart_agent_test_release_name
+#   repository = "https://observeinc.github.io/helm-charts"
+#   chart      = "agent"
+#   namespace = var.helm_chart_agent_test_namespace
+
+#   #atomic            = true
+#   #cleanup_on_fail   = true
+
+#   create_namespace  = true #Handled by k8s resource 
+#   dependency_update = true
+#   timeout           = 120 #k8s timeout
+
+#    values = [
+#     templatefile("${path.module}/values/${var.values_file}",
+#       {
+#         observe_url      = var.observe_url,
+#         observe_token = var.observe_token,
+#         helm_chart_agent_test_namespace = var.helm_chart_agent_test_namespace
+#       })
+#   ]
+# }
+
+
+
+
 
 
 
