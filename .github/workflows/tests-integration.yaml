@@ -77,9 +77,12 @@ jobs:
           run: |
             
             echo $KUBECONFIG
-            
-            kubectl describe deployments --namespace=observe    
 
+            kubectl get pods --namespace=observe
+            
+            kubectl events --namespace=observe 
+
+            kubectl describe deployments --namespace=observe  
             kubectl describe pods --namespace=observe    
         
         # - name: Terraform Apply 
