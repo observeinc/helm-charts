@@ -562,6 +562,25 @@ entries:
     version: 0.1.8
   logs:
   - apiVersion: v2
+    created: "2024-08-27T15:04:15.430554299Z"
+    dependencies:
+    - name: fluent-bit
+      repository: https://fluent.github.io/helm-charts
+      version: 0.47.7
+    - name: endpoint
+      repository: file://../endpoint
+      version: 0.1.11
+    description: Observe logs collection
+    digest: ef66f87d752324bff2fd2ecc2a09ab01f4e6d80fc741c1b5c64eee306e4e5d89
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: logs
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/logs-0.1.31/logs-0.1.31.tgz
+    version: 0.1.31
+  - apiVersion: v2
     created: "2024-08-14T22:15:10.516019174Z"
     dependencies:
     - name: fluent-bit
@@ -1572,6 +1591,39 @@ entries:
     - https://github.com/observeinc/helm-charts/releases/download/proxy-0.1.0/proxy-0.1.0.tgz
     version: 0.1.0
   stack:
+  - apiVersion: v2
+    created: "2024-08-27T15:04:15.653865115Z"
+    dependencies:
+    - condition: logs.enabled
+      name: logs
+      repository: file://../logs
+      version: 0.1.31
+    - condition: metrics.enabled
+      name: metrics
+      repository: file://../metrics
+      version: 0.3.23
+    - condition: events.enabled
+      name: events
+      repository: file://../events
+      version: 0.1.24
+    - condition: proxy.enabled
+      name: proxy
+      repository: file://../proxy
+      version: 0.1.7
+    - condition: traces.enabled
+      name: traces
+      repository: file://../traces
+      version: 1.0.2
+    description: Observe Kubernetes agent stack
+    digest: 15aaa7364f527ec0b69591a708e8287cc3272c2e5e8c200fc2b782bbc69c2b2d
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: stack
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/stack-1.0.2/stack-1.0.2.tgz
+    version: 1.0.2
   - apiVersion: v2
     created: "2024-08-14T22:15:10.81400714Z"
     dependencies:
@@ -3316,6 +3368,29 @@ entries:
     version: 0.1.0
   traces:
   - apiVersion: v2
+    created: "2024-08-27T15:04:15.918421313Z"
+    dependencies:
+    - name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.102.1
+    - name: endpoint
+      repository: file://../endpoint
+      version: 0.1.11
+    - condition: proxy.enabled
+      name: proxy
+      repository: file://../proxy
+      version: 0.1.7
+    description: Observe OpenTelemetry trace collection
+    digest: 42623cf2da1347951c4d501d5dc9ec6ce627ace7fdf1a10941346d30544b1bd6
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: traces
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/traces-1.0.2/traces-1.0.2.tgz
+    version: 1.0.2
+  - apiVersion: v2
     created: "2024-08-14T22:15:10.970925282Z"
     dependencies:
     - name: opentelemetry-collector
@@ -4159,4 +4234,4 @@ entries:
     urls:
     - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.0/traces-0.1.0.tgz
     version: 0.1.0
-generated: "2024-08-21T22:55:40.939105037Z"
+generated: "2024-08-27T15:04:15.91902788Z"
