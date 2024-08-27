@@ -168,11 +168,11 @@ service:
         receivers: [filelog]
         processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, attributes/debug_source_pod_logs]
         exporters: [otlphttp/observe/base, debug/override]
-      hostmetrics:
+      metrics/hostmetrics:
         receivers: [hostmetrics]
         processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, attributes/debug_source_hostmetrics]
         exporters: [prometheusremotewrite, debug/override]
-      kubeletstatsmetrics:
+      metrics/kubeletstats:
         receivers: [kubeletstats]
         processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, attributes/debug_source_kubletstats_metrics]
         exporters: [prometheusremotewrite, debug/override]
