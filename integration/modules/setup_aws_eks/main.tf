@@ -68,13 +68,13 @@ module "eks" {
         example = {
           policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
           access_scope = {
-            type       = "cluster"
+            type = "cluster"
           }
         }
       }
     }
   }
- 
+
 
   cluster_endpoint_public_access           = true
   enable_cluster_creator_admin_permissions = true
@@ -85,7 +85,7 @@ module "eks" {
     }
   }
 
-   tags = merge(
+  tags = merge(
     var.BASE_TAGS,
     { Name = format(var.name_format, "subnet") }
   )

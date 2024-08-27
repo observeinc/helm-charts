@@ -1,6 +1,6 @@
-variable "cluster_config_path"{
-  type = string
-  default = "~/.kube/config"
+variable "cluster_config_path" {
+  type        = string
+  default     = "~/.kube/config"
   description = "Config Path to use for cluster where helm will be deployed"
 }
 

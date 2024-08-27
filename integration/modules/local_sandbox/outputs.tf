@@ -5,7 +5,7 @@ output "kind_cluster_name" {
 }
 
 output "kind_cluster_config_path" {
-  description = "Kind cluster config path" 
+  description = "Kind cluster config path"
   value       = module.setup_kind_cluster.kind_cluster_config_path
 }
 

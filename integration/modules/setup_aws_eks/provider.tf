@@ -33,10 +33,10 @@ terraform {
 }
 
 provider "aws" {
-  region = var.region # Specify the AWS region
+  region  = var.region # Specify the AWS region
   profile = "blunderdome"
   assume_role {
-    role_arn = "arn:aws:iam::767397788203:role/OrganizationAccountAccessRole"   
+    role_arn = "arn:aws:iam::767397788203:role/OrganizationAccountAccessRole"
   }
 }
 
