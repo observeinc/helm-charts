@@ -14,4 +14,4 @@ variable "observe_token" {
   type        = string
   sensitive   = true
   description = "Observe Token for Datastream for agent helm-chart to send data to. Eg: ds1....23AB"
-} 
+}

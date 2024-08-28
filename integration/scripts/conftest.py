@@ -1,5 +1,5 @@
 import pytest
-import os 
+import os
 from kubernetes import client, config
 
 @pytest.fixture(scope="session", autouse=True)
@@ -19,14 +19,14 @@ def kube_client():
     Returns:
         client.CoreViApi()_: CoreV1Api client
     """
-    # Load the kube config   
+    # Load the kube config
     config.load_kube_config()
     contexts, active_context = config.list_kube_config_contexts()
     if not contexts:
         print("Cannot find any context in kube-config file.")
         return
 
-    print("\n [kube_client] Active Context is {}\n".format(active_context['name']))    
+    print("\n [kube_client] Active Context is {}\n".format(active_context['name']))
     v1 = client.CoreV1Api()
     return v1
 
@@ -34,11 +34,11 @@ def kube_client():
 def helm_config():
     """
     Fixture to retrieve the Helm namespace configuration.
-    
+
     Returns:
         dict: Dictionary containing the Helm configuration.
     """
-    
+
     # Get the HELM_NAMESPACE environment variable, defaulting to 'observe' if not set
     namespace = os.getenv('HELM_NAMESPACE', 'observe')
     # Create the Helm config dictionary

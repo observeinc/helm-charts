@@ -1,14 +1,14 @@
 observe:
-    collectionEndpoint: 
+    collectionEndpoint:
       value: ${observe_url}
-    token: 
+    token:
       value: ${observe_token}
 namespaceOverride: ${helm_chart_agent_test_namespace}
 deployment-cluster-events:
-  namespaceOverride:  ${helm_chart_agent_test_namespace}     
+  namespaceOverride:  ${helm_chart_agent_test_namespace}
 deployment-cluster-metrics:
   namespaceOverride:  ${helm_chart_agent_test_namespace}
 daemonset-logs-metrics:
-  namespaceOverride:  ${helm_chart_agent_test_namespace}           
+  namespaceOverride:  ${helm_chart_agent_test_namespace}
 deployment-agent-monitor:
   namespaceOverride:  ${helm_chart_agent_test_namespace}

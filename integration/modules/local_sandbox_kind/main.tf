@@ -5,7 +5,7 @@ provider "helm" {
 }
 
 provider "kubernetes" {
-  config_path = pathexpand(var.cluster_config_path) #Needed by deploy_helm, uses current context 
+  config_path = pathexpand(var.cluster_config_path) #Needed by deploy_helm, uses current context
 }
 
 
@@ -19,10 +19,9 @@ module "setup_kind_cluster" {
 module "deploy_helm" {
   source          = "./../deploy_helm"
   observe_url     = var.observe_url
-  observe_token   = var.observe_token 
-  values_file     = "default.yaml" #This is the default values file   
+  observe_token   = var.observe_token
+  values_file     = "default.yaml" #This is the default values file
   use_local_chart = true
 
   depends_on = [module.setup_kind_cluster]
 }
-

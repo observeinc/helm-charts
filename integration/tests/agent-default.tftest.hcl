@@ -4,12 +4,12 @@ variables {
 
 provider "helm" {
   kubernetes {
-    config_path = pathexpand(var.cluster_config_path) #Needed by deploy_helm 
+    config_path = pathexpand(var.cluster_config_path) #Needed by deploy_helm
   }
 }
 
 provider "kubernetes" {
-  config_path = pathexpand(var.cluster_config_path) #Needed by deploy_helm 
+  config_path = pathexpand(var.cluster_config_path) #Needed by deploy_helm
 }
 
 
@@ -40,7 +40,7 @@ run "test_basic" {
   }
 
   variables {
-    command = "pytest ./scripts/test_basic.py -s -v"   
+    command = "pytest ./scripts/test_basic.py -s -v"
     env_vars = {
       HELM_NAMESPACE = run.deploy_helm.helm_chart_agent_test_namespace
     }

@@ -19,4 +19,3 @@ output "kind_cluster_config_path" {
   value       = var.kind_cluster_config_path
   description = "The location where this cluster's kubeconfig was saved to."
 }
-

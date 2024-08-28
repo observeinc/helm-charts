@@ -1,5 +1,5 @@
 # Create an IAM role
-# 
+#
 # This role will allow:
 #   - reading and writing to S3 state bucket, restricted to a specific prefix
 #   - reading and writing to a single SecretsManager secret
@@ -33,7 +33,7 @@ data "aws_iam_policy_document" "assume_role" {
     }
   }
   statement {
-    actions = ["sts:AssumeRole"] #Allow member account's admin role assumption 
+    actions = ["sts:AssumeRole"] #Allow member account's admin role assumption
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/OrganizationAccountAccessRole"]
@@ -41,7 +41,7 @@ data "aws_iam_policy_document" "assume_role" {
   }
 
   statement {
-    actions = ["sts:AssumeRole"] #Allow self-assumption 
+    actions = ["sts:AssumeRole"] #Allow self-assumption
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${local.gh_role_name}"]
