@@ -14,24 +14,23 @@ provider "kubernetes" {
 
 
 
+run "setup_kind_cluster" {
+  variables {
+    kind_cluster_config_path = var.cluster_config_path
+  }
+  module {
+    source = "./modules/setup_kind_cluster"
+  }
+}
 
-// run "setup_kind_cluster" {
-//   variables {
-//     kind_cluster_config_path = var.cluster_config_path
-//   }
-//   module {
-//     source = "./modules/setup_kind_cluster"
-//   }
-// }
-
-// run "deploy_helm" {
-//   variables {
-//     values_file = "default.yaml"
-//   }
-//   module {
-//     source = "./modules/deploy_helm"
-//   }
-// }
+run "deploy_helm" {
+  variables {
+    values_file = "default.yaml"
+  }
+  module {
+    source = "./modules/deploy_helm"
+  }
+}
 
 
 run "test_basic" {
@@ -43,7 +42,7 @@ run "test_basic" {
   variables {
     command = "pytest ./scripts/test_basic.py -s -v"   
     env_vars = {
-      TEST = "none"
+      HELM_NAMESPACE = run.deploy_helm.helm_chart_agent_test_namespace
     }
   }
 
