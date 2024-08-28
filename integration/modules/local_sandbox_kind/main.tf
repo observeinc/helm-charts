@@ -23,6 +23,8 @@ module "deploy_helm" {
   values_file     = "default.yaml" #This is the default values file   
   use_local_chart = true
 
+  helm_chart_agent_test_namespace="observe3"
+
   depends_on = [module.setup_kind_cluster]
 }
 
