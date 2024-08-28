@@ -1,8 +1,7 @@
-
 namespaceOverride: &namespaceOverride "observe"
 
 observe:
-  #If create = false it is assumed that a secret named agent-credentials with key: OBSERVE_TOKEN already exists
+  # If create = false it is assumed that a secret named agent-credentials with key: OBSERVE_TOKEN already exists
   token:
     create: true
     value: ""
