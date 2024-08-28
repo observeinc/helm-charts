@@ -1,11 +1,11 @@
 provider "helm" {
   kubernetes {
-    config_path = pathexpand(var.cluster_config_path) #Needed by deploy_helm 
+    config_path = pathexpand(var.cluster_config_path) #Needed by deploy_helm, uses current context
   }
 }
 
 provider "kubernetes" {
-  config_path = pathexpand(var.cluster_config_path) #Needed by deploy_helm 
+  config_path = pathexpand(var.cluster_config_path) #Needed by deploy_helm, uses current context 
 }
 
 
