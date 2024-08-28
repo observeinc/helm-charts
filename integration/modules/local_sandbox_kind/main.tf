@@ -18,12 +18,10 @@ module "setup_kind_cluster" {
 
 module "deploy_helm" {
   source          = "./../deploy_helm"
-  observe_url     = var.observe_token
-  observe_token   = var.observe_url
+  observe_url     = var.observe_url
+  observe_token   = var.observe_token 
   values_file     = "default.yaml" #This is the default values file   
   use_local_chart = true
-
-  helm_chart_agent_test_namespace="observe3"
 
   depends_on = [module.setup_kind_cluster]
 }
