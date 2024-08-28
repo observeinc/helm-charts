@@ -237,7 +237,7 @@ service:
         receivers: [k8sobjects/cluster]
         processors: [memory_limiter, batch, attributes/observe_common, filter/cluster, transform/cluster]
         exporters: [otlphttp/observe/base, debug/override]
-      {{ if .Values.observe.entityToken  -}}
+      {{ if .Values.observe.entityToken.create  -}}
       logs/entity:
         receivers: [k8sobjects/objects]
         processors: [memory_limiter, batch, attributes/observe_common, transform/object, observek8sattributes]
