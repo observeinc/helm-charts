@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.6.1](https://img.shields.io/badge/Version-0.6.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 0.7.0](https://img.shields.io/badge/Version-0.7.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 > [!CAUTION]
 > This chart is under active development and is not meant to be installed yet.
@@ -26,13 +26,19 @@ Chart to install K8s collection stack based on Observe Agent
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| agent.config.global.debug.verbosity | string | `"basic"` |  |
+| agent.config.global.processors.batch.send_batch_max_size | int | `100` |  |
+| agent.config.global.processors.batch.send_batch_size | int | `100` |  |
+| agent.config.global.service.telemetry.logging_level | string | `"WARN"` |  |
+| agent.config.global.service.telemetry.metrics_level | string | `"normal"` |  |
+| agent.selfMonitor.enabled | bool | `true` |  |
+| cluster.events.enabled | bool | `true` |  |
 | cluster.events.pullInterval | string | `"20m"` |  |
+| cluster.metrics.enabled | bool | `true` |  |
 | cluster.name | string | `"observe-agent-monitored-cluster"` |  |
-| config.global.debug.verbosity | string | `"basic"` |  |
-| config.global.processors.batch.send_batch_max_size | int | `100` |  |
-| config.global.processors.batch.send_batch_size | int | `100` |  |
-| config.global.service.telemetry.logging_level | string | `"WARN"` |  |
-| config.global.service.telemetry.metrics_level | string | `"normal"` |  |
+| cluster.namespaceOverride.value | string | `"observe"` |  |
+| containers.logs.enabled | bool | `true` |  |
+| containers.metrics.enabled | bool | `true` |  |
 | daemonset-logs-metrics.clusterRole.create | bool | `false` |  |
 | daemonset-logs-metrics.clusterRole.name | string | `"observe-agent-cluster-role"` |  |
 | daemonset-logs-metrics.command.extraArgs[0] | string | `"start"` |  |
@@ -41,6 +47,7 @@ Chart to install K8s collection stack based on Observe Agent
 | daemonset-logs-metrics.command.name | string | `"observe-agent"` |  |
 | daemonset-logs-metrics.configMap.create | bool | `false` |  |
 | daemonset-logs-metrics.configMap.existingName | string | `"daemonset-logs-metrics"` |  |
+| daemonset-logs-metrics.enabled | bool | `true` |  |
 | daemonset-logs-metrics.extraEnvsFrom | list | `[]` |  |
 | daemonset-logs-metrics.extraEnvs[0].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
 | daemonset-logs-metrics.extraEnvs[0].valueFrom.configMapKeyRef.key | string | `"name"` |  |
@@ -123,6 +130,7 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-agent-monitor.command.name | string | `"observe-agent"` |  |
 | deployment-agent-monitor.configMap.create | bool | `false` |  |
 | deployment-agent-monitor.configMap.existingName | string | `"deployment-agent-monitor"` |  |
+| deployment-agent-monitor.enabled | bool | `true` |  |
 | deployment-agent-monitor.extraEnvsFrom | list | `[]` |  |
 | deployment-agent-monitor.extraEnvs[0].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
 | deployment-agent-monitor.extraEnvs[0].valueFrom.configMapKeyRef.key | string | `"name"` |  |
@@ -237,6 +245,7 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-cluster-metrics.command.name | string | `"observe-agent"` |  |
 | deployment-cluster-metrics.configMap.create | bool | `false` |  |
 | deployment-cluster-metrics.configMap.existingName | string | `"deployment-cluster-metrics"` |  |
+| deployment-cluster-metrics.enabled | bool | `true` |  |
 | deployment-cluster-metrics.extraEnvsFrom | list | `[]` |  |
 | deployment-cluster-metrics.extraEnvs[0].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
 | deployment-cluster-metrics.extraEnvs[0].valueFrom.configMapKeyRef.key | string | `"name"` |  |
@@ -286,7 +295,6 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-cluster-metrics.resources | object | `{"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | deployment-cluster-metrics.serviceAccount.create | bool | `false` |  |
 | deployment-cluster-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
-| namespaceOverride | string | `"observe"` |  |
 | observe.collectionEndpoint.value | string | `""` |  |
 | observe.entityToken.create | bool | `false` |  |
 | observe.entityToken.value | string | `""` |  |

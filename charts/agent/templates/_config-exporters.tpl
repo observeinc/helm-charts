@@ -23,7 +23,7 @@ prometheusremotewrite:
 
 {{- define "config.exporters.debug" -}}
 debug/override:
-    verbosity: {{ .Values.config.global.debug.verbosity }}
+    verbosity: {{ .Values.agent.config.global.debug.verbosity }}
     sampling_initial: 2
     sampling_thereafter: 1
 {{- end -}}

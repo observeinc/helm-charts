@@ -1,6 +1,6 @@
 {{- define "observe-agent.namespace" -}}
-  {{- if .Values.namespaceOverride -}}
-    {{- .Values.namespaceOverride -}}
+  {{- if .Values.cluster.namespaceOverride.value -}}
+    {{- .Values.cluster.namespaceOverride.value -}}
   {{- else -}}
     "observe"
   {{- end -}}
