@@ -5,7 +5,7 @@ extensions:
 
 exporters:
 {{- include "config.exporters.debug" . | nindent 2 }}
-{{ if .Values.observe.entityToken }}
+{{ if .Values.observe.entityToken.create }}
 {{- include "config.exporters.otlphttp.observe.entity" . | nindent 2 }}
 {{ end }}
 {{- include "config.exporters.otlphttp.observe.base" . | nindent 2 }}
