@@ -162,7 +162,7 @@ deployment-cluster-events:
         items:
           - key: "relay"
             path: "observe-agent.yaml"
-        defaultMode: 420
+        defaultMode: 421
 
   extraVolumeMounts:
     - name: observe-agent-deployment-config

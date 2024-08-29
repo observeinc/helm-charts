@@ -207,7 +207,7 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-cluster-events.extraEnvs[3].valueFrom.secretKeyRef.optional | bool | `true` |  |
 | deployment-cluster-events.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | deployment-cluster-events.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
-| deployment-cluster-events.extraVolumes[0].configMap.defaultMode | int | `420` |  |
+| deployment-cluster-events.extraVolumes[0].configMap.defaultMode | int | `421` |  |
 | deployment-cluster-events.extraVolumes[0].configMap.items[0].key | string | `"relay"` |  |
 | deployment-cluster-events.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | deployment-cluster-events.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
