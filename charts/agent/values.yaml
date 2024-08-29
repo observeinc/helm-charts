@@ -1,5 +1,3 @@
-namespaceOverride: &namespaceOverride "observe"
-
 observe:
   # If create = false it is assumed that a secret named agent-credentials with key: OBSERVE_TOKEN already exists
   token:
@@ -17,30 +15,47 @@ cluster:
   name: observe-agent-monitored-cluster
   events:
     pullInterval: 20m
+    enabled: true
+  metrics:
+    enabled: true
 
-config:
-  global:
-    processors:
-      batch:
-        send_batch_size: 100
-        send_batch_max_size: 100
-    service:
-      telemetry:
-        metrics_level: normal
-        logging_level: WARN
-    debug:
-      # values basic, normal, detailed
-      verbosity: basic
+  namespaceOverride:
+    # ! This needs to have same value as namespaceOverride in deployments and daemonsets below
+    value: observe
+
+containers:
+  logs:
+    enabled: true
+  metrics:
+    enabled: true
+
+agent:
+  config:
+    global:
+      processors:
+        batch:
+          send_batch_size: 100
+          send_batch_max_size: 100
+      service:
+        telemetry:
+          metrics_level: normal
+          logging_level: WARN
+      debug:
+        # values basic, normal, detailed
+        verbosity: basic
+  selfMonitor:
+    enabled: true
 
 
 ################################################
 deployment-cluster-events:
+  # enabled: true
   mode: deployment
 
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
   nameOverride: "deployment-cluster-events"
-  namespaceOverride: *namespaceOverride
+  namespaceOverride: "observe"
 
   configMap:
     create: false
@@ -149,11 +164,12 @@ deployment-cluster-events:
 
 ################################################
 deployment-cluster-metrics:
+  enabled: true
   mode: deployment
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
   nameOverride: "deployment-cluster-metrics"
-  namespaceOverride: *namespaceOverride
+  namespaceOverride: "observe"
 
   configMap:
     create: false
@@ -261,11 +277,12 @@ deployment-cluster-metrics:
 
 ################################################
 daemonset-logs-metrics:
+  enabled: true
   mode: daemonset
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
   nameOverride: "daemonset-logs-metrics"
-  namespaceOverride: *namespaceOverride
+  namespaceOverride: "observe"
 
   configMap:
     create: false
@@ -405,11 +422,12 @@ daemonset-logs-metrics:
 
 ################################################
 deployment-agent-monitor:
+  enabled: true
   mode: deployment
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
   nameOverride: "deployment-agent-monitor"
-  namespaceOverride: *namespaceOverride
+  namespaceOverride: "observe"
 
   configMap:
     create: false

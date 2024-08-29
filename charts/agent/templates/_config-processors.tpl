@@ -7,8 +7,8 @@ resourcedetection/cloud:
 
 {{- define "config.processors.batch" -}}
 batch:
-  send_batch_size: {{ .Values.config.global.processors.batch.send_batch_size }}
-  send_batch_max_size: {{ .Values.config.global.processors.batch.send_batch_max_size }}
+  send_batch_size: {{ .Values.agent.config.global.processors.batch.send_batch_size }}
+  send_batch_max_size: {{ .Values.agent.config.global.processors.batch.send_batch_max_size }}
 {{- end -}}
 
 {{- define "config.processors.attributes.k8sattributes" -}}
