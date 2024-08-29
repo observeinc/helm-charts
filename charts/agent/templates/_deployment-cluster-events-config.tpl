@@ -123,7 +123,7 @@ processors:
           - set(attributes["observe_transform"]["facets"]["deploymentName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "ReplicaSet"
           - replace_pattern(attributes["observe_transform"]["facets"]["deploymentName"], "^(.*)-[0-9a-f]+$$", "$$1")
           - set(attributes["observe_transform"]["facets"]["deploymentName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "Deployment"
-      # For Pod
+      # Pod
       - context: log
         conditions:
           - body["kind"] == "Pod"
@@ -135,13 +135,13 @@ processors:
           - set(attributes["observe_transform"]["facets"]["startTime"], body["status"]["startTime"])
           - set(attributes["observe_transform"]["facets"]["readinessGates"], body["object"]["spec"]["readinessGates"])
           - set(attributes["observe_transform"]["facets"]["nodeName"], body["spec"]["nodeName"])
-      # For Namespace
+      # Namespace
       - context: log
         conditions:
           - body["kind"] == "Namespace"
         statements:
           - set(attributes["observe_transform"]["facets"]["status"], body["status"]["phase"])
-      # For Node
+      # Node
       - context: log
         conditions:
           - body["kind"] == "Node"
@@ -151,7 +151,7 @@ processors:
           - set(attributes["observe_transform"]["facets"]["kubeletVersion"], body["status"]["nodeInfo"]["kubeletVersion"])
           - set(attributes["observe_transform"]["facets"]["osImage"], body["status"]["nodeInfo"]["osImage"])
           - set(attributes["observe_transform"]["facets"]["taints"], body["spec"]["taints"])
-      # For Deployment
+      # Deployment
       - context: log
         conditions:
           - body["kind"] == "Deployment"
@@ -163,7 +163,7 @@ processors:
           - set(attributes["observe_transform"]["facets"]["readyReplicas"], body["status"]["readyReplicas"])
           - set(attributes["observe_transform"]["facets"]["readyReplicas"], 0) where attributes["observe_transform"]["facets"]["readyReplicas"] == nil
           - set(attributes["observe_transform"]["facets"]["unavailableReplicas"], body["status"]["unavailableReplicas"])
-      # For ReplicaSet
+      # ReplicaSet
       - context: log
         conditions:
           - body["kind"] == "ReplicaSet"
@@ -173,7 +173,7 @@ processors:
           - set(attributes["observe_transform"]["facets"]["availableReplicas"], body["status"]["availableReplicas"])
           - set(attributes["observe_transform"]["facets"]["readyReplicas"], body["status"]["readyReplicas"])
           - set(attributes["observe_transform"]["facets"]["readyReplicas"], 0) where attributes["observe_transform"]["facets"]["readyReplicas"] == nil
-      # For Event
+      # Event
       - context: log
         conditions:
           - body["kind"] == "Event"
@@ -186,6 +186,64 @@ processors:
           - set(attributes["observe_transform"]["facets"]["count"], body["count"])
           - set(attributes["observe_transform"]["facets"]["type"], body["type"])
           - set(attributes["observe_transform"]["facets"]["sourceComponent"], body["source"]["component"])
+      # Job
+      - context: log
+        conditions:
+          - body["kind"] == "Job"
+        statements:
+          # status
+          - set(attributes["observe_transform"]["facets"]["startTime"], body["status"]["startTime"])
+          - set(attributes["observe_transform"]["facets"]["activePods"], body["status"]["active"])
+          - set(attributes["observe_transform"]["facets"]["failedPods"], body["status"]["falied"])
+          - set(attributes["observe_transform"]["facets"]["succeededPods"], body["status"]["succeeded"])
+          - set(attributes["observe_transform"]["facets"]["readyPods"], body["status"]["ready"])
+          # spec
+          - set(attributes["observe_transform"]["facets"]["completions"], body["spec"]["completions"])
+          - set(attributes["observe_transform"]["facets"]["parallelism"], body["spec"]["parallelism"])
+          - set(attributes["observe_transform"]["facets"]["activeDeadlineSeconds"], body["spec"]["activeDeadlineSeconds"])
+          - set(attributes["observe_transform"]["facets"]["backoffLimit"], body["spec"]["backoffLimit"])
+      # CronJob
+      - context: log
+        conditions:
+          - body["kind"] == "CronJob"
+        statements:
+          # spec
+          - set(attributes["observe_transform"]["facets"]["schedule"], body["spec"]["schedule"])
+          - set(attributes["observe_transform"]["facets"]["suspend"], "Active") where body["spec"]["suspend"] == false
+          - set(attributes["observe_transform"]["facets"]["suspend"], "Suspend") where body["spec"]["suspend"] == true
+          # status
+          - set(attributes["observe_transform"]["facets"]["activeJobs"], Len(body["status"]["active"]))
+      # DaemonSet
+      - context: log
+        conditions:
+          - body["kind"] == "DaemonSet"
+        statements:
+          # status
+          - set(attributes["observe_transform"]["facets"]["numberReady"], body["status"]["numberReady"])
+          - set(attributes["observe_transform"]["facets"]["desiredNumberScheduled"], body["status"]["desiredNumberScheduled"])
+          - set(attributes["observe_transform"]["facets"]["currentNumberScheduled"], body["status"]["currentNumberScheduled"])
+          - set(attributes["observe_transform"]["facets"]["updatedNumberScheduled"], body["status"]["updatedNumberScheduled"])
+          - set(attributes["observe_transform"]["facets"]["numberAvailable"], body["status"]["numberAvailable"])
+          - set(attributes["observe_transform"]["facets"]["numberUnavailable"], body["status"]["numberUnavailable"])
+          - set(attributes["observe_transform"]["facets"]["numberMisscheduled"], body["status"]["numberMisscheduled"])
+          # spec
+          - set(attributes["observe_transform"]["facets"]["updateStrategy"], body["spec"]["updateStrategy"]["type"])
+          - set(attributes["observe_transform"]["facets"]["maxUnavailable"], body["spec"]["updateStrategy"]["rollingUpdate"]["maxUnavailable"])
+          - set(attributes["observe_transform"]["facets"]["maxSurge"], body["spec"]["updateStrategy"]["rollingUpdate"]["maxSurge"])
+      # StatefulSet
+      - context: log
+        conditions:
+          - body["kind"] == "StatefulSet"
+        statements:
+          # status
+          - set(attributes["observe_transform"]["facets"]["currentReplicas"], body["status"]["currentReplicas"])
+          - set(attributes["observe_transform"]["facets"]["readyReplicas"], body["status"]["readyReplicas"])
+          # spec
+          - set(attributes["observe_transform"]["facets"]["service"], body["spec"]["serviceName"])
+          - set(attributes["observe_transform"]["facets"]["podManagementPolicy"], body["spec"]["podManagementPolicy"])
+          - set(attributes["observe_transform"]["facets"]["desiredReplicas"], body["spec"]["replicas"])
+          - set(attributes["observe_transform"]["facets"]["updateStrategy"], body["spec"]["updateStrategy"]["type"])
+          - set(attributes["observe_transform"]["facets"]["partition"], body["spec"]["updateStrategy"]["rollingUpdate"]["partition"])
 
   # drop all namespace except kube-system
   filter/cluster:
