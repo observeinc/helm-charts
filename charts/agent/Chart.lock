@@ -12,4 +12,4 @@ dependencies:
   repository: https://open-telemetry.github.io/opentelemetry-helm-charts
   version: 0.101.1
 digest: sha256:a24a099b6ef2b3229aa5436611180f6238d22e1d5e55edc2d14465b55bc28392
-generated: "2024-08-28T20:50:31.245596259Z"
+generated: "2024-08-29T20:03:58.751618007Z"
