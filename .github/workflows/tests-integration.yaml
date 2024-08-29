@@ -1,0 +1,60 @@
+name: Helm Charts Agent - Integration Tests
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+
+
+#Special permissions required for OIDC authentication
+permissions:
+    id-token: write
+    contents: write
+    pull-requests: write
+
+env:
+    TF_VAR_observe_url: ${{secrets.OBSERVE_URL}}
+    TF_VAR_observe_token: ${{secrets.OBSERVE_TOKEN}}
+
+jobs:
+
+  helm-charts-agent-integration-tests:
+    name: helm-charts-agent-integration-tests
+    runs-on: ubuntu-latest
+    defaults:
+        run:
+            working-directory: integration #Terrafrom commands and tests are ran from integration directory
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+
+        - uses: azure/setup-kubectl@v4
+          with:
+            version: latest
+
+        - name: Setup Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: '3.10'
+
+        - run: pip install -r scripts/requirements.txt
+
+        - name: Setup Terraform
+          uses: hashicorp/setup-terraform@v3
+          with:
+            terraform_version: 1.8.5
+
+        - name: Terraform Init
+          id: init
+          run: terraform init
+
+        - name: Terraform Validate
+          id: validate
+          run: terraform validate -no-color
+
+        - name: Terraform Test
+          id: test
+          run: |
+            terraform test -verbose
