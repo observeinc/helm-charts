@@ -1,0 +1,38 @@
+name: Bump Agent Chart Minor Version
+sources:
+  currentAgentChartVersion:
+    kind: helmchart
+    spec:
+      url: https://observeinc.github.io/helm-charts
+      name: agent
+      versionfilter:
+        kind: "latest"
+conditions:
+  chartChanged:
+    name: "Check if charts/agent/ has changes"
+    kind: shell
+    spec:
+      command: git diff --quiet --name-only origin/main...HEAD -- charts/agent/ && git diff --quiet --name-only -- charts/agent/ && exit 1 || exit 0
+    disablesourceinput: true
+  nonBreakingChanges:
+    name: "Check if commit is non-breaking"
+    kind: shell
+    spec:
+      command: git log -1 --no-merges --pretty=%s | tail -n 1 | grep -v "BREAKING CHANGE"
+    disablesourceinput: true
+  isAFeatCommit:
+    name: "Check if commit is a feature"
+    kind: shell
+    spec:
+      command: git log -1 --no-merges --pretty=%s | tail -n 1 | grep "feat"
+    disablesourceinput: true
+targets:
+  updateAgentChartMinor:
+    name: "Bump Minor Version"
+    kind: yaml
+    sourceid: currentAgentChartVersion
+    transformers:
+      - semverinc: "minor"
+    spec:
+      file: "charts/agent/Chart.yaml"
+      key: "$.version"
