@@ -8,8 +8,12 @@ observe:
     value: ""
   # this is temporary and will be removed
   entityToken:
+    # To create secret
     create: false
     value: ""
+    # To use exporter
+    use: false
+
 
 cluster:
   name: observe-agent-monitored-cluster
@@ -22,6 +26,8 @@ cluster:
   namespaceOverride:
     # ! This needs to have same value as namespaceOverride in deployments and daemonsets below
     value: observe
+  uidOverride:
+    value: ""
 
 containers:
   logs:

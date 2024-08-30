@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.8.0](https://img.shields.io/badge/Version-0.8.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 0.8.1](https://img.shields.io/badge/Version-0.8.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 > [!CAUTION]
 > This chart is under active development and is not meant to be installed yet.
@@ -37,6 +37,7 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster.metrics.enabled | bool | `true` |  |
 | cluster.name | string | `"observe-agent-monitored-cluster"` |  |
 | cluster.namespaceOverride.value | string | `"observe"` |  |
+| cluster.uidOverride.value | string | `""` |  |
 | containers.logs.enabled | bool | `true` |  |
 | containers.metrics.enabled | bool | `true` |  |
 | daemonset-logs-metrics.clusterRole.create | bool | `false` |  |
@@ -305,6 +306,7 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-cluster-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | observe.collectionEndpoint.value | string | `""` |  |
 | observe.entityToken.create | bool | `false` |  |
+| observe.entityToken.use | bool | `false` |  |
 | observe.entityToken.value | string | `""` |  |
 | observe.token.create | bool | `true` |  |
 | observe.token.value | string | `""` |  |

@@ -48,7 +48,11 @@ attributes/observe_common:
       value: ${env:OBSERVE_CLUSTER_NAME}
     - key: k8s.cluster.uid
       action: insert
+      {{ if .Values.cluster.uidOverride.value -}}
+      value:  {{ .Values.cluster.uidOverride.value }}
+      {{ else -}}
       value:  ${env:OBSERVE_CLUSTER_UID}
+      {{ end -}}
 {{- end -}}
 
 {{- define "config.processors.memory_limiter" -}}

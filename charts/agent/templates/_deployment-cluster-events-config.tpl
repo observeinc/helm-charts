@@ -5,7 +5,7 @@ extensions:
 
 exporters:
 {{- include "config.exporters.debug" . | nindent 2 }}
-{{ if .Values.observe.entityToken.create }}
+{{ if .Values.observe.entityToken.use }}
 {{- include "config.exporters.otlphttp.observe.entity" . | nindent 2 }}
 {{ end }}
 {{- include "config.exporters.otlphttp.observe.base" . | nindent 2 }}
@@ -295,7 +295,7 @@ service:
         receivers: [k8sobjects/cluster]
         processors: [memory_limiter, batch, attributes/observe_common, filter/cluster, transform/cluster]
         exporters: [otlphttp/observe/base, debug/override]
-      {{ if .Values.observe.entityToken.create  -}}
+      {{ if .Values.observe.entityToken.use  -}}
       logs/entity:
         receivers: [k8sobjects/objects]
         processors: [memory_limiter, batch, attributes/observe_common, transform/object, observek8sattributes]
