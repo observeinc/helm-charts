@@ -55,7 +55,6 @@ agent:
 
 ################################################
 deployment-cluster-events:
-  # enabled: true
   mode: deployment
 
   # ----------------------------------------- #
@@ -177,7 +176,6 @@ deployment-cluster-events:
 
 ################################################
 deployment-cluster-metrics:
-  enabled: true
   mode: deployment
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
@@ -290,7 +288,6 @@ deployment-cluster-metrics:
 
 ################################################
 daemonset-logs-metrics:
-  enabled: true
   mode: daemonset
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
@@ -436,7 +433,6 @@ daemonset-logs-metrics:
 
 ################################################
 deployment-agent-monitor:
-  enabled: true
   mode: deployment
   # ----------------------------------------- #
   # Different for each deployment/daemonset #

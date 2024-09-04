@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.8.1](https://img.shields.io/badge/Version-0.8.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 0.8.2](https://img.shields.io/badge/Version-0.8.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 > [!CAUTION]
 > This chart is under active development and is not meant to be installed yet.
@@ -48,7 +48,6 @@ Chart to install K8s collection stack based on Observe Agent
 | daemonset-logs-metrics.command.name | string | `"observe-agent"` |  |
 | daemonset-logs-metrics.configMap.create | bool | `false` |  |
 | daemonset-logs-metrics.configMap.existingName | string | `"daemonset-logs-metrics"` |  |
-| daemonset-logs-metrics.enabled | bool | `true` |  |
 | daemonset-logs-metrics.extraEnvsFrom | list | `[]` |  |
 | daemonset-logs-metrics.extraEnvs[0].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
 | daemonset-logs-metrics.extraEnvs[0].valueFrom.configMapKeyRef.key | string | `"name"` |  |
@@ -132,7 +131,6 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-agent-monitor.command.name | string | `"observe-agent"` |  |
 | deployment-agent-monitor.configMap.create | bool | `false` |  |
 | deployment-agent-monitor.configMap.existingName | string | `"deployment-agent-monitor"` |  |
-| deployment-agent-monitor.enabled | bool | `true` |  |
 | deployment-agent-monitor.extraEnvsFrom | list | `[]` |  |
 | deployment-agent-monitor.extraEnvs[0].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
 | deployment-agent-monitor.extraEnvs[0].valueFrom.configMapKeyRef.key | string | `"name"` |  |
@@ -253,7 +251,6 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-cluster-metrics.command.name | string | `"observe-agent"` |  |
 | deployment-cluster-metrics.configMap.create | bool | `false` |  |
 | deployment-cluster-metrics.configMap.existingName | string | `"deployment-cluster-metrics"` |  |
-| deployment-cluster-metrics.enabled | bool | `true` |  |
 | deployment-cluster-metrics.extraEnvsFrom | list | `[]` |  |
 | deployment-cluster-metrics.extraEnvs[0].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
 | deployment-cluster-metrics.extraEnvs[0].valueFrom.configMapKeyRef.key | string | `"name"` |  |
