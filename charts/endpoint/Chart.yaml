@@ -2,7 +2,7 @@ apiVersion: v2
 name: endpoint
 description: Observe collection endpoint utility functions
 type: library
-version: 0.1.11
+version: 0.1.12
 maintainers:
   - name: Observe
     email: support@observeinc.com
