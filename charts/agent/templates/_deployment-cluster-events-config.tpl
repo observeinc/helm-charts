@@ -116,10 +116,10 @@ processors:
           - set(attributes["observe_transform"]["facets"]["labels"], body["metadata"]["labels"])
           - set(attributes["observe_transform"]["facets"]["annotations"], body["metadata"]["annotations"])
           # controllers with correlation tags
-          - set(attributes["observe_transform"]["facets"]["replicasetName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "ReplicaSet"
-          - set(attributes["observe_transform"]["facets"]["daemonsetName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "DaemonSet"
+          - set(attributes["observe_transform"]["facets"]["replicaSetName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "ReplicaSet"
+          - set(attributes["observe_transform"]["facets"]["daemonSetName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "DaemonSet"
           - set(attributes["observe_transform"]["facets"]["jobName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "Job"
-          - set(attributes["observe_transform"]["facets"]["statefulsetName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "StatefulSet"
+          - set(attributes["observe_transform"]["facets"]["statefulSetName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "StatefulSet"
           - set(attributes["observe_transform"]["facets"]["deploymentName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "ReplicaSet"
           - replace_pattern(attributes["observe_transform"]["facets"]["deploymentName"], "^(.*)-[0-9a-f]+$$", "$$1")
           - set(attributes["observe_transform"]["facets"]["deploymentName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "Deployment"
