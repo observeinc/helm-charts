@@ -1,0 +1,255 @@
+global:
+  observe:
+    collectionEndpoint: "https://161011529721.collect.observe-eng.com"
+
+observe:
+  token:
+    value: "ds1y2NaPffSRvBwKn2C2:Df1l5Mp2hTsAqe-4qgXla1l2ZnCKErDE"
+
+events:
+    enabled: true
+    resources:
+      limits:
+        cpu: 50m
+        memory: 256Mi
+      requests:
+        cpu: 50m
+        memory: 256Mi
+
+logs:
+    enabled: true
+    fluent-bit:
+        resources:
+          limits:
+              cpu: 100m
+              memory: 128Mi
+          requests:
+              cpu: 100m
+              memory: 128Mi
+
+        ################################################################
+        # Add labels and annotations to fluent-bit daemonset
+        ################################################################
+        labels: {
+            app.observeinc.com/name: observe-logs-daemonset
+        }
+
+        annotations: {
+          observe_daemonset_purpose: observecollection,
+        }
+        ################################################################
+
+        ################################################################
+        # Add labels and annotations to fluent-bit pod
+        ################################################################
+        podAnnotations: {
+          observe_monitor_purpose: observecollection,
+          observe_monitor_scrape: 'true',
+          observe_monitor_path: '/metrics',
+          observe_monitor_port: '8888',
+        }
+
+
+        podLabels: {
+          foo: "bar",
+        }
+        ################################################################
+
+        ################################################################
+        # Add your own configuration to fluent-bit
+        ################################################################
+        config:
+          log_level: info
+
+          service: |
+            [SERVICE]
+                Flush                  {{.Values.config.flush}}
+                Grace                  {{.Values.config.grace}}
+                Daemon                 Off
+                Log_Level              {{.Values.config.log_level}}
+                Parsers_File           custom_parsers.conf
+                HTTP_Server            On
+                HTTP_Listen            0.0.0.0
+                HTTP_PORT              2020
+                Health_Check           On
+                HC_Errors_Count        {{.Values.config.hc_errors_count}}
+                HC_Retry_Failure_Count {{.Values.config.hc_retry_failure_count}}
+                HC_Period              {{.Values.config.hc_period}}
+                dns.mode               {{.Values.config.dns_mode}}
+                dns.resolver           {{.Values.config.dns_resolver}}
+                storage.metrics        {{.Values.config.storage_metrics}}
+
+          inputs: |
+            [INPUT]
+                Name                tail
+                ################################
+                # CHANGE tag for tail input
+                Tag                 kube.*
+                ################################
+                Alias               k8slogs
+                Path                /var/log/containers/*.log
+                Path_Key            filename
+                DB                  /var/log/flb_kube_${NAMESPACE}.db
+                Skip_Long_Lines     On
+                Read_From_Head      {{.Values.config.read_from_head}}
+                Mem_Buf_Limit       {{.Values.config.mem_buf_limit}}
+                Buffer_Chunk_Size   {{.Values.config.buffer_chunk_size}}
+                Buffer_Max_Size     {{.Values.config.buffer_max_size}}
+                Rotate_Wait         {{.Values.config.rotate_wait}}
+                Refresh_Interval    {{.Values.config.refresh_interval}}
+                Inotify_Watcher     {{.Values.config.inotify_watcher}}
+
+
+            [INPUT]
+                Name                tail
+                Tag                 k8snode
+                Alias               k8snode
+                Path                {{.Values.config.node_log_include_path}}
+                Exclude_Path        {{.Values.config.node_log_exclude_path}}
+                Path_Key            filename
+                DB                  /var/log/flb_node_${NAMESPACE}.db
+                Skip_Long_Lines     On
+                Read_From_Head      {{.Values.config.read_from_head}}
+                Ignore_Older        {{.Values.config.ignore_older}}
+                Mem_Buf_Limit       {{.Values.config.mem_buf_limit}}
+                Buffer_Chunk_Size   {{.Values.config.buffer_chunk_size}}
+                Buffer_Max_Size     {{.Values.config.buffer_max_size}}
+                Rotate_Wait         {{.Values.config.rotate_wait}}
+                Inotify_Watcher     {{.Values.config.inotify_watcher}}
+
+          filters: |
+            ################################
+            # ADD kubernetes filter
+            # Filter section to enrich logs with Kubernetes metadata
+            ################################
+            [FILTER]
+                Name                kubernetes
+                Match               kube.*
+                Kube_URL            https://kubernetes.default.svc:443
+                Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+                Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
+                Kube_Tag_Prefix     kube.var.log.containers.
+                Merge_Log           On
+                Merge_Log_Key       log
+                Annotations         On
+                Labels              On
+            ################################
+            # ADD lift filter
+            # Pulls data up from kubernetes property
+            ################################
+            [FILTER]
+                Name         nest
+                Match        kube.*
+                Operation    lift
+                Nested_under kubernetes
+            ################################
+            # ADD record_modifier filter
+            # Keeps only the properties we want
+            ################################
+            [FILTER]
+                Name                record_modifier
+                Alias               filter_k8s
+                Match               kube.*
+                Whitelist_key       annotations
+                Whitelist_key       labels
+                Whitelist_key       log
+                Whitelist_key       filename
+
+            [FILTER]
+                Name                record_modifier
+                Alias               add_nodename
+                Match               *
+                Record              nodeName ${NODE}
+
+            [FILTER]
+                Name                parser
+                Alias               parse_filename
+                Match               kube.*
+                Key_Name            filename
+                Reserve_Data        True
+                Parser              kube-custom
+
+            [FILTER]
+                Name                record_modifier
+                Alias               filter_docker
+                Match               kube.*
+                Whitelist_key       containerId
+                Whitelist_key       containerName
+                Whitelist_key       log
+                Whitelist_key       podName
+                Whitelist_key       namespace
+                Whitelist_key       nodeName
+                ################################
+                # ADD Whitelist_key for annotations and labels to existing record_modifier filter
+                ################################
+                Whitelist_key       annotations
+                Whitelist_key       labels
+
+
+            [FILTER]
+                Name                grep
+                Alias               exclude
+                Match               {{.Values.config.grep_match_tag}}
+                Exclude             {{.Values.config.grep_exclude}}
+
+          outputs: |
+            [OUTPUT]
+                Name                http
+                Match               kube.*
+                Alias               k8slogs
+                Host                {{ include "observe.collectorHost" . }}
+                Port                {{ include "observe.collectorPort" . }}
+                TLS                 {{ include "observe.useTLS" . }}
+                URI                 /v1/http/kubernetes/logs?clusterUid=${OBSERVE_CLUSTER}
+                Format              msgpack
+                Header              X-Observe-Decoder fluent
+                Header              Authorization Bearer ${OBSERVE_TOKEN}
+                Compress            gzip
+                Retry_Limit         {{.Values.config.retry_limit}}
+                Workers             {{.Values.config.workers}}
+                net.connect_timeout         {{.Values.config.connect_timeout}}
+                net.keepalive               {{.Values.config.keepalive}}
+                net.keepalive_idle_timeout  {{.Values.config.keepalive_idle_timeout}}
+                net.keepalive_max_recycle   {{.Values.config.keepalive_max_recycle}}
+                net.max_worker_connections  {{.Values.config.max_worker_connections}}
+
+
+            [OUTPUT]
+                Name                http
+                Match               k8snode*
+                Alias               k8snode
+                Host                {{ include "observe.collectorHost" . }}
+                Port                {{ include "observe.collectorPort" . }}
+                TLS                 {{ include "observe.useTLS" . }}
+                URI                 /v1/http/kubernetes/node?clusterUid=${OBSERVE_CLUSTER}
+                Format              msgpack
+                Header              X-Observe-Decoder fluent
+                Header              Authorization Bearer ${OBSERVE_TOKEN}
+                Compress            gzip
+                Retry_Limit         {{.Values.config.retry_limit}}
+                Workers             {{.Values.config.workers}}
+                net.connect_timeout         {{.Values.config.connect_timeout}}
+                net.keepalive               {{.Values.config.keepalive}}
+                net.keepalive_idle_timeout  {{.Values.config.keepalive_idle_timeout}}
+                net.keepalive_max_recycle   {{.Values.config.keepalive_max_recycle}}
+                net.max_worker_connections  {{.Values.config.max_worker_connections}}
+
+            ################################
+            # Output section to send the logs to the destination
+            ################################
+            # [OUTPUT]
+            #     Name          stdout
+            #     Match         kube.*
+            #     Format        json_lines
+            ################################
+
+            {{- include "observe.includeExtraFiles" . }}
+
+          customParsers: |
+            [PARSER]
+                Name        kube-custom
+                Format      regex
+                Regex       (?<podName>[a-z0-9](?:[-a-z0-9]*[a-z0-9])?(?:\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*)_(?<namespace>[^_]+)_(?<containerName>.+)-(?<containerId>[a-f0-9]{64})\.log$
+
+metrics:
+  enabled: false
