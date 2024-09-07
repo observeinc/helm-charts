@@ -1,10 +1,10 @@
 global:
   observe:
-    collectionEndpoint: "https://161011529721.collect.observe-eng.com"
+    collectionEndpoint: "https://[CUSTOMER_ID].collect.observeinc.com"
 
 observe:
   token:
-    value: "ds1y2NaPffSRvBwKn2C2:Df1l5Mp2hTsAqe-4qgXla1l2ZnCKErDE"
+    value: "[YOUR_TOKEN]"
 
 events:
     enabled: true
