@@ -1,5 +1,6 @@
 variables {
   cluster_config_path = "~/.kube/config"
+  tag = "default"
 }
 
 provider "helm" {
@@ -25,7 +26,7 @@ run "setup_kind_cluster" {
 
 run "deploy_helm" {
   variables {
-    values_file = "default.yaml"
+    values_file = "${var.tag}.yaml"
   }
   module {
     source = "./modules/deploy_helm"
@@ -40,7 +41,7 @@ run "test_basic" {
   }
 
   variables {
-    command = "pytest ./scripts/test_basic.py -s -v"
+    command = "pytest ./scripts/test_basic.py -s -v --tags ${var.tag}"
     env_vars = {
       HELM_NAMESPACE = run.deploy_helm.helm_chart_agent_test_namespace
     }

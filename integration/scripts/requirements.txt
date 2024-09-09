@@ -1,2 +1,3 @@
-pytest==8.3.2
+pytest==7.4.4
 kubernetes==30.1.0
+pytest_tagging==1.5.3
