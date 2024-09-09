@@ -17,6 +17,7 @@ permissions:
 env:
     TF_VAR_observe_url: ${{secrets.OBSERVE_URL}}
     TF_VAR_observe_token: ${{secrets.OBSERVE_TOKEN}}
+    TF_VAR_values_file: "default.yaml"    
 
 jobs:
 

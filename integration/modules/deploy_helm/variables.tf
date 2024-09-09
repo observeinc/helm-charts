@@ -11,8 +11,7 @@ variable "helm_chart_agent_test_release_name" {
 }
 
 variable "values_file" {
-  type        = string
-  default     = "default.yaml"
+  type        = string  
   description = "Values file to use to install helm chart"
 }
 

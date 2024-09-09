@@ -1,23 +1,22 @@
 variables {
-  cluster_config_path = "~/.kube/config"
-  tag = "default"
+  cluster_config_path = "~/.kube/config" #Global var for provider 
+  pytest_tag=replace(var.values_file, ".yaml", "")  #Global var for pytest 
 }
 
 provider "helm" {
   kubernetes {
-    config_path = pathexpand(var.cluster_config_path) #Needed by deploy_helm
+    config_path = pathexpand(var.cluster_config_path) #Needed by deploy_helm, root level value 
   }
 }
 
 provider "kubernetes" {
-  config_path = pathexpand(var.cluster_config_path) #Needed by deploy_helm
+  config_path = pathexpand(var.cluster_config_path) #Needed by deploy_helm, root level value 
 }
-
 
 
 run "setup_kind_cluster" {
   variables {
-    kind_cluster_config_path = var.cluster_config_path
+    kind_cluster_config_path = var.cluster_config_path #Reference to root level values 
   }
   module {
     source = "./modules/setup_kind_cluster"
@@ -25,9 +24,6 @@ run "setup_kind_cluster" {
 }
 
 run "deploy_helm" {
-  variables {
-    values_file = "${var.tag}.yaml"
-  }
   module {
     source = "./modules/deploy_helm"
   }
@@ -41,7 +37,7 @@ run "test_basic" {
   }
 
   variables {
-    command = "pytest ./scripts/test_basic.py -s -v --tags ${var.tag}"
+    command = "pytest ./scripts/test_basic.py -s -v --tags ${var.pytest_tag}"
     env_vars = {
       HELM_NAMESPACE = run.deploy_helm.helm_chart_agent_test_namespace
     }
