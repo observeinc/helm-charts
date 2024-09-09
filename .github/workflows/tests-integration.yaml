@@ -17,8 +17,8 @@ permissions:
 env:
     TF_VAR_observe_url: ${{secrets.OBSERVE_URL}}
     TF_VAR_observe_token: ${{secrets.OBSERVE_TOKEN}}
-    TF_VAR_helm_chart_agent_test_namespace: "observe" #Matrix This 
-    TF_VAR_values_file: "default.yaml"    #Matrix This 
+    TF_VAR_values_file: default.yaml #Matrix this 
+    TF_VAR_helm_chart_agent_test_namespace: "observe" #Matrix this  
 
 jobs:
 
@@ -46,7 +46,7 @@ jobs:
         - name: Setup Terraform
           uses: hashicorp/setup-terraform@v3
           with:
-            terraform_version: 1.8.5
+            terraform_version: 1.9.5
 
         - name: Terraform Init
           id: init

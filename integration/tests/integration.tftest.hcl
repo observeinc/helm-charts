@@ -1,6 +1,15 @@
+# We have the ability to create variables specific for test and let it be controlled on a per test level 
+# For now, we'll let these variables be controlled either from tests.auto.tfvars or via TF_VAR variables 
+
+// variables {
+//   cluster_config_path = "~/.kube/config" #Global var for provider 
+//   helm_chart_agent_test_namespace="observe"
+//   values_file="default.yaml"
+// }
+
 variables {
   cluster_config_path = "~/.kube/config" #Global var for provider 
-  // pytest_tag=replace(var.values_file, ".yaml", "")  #Global var for pytest 
+  
 }
 
 provider "helm" {
@@ -37,9 +46,10 @@ run "test_basic" {
   }
 
   variables {
-    command = "pytest ./scripts/test_basic.py -s -v --tags ${var.values_file}"
+    command = "pytest ./scripts/test_basic.py -s -v --tags ${run.deploy_helm.helm_chart_agent_test_values_file}"
     env_vars = {
       HELM_NAMESPACE = run.deploy_helm.helm_chart_agent_test_namespace
+      #HELM_NAMESPACE ="observe"
     }
   }
 
