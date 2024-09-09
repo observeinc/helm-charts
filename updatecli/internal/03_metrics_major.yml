@@ -12,7 +12,7 @@ conditions:
     name: "Check if charts/metrics/ has changes"
     kind: shell
     spec:
-      command: git diff --quiet --name-only origin/main...HEAD -- charts/metrics/ && git diff --quiet --name-only -- charts/metrics/ && exit 1 || exit 0
+      command: git diff --quiet --name-only origin/main...HEAD -- charts/metrics/ ':(exclude)charts/metrics/README.md' ':(exclude)charts/metrics/README.md.gotmpl' && git diff --quiet --name-only -- charts/metrics/ ':(exclude)charts/metrics/README.md' ':(exclude)charts/metrics/README.md.gotmpl' && exit 1 || exit 0
     disablesourceinput: true
   breakingChanges:
     name: "Check if commit is a breaking change"
