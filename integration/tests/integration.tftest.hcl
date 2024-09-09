@@ -1,6 +1,6 @@
 variables {
   cluster_config_path = "~/.kube/config" #Global var for provider 
-  pytest_tag=replace(var.values_file, ".yaml", "")  #Global var for pytest 
+  // pytest_tag=replace(var.values_file, ".yaml", "")  #Global var for pytest 
 }
 
 provider "helm" {
@@ -37,7 +37,7 @@ run "test_basic" {
   }
 
   variables {
-    command = "pytest ./scripts/test_basic.py -s -v --tags ${var.pytest_tag}"
+    command = "pytest ./scripts/test_basic.py -s -v --tags ${var.values_file}"
     env_vars = {
       HELM_NAMESPACE = run.deploy_helm.helm_chart_agent_test_namespace
     }
