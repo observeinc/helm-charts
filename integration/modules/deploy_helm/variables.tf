@@ -10,7 +10,7 @@ variable "helm_chart_agent_test_release_name" {
   description = "release name to use for agent helm chart"
 }
 
-variable "values_file" {
+variable "helm_chart_agent_test_values_file" {
   type        = string  
   description = "Values file to use to install helm chart"
 }

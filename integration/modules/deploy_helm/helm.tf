@@ -9,7 +9,7 @@ resource "helm_release" "observe-agent" {
   timeout           = 120 #k8s timeout
 
   values = [
-    templatefile("${path.module}/values/${var.values_file}",
+    templatefile("${path.module}/values/${var.helm_chart_agent_test_values_file}",
       {
         observe_url                     = var.observe_url,
         observe_token                   = var.observe_token,

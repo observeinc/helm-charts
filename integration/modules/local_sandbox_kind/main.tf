@@ -20,7 +20,8 @@ module "deploy_helm" {
   source          = "./../deploy_helm"
   observe_url     = var.observe_url
   observe_token   = var.observe_token
-  values_file     = "default.yaml" #This is the default values file
+  helm_chart_agent_test_values_file    = "default.yaml" #This is the default values file
+  helm_chart_agent_test_namespace = "observe"
   use_local_chart = true
 
   depends_on = [module.setup_kind_cluster]

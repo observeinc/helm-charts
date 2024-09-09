@@ -17,12 +17,19 @@ Generally a test will do the following
 
 The tests are run using the following variables. These can be set in the `integration/tests.auto.tfvars` file for local testing if needed.
 
-The required variables which must be set manually (as they are sensitive) are:
+
+The **required** variables which must be set manually are:
 ```
 observe_url  = "https://<TENANT_ID>.collect.<DOMAIN>.com"
 observe_token = "your-secure-observe-token"
-values_file ="<values_file_to_use_for_helm_chart_installation> #Generally this is default.yaml
+helm_chart_agent_test_values_file ="<xyz.yaml> #Generally this is default.yaml
 ```
+
+Optionally, add below namespace variable if testing alternative namespace that's not called `observe`:
+```
+helm_chart_agent_test_namespace = "<some_other_namespace_to_test_helm_chart_installation>"
+```
+These variables get passed on to `modules/deploy_helm` appropriately when testing. 
 
 Note that the kubernetes and helm providers are automatically specified to use your `~/.kube/config` file by default, when using the context created by the kind cluster.
 

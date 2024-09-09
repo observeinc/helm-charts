@@ -25,5 +25,5 @@ output "helm_chart_agent_test_namespace" {
 
 output "helm_chart_agent_test_values_file" {
   description = "Which values file was used"
-  value       = var.values_file  
+  value       = var.helm_chart_agent_test_values_file
 }
