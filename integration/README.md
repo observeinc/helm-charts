@@ -21,6 +21,7 @@ The required variables which must be set manually (as they are sensitive) are:
 ```
 observe_url  = "https://<TENANT_ID>.collect.<DOMAIN>.com"
 observe_token = "your-secure-observe-token"
+values_file ="<values_file_to_use_for_helm_chart_installation> #Generally this is default.yaml
 ```
 
 Note that the kubernetes and helm providers are automatically specified to use your `~/.kube/config` file by default, when using the context created by the kind cluster.
