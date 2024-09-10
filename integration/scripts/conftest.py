@@ -26,7 +26,7 @@ def kube_client():
         print("Cannot find any context in kube-config file.")
         return
 
-    print("\n [kube_client] Active Context is {}\n".format(active_context['name']))
+    print("\n [kube_client] Active Context is {}".format(active_context['name']))
     v1 = client.CoreV1Api()
     return v1
 
@@ -45,5 +45,5 @@ def helm_config():
     config = {
         'namespace': namespace,
     }
-    print("\n [helm_config] - Helm config is: {}\n".format(config))
+    print(" [helm_config] - Helm config is: {}\n".format(config))
     return config

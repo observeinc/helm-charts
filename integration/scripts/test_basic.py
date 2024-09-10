@@ -2,6 +2,8 @@
 
 import pytest
 import base64 
+import json, yaml
+import re
 from . import helpers as h
 
 @pytest.mark.tags("default.yaml", "observe")
@@ -50,7 +52,25 @@ def test_config_map(kube_client, helm_config):
         assert config_map_name in found_config_maps, f"ConfigMap {config_map_name} not found!"
     
     print("All expected ConfigMaps found.")
+ 
 
+    # Check the 'observe-agent' ConfigMap to contain a value for the "token" key 
+    print(f"Checking ConfigMap observe-agent for token value")
+    observe_agent_cm = next((cm for cm in config_maps.items if cm.metadata.name == "observe-agent"), None)
+    relay_data = observe_agent_cm.data.get('relay', None) 
+    assert relay_data, "ConfigMap 'observe-agent' does not contain relay data!"
+    relay_data_dict = yaml.safe_load(relay_data) #Convert relay yaml to dict 
+
+    token_key = "token"
+    if token_key in relay_data_dict:
+        token_value = relay_data_dict["token"]
+        assert token_value, f"ConfigMap 'observe-agent' has no value for token key {token_key}!"
+        masked_token = token_value[:4] + "******" + token_value[-4:]  # Mask all but first 4 and last 4 chars
+        print(f"ConfigMap 'observe-agent' contains value for key '{token_key}' (masked): {masked_token}")
+    else:
+        assert False, f"ConfigMap 'observe-agent' does not contain token key '{token_key}'!"
+    
+    print("ConfigMap 'observe-agent' with token value verified.")
 
 @pytest.mark.tags("default.yaml", "observe")
 def test_secrets(kube_client, helm_config):
@@ -66,9 +86,9 @@ def test_secrets(kube_client, helm_config):
 
     if token_key in secret_data:
         token_value = base64.b64decode(secret_data[token_key]).decode('utf-8')
+        assert token_value, f"Secret '{secret_name}' has no value for OBSERVE_TOKEN!"
         masked_token = token_value[:4] + "******" + token_value[-4:]  # Mask all but first 4 and last 4 chars
-        print(f"Secret '{secret_name}' contains TOKEN (masked): {masked_token}")
-        assert token_value, f"Secret '{secret_name}' has no value for TOKEN!"
+        print(f"Secret '{secret_name}' contains OBSERVE_TOKEN (masked): {masked_token}")
     else:
         assert False, f"Secret '{secret_name}' does not contain OBSERVE_TOKEN!"
 
