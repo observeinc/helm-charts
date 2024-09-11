@@ -54,7 +54,28 @@ run "test_basic" {
 
   assert {
     condition     = output.error == ""
-    error_message = "Error in Python Tests"
+    error_message = "Error in test_basic"
   }
 
 }
+
+run "test_logs" {
+  module {
+    source  = "observeinc/collection/aws//modules/testing/exec"
+    version = "2.9.0"
+  }
+
+  variables {
+    command = "pytest ./scripts/test_logs.py -s -v --tags ${run.deploy_helm.helm_chart_agent_test_values_file}"
+    env_vars = {
+      HELM_NAMESPACE = run.deploy_helm.helm_chart_agent_test_namespace
+    }
+  }
+
+  assert {
+    condition     = output.error == ""
+    error_message = "Error in test_logs"
+  }
+
+}
+
