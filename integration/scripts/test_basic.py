@@ -54,18 +54,23 @@ def test_config_map(kube_client, helm_config):
     print("All expected ConfigMaps found.")
  
 
-    # Check the 'observe-agent' ConfigMap to contain a value for the "token" key 
-    print(f"Checking ConfigMap observe-agent for token value")
+    # Check the 'observe-agent' ConfigMap for observe token
+    print(f"Checking ConfigMap 'observe-agent' for token value")
     observe_agent_cm = next((cm for cm in config_maps.items if cm.metadata.name == "observe-agent"), None)
     relay_data = observe_agent_cm.data.get('relay', None) 
     assert relay_data, "ConfigMap 'observe-agent' does not contain relay data!"
     relay_data_dict = yaml.safe_load(relay_data) #Convert relay yaml to dict 
 
     token_key = "token"
-    if token_key in relay_data_dict:
+    if token_key in relay_data_dict: #Check for existence of token + validate token key resolves to correct form  
         token_value = relay_data_dict["token"]
+
         assert token_value, f"ConfigMap 'observe-agent' has no value for token key {token_key}!"
         masked_token = token_value[:4] + "******" + token_value[-4:]  # Mask all but first 4 and last 4 chars
+        
+        pattern = r"^[a-zA-Z0-9]{20}:[a-zA-Z0-9]+$"
+        assert re.match(pattern, token_value), f"ConfigMap 'observe-agent' has invalid value for token key {token_key}!"
+        
         print(f"ConfigMap 'observe-agent' contains value for key '{token_key}' (masked): {masked_token}")
     else:
         assert False, f"ConfigMap 'observe-agent' does not contain token key '{token_key}'!"
@@ -76,7 +81,8 @@ def test_config_map(kube_client, helm_config):
 def test_secrets(kube_client, helm_config):
    
 
-    # Checking the Secret "agent-credentials"
+    # Checking the Secret "agent-credentials" for observe token 
+    print(f"Checking Secret 'agent-credentials' for OBSERVE_TOKEN value")
     secret_name = "agent-credentials"
     secret = kube_client.read_namespaced_secret(name=secret_name, namespace=helm_config['namespace'])
 
@@ -84,10 +90,15 @@ def test_secrets(kube_client, helm_config):
     secret_data = secret.data
     token_key = "OBSERVE_TOKEN"
 
-    if token_key in secret_data:
+    if token_key in secret_data: #Check for existence of token + validate token key resolves to correct form  
         token_value = base64.b64decode(secret_data[token_key]).decode('utf-8')
+
         assert token_value, f"Secret '{secret_name}' has no value for OBSERVE_TOKEN!"
         masked_token = token_value[:4] + "******" + token_value[-4:]  # Mask all but first 4 and last 4 chars
+
+        pattern = r"^[a-zA-Z0-9]{20}:[a-zA-Z0-9]+$"
+        assert re.match(pattern, token_value), f"Secret '{secret_name}' has invalid value for OBSERVE_TOKEN!"
+
         print(f"Secret '{secret_name}' contains OBSERVE_TOKEN (masked): {masked_token}")
     else:
         assert False, f"Secret '{secret_name}' does not contain OBSERVE_TOKEN!"
