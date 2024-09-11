@@ -11,7 +11,7 @@ variable "helm_chart_agent_test_release_name" {
 }
 
 variable "helm_chart_agent_test_values_file" {
-  type        = string  
+  type        = string
   description = "Values file to use to install helm chart"
 }
 
