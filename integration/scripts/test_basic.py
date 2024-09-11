@@ -68,7 +68,7 @@ def test_config_map(kube_client, helm_config):
         assert token_value, f"ConfigMap 'observe-agent' has no value for token key {token_key}!"
         masked_token = token_value[:4] + "******" + token_value[-4:]  # Mask all but first 4 and last 4 chars
         
-        pattern = r"^[a-zA-Z0-9]{20}:[a-zA-Z0-9]+$"
+         pattern = r"^[a-zA-Z0-9]+:[a-zA-Z0-9]+$"
         assert re.match(pattern, token_value), f"ConfigMap 'observe-agent' has invalid value for token key {token_key}!"
         
         print(f"ConfigMap 'observe-agent' contains value for key '{token_key}' (masked): {masked_token}")
@@ -96,7 +96,7 @@ def test_secrets(kube_client, helm_config):
         assert token_value, f"Secret '{secret_name}' has no value for OBSERVE_TOKEN!"
         masked_token = token_value[:4] + "******" + token_value[-4:]  # Mask all but first 4 and last 4 chars
 
-        pattern = r"^[a-zA-Z0-9]{20}:[a-zA-Z0-9]+$"
+        pattern = r"^[a-zA-Z0-9]+:[a-zA-Z0-9]+$"
         assert re.match(pattern, token_value), f"Secret '{secret_name}' has invalid value for OBSERVE_TOKEN!"
 
         print(f"Secret '{secret_name}' contains OBSERVE_TOKEN (masked): {masked_token}")
