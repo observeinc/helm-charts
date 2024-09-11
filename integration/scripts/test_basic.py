@@ -31,6 +31,13 @@ def test_pods_state(kube_client, helm_config):
 
 @pytest.mark.tags("default.yaml", "observe")
 def test_config_map(kube_client, helm_config):
+    """
+    This test does the following: 
+    - Check that expected config maps exist in the cluster
+    - Check that the 'observe-agent' config map 
+       * Token value exists
+       * Contains the correct token with correct structure 
+    """
 
     #config_map = kube_client.read_namespaced_config_map(name="observe-agent",namespace=helm_config['namespace'])
     #print(config_map)
@@ -79,7 +86,13 @@ def test_config_map(kube_client, helm_config):
 
 @pytest.mark.tags("default.yaml", "observe")
 def test_secrets(kube_client, helm_config):
-   
+    """
+    This test does the following: 
+    - Check that expected secret `agent-credentials` exist in the cluster
+    - Check that for the 'agent-credentials' secret 
+       * Token value exists
+       * Contains the correct token with correct structure
+    """
 
     # Checking the Secret "agent-credentials" for observe token 
     print(f"Checking Secret 'agent-credentials' for OBSERVE_TOKEN value")
