@@ -1,5 +1,5 @@
 {{- define "observe.observe-agent" -}}
-token: {{ .Values.observe.token }}
+token: {{ .Values.observe.token.value }}
 
 debug: false
 
