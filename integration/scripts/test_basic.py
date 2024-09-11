@@ -4,7 +4,6 @@ import pytest
 import base64 
 import json, yaml
 import re
-from . import helpers as h
 
 @pytest.mark.tags("default.yaml", "observe")
 def test_pods_state(kube_client, helm_config):

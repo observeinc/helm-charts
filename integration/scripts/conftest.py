@@ -2,6 +2,7 @@ import pytest
 import os
 from kubernetes import client, config
 
+
 @pytest.fixture(scope="session", autouse=True)
 def white_space():
     #print('\n')
@@ -47,3 +48,19 @@ def helm_config():
     }
     print(" [helm_config] - Helm config is: {}\n".format(config))
     return config
+
+
+@pytest.helpers.register
+def ApiException():
+    """
+    returns ApiException for k8s client 
+    """    
+    from kubernetes.client.rest import ApiException
+    return ApiException
+
+@pytest.helpers.register
+def parseLogs():
+    """
+    returns 
+    """
+    return "Hi"

@@ -2,3 +2,4 @@ pytest==7.4.4
 kubernetes==30.1.0
 pytest_tagging==1.5.3
 pyyaml==6.0.2
+pytest-helpers-namespace==2021.12.29
