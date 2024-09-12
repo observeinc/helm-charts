@@ -7,6 +7,11 @@ import re
 
 @pytest.mark.tags("default.yaml", "observe")
 def test_pods_state(kube_client, helm_config):
+    """
+    This test does the following: 
+    - Check that all pods in the cluster's namespace are in the 'Running' phase 
+
+    """
      # List all pods in the specified namespace
     pods = kube_client.list_namespaced_pod(namespace=helm_config['namespace'])
 
