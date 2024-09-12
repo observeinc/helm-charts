@@ -13,7 +13,7 @@ def test_errors_logs(kube_client, helm_config):
     for pod in pods.items:
         pod_name = pod.metadata.name
         print(f"Pod: {pod_name}")
-
+        
         try:
             # Get logs for the pod           
             logs = kube_client.read_namespaced_pod_log(name=pod_name, namespace=helm_config['namespace'])

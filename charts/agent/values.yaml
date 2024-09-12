@@ -46,6 +46,7 @@ agent:
         telemetry:
           metrics_level: normal
           logging_level: WARN
+          logging_encoding: console 
       debug:
         # values basic, normal, detailed
         verbosity: basic
