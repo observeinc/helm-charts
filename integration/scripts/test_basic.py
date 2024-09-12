@@ -6,6 +6,23 @@ import json, yaml
 import re
 
 @pytest.mark.tags("default.yaml", "observe")
+def test_helm_install(apps_client, helm_config):
+    """
+    Test to verify there are 3 deployments and 1 daemonset in the cluster.
+    """
+    # Retrieve the deployments in the specified namespace
+    print(f"Checking Deployments in namespace: {helm_config['namespace']}")
+    deployments = apps_client.list_namespaced_deployment(namespace=helm_config['namespace']).items
+    assert len(deployments) == 3, f"Expected 3 deployments in namespace '{helm_config['namespace']}', but found {len(deployments)}"
+
+    # Retrieve the daemonsets in the specified namespace
+    print(f"Checking Daemonsets  in namespace: {helm_config['namespace']}")
+    daemonsets = apps_client.list_namespaced_daemon_set(namespace=helm_config['namespace']).items
+    assert len(daemonsets) == 1, f"Expected 1 daemonset in namespace '{helm_config['namespace']}', but found {len(daemonsets)}"
+
+    print("All expected deployments and daemonsets found.")
+
+@pytest.mark.tags("default.yaml", "observe")
 def test_pods_state(kube_client, helm_config):
     """
     This test does the following: 

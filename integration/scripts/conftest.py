@@ -32,6 +32,25 @@ def kube_client():
     return v1
 
 @pytest.fixture(scope="function")
+def apps_client():
+    """
+    Fixture to retrieve the Kubernetes client.
+
+    Returns:
+        client.AppsV1Api: AppsV1Api client
+    """
+    # Load the kube config
+    config.load_kube_config()
+    contexts, active_context = config.list_kube_config_contexts()
+    if not contexts:
+        print("Cannot find any context in kube-config file.")
+        return
+
+    print("\n [apps_client] Active Context is {}".format(active_context['name']))
+    v1 = client.AppsV1Api()  # Use AppsV1Api to get deployments and daemonsets
+    return v1
+
+@pytest.fixture(scope="function")
 def helm_config():
     """
     Fixture to retrieve the Helm namespace configuration.
