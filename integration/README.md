@@ -39,3 +39,9 @@ Note that the kubernetes and helm providers are automatically specified to use y
 To manually setup a kind cluster and install the helm chart WITHOUT running tests, refer to [local sandbox module](modules/local_sandbox/README.md)
 
 After creation of cluster and helm-chart installation, any of the python scripts in `/scripts` directory can be tested by running them directly against the local kind cluster.
+
+They can be called like the following example:.
+```
+export HELM_NAMESPACE=observe
+(venv) ➜  integration git:(main) ✗ pytest ./scripts/test_logs.py -v -s --tags default.yaml
+```
