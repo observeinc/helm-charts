@@ -46,7 +46,7 @@ run "test_basic" {
   }
 
   variables {
-    command = "pytest ./scripts/test_basic.py -s -v --tags ${run.deploy_helm.helm_chart_agent_test_values_file}"
+    command = "pytest ./scripts/test_basic.py -v --tags ${run.deploy_helm.helm_chart_agent_test_values_file}"
     env_vars = {
       HELM_NAMESPACE = run.deploy_helm.helm_chart_agent_test_namespace
     }
@@ -66,7 +66,7 @@ run "test_logs" {
   }
 
   variables {
-    command = "pytest ./scripts/test_logs.py -s -v --tags ${run.deploy_helm.helm_chart_agent_test_values_file}"
+    command = "pytest ./scripts/test_logs.py -v --tags ${run.deploy_helm.helm_chart_agent_test_values_file}"
     env_vars = {
       HELM_NAMESPACE = run.deploy_helm.helm_chart_agent_test_namespace
     }
