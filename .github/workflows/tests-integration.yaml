@@ -17,25 +17,37 @@ permissions:
 env:
     TF_VAR_observe_url: ${{secrets.OBSERVE_URL}}
     TF_VAR_observe_token: ${{secrets.OBSERVE_TOKEN}}
-    TF_VAR_helm_chart_agent_test_values_file: default.yaml #Matrix this 
-    TF_VAR_helm_chart_agent_test_namespace: "observe" #Matrix this  
+    #TF_VAR_helm_chart_agent_test_values_file: default.yaml #Matrix this 
+    #TF_VAR_helm_chart_agent_test_namespace: "observe" #Matrix this  
 
 jobs:
 
   helm-charts-agent-integration-tests:
-    name: helm-charts-agent-integration-tests
+    name: helm-charts-agent-integration-tests-${{ matrix.namespace }}-${{ matrix.values }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false 
+      matrix:
+          values: 
+            - default.yaml
+          namespace: 
+            - observe
     defaults:
         run:
             working-directory: integration #Terrafrom commands and tests are ran from integration directory
     steps:
         - name: Checkout code
           uses: actions/checkout@v4
+                               
+        - name: Setup Terraform Variables for matrixing
+          run:  |
+            echo "TF_VAR_helm_chart_agent_test_values_file=$(echo ${{matrix.values}})" >> $GITHUB_ENV
+            echo "TF_VAR_helm_chart_agent_test_namespace=$(echo ${{matrix.namespace}})" >> $GITHUB_ENV
 
         - uses: azure/setup-kubectl@v4
           with:
             version: latest
-
+            
         - name: Setup Python
           uses: actions/setup-python@v5
           with:
