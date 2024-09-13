@@ -33,10 +33,9 @@ jobs:
             - non-default.yaml #currently there is no difference here 
           namespace: 
             - observe
-            - non-observe
-          include:
+          include: # Test not-observe namespace with default values only 
             - values: default.yaml
-              namespace: non-observe
+              namespace: not-observe
     defaults:
         run:
             working-directory: integration #Terrafrom commands and tests are ran from integration directory
