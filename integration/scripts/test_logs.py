@@ -5,7 +5,10 @@ import base64
 import json, yaml
 import re
 
-@pytest.mark.tags("default.yaml")
+
+@pytest.mark.tags(
+        "default.yaml",
+        "non-default.yaml")
 def test_errors_logs(kube_client, helm_config):
      # List all pods in the specified namespace
     pods = kube_client.list_namespaced_pod(namespace=helm_config['namespace'])
