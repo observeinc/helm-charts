@@ -32,6 +32,7 @@ jobs:
             - default.yaml
           namespace: 
             - observe
+            - non-observe
     defaults:
         run:
             working-directory: integration #Terrafrom commands and tests are ran from integration directory
