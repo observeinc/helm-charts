@@ -30,9 +30,13 @@ jobs:
       matrix:
           values: 
             - default.yaml
+            - non-default.yaml #currently there is no difference here 
           namespace: 
             - observe
             - non-observe
+          include:
+            - values: default.yaml
+              namespace: non-observe
     defaults:
         run:
             working-directory: integration #Terrafrom commands and tests are ran from integration directory

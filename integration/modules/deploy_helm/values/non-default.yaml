@@ -5,6 +5,7 @@ agent:
         service:
           telemetry:          
             logging_encoding: json
+            
 #Common for namepsace/url/token
 observe:
   collectionEndpoint:
