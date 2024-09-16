@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.9.3](https://img.shields.io/badge/Version-0.9.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 0.10.0](https://img.shields.io/badge/Version-0.10.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 > [!CAUTION]
 > This chart is under active development and is not meant to be installed yet.
@@ -29,6 +29,7 @@ Chart to install K8s collection stack based on Observe Agent
 | agent.config.global.debug.verbosity | string | `"basic"` |  |
 | agent.config.global.processors.batch.send_batch_max_size | int | `100` |  |
 | agent.config.global.processors.batch.send_batch_size | int | `100` |  |
+| agent.config.global.service.telemetry.logging_encoding | string | `"console"` |  |
 | agent.config.global.service.telemetry.logging_level | string | `"WARN"` |  |
 | agent.config.global.service.telemetry.metrics_level | string | `"normal"` |  |
 | agent.selfMonitor.enabled | bool | `true` |  |
