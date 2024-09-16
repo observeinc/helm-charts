@@ -47,7 +47,7 @@ jobs:
           run:  |
             echo "TF_VAR_helm_chart_agent_test_values_file=$(echo ${{matrix.values}})" >> $GITHUB_ENV
             echo "TF_VAR_helm_chart_agent_test_namespace=$(echo ${{matrix.namespace}})" >> $GITHUB_ENV
-            echo "TF_VAR_helm_chart_agent_test_release_name=$(echo helm-charts-agent-GHA-${{ matrix.namespace }}-$(echo ${{ matrix.values }} | sed 's/\./-/g'))" >> $GITHUB_ENV
+            echo "TF_VAR_helm_chart_agent_test_release_name=$(echo helm-charts-agent-gha-${{ matrix.namespace }}-$(echo ${{ matrix.values }} | sed 's/\./-/g'))" >> $GITHUB_ENV
       
         - uses: azure/setup-kubectl@v4
           with:
