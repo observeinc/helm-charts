@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.12.0](https://img.shields.io/badge/Version-0.12.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
+![Version: 0.13.0](https://img.shields.io/badge/Version-0.13.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 > [!CAUTION]
 > This chart is under active development and is not meant to be installed yet.
@@ -39,6 +39,11 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster.name | string | `"observe-agent-monitored-cluster"` |  |
 | cluster.namespaceOverride.value | string | `"observe"` |  |
 | cluster.uidOverride.value | string | `""` |  |
+| daemonset-logs-metrics.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
+| daemonset-logs-metrics.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"DoesNotExist"` |  |
+| daemonset-logs-metrics.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].key | string | `"kubernetes.io/os"` |  |
+| daemonset-logs-metrics.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].operator | string | `"NotIn"` |  |
+| daemonset-logs-metrics.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].values[0] | string | `"windows"` |  |
 | daemonset-logs-metrics.clusterRole.create | bool | `false` |  |
 | daemonset-logs-metrics.clusterRole.name | string | `"observe-agent-cluster-role"` |  |
 | daemonset-logs-metrics.command.extraArgs[0] | string | `"start"` |  |
@@ -122,6 +127,11 @@ Chart to install K8s collection stack based on Observe Agent
 | daemonset-logs-metrics.securityContext.runAsUser | int | `0` |  |
 | daemonset-logs-metrics.serviceAccount.create | bool | `false` |  |
 | daemonset-logs-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
+| deployment-agent-monitor.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
+| deployment-agent-monitor.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"DoesNotExist"` |  |
+| deployment-agent-monitor.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].key | string | `"kubernetes.io/os"` |  |
+| deployment-agent-monitor.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].operator | string | `"NotIn"` |  |
+| deployment-agent-monitor.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].values[0] | string | `"windows"` |  |
 | deployment-agent-monitor.clusterRole.create | bool | `false` |  |
 | deployment-agent-monitor.clusterRole.name | string | `"observe-agent-cluster-role"` |  |
 | deployment-agent-monitor.command.extraArgs[0] | string | `"start"` |  |
@@ -180,6 +190,11 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-agent-monitor.resources | object | `{"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | deployment-agent-monitor.serviceAccount.create | bool | `false` |  |
 | deployment-agent-monitor.serviceAccount.name | string | `"observe-agent-service-account"` |  |
+| deployment-cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
+| deployment-cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"DoesNotExist"` |  |
+| deployment-cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].key | string | `"kubernetes.io/os"` |  |
+| deployment-cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].operator | string | `"NotIn"` |  |
+| deployment-cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].values[0] | string | `"windows"` |  |
 | deployment-cluster-events.clusterRole.create | bool | `false` |  |
 | deployment-cluster-events.clusterRole.name | string | `"observe-agent-cluster-role"` |  |
 | deployment-cluster-events.command.extraArgs[0] | string | `"start"` |  |
@@ -242,6 +257,11 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-cluster-events.resources | object | `{"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | deployment-cluster-events.serviceAccount.create | bool | `false` |  |
 | deployment-cluster-events.serviceAccount.name | string | `"observe-agent-service-account"` |  |
+| deployment-cluster-metrics.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
+| deployment-cluster-metrics.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"DoesNotExist"` |  |
+| deployment-cluster-metrics.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].key | string | `"kubernetes.io/os"` |  |
+| deployment-cluster-metrics.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].operator | string | `"NotIn"` |  |
+| deployment-cluster-metrics.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].values[0] | string | `"windows"` |  |
 | deployment-cluster-metrics.clusterRole.create | bool | `false` |  |
 | deployment-cluster-metrics.clusterRole.name | string | `"observe-agent-cluster-role"` |  |
 | deployment-cluster-metrics.command.extraArgs[0] | string | `"start"` |  |
