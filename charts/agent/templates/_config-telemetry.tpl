@@ -5,4 +5,5 @@ telemetry:
       address: {{ template "config.local_host"}}:8888
     logs:
       level: {{ .Values.agent.config.global.service.telemetry.logging_level }}
+      encoding: {{ .Values.agent.config.global.service.telemetry.logging_encoding }}
 {{- end -}}
