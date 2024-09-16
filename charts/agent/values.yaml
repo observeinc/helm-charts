@@ -79,7 +79,7 @@ deployment-cluster-events:
     repository: observeinc/observe-agent
     # Overrides the image tag whose default is the chart appVersion.
     # The service's name will be applied to the end of this value.
-    tag: "1.0.0"
+    tag: "1.1.0"
     pullPolicy: IfNotPresent
 
   command:
@@ -199,7 +199,7 @@ deployment-cluster-metrics:
     repository: observeinc/observe-agent
     # # Overrides the image tag whose default is the chart appVersion.
     # # The service's name will be applied to the end of this value.
-    tag: "1.0.0"
+    tag: "1.1.0"
     pullPolicy: IfNotPresent
 
   command:
@@ -311,7 +311,7 @@ daemonset-logs-metrics:
     repository: observeinc/observe-agent
     # # Overrides the image tag whose default is the chart appVersion.
     # # The service's name will be applied to the end of this value.
-    tag: "1.0.0"
+    tag: "1.1.0"
     pullPolicy: IfNotPresent
 
   command:
@@ -456,7 +456,7 @@ deployment-agent-monitor:
     repository: observeinc/observe-agent
     # # Overrides the image tag whose default is the chart appVersion.
     # # The service's name will be applied to the end of this value.
-    tag: "1.0.0"
+    tag: "1.1.0"
     pullPolicy: IfNotPresent
 
   command:
