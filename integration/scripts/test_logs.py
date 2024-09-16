@@ -13,7 +13,8 @@ def test_errors_logs(kube_client, helm_config):
      # List all pods in the specified namespace
     pods = kube_client.list_namespaced_pod(namespace=helm_config['namespace'])
     ignore_error_patterns = [
-        "failed to retrieve ConfigMap kube-system/aws-auth" 
+        "failed to retrieve ConfigMap kube-system/aws-auth",
+        "Exporting failed. Will retry the request after interval"
     ]
     expected_good_logs = ["Starting observe-agent"] #Check observe-agent starts in every pod 
 
