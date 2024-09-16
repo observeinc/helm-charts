@@ -41,7 +41,7 @@ Chart to install K8s collection stack based on Observe Agent
 | containers.logs.enabled | bool | `true` |  |
 | containers.metrics.enabled | bool | `true` |  |
 | daemonset-logs-metrics.clusterRole.create | bool | `false` |  |
-| daemonset-logs-metrics.clusterRole.name | string | `"observe-agent-cluster-role"` |  |
+| daemonset-logs-metrics.clusterRole.name | string | `"observe-agent-cluster-role-{{ tpl template \"observe-agent.namespace\" . }}"` |  |
 | daemonset-logs-metrics.command.extraArgs[0] | string | `"start"` |  |
 | daemonset-logs-metrics.command.extraArgs[1] | string | `"--config=/observe-agent-conf/observe-agent.yaml"` |  |
 | daemonset-logs-metrics.command.extraArgs[2] | string | `"--otel-config=/conf/relay.yaml"` |  |
@@ -122,9 +122,9 @@ Chart to install K8s collection stack based on Observe Agent
 | daemonset-logs-metrics.securityContext.runAsGroup | int | `0` |  |
 | daemonset-logs-metrics.securityContext.runAsUser | int | `0` |  |
 | daemonset-logs-metrics.serviceAccount.create | bool | `false` |  |
-| daemonset-logs-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
+| daemonset-logs-metrics.serviceAccount.name | string | `"observe-agent-service-account-{{ tpl template \"observe-agent.namespace\" . }}"` |  |
 | deployment-agent-monitor.clusterRole.create | bool | `false` |  |
-| deployment-agent-monitor.clusterRole.name | string | `"observe-agent-cluster-role"` |  |
+| deployment-agent-monitor.clusterRole.name | string | `"observe-agent-cluster-role-{{ tpl template \"observe-agent.namespace\" . }}"` |  |
 | deployment-agent-monitor.command.extraArgs[0] | string | `"start"` |  |
 | deployment-agent-monitor.command.extraArgs[1] | string | `"--config=/observe-agent-conf/observe-agent.yaml"` |  |
 | deployment-agent-monitor.command.extraArgs[2] | string | `"--otel-config=/conf/relay.yaml"` |  |
@@ -180,9 +180,9 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-agent-monitor.readinessProbe.periodSeconds | int | `5` |  |
 | deployment-agent-monitor.resources | object | `{"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | deployment-agent-monitor.serviceAccount.create | bool | `false` |  |
-| deployment-agent-monitor.serviceAccount.name | string | `"observe-agent-service-account"` |  |
+| deployment-agent-monitor.serviceAccount.name | string | `"observe-agent-service-account-{{ .observe-agent.namespace }}"` |  |
 | deployment-cluster-events.clusterRole.create | bool | `false` |  |
-| deployment-cluster-events.clusterRole.name | string | `"observe-agent-cluster-role"` |  |
+| deployment-cluster-events.clusterRole.name | string | `"observe-agent-cluster-role-{{ tpl template \"observe-agent.namespace\" . }}"` |  |
 | deployment-cluster-events.command.extraArgs[0] | string | `"start"` |  |
 | deployment-cluster-events.command.extraArgs[1] | string | `"--config=/observe-agent-conf/observe-agent.yaml"` |  |
 | deployment-cluster-events.command.extraArgs[2] | string | `"--otel-config=/conf/relay.yaml"` |  |
@@ -242,9 +242,9 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-cluster-events.readinessProbe.periodSeconds | int | `5` |  |
 | deployment-cluster-events.resources | object | `{"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | deployment-cluster-events.serviceAccount.create | bool | `false` |  |
-| deployment-cluster-events.serviceAccount.name | string | `"observe-agent-service-account"` |  |
+| deployment-cluster-events.serviceAccount.name | string | `"observe-agent-service-account-{{ tpl observe-agent.namespace . }}"` |  |
 | deployment-cluster-metrics.clusterRole.create | bool | `false` |  |
-| deployment-cluster-metrics.clusterRole.name | string | `"observe-agent-cluster-role"` |  |
+| deployment-cluster-metrics.clusterRole.name | string | `"observe-agent-cluster-role-{{ tpl template \"observe-agent.namespace\" . }}"` |  |
 | deployment-cluster-metrics.command.extraArgs[0] | string | `"start"` |  |
 | deployment-cluster-metrics.command.extraArgs[1] | string | `"--config=/observe-agent-conf/observe-agent.yaml"` |  |
 | deployment-cluster-metrics.command.extraArgs[2] | string | `"--otel-config=/conf/relay.yaml"` |  |
@@ -300,7 +300,7 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-cluster-metrics.readinessProbe.periodSeconds | int | `5` |  |
 | deployment-cluster-metrics.resources | object | `{"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | deployment-cluster-metrics.serviceAccount.create | bool | `false` |  |
-| deployment-cluster-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
+| deployment-cluster-metrics.serviceAccount.name | string | `"observe-agent-service-account-{{ tpl template \"observe-agent.namespace\" . }}"` |  |
 | observe.collectionEndpoint.value | string | `""` |  |
 | observe.entityToken.create | bool | `false` |  |
 | observe.entityToken.use | bool | `false` |  |

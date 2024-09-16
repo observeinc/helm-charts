@@ -36,7 +36,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: observe-agent-cluster-role-binding
+  name: observe-agent-cluster-role-binding-{{ template "observe-agent.namespace" . }}
   labels:
     app.kubernetes.io/name: observe-agent-cluster-role-binding-{{ template "observe-agent.namespace" . }}
     app.kubernetes.io/instance: observe-agent
@@ -46,5 +46,5 @@ roleRef:
   name: observe-agent-cluster-role-{{ template "observe-agent.namespace" . }}
 subjects:
 - kind: ServiceAccount
-  name: observe-agent-service-account
+  name: observe-agent-service-account-{{ template "observe-agent.namespace" . }}
   namespace: {{ template "observe-agent.namespace" . }}

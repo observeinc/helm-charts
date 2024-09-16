@@ -87,11 +87,10 @@ deployment-cluster-events:
 
   serviceAccount:
     create: false
-    name: "observe-agent-service-account"
-
+    name: "observe-agent-service-account-{{ tpl observe-agent.namespace . }}"
   clusterRole:
     create: false
-    name: "observe-agent-cluster-role"
+    name: "observe-agent-cluster-role-{{ tpl template \"observe-agent.namespace\" . }}"
 
   livenessProbe:
     httpGet:
@@ -207,10 +206,10 @@ deployment-cluster-metrics:
 
   serviceAccount:
     create: false
-    name: "observe-agent-service-account"
+    name: "observe-agent-service-account-{{ tpl template \"observe-agent.namespace\" . }}"
   clusterRole:
     create: false
-    name: "observe-agent-cluster-role"
+    name: "observe-agent-cluster-role-{{ tpl template \"observe-agent.namespace\" . }}"
 
   livenessProbe:
     httpGet:
@@ -319,10 +318,10 @@ daemonset-logs-metrics:
 
   serviceAccount:
     create: false
-    name: "observe-agent-service-account"
+    name: "observe-agent-service-account-{{ tpl template \"observe-agent.namespace\" . }}"
   clusterRole:
     create: false
-    name: "observe-agent-cluster-role"
+    name: "observe-agent-cluster-role-{{ tpl template \"observe-agent.namespace\" . }}"
 
   livenessProbe:
     httpGet:
@@ -464,10 +463,10 @@ deployment-agent-monitor:
 
   serviceAccount:
     create: false
-    name: "observe-agent-service-account"
+    name: "observe-agent-service-account-{{ .observe-agent.namespace }}"
   clusterRole:
     create: false
-    name: "observe-agent-cluster-role"
+    name: "observe-agent-cluster-role-{{ tpl template \"observe-agent.namespace\" . }}"
 
   livenessProbe:
     httpGet:
