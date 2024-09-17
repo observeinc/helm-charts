@@ -1,5 +1,4 @@
-{{ if .Values.containers.logs.enabled -}}
-# TO DO: seperate logs and metrics
+{{ if .Values.node.enabled  -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
