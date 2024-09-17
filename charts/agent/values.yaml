@@ -29,11 +29,15 @@ cluster:
   uidOverride:
     value: ""
 
-containers:
-  logs:
-    enabled: true
+node:
+  enabled: true
   metrics:
     enabled: true
+  containers:
+    logs:
+      enabled: true
+    metrics:
+      enabled: true
 
 agent:
   config:

@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.11.0](https://img.shields.io/badge/Version-0.11.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
+![Version: 0.12.0](https://img.shields.io/badge/Version-0.12.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 > [!CAUTION]
 > This chart is under active development and is not meant to be installed yet.
@@ -39,8 +39,6 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster.name | string | `"observe-agent-monitored-cluster"` |  |
 | cluster.namespaceOverride.value | string | `"observe"` |  |
 | cluster.uidOverride.value | string | `""` |  |
-| containers.logs.enabled | bool | `true` |  |
-| containers.metrics.enabled | bool | `true` |  |
 | daemonset-logs-metrics.clusterRole.create | bool | `false` |  |
 | daemonset-logs-metrics.clusterRole.name | string | `"observe-agent-cluster-role"` |  |
 | daemonset-logs-metrics.command.extraArgs[0] | string | `"start"` |  |
@@ -302,6 +300,10 @@ Chart to install K8s collection stack based on Observe Agent
 | deployment-cluster-metrics.resources | object | `{"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | deployment-cluster-metrics.serviceAccount.create | bool | `false` |  |
 | deployment-cluster-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
+| node.containers.logs.enabled | bool | `true` |  |
+| node.containers.metrics.enabled | bool | `true` |  |
+| node.enabled | bool | `true` |  |
+| node.metrics.enabled | bool | `true` |  |
 | observe.collectionEndpoint.value | string | `""` |  |
 | observe.entityToken.create | bool | `false` |  |
 | observe.entityToken.use | bool | `false` |  |
