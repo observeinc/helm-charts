@@ -72,14 +72,14 @@ def helm_config():
 @pytest.helpers.register
 def ApiException():
     """
-    returns ApiException for k8s client 
-    """    
+    returns ApiException for k8s client
+    """
     from kubernetes.client.rest import ApiException
     return ApiException
 
 @pytest.helpers.register
 def parseLogs():
     """
-    returns 
+    returns
     """
     return "Hi"

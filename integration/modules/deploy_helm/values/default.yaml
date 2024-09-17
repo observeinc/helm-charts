@@ -1,12 +1,12 @@
-#Common for telemetry 
+#Common for telemetry
 agent:
-  config:    
+  config:
       global:
         service:
-          telemetry:          
+          telemetry:
             logging_encoding: json
-            logging_level: INFO       
-            
+            logging_level: INFO
+
 #Common for namepsace/url/token
 observe:
   collectionEndpoint:
