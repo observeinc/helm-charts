@@ -17,8 +17,6 @@ permissions:
 env:
     TF_VAR_observe_url: ${{secrets.OBSERVE_URL}}
     TF_VAR_observe_token: ${{secrets.OBSERVE_TOKEN}}
-    #TF_VAR_helm_chart_agent_test_values_file: default.yaml #Matrix this 
-    #TF_VAR_helm_chart_agent_test_namespace: "observe" #Matrix this  
 
 jobs:
 
@@ -30,7 +28,6 @@ jobs:
       matrix:
           values: 
             - default.yaml
-            - non-default.yaml #currently there is no difference here 
           namespace: 
             - observe
           include: # Test not-observe namespace with default values only 

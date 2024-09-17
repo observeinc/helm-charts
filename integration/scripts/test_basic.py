@@ -23,8 +23,7 @@ def test_helm_correctness(apps_client, helm_config):
     print("All expected deployments and daemonsets found.")
 
 @pytest.mark.tags(
-        "default.yaml",
-        "non-default.yaml")
+        "default.yaml")
 def test_pods_state(kube_client, helm_config):
     """
     This test does the following: 
