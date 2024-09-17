@@ -7,11 +7,18 @@ import re
 import time
 
 
-@pytest.mark.tags(
-        "default.yaml")
+@pytest.mark.tags("default.yaml")
 def test_errors_logs(kube_client, helm_config):
-     # List all pods in the specified namespace
-    pods = kube_client.list_namespaced_pod(namespace=helm_config['namespace'])
+
+    """_summary_
+
+    This test does the following:
+    - Check that all pods in the cluster's namespace have no errors/warnings in their logs
+    - Ignore expected errors
+    - Check that all pods have the expected logs 
+    """
+
+    
     ignore_error_patterns = [
         "failed to retrieve ConfigMap kube-system/aws-auth",
         "Exporting failed. Will retry the request after interval",
@@ -20,6 +27,9 @@ def test_errors_logs(kube_client, helm_config):
     expected_good_logs = [
         "Starting observe-agent"
     ]
+
+    # List all pods in the specified namespace
+    pods = kube_client.list_namespaced_pod(namespace=helm_config['namespace'])
 
     for pod in pods.items: #For each pod
         pod_name = pod.metadata.name
