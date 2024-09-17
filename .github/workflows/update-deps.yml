@@ -28,6 +28,7 @@ jobs:
         uses: losisin/helm-docs-github-action@v1
         with:
           git-push: false
+          template-files: README.md.gotmpl
 
       # Use Peter Evans Pull Request Action to create a pull request
       - name: Create Pull Request
