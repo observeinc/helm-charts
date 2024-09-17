@@ -17,11 +17,19 @@ Generally a test will do the following
 
 The tests are run using the following variables. These can be set in the `integration/tests.auto.tfvars` file for local testing if needed.
 
-The required variables which must be set manually (as they are sensitive) are:
+
+The **required** variables which must be set manually are:
 ```
 observe_url  = "https://<TENANT_ID>.collect.<DOMAIN>.com"
 observe_token = "your-secure-observe-token"
+helm_chart_agent_test_values_file ="<xyz.yaml> #Generally this is default.yaml
 ```
+
+Optionally, add below namespace variable if testing alternative namespace that's not called `observe`:
+```
+helm_chart_agent_test_namespace = "<some_other_namespace_to_test_helm_chart_installation>"
+```
+These variables get passed on to `modules/deploy_helm` appropriately when testing.
 
 Note that the kubernetes and helm providers are automatically specified to use your `~/.kube/config` file by default, when using the context created by the kind cluster.
 
@@ -31,3 +39,9 @@ Note that the kubernetes and helm providers are automatically specified to use y
 To manually setup a kind cluster and install the helm chart WITHOUT running tests, refer to [local sandbox module](modules/local_sandbox/README.md)
 
 After creation of cluster and helm-chart installation, any of the python scripts in `/scripts` directory can be tested by running them directly against the local kind cluster.
+
+They can be called like the following example:.
+```
+export HELM_NAMESPACE=observe
+(venv) ➜  integration git:(main) ✗ pytest ./scripts/test_logs.py -v -s --tags default.yaml
+```

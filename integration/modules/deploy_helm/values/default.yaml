@@ -1,8 +1,18 @@
+#Common for telemetry
+agent:
+  config:
+      global:
+        service:
+          telemetry:
+            logging_encoding: json
+            logging_level: INFO
+
+#Common for namepsace/url/token
 observe:
-    collectionEndpoint:
-      value: ${observe_url}
-    token:
-      value: ${observe_token}
+  collectionEndpoint:
+    value: ${observe_url}
+  token:
+    value: ${observe_token}
 cluster:
   namespaceOverride:
     value: ${helm_chart_agent_test_namespace}

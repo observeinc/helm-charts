@@ -22,3 +22,8 @@ output "helm_chart_agent_test_namespace" {
   description = "value of helm_chart_agent_test_namespace"
   value       = module.deploy_helm.helm_chart_agent_test_namespace
 }
+
+output "helm_chart_agent_test_values_file" {
+  description = "Which values file was used for deployment"
+  value       = module.deploy_helm.helm_chart_agent_test_values_file
+}
