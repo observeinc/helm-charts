@@ -6,6 +6,8 @@ on:
   push:
     branches:
       - main
+  schedule:
+    - cron: "0 6 * * *" #Runs at 06:00 UTC Daily
 
 
 #Special permissions required for OIDC authentication
@@ -30,6 +32,8 @@ jobs:
       matrix:
           values:
             - default.yaml
+            - node_affinity.yaml
+            - node_taint.yaml
           namespace:
             - observe
           include: # Test not-observe namespace with default values only

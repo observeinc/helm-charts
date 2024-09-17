@@ -7,7 +7,10 @@ import re
 import time
 
 
-@pytest.mark.tags("default.yaml")
+@pytest.mark.tags(
+        "default.yaml",
+        "node_affinity.yaml",
+        "node_taint.yaml")
 def test_errors_logs(kube_client, helm_config):
 
     """_summary_
