@@ -21,5 +21,9 @@ output "helm_chart_agent_test_release_name" {
 output "helm_chart_agent_test_namespace" {
   description = "value of helm_chart_agent_test_namespace"
   value       = helm_release.observe-agent.metadata[0].namespace
+}
 
+output "helm_chart_agent_test_values_file" {
+  description = "Which values file was used"
+  value       = var.helm_chart_agent_test_values_file
 }
