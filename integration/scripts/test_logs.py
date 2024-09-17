@@ -15,7 +15,7 @@ def test_errors_logs(kube_client, helm_config):
     pods = kube_client.list_namespaced_pod(namespace=helm_config['namespace'])
     ignore_error_patterns = [
         "failed to retrieve ConfigMap kube-system/aws-auth",
-        "exporting failed. Will retry the request after interval",
+        "Exporting failed. Will retry the request after interval",
         "The resourceVersion for the provided watch is too old"
     ]
     expected_good_logs = [
