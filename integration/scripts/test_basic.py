@@ -65,10 +65,10 @@ def test_config_map(kube_client, helm_config):
     #print(config_map)
 
     expected_config_maps = {
-        "node-logs-metrics",
-        "monitor",
-        "cluster-events",
-        "cluster-metrics",
+        "daemonset-logs-metrics",
+        "deployment-agent-monitor",
+        "deployment-cluster-events",
+        "deployment-cluster-metrics",
         "observe-agent",
         "cluster-name"
     }

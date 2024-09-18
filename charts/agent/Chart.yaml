@@ -8,22 +8,22 @@ dependencies:
   - name: opentelemetry-collector
     version: 0.101.1
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
-    alias: cluster-events
+    alias: deployment-cluster-events
     condition: cluster.events.enabled
   - name: opentelemetry-collector
     version: 0.101.1
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
-    alias: cluster-metrics
+    alias: deployment-cluster-metrics
     condition: cluster.metrics.enabled
   - name: opentelemetry-collector
     version: 0.101.1
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
-    alias: node-logs-metrics
+    alias: daemonset-logs-metrics
     condition: node.enabled
   - name: opentelemetry-collector
     version: 0.101.1
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
-    alias: monitor
+    alias: deployment-agent-monitor
     condition: agent.selfMonitor.enabled
 maintainers:
   - name: Observe

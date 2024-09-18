@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: monitor
+  name: deployment-agent-monitor
   namespace: {{ template "observe-agent.namespace" . }}
 data:
   relay: |

@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: node-logs-metrics
+  name: daemonset-logs-metrics
   namespace: {{ template "observe-agent.namespace" . }}
 data:
   relay: |

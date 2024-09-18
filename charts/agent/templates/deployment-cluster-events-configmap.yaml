@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: cluster-events
+  name: deployment-cluster-events
   namespace: {{ template "observe-agent.namespace" . }}
 data:
   relay: |

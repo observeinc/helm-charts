@@ -59,17 +59,17 @@ agent:
 
 
 ################################################
-cluster-events:
+deployment-cluster-events:
   mode: deployment
 
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
-  nameOverride: "cluster-events"
+  nameOverride: "deployment-cluster-events"
   namespaceOverride: "observe"
 
   configMap:
     create: false
-    existingName: "cluster-events"
+    existingName: "deployment-cluster-events"
   # ----------------------------------------- #
 
   # ----------------------------------------- #
@@ -180,16 +180,16 @@ cluster-events:
   # ----------------------------------------- #
 
 ################################################
-cluster-metrics:
+deployment-cluster-metrics:
   mode: deployment
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
-  nameOverride: "cluster-metrics"
+  nameOverride: "deployment-cluster-metrics"
   namespaceOverride: "observe"
 
   configMap:
     create: false
-    existingName: "cluster-metrics"
+    existingName: "deployment-cluster-metrics"
   # ----------------------------------------- #
 
   # ----------------------------------------- #
@@ -292,16 +292,16 @@ cluster-metrics:
   # ----------------------------------------- #
 
 ################################################
-node-logs-metrics:
+daemonset-logs-metrics:
   mode: daemonset
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
-  nameOverride: "node-logs-metrics"
+  nameOverride: "daemonset-logs-metrics"
   namespaceOverride: "observe"
 
   configMap:
     create: false
-    existingName: "node-logs-metrics"
+    existingName: "daemonset-logs-metrics"
   # ----------------------------------------- #
 
   # ----------------------------------------- #
@@ -437,16 +437,16 @@ node-logs-metrics:
   # ----------------------------------------- #
 
 ################################################
-monitor:
+deployment-agent-monitor:
   mode: deployment
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
-  nameOverride: "monitor"
+  nameOverride: "deployment-agent-monitor"
   namespaceOverride: "observe"
 
   configMap:
     create: false
-    existingName: "monitor"
+    existingName: "deployment-agent-monitor"
   # ----------------------------------------- #
 
   # ----------------------------------------- #
