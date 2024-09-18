@@ -16,11 +16,11 @@ observe:
 cluster:
   namespaceOverride:
     value: ${helm_chart_agent_test_namespace}
-deployment-cluster-events:
+cluster-events:
   namespaceOverride:  ${helm_chart_agent_test_namespace}
-deployment-cluster-metrics:
+cluster-metrics:
   namespaceOverride:  ${helm_chart_agent_test_namespace}
-daemonset-logs-metrics:
+node-logs-metrics:
   namespaceOverride:  ${helm_chart_agent_test_namespace}
-deployment-agent-monitor:
+monitor:
   namespaceOverride:  ${helm_chart_agent_test_namespace}

@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: deployment-cluster-metrics
+  name: cluster-metrics
   namespace: {{ template "observe-agent.namespace" . }}
 data:
   relay: |
