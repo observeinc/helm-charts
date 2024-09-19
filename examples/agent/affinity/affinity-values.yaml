@@ -1,0 +1,61 @@
+observe:
+  token:
+    value: YOURS
+  collectionEndpoint:
+    value: https://YOURS.collect.observeinc.com
+
+
+cluster:
+  name: obs-agent-eks-cluster-entity
+  events:
+    pullInterval: 15m
+    enabled: true
+  metrics:
+    enabled: true
+  namespaceOverride:
+    value: k8smonitoring
+
+containers:
+  logs:
+    enabled: true
+  metrics:
+    enabled: false
+
+agent:
+  selfMonitor:
+    enabled: true
+
+config:
+  global:
+    debug:
+      verbosity: normal
+
+deployment-cluster-events:
+  enabled: true
+  namespaceOverride: "k8smonitoring"
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node-type
+                operator: In
+                values: [useme]
+              - key: observeinc.com/unschedulable
+                operator: DoesNotExist
+              - key: kubernetes.io/os
+                operator: NotIn
+                values: [windows]
+
+deployment-cluster-metrics:
+  enabled: true
+  namespaceOverride: "k8smonitoring"
+
+daemonset-logs-metrics:
+  enabled: true
+  namespaceOverride: "k8smonitoring"
+
+
+deployment-agent-monitor:
+  enabled: true
+  namespaceOverride: "k8smonitoring"
