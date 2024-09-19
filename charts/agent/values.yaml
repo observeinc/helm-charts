@@ -14,7 +14,6 @@ observe:
     # To use exporter
     use: false
 
-
 cluster:
   name: observe-agent-monitored-cluster
   events:
@@ -122,6 +121,20 @@ cluster-events:
     observe_monitor_path: '/metrics',
     observe_monitor_port: '8888',
   }
+
+  # Standard anti-affinity rules will exclude any node labeled with observeinc.com/unschedulable or using windows os
+  # See helm-charts/examples/agent/affinity/README.md for more information
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: observeinc.com/unschedulable
+                operator: DoesNotExist
+              - key: kubernetes.io/os
+                operator: NotIn
+                values: [windows]
+
   ports:
     metrics:
       # The metrics port is disabled by default. However you need to enable the port
@@ -241,6 +254,20 @@ cluster-metrics:
     observe_monitor_path: '/metrics',
     observe_monitor_port: '8888',
   }
+
+  # Standard anti-affinity rules will exclude any node labeled with observeinc.com/unschedulable or using windows os
+  # See helm-charts/examples/agent/affinity/README.md for more information
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: observeinc.com/unschedulable
+                operator: DoesNotExist
+              - key: kubernetes.io/os
+                operator: NotIn
+                values: [windows]
+
   ports:
     metrics:
       # The metrics port is disabled by default. However you need to enable the port
@@ -353,6 +380,20 @@ node-logs-metrics:
     observe_monitor_path: '/metrics',
     observe_monitor_port: '8888',
   }
+
+  # Standard anti-affinity rules will exclude any node labeled with observeinc.com/unschedulable or using windows os
+  # See helm-charts/examples/agent/affinity/README.md for more information
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: observeinc.com/unschedulable
+                operator: DoesNotExist
+              - key: kubernetes.io/os
+                operator: NotIn
+                values: [windows]
+
   ports:
     metrics:
       # The metrics port is disabled by default. However you need to enable the port
@@ -498,6 +539,20 @@ monitor:
     observe_monitor_path: '/metrics',
     observe_monitor_port: '8888',
   }
+
+  # Standard anti-affinity rules will exclude any node labeled with observeinc.com/unschedulable or using windows os
+  # See helm-charts/examples/agent/affinity/README.md for more information
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: observeinc.com/unschedulable
+                operator: DoesNotExist
+              - key: kubernetes.io/os
+                operator: NotIn
+                values: [windows]
+
   ports:
     metrics:
       # The metrics port is disabled by default. However you need to enable the port

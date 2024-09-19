@@ -1,0 +1,53 @@
+observe:
+  token:
+    value: ds1eBrlOrwanhU2SzaWJ:vuMurJ7F4Bik9hqxDTjFQUXFQ9rSgkus
+  collectionEndpoint:
+    value: https://161011529721.collect.observe-eng.com
+
+
+cluster:
+  name: obs-agent-eks-cluster-entity
+  events:
+    pullInterval: 15m
+    enabled: true
+  metrics:
+    enabled: true
+  namespaceOverride:
+    value: k8smonitoring
+
+containers:
+  logs:
+    enabled: true
+  metrics:
+    enabled: false
+
+agent:
+  selfMonitor:
+    enabled: true
+
+config:
+  global:
+    debug:
+      verbosity: normal
+
+deployment-cluster-events:
+  enabled: true
+  namespaceOverride: "k8smonitoring"
+  tolerations:
+  - key: "deployObserve"
+    operator: "Equal"
+    value: "notAllowed"
+    effect: "NoSchedule"
+
+deployment-cluster-metrics:
+  enabled: true
+  namespaceOverride: "k8smonitoring"
+
+daemonset-logs-metrics:
+  enabled: true
+  namespaceOverride: "k8smonitoring"
+
+
+deployment-agent-monitor:
+  enabled: true
+  namespaceOverride: "k8smonitoring"
