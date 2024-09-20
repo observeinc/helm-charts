@@ -40,19 +40,19 @@ k8sattributes:
     - from: connection
 {{- end -}}
 
-{{- define "config.processors.attributes.observe_common" -}}
-attributes/observe_common:
-  actions:
-    - key: k8s.cluster.name
-      action: insert
-      value: ${env:OBSERVE_CLUSTER_NAME}
-    - key: k8s.cluster.uid
-      action: insert
-      {{ if .Values.cluster.uidOverride.value -}}
-      value:  {{ .Values.cluster.uidOverride.value }}
-      {{ else -}}
-      value:  ${env:OBSERVE_CLUSTER_UID}
-      {{ end -}}
+{{- define "config.processors.resource.observe_common" -}}
+resource/observe_common:
+  attributes:
+  - key: k8s.cluster.name
+    action: insert
+    value: ${env:OBSERVE_CLUSTER_NAME}
+  - key: k8s.cluster.uid
+    action: insert
+    {{ if .Values.cluster.uidOverride.value -}}
+    value:  {{ .Values.cluster.uidOverride.value }}
+    {{ else -}}
+    value:  ${env:OBSERVE_CLUSTER_UID}
+    {{ end -}}
 {{- end -}}
 
 {{- define "config.processors.memory_limiter" -}}

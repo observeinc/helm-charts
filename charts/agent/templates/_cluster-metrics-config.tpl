@@ -31,7 +31,7 @@ processors:
 
 {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
 
-{{- include "config.processors.attributes.observe_common" . | nindent 2 }}
+{{- include "config.processors.resource.observe_common" . | nindent 2 }}
 
   # attributes to append to objects
   attributes/debug_source_cluster_metrics:
@@ -45,7 +45,7 @@ service:
   pipelines:
       metrics:
         receivers: [k8s_cluster]
-        processors: [memory_limiter, batch, k8sattributes, attributes/observe_common, attributes/debug_source_cluster_metrics]
+        processors: [memory_limiter, batch, k8sattributes, resource/observe_common, attributes/debug_source_cluster_metrics]
         exporters: [prometheusremotewrite, debug/override]
 {{- include "config.service.telemetry" . | nindent 2 }}
 
