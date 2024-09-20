@@ -195,7 +195,9 @@ processors:
         conditions:
           - body["kind"] == "Event"
         statements:
-          - set(attributes["observe_transform"]["identifiers"]["involvedObject"], body["involvedObject"])
+          - set(attributes["observe_transform"]["identifiers"]["involvedObjectKind"], body["involvedObject"]["kind"])
+          - set(attributes["observe_transform"]["identifiers"]["involvedObjectName"], body["involvedObject"]["name"])
+          - set(attributes["observe_transform"]["identifiers"]["involvedObjectUid"], body["involvedObject"]["uid"])
           - set(attributes["observe_transform"]["facets"]["firstTimestamp"], body["firstTimestamp"])
           - set(attributes["observe_transform"]["facets"]["lastTimestamp"], body["lastTimestamp"])
           - set(attributes["observe_transform"]["facets"]["message"], body["message"])
