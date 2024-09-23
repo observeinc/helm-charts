@@ -58,7 +58,7 @@ processors:
 
 {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
 
-{{- include "config.processors.attributes.observe_common" . | nindent 2 }}
+{{- include "config.processors.resource.observe_common" . | nindent 2 }}
 
   # attributes to append to objects
   attributes/debug_source_agent_monitor:
@@ -72,7 +72,7 @@ service:
   pipelines:
       metrics:
         receivers: [prometheus/collector]
-        processors: [memory_limiter, batch, attributes/observe_common, k8sattributes, attributes/debug_source_agent_monitor]
+        processors: [memory_limiter, batch, resource/observe_common, k8sattributes, attributes/debug_source_agent_monitor]
         exporters: [prometheusremotewrite]
 {{- include "config.service.telemetry" . | nindent 2 }}
 
