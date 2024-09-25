@@ -13,6 +13,7 @@ observe:
     value: ${observe_url}
   token:
     value: ${observe_token}
+    create: false
 cluster:
   namespaceOverride:
     value: ${helm_chart_agent_test_namespace}
