@@ -295,8 +295,8 @@ processors:
           - set(attributes["observe_transform"]["identifiers"]["persistentVolumeUid"], body["metadata"]["uid"])
           # spec
           - set(attributes["observe_transform"]["facets"]["capacity"], body["spec"]["capacity"]["storage"])
-          - set(attributes["observe_transform"]["facets"]["persistentVolumeReclaimPolicy"], body["spec"]["persistentVolumeReclaimPolicy"])
-          - set(attributes["observe_transform"]["facets"]["persistentVolumeClass"], body["spec"]["storageClassName"])
+          - set(attributes["observe_transform"]["facets"]["reclaimPolicy"], body["spec"]["persistentVolumeReclaimPolicy"])
+          - set(attributes["observe_transform"]["facets"]["class"], body["spec"]["storageClassName"])
           - set(attributes["observe_transform"]["facets"]["accessModes"], body["spec"]["accessModes"])
           - set(attributes["observe_transform"]["facets"]["volumeMode"], body["spec"]["volumeMode"])
           # status
@@ -310,11 +310,12 @@ processors:
           # spec
           - set(attributes["observe_transform"]["facets"]["capacityRequests"], body["spec"]["resources"]["requests"]["storage"])
           - set(attributes["observe_transform"]["facets"]["capacityLimits"], body["spec"]["resources"]["limits"]["storage"])
-          - set(attributes["observe_transform"]["facets"]["persistentVolumeClaimClass"], body["spec"]["storageClassName"])
+          - set(attributes["observe_transform"]["facets"]["class"], body["spec"]["storageClassName"])
           - set(attributes["observe_transform"]["facets"]["volumeName"], body["spec"]["volumeName"])
           - set(attributes["observe_transform"]["facets"]["desiredAccessModes"], body["spec"]["accessModes"])
           - set(attributes["observe_transform"]["facets"]["volumeMode"], body["spec"]["volumeMode"])
           # status
+          - set(attributes["observe_transform"]["facets"]["capacity"], body["status"]["capacity"]["storage"])
           - set(attributes["observe_transform"]["facets"]["phase"], body["status"]["phase"])
           - set(attributes["observe_transform"]["facets"]["currentAccessModes"], body["spec"]["accessModes"])
       - context: log
