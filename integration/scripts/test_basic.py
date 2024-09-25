@@ -5,7 +5,10 @@ import base64
 import json, yaml
 import re
 
-@pytest.mark.tags("default.yaml")
+@pytest.mark.tags(
+        "default.yaml",
+        "node_affinity.yaml",
+        "node_taint.yaml")
 def test_helm_correctness(apps_client, helm_config):
     """
     Test to verify there are 3 deployments and 1 daemonset in the cluster.
@@ -23,7 +26,9 @@ def test_helm_correctness(apps_client, helm_config):
     print("All expected deployments and daemonsets found.")
 
 @pytest.mark.tags(
-        "default.yaml")
+        "default.yaml",
+        "node_affinity.yaml",
+        "node_taint.yaml")
 def test_pods_state(kube_client, helm_config):
     """
     This test does the following:
@@ -51,7 +56,10 @@ def test_pods_state(kube_client, helm_config):
     print("All pods are running in the namespace:", helm_config['namespace'])
 
 
-@pytest.mark.tags("default.yaml")
+@pytest.mark.tags(
+        "default.yaml",
+        "node_affinity.yaml",
+        "node_taint.yaml")
 def test_config_map(kube_client, helm_config):
     """
     This test does the following:
@@ -106,7 +114,10 @@ def test_config_map(kube_client, helm_config):
 
     print("ConfigMap 'observe-agent' with token value verified.")
 
-@pytest.mark.tags("default.yaml")
+@pytest.mark.tags(
+        "default.yaml",
+        "node_affinity.yaml",
+        "node_taint.yaml")
 def test_secrets(kube_client, helm_config):
     """
     This test does the following:

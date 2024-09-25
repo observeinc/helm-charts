@@ -19,5 +19,9 @@ resource "kind_cluster" "cluster" {
     node {
       role = "worker"
     }
+
+    node {
+      role = "worker"
+    }
   }
 }

@@ -2,6 +2,7 @@
 
 This module is only intended to quickly install the agent helm chart without configuring a k8s cluster yourself and touching helm manually.  No tests will run here as this module just creates a kind cluster and installs a helm chart in it.
 
+The purpose is to mimic what `terraform test` does but since terrafrom test destroys the infrastructure, this sandbox allows you to preserve it
 
 # Local Sandbox
 
@@ -14,6 +15,7 @@ If you want install kind cluster with defaults and then deploy helm chart locall
 ```
 observe_url  = "https://your-observe-url.com"
 observe_token = "your-secure-token"
+helm_chart_agent_test_values_file = "default.yaml"
 ```
 
 Then run `terraform init` && `terraform apply` in this directory.
