@@ -12,6 +12,7 @@ terraform.tfvars
 tfplan
 .terraform.lock.hcl
 *_override.tf
+*.xml
 
 #python
 venv
