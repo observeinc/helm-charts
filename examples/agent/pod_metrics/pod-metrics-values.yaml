@@ -1,0 +1,52 @@
+cluster:
+  name: observe-agent-monitored-cluster
+  events:
+    pullInterval: 20m
+    enabled: true
+  metrics:
+    enabled: true
+    pod:
+      enabled: true
+      namespace_keep_regex: (default)
+      metric_drop_regex: ""
+      port_keep_regex: .*metrics|web
+
+  namespaceOverride:
+    value: k8smonitoring
+
+containers:
+  logs:
+    enabled: true
+  metrics:
+    enabled: false
+
+agent:
+  selfMonitor:
+    enabled: true
+
+config:
+global:
+  debug:
+    verbosity: normal
+
+cluster-events:
+  enabled: true
+  namespaceOverride: "k8smonitoring"
+  tolerations:
+  - key: "deployObserve"
+    operator: "Equal"
+    value: "notAllowed"
+    effect: "NoSchedule"
+
+cluster-metrics:
+  enabled: true
+  namespaceOverride: "k8smonitoring"
+
+node-logs-metrics:
+  enabled: true
+  namespaceOverride: "k8smonitoring"
+
+
+monitor:
+  enabled: true
+  namespaceOverride: "k8smonitoring"

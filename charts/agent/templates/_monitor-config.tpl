@@ -31,7 +31,7 @@ receivers:
               action: keep
               regex: true
               # set metrics_path (default is /metrics) to the metrics path specified in "prometheus.io/path: <metric path>" annotation.
-            - source_labels: [__meta_kubernetes_pod_annotationobserve_monitor_path]
+            - source_labels: [__meta_kubernetes_pod_annotation_observe_monitor_path]
               action: replace
               target_label: __metrics_path__
               regex: (.+)

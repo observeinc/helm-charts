@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.17.0](https://img.shields.io/badge/Version-0.17.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
+![Version: 0.18.0](https://img.shields.io/badge/Version-0.18.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 > [!CAUTION]
 > This chart is under active development and is not meant to be installed yet.
@@ -166,6 +166,14 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster.events.enabled | bool | `true` |  |
 | cluster.events.pullInterval | string | `"20m"` |  |
 | cluster.metrics.enabled | bool | `true` |  |
+| cluster.metrics.pod.action | string | `"keep"` |  |
+| cluster.metrics.pod.enabled | bool | `false` |  |
+| cluster.metrics.pod.interval | string | `"10s"` |  |
+| cluster.metrics.pod.metric_drop_regex | string | `".*bucket"` |  |
+| cluster.metrics.pod.metric_keep_regex | string | `"(.*)"` |  |
+| cluster.metrics.pod.namespace_drop_regex | string | `"(.*istio.*|.*ingress.*|kube-system|observe)"` |  |
+| cluster.metrics.pod.namespace_keep_regex | string | `"(.*)"` |  |
+| cluster.metrics.pod.port_keep_regex | string | `".*metrics"` |  |
 | cluster.name | string | `"observe-agent-monitored-cluster"` |  |
 | cluster.namespaceOverride.value | string | `"observe"` |  |
 | cluster.uidOverride.value | string | `""` |  |

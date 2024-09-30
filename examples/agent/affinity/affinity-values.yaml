@@ -30,7 +30,7 @@ config:
     debug:
       verbosity: normal
 
-deployment-cluster-events:
+cluster-events:
   enabled: true
   namespaceOverride: "k8smonitoring"
   affinity:
@@ -47,15 +47,14 @@ deployment-cluster-events:
                 operator: NotIn
                 values: [windows]
 
-deployment-cluster-metrics:
+cluster-metrics:
   enabled: true
   namespaceOverride: "k8smonitoring"
 
-daemonset-logs-metrics:
+node-logs-metrics:
   enabled: true
   namespaceOverride: "k8smonitoring"
 
-
-deployment-agent-monitor:
+monitor:
   enabled: true
   namespaceOverride: "k8smonitoring"

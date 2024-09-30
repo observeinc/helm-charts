@@ -21,6 +21,16 @@ cluster:
     enabled: true
   metrics:
     enabled: true
+    pod:
+      enabled: false
+      action: keep
+      interval: 10s
+      # add whatever namespace the collection is deployed to
+      namespace_drop_regex: (.*istio.*|.*ingress.*|kube-system|observe)
+      namespace_keep_regex: (.*)
+      port_keep_regex: .*metrics
+      metric_drop_regex: .*bucket
+      metric_keep_regex: (.*)
 
   namespaceOverride:
     # ! This needs to have same value as namespaceOverride in deployments and daemonsets below
