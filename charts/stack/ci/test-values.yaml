@@ -22,3 +22,10 @@ metrics:
           memory: 256Mi
         requests:
           memory: 256Mi
+
+events:
+  containerOverrides:
+    excludeTargets:
+      - apps/v1/replicasets
+    includeTargets:
+      - apps/v1/deployments

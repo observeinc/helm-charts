@@ -1,7 +1,7 @@
 *.tgz
 demo
 .kubeconfig
-
+.idea
 
 #terraform
 integration/.terraform

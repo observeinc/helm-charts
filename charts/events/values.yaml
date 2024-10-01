@@ -26,6 +26,12 @@ serviceAccount:
   annotations: {}
   name:
 
+# Override exclude or include resources matching pattern from being watched. View resources with `kubectl api-resources`
+# Does not work for "Core" APIs. Values must be in format <group>/<version>/<resource>. example "events.k8s.io/v1/events"
+containerOverrides:
+  excludeTargets: []
+  includeTargets: []
+
 resources:
   limits:
     cpu: 50m

@@ -47,6 +47,18 @@ spec:
           image: {{ .Values.image.kube_state_events.repository }}:{{ default .Chart.AppVersion .Values.image.kube_state_events.tag }}
           imagePullPolicy: {{ .Values.image.kube_state_events.pullPolicy }}
           args:
+            # Include excludeTags if defined
+            {{- if .Values.containerOverrides.excludeTargets }}
+            {{- range .Values.containerOverrides.excludeTargets }}
+            - -exclude-target={{ . }}
+            {{- end }}
+            {{- end }}
+            # Include includeTags if defined
+            {{- if .Values.containerOverrides.includeTargets }}
+            {{- range .Values.containerOverrides.includeTargets }}
+            - -include-target={{ . }}
+            {{- end }}
+            {{- end }}
             - -healthz-addr=:5171
             - -metrics-addr=:9090
             - -o={{ include "observe.collectionEndpointWithToken" . }}/v1/http/kubernetes/events?clusterUid=$(OBSERVE_CLUSTER)
