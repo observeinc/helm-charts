@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.19.0](https://img.shields.io/badge/Version-0.19.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
+![Version: 0.20.0](https://img.shields.io/badge/Version-0.20.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 > [!CAUTION]
 > This chart is under active development and is not meant to be installed yet.
@@ -332,6 +332,15 @@ Chart to install K8s collection stack based on Observe Agent
 | node-logs-metrics.serviceAccount.create | bool | `false` |  |
 | node-logs-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | node.containers.logs.enabled | bool | `true` |  |
+| node.containers.logs.exclude | string | `"[]"` |  |
+| node.containers.logs.include | string | `"[\"/var/log/pods/*/*/*.log\", \"/var/log/kube-apiserver-audit.log\"]"` |  |
+| node.containers.logs.lookbackPeriod | string | `"24h"` |  |
+| node.containers.logs.maxLogSize | string | `"512kb"` |  |
+| node.containers.logs.retryOnFailure.enabled | bool | `true` |  |
+| node.containers.logs.retryOnFailure.initialInterval | string | `"1s"` |  |
+| node.containers.logs.retryOnFailure.maxElapsedTime | string | `"5m"` |  |
+| node.containers.logs.retryOnFailure.maxInterval | string | `"30s"` |  |
+| node.containers.logs.startAt | string | `"end"` |  |
 | node.containers.metrics.enabled | bool | `true` |  |
 | node.enabled | bool | `true` |  |
 | node.metrics.enabled | bool | `true` |  |

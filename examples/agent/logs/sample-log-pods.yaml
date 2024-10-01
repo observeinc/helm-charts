@@ -1,0 +1,235 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-generator-apache
+  labels:
+    app.kubernetes.io/name: log-generator-apache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: log-generator-apache
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: log-generator-apache
+    spec:
+      containers:
+      - name: log-generator-apache
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          cp /scripts/log-generator.sh /tmp/log-generator.sh && chmod +x /tmp/log-generator.sh && /tmp/log-generator.sh
+        env:
+        - name: LOG_TYPE
+          value: "apache"  # Default log format, can be overridden at runtime
+        - name: LOG_LENGTH
+          value: "1"
+        - name: LINE_LENGTH
+          value: "100"
+        - name: SLEEP_LENGTH
+          value: "2"
+        volumeMounts:
+        - name: script-volume
+          mountPath: /scripts
+          readOnly: true
+      volumes:
+      - name: script-volume
+        configMap:
+          name: log-generator-script  # Mount the ConfigMap as a volume
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-generator-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-generator-nginx
+  template:
+    metadata:
+      labels:
+        app: log-generator-nginx
+    spec:
+      containers:
+      - name: log-generator-nginx
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          cp /scripts/log-generator.sh /tmp/log-generator.sh && chmod +x /tmp/log-generator.sh && /tmp/log-generator.sh
+        env:
+        - name: LOG_TYPE
+          value: "apache"  # Default log format, can be overridden at runtime
+        - name: LOG_LENGTH
+          value: "1"
+        - name: LINE_LENGTH
+          value: "100"
+        - name: SLEEP_LENGTH
+          value: "2"
+        volumeMounts:
+        - name: script-volume
+          mountPath: /scripts
+          readOnly: true
+      volumes:
+      - name: script-volume
+        configMap:
+          name: log-generator-script
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-generator-json
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-generator-json
+  template:
+    metadata:
+      labels:
+        app: log-generator-json
+    spec:
+      containers:
+      - name: log-generator-json
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          cp /scripts/log-generator.sh /tmp/log-generator.sh && chmod +x /tmp/log-generator.sh && /tmp/log-generator.sh
+        env:
+        - name: LOG_TYPE
+          value: "apache"  # Default log format, can be overridden at runtime
+        - name: LOG_LENGTH
+          value: "1"
+        - name: LINE_LENGTH
+          value: "100"
+        - name: SLEEP_LENGTH
+          value: "2"
+        volumeMounts:
+        - name: script-volume
+          mountPath: /scripts
+          readOnly: true
+      volumes:
+      - name: script-volume
+        configMap:
+          name: log-generator-script
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-generator-csv
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-generator-csv
+  template:
+    metadata:
+      labels:
+        app: log-generator-csv
+    spec:
+      containers:
+      - name: log-generator-csv
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          cp /scripts/log-generator.sh /tmp/log-generator.sh && chmod +x /tmp/log-generator.sh && /tmp/log-generator.sh
+        env:
+        - name: LOG_TYPE
+          value: "apache"  # Default log format, can be overridden at runtime
+        - name: LOG_LENGTH
+          value: "1"
+        - name: LINE_LENGTH
+          value: "100"
+        - name: SLEEP_LENGTH
+          value: "2"
+        volumeMounts:
+        - name: script-volume
+          mountPath: /scripts
+          readOnly: true
+      volumes:
+      - name: script-volume
+        configMap:
+          name: log-generator-script
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-generator-custom
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-generator-custom
+  template:
+    metadata:
+      labels:
+        app: log-generator-custom
+    spec:
+      containers:
+      - name: log-generator-custom
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          cp /scripts/log-generator.sh /tmp/log-generator.sh && chmod +x /tmp/log-generator.sh && /tmp/log-generator.sh
+        env:
+        - name: LOG_TYPE
+          value: "apache"  # Default log format, can be overridden at runtime
+        - name: LOG_LENGTH
+          value: "1"
+        - name: LINE_LENGTH
+          value: "100"
+        - name: SLEEP_LENGTH
+          value: "2"
+        volumeMounts:
+        - name: script-volume
+          mountPath: /scripts
+          readOnly: true
+      volumes:
+      - name: script-volume
+        configMap:
+          name: log-generator-script
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-generator-custom-600
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-generator-custom-600
+  template:
+    metadata:
+      labels:
+        app: log-generator-custom-600
+    spec:
+      containers:
+      - name: log-generator-custom-600
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          cp /scripts/log-generator.sh /tmp/log-generator.sh && chmod +x /tmp/log-generator.sh && /tmp/log-generator.sh
+        env:
+        - name: LOG_TYPE
+          value: "apache"  # Default log format, can be overridden at runtime
+        - name: LOG_LENGTH
+          value: "1"
+        - name: LINE_LENGTH
+          value: "100"
+        - name: SLEEP_LENGTH
+          value: "2"
+        volumeMounts:
+        - name: script-volume
+          mountPath: /scripts
+          readOnly: true
+      volumes:
+      - name: script-volume
+        configMap:
+          name: log-generator-script
