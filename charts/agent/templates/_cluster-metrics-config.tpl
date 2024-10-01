@@ -23,33 +23,34 @@ receivers:
     metrics:
       k8s.node.condition:
         enabled: true
-  {{- if .Values.cluster.metrics.pod.enabled }}
+
+  {{- if .Values.application.prometheusScrape.enabled }}
   prometheus/pod_metrics:
       config:
         scrape_configs:
         - job_name: pod-metrics
-          scrape_interval: {{.Values.cluster.metrics.pod.interval}}
+          scrape_interval: {{.Values.application.prometheusScrape.interval}}
           honor_labels: true
           kubernetes_sd_configs:
           - role: pod
           relabel_configs:
-          # this is defaulted to keep but if set to drop then pod metrics will not be collected
-          - action: {{.Values.cluster.metrics.pod.action}}
+          # this is defaulted to keep so we start with everything
+          - action: keep
 
           # Drop anything matching the configured namespace.
           - action: 'drop'
             source_labels: ['__meta_kubernetes_namespace']
-            regex: {{.Values.cluster.metrics.pod.namespace_drop_regex}}
+            regex: {{.Values.application.prometheusScrape.namespaceDropRegex}}
 
           # Drop anything not matching the configured namespace.
           - action: 'keep'
             source_labels: ['__meta_kubernetes_namespace']
-            regex: {{.Values.cluster.metrics.pod.namespace_keep_regex}}
+            regex: {{.Values.application.prometheusScrape.namespaceKeepRegex}}
 
           # Drop endpoints without one of: a port name suffixed with the configured regex, or an explicit prometheus port annotation.
           - action: 'keep'
             source_labels: ['__meta_kubernetes_pod_container_port_name', '__meta_kubernetes_pod_annotation_prometheus_io_port']
-            regex: '({{.Values.cluster.metrics.pod.port_keep_regex}};|.*;\d+)'
+            regex: '({{.Values.application.prometheusScrape.portKeepRegex}};|.*;\d+)'
 
           # Drop pods with phase Succeeded or Failed.
           - action: 'drop'
@@ -109,8 +110,9 @@ receivers:
           - source_labels: [__address__, __meta_kubernetes_pod_annotation_observeinc_com_port]
             action: replace
             regex: ([^:]+)(?::\d+)?;(\d+)
-            replacement: $$1:$$2
+            replacement: '$1:$2'
             target_label: __address__
+          ################################################################
 
           # Maps all Kubernetes pod labels to Prometheus labels with the prefix removed (e.g., __meta_kubernetes_pod_label_app becomes app).
           - action: labelmap
@@ -125,6 +127,18 @@ receivers:
           - source_labels: [__meta_kubernetes_pod_name]
             action: replace
             target_label: kubernetes_pod_name
+
+          metric_relabel_configs:
+            - action: drop
+              regex: {{.Values.application.prometheusScrape.metricDropRegex}}
+              source_labels:
+                - __name__
+            - action: keep
+              regex: {{.Values.application.prometheusScrape.metricKeepRegex}}
+              source_labels:
+                - __name__
+
+
   {{ end }}
 
 processors:
@@ -155,7 +169,7 @@ service:
         receivers: [k8s_cluster]
         processors: [memory_limiter, batch, k8sattributes, attributes/observe_common, attributes/debug_source_cluster_metrics]
         exporters: [prometheusremotewrite, debug/override]
-      {{- if .Values.cluster.metrics.pod.enabled }}
+      {{- if .Values.application.prometheusScrape.enabled }}
       metrics/pod_metrics:
         receivers: [prometheus/pod_metrics]
         processors: [memory_limiter, batch, k8sattributes, attributes/observe_common, attributes/debug_source_pod_metrics]

@@ -13,16 +13,28 @@ kubectl apply -f sample-pod.yaml
 
 kubectl apply -f sample-pod-no.yaml
 
+kubectl apply -f sample-pod-prometheus-labels.yaml
+
+kubectl apply -f sample-pod-prometheus-labels-no.yaml
+
 ```
 
 ## Port forward
+You can curl a given service to increment counters from local machine by port forwarding.
+
+These sevices are defined in sample-pod files
 ```
 kubectl port-forward service/prometheus-example-app-service 8080:8080
 
 kubectl port-forward service/prometheus-example-app-no-service 8080:8080
+
+kubectl port-forward service/prometheus-example-app-promlabel-service 8080:8080
+
+kubectl port-forward service/prometheus-example-app-promlabel-no-service 8080:8080
 ```
 
 ## Call service locally
+If port forwarded you can use these curl commands
 ```
 # Get metrics
 curl localhost:8080/metrics
@@ -40,14 +52,35 @@ curl localhost:8080/err
 kubectl delete -f sample-pod.yaml
 
 kubectl delete -f sample-pod-no.yaml
+
+kubectl delete -f sample-pod-prometheus-labels.yaml
+
+kubectl delete -f sample-pod-prometheus-labels-no.yaml
 ```
 
 ## Deploy k8s monitoring with pod metrics collection enabled
 The sample-pod.yaml is deployed in the default namespace unless you change the provided command.
 
-It has annotations to change the metrics port to 8080 (observeinc_com_port: '8080') which will tell the scrape config to not use the default port of 8888.
+It has annotations to change the metrics port, metrics path and that this pod should be scraped:
+```
+      annotations:
+        observeinc_com_scrape: 'true'
+        observeinc_com_path: '/metrics'
+        observeinc_com_port: '8080'
+```
 
-The pod-metrics-values.yaml file sets the namespace to scrape metrics from to default with namespace_keep_regex and adds the web port name as valid with port_keep_regex.
+The sample-pod-no.yaml sets observeinc_com_scrape: 'false' so no metrics should be collected from this pod.
+
+Pods created by sample-pod-prometheus-labels and sample-pod-prometheus-labels-no yaml files use prometheus annotations to accomplish same functions as pods above:
+```
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: '/metrics'
+        prometheus.io/port: '8080'
+```
+
+The pod-metrics-values.yaml file sets the namespace to scrape metrics from to default with namespaceKeepRegex and adds the web port name as valid with portKeepRegex.
+
 
 ```
 helm install pod-metrics-example -n k8smonitoring \

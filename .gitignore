@@ -17,3 +17,5 @@ tfplan
 venv
 __pycache__
 .pytest_*
+
+local*

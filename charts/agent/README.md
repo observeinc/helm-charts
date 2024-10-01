@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.18.0](https://img.shields.io/badge/Version-0.18.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
+![Version: 0.19.0](https://img.shields.io/badge/Version-0.19.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 > [!CAUTION]
 > This chart is under active development and is not meant to be installed yet.
@@ -33,6 +33,13 @@ Chart to install K8s collection stack based on Observe Agent
 | agent.config.global.service.telemetry.logging_level | string | `"WARN"` |  |
 | agent.config.global.service.telemetry.metrics_level | string | `"normal"` |  |
 | agent.selfMonitor.enabled | bool | `true` |  |
+| application.prometheusScrape.enabled | bool | `false` |  |
+| application.prometheusScrape.interval | string | `"10s"` |  |
+| application.prometheusScrape.metricDropRegex | string | `".*bucket"` |  |
+| application.prometheusScrape.metricKeepRegex | string | `"(.*)"` |  |
+| application.prometheusScrape.namespaceDropRegex | string | `"(.*istio.*|.*ingress.*|kube-system)"` |  |
+| application.prometheusScrape.namespaceKeepRegex | string | `"(.*)"` |  |
+| application.prometheusScrape.portKeepRegex | string | `".*metrics"` |  |
 | cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
 | cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"DoesNotExist"` |  |
 | cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].key | string | `"kubernetes.io/os"` |  |
@@ -89,6 +96,7 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster-events.podAnnotations.observe_monitor_port | string | `"8888"` |  |
 | cluster-events.podAnnotations.observe_monitor_purpose | string | `"observecollection"` |  |
 | cluster-events.podAnnotations.observe_monitor_scrape | string | `"true"` |  |
+| cluster-events.podAnnotations.observeinc_com_scrape | string | `"false"` |  |
 | cluster-events.ports.metrics.containerPort | int | `8888` |  |
 | cluster-events.ports.metrics.enabled | bool | `true` |  |
 | cluster-events.ports.metrics.protocol | string | `"TCP"` |  |
@@ -152,6 +160,7 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster-metrics.podAnnotations.observe_monitor_port | string | `"8888"` |  |
 | cluster-metrics.podAnnotations.observe_monitor_purpose | string | `"observecollection"` |  |
 | cluster-metrics.podAnnotations.observe_monitor_scrape | string | `"true"` |  |
+| cluster-metrics.podAnnotations.observeinc_com_scrape | string | `"false"` |  |
 | cluster-metrics.ports.metrics.containerPort | int | `8888` |  |
 | cluster-metrics.ports.metrics.enabled | bool | `true` |  |
 | cluster-metrics.ports.metrics.protocol | string | `"TCP"` |  |
@@ -166,14 +175,6 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster.events.enabled | bool | `true` |  |
 | cluster.events.pullInterval | string | `"20m"` |  |
 | cluster.metrics.enabled | bool | `true` |  |
-| cluster.metrics.pod.action | string | `"keep"` |  |
-| cluster.metrics.pod.enabled | bool | `false` |  |
-| cluster.metrics.pod.interval | string | `"10s"` |  |
-| cluster.metrics.pod.metric_drop_regex | string | `".*bucket"` |  |
-| cluster.metrics.pod.metric_keep_regex | string | `"(.*)"` |  |
-| cluster.metrics.pod.namespace_drop_regex | string | `"(.*istio.*|.*ingress.*|kube-system|observe)"` |  |
-| cluster.metrics.pod.namespace_keep_regex | string | `"(.*)"` |  |
-| cluster.metrics.pod.port_keep_regex | string | `".*metrics"` |  |
 | cluster.name | string | `"observe-agent-monitored-cluster"` |  |
 | cluster.namespaceOverride.value | string | `"observe"` |  |
 | cluster.uidOverride.value | string | `""` |  |
@@ -229,6 +230,7 @@ Chart to install K8s collection stack based on Observe Agent
 | monitor.podAnnotations.observe_monitor_port | string | `"8888"` |  |
 | monitor.podAnnotations.observe_monitor_purpose | string | `"observecollection"` |  |
 | monitor.podAnnotations.observe_monitor_scrape | string | `"false"` |  |
+| monitor.podAnnotations.observeinc_com_scrape | string | `"false"` |  |
 | monitor.ports.metrics.containerPort | int | `8888` |  |
 | monitor.ports.metrics.enabled | bool | `true` |  |
 | monitor.ports.metrics.protocol | string | `"TCP"` |  |
@@ -315,6 +317,7 @@ Chart to install K8s collection stack based on Observe Agent
 | node-logs-metrics.podAnnotations.observe_monitor_port | string | `"8888"` |  |
 | node-logs-metrics.podAnnotations.observe_monitor_purpose | string | `"observecollection"` |  |
 | node-logs-metrics.podAnnotations.observe_monitor_scrape | string | `"true"` |  |
+| node-logs-metrics.podAnnotations.observeinc_com_scrape | string | `"false"` |  |
 | node-logs-metrics.ports.metrics.containerPort | int | `8888` |  |
 | node-logs-metrics.ports.metrics.enabled | bool | `true` |  |
 | node-logs-metrics.ports.metrics.protocol | string | `"TCP"` |  |
