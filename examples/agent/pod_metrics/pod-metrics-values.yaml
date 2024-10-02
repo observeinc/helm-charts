@@ -5,14 +5,27 @@ cluster:
     enabled: true
   metrics:
     enabled: true
-    pod:
-      enabled: true
-      namespace_keep_regex: (default)
-      metric_drop_regex: ""
-      port_keep_regex: .*metrics|web
 
   namespaceOverride:
     value: k8smonitoring
+
+application:
+  # use this option to scrape prometheus metrics from pods
+  prometheusScrape:
+    enabled: true
+    interval: 10s
+    # namespaces to exclude from scraping
+    namespaceDropRegex: (.*istio.*|.*ingress.*|kube-system)
+    # namespaces to explicity include for scraping - can use or (ns1|ns2)
+    namespaceKeepRegex: (default)
+    # port names to scrape from - can use or .*metrics|otherportname
+    portKeepRegex: .*metrics|web
+    # metrics to drop
+    metricDropRegex: .*bucket
+    # metrics to keep
+    metricKeepRegex: (.*)
+
+
 
 containers:
   logs:

@@ -21,22 +21,31 @@ cluster:
     enabled: true
   metrics:
     enabled: true
-    pod:
-      enabled: false
-      action: keep
-      interval: 10s
-      # add whatever namespace the collection is deployed to
-      namespace_drop_regex: (.*istio.*|.*ingress.*|kube-system|observe)
-      namespace_keep_regex: (.*)
-      port_keep_regex: .*metrics
-      metric_drop_regex: .*bucket
-      metric_keep_regex: (.*)
 
   namespaceOverride:
     # ! This needs to have same value as namespaceOverride in deployments and daemonsets below
     value: observe
   uidOverride:
     value: ""
+
+application:
+  # use this option to scrape prometheus metrics from pods
+  # cluster.metrics.enabled must be set to true
+  prometheusScrape:
+    enabled: false
+    interval: 10s
+    # namespaces to exclude from scraping
+    # drop is processed first so all namespaces that match regex will be dropped
+    namespaceDropRegex: (.*istio.*|.*ingress.*|kube-system)
+    # namespaces to explicity include for scraping - can use or (ns1|ns2)
+    # keep is processed after drop so only remaining namespaces that match regex will be kept
+    namespaceKeepRegex: (.*)
+    # port names to scrape from - can use or .*metrics|otherportname
+    portKeepRegex: .*metrics
+    # metrics to drop
+    metricDropRegex: .*bucket
+    # metrics to keep
+    metricKeepRegex: (.*)
 
 node:
   enabled: true
@@ -126,6 +135,8 @@ cluster-events:
 
 
   podAnnotations: {
+    # This stops optional prometheus scrape config from picking up these pods
+    observeinc_com_scrape: 'false',
     observe_monitor_purpose: observecollection,
     observe_monitor_scrape: 'true',
     observe_monitor_path: '/metrics',
@@ -259,6 +270,8 @@ cluster-metrics:
     egressRules: [{}]
 
   podAnnotations: {
+    # This stops optional prometheus scrape config from picking up these pods
+    observeinc_com_scrape: 'false',
     observe_monitor_purpose: observecollection,
     observe_monitor_scrape: 'true',
     observe_monitor_path: '/metrics',
@@ -385,6 +398,8 @@ node-logs-metrics:
     egressRules: [{}]
 
   podAnnotations: {
+    # This stops optional prometheus scrape config from picking up these pods
+    observeinc_com_scrape: 'false',
     observe_monitor_purpose: observecollection,
     observe_monitor_scrape: 'true',
     observe_monitor_path: '/metrics',
@@ -544,6 +559,8 @@ monitor:
     egressRules: [{}]
 
   podAnnotations: {
+    # This stops optional prometheus scrape config from picking up these pods
+    observeinc_com_scrape: 'false',
     observe_monitor_purpose: observecollection,
     observe_monitor_scrape: 'false',
     observe_monitor_path: '/metrics',
