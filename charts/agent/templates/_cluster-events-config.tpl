@@ -408,9 +408,9 @@ processors:
           # identifiers
           - set(attributes["observe_transform"]["identifiers"]["clusterName"], attributes["k8s.cluster.name"])
           - set(attributes["observe_transform"]["identifiers"]["clusterUid"], attributes["k8s.cluster.uid"])
+          - set(attributes["observe_transform"]["identifiers"]["uid"], attributes["k8s.cluster.uid"])
           - set(attributes["observe_transform"]["identifiers"]["kind"], "Cluster")
           - set(attributes["observe_transform"]["identifiers"]["name"], attributes["k8s.cluster.name"])
-          - delete_key(attributes["observe_transform"]["identifiers"], "uid")
           # facets
           - set(attributes["observe_transform"]["facets"]["creationTimestamp"], body["metadata"]["creationTimestamp"])
           - set(attributes["observe_transform"]["facets"]["labels"], body["metadata"]["labels"])
