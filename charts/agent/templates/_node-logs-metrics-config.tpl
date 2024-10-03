@@ -124,19 +124,21 @@ receivers:
   {{ end -}}
   {{- if .Values.node.containers.logs.enabled }}
   filelog:
-    exclude: []
-    include:
-    - /var/log/pods/*/*/*.log
-    - /var/log/kube-apiserver-audit.log
+    exclude: {{ .Values.node.containers.logs.exclude }}
+    include: {{ .Values.node.containers.logs.include }}
     include_file_name: false
     include_file_path: true
+    exclude_older_than: {{ .Values.node.containers.logs.lookbackPeriod }}
     operators:
     - id: container-parser
       max_log_size: 102400
       type: container
     retry_on_failure:
-      enabled: true
-    start_at: end
+      enabled: {{ .Values.node.containers.logs.retryOnFailure.enabled }}
+      initial_interval: {{ .Values.node.containers.logs.retryOnFailure.initialInterval }}
+      max_interval: {{ .Values.node.containers.logs.retryOnFailure.maxInterval }}
+      max_elapsed_time: {{ .Values.node.containers.logs.retryOnFailure.maxElapsedTime }}
+    start_at: {{ .Values.node.containers.logs.startAt }}
     storage: file_storage
   {{ end }}
 processors:

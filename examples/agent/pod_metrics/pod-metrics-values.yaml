@@ -38,9 +38,9 @@ agent:
     enabled: true
 
 config:
-global:
-  debug:
-    verbosity: normal
+  global:
+    debug:
+      verbosity: normal
 
 cluster-events:
   enabled: true

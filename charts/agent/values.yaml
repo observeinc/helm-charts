@@ -54,6 +54,26 @@ node:
   containers:
     logs:
       enabled: true
+      # log lines above this size will be truncated
+      maxLogSize: 512kb
+      # If true, the receiver will pause reading a file and attempt to resend the current batch of logs if it encounters an error from downstream components.
+      retryOnFailure:
+        enabled: true
+        # Time to wait after the first failure before retrying.
+        initialInterval: 1s
+        # Upper bound on retry backoff interval. Once this value is reached the delay between consecutive retries will remain constant at the specified value.
+        maxInterval: 30s
+        # Maximum amount of time (including retries) spent trying to send a logs batch to a downstream consumer. Once this value is reached, the data is discarded. Retrying never stops if set to 0.
+        maxElapsedTime: 5m
+      # A list of file glob patterns that match the file paths to be read. Need to put inside of '' to avoid helm stripping commas and quotes.
+      include: '["/var/log/pods/*/*/*.log", "/var/log/kube-apiserver-audit.log"]'
+      # A list of file glob patterns to exclude from reading. This is applied against the paths matched by include. Need to put inside of '' to avoid helm stripping commas and quotes.
+      exclude: '[]'
+      # time unit 1m, 1h
+      lookbackPeriod: 24h
+      # At startup, where to start reading logs from the file. Options are beginning or end.
+      startAt: end
+
     metrics:
       enabled: true
 

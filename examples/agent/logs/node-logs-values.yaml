@@ -1,0 +1,61 @@
+cluster:
+  name: observe-agent-monitored-cluster
+  events:
+    pullInterval: 20m
+    enabled: true
+  metrics:
+    enabled: true
+    pod:
+      enabled: true
+  namespaceOverride:
+    value: k8smonitoring
+
+node:
+  containers:
+    logs:
+      enabled: true
+      # log lines above this size will be truncated
+      maxLogSize: 512kb
+      # If true, the receiver will pause reading a file and attempt to resend the current batch of logs if it encounters an error from downstream components.
+      retryOnFailure: true
+      # A list of file glob patterns that match the file paths to be read.
+      include: '["/var/log/pods/*/*/*.log", "/var/log/kube-apiserver-audit.log"]'
+      # A list of file glob patterns to exclude from reading. This is applied against the paths matched by include.
+      exclude: '["/var/log/pods/default_log-generator-csv*/**"]'
+      # time unit 1m, 1h, 1d
+      excludeOlderThan: 1d
+      # At startup, where to start reading logs from the file. Options are beginning or end.
+      startAt: end
+    metrics:
+      enabled: false
+
+agent:
+  selfMonitor:
+    enabled: true
+
+config:
+  global:
+    debug:
+      verbosity: normal
+
+cluster-events:
+  enabled: true
+  namespaceOverride: "k8smonitoring"
+  tolerations:
+  - key: "deployObserve"
+    operator: "Equal"
+    value: "notAllowed"
+    effect: "NoSchedule"
+
+cluster-metrics:
+  enabled: true
+  namespaceOverride: "k8smonitoring"
+
+node-logs-metrics:
+  enabled: true
+  namespaceOverride: "k8smonitoring"
+
+
+monitor:
+  enabled: true
+  namespaceOverride: "k8smonitoring"

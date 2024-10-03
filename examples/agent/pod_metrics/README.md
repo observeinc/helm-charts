@@ -101,3 +101,8 @@ make_col metric:string(EXTRA.__name__)
 make_col k8s_namespace_name:string(EXTRA.k8s_namespace_name)
 make_col app_kubernetes_io_name:string(EXTRA.app_kubernetes_io_name)
 ```
+
+### Cleanup
+```
+helm delete pod-metrics-example -n k8smonitoring
+```
