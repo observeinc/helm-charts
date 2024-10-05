@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.20.3](https://img.shields.io/badge/Version-0.20.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
+![Version: 0.21.0](https://img.shields.io/badge/Version-0.21.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 > [!CAUTION]
 > This chart is under active development and is not meant to be installed yet.
@@ -27,14 +27,14 @@ Chart to install K8s collection stack based on Observe Agent
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | agent.config.global.debug.verbosity | string | `"basic"` |  |
-| agent.config.global.processors.batch.send_batch_max_size | int | `100` |  |
-| agent.config.global.processors.batch.send_batch_size | int | `100` |  |
+| agent.config.global.processors.batch.send_batch_max_size | int | `4096` |  |
+| agent.config.global.processors.batch.send_batch_size | int | `4096` |  |
 | agent.config.global.service.telemetry.logging_encoding | string | `"console"` |  |
 | agent.config.global.service.telemetry.logging_level | string | `"WARN"` |  |
 | agent.config.global.service.telemetry.metrics_level | string | `"normal"` |  |
 | agent.selfMonitor.enabled | bool | `true` |  |
 | application.prometheusScrape.enabled | bool | `false` |  |
-| application.prometheusScrape.interval | string | `"10s"` |  |
+| application.prometheusScrape.interval | string | `"60s"` |  |
 | application.prometheusScrape.metricDropRegex | string | `".*bucket"` |  |
 | application.prometheusScrape.metricKeepRegex | string | `"(.*)"` |  |
 | application.prometheusScrape.namespaceDropRegex | string | `"(.*istio.*|.*ingress.*|kube-system)"` |  |
@@ -108,6 +108,7 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster-events.resources | object | `{"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | cluster-events.serviceAccount.create | bool | `false` |  |
 | cluster-events.serviceAccount.name | string | `"observe-agent-service-account"` |  |
+| cluster-events.tolerations | list | `[]` |  |
 | cluster-metrics.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
 | cluster-metrics.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"DoesNotExist"` |  |
 | cluster-metrics.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].key | string | `"kubernetes.io/os"` |  |
@@ -172,9 +173,11 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster-metrics.resources | object | `{"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | cluster-metrics.serviceAccount.create | bool | `false` |  |
 | cluster-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
+| cluster-metrics.tolerations | list | `[]` |  |
 | cluster.events.enabled | bool | `true` |  |
 | cluster.events.pullInterval | string | `"20m"` |  |
 | cluster.metrics.enabled | bool | `true` |  |
+| cluster.metrics.interval | string | `"60s"` |  |
 | cluster.name | string | `"observe-agent-monitored-cluster"` |  |
 | cluster.namespaceOverride.value | string | `"observe"` |  |
 | cluster.uidOverride.value | string | `""` |  |
@@ -242,6 +245,7 @@ Chart to install K8s collection stack based on Observe Agent
 | monitor.resources | object | `{"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | monitor.serviceAccount.create | bool | `false` |  |
 | monitor.serviceAccount.name | string | `"observe-agent-service-account"` |  |
+| monitor.tolerations | list | `[]` |  |
 | node-logs-metrics.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
 | node-logs-metrics.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"DoesNotExist"` |  |
 | node-logs-metrics.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].key | string | `"kubernetes.io/os"` |  |
@@ -331,6 +335,7 @@ Chart to install K8s collection stack based on Observe Agent
 | node-logs-metrics.securityContext.runAsUser | int | `0` |  |
 | node-logs-metrics.serviceAccount.create | bool | `false` |  |
 | node-logs-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
+| node-logs-metrics.tolerations | list | `[]` |  |
 | node.containers.logs.enabled | bool | `true` |  |
 | node.containers.logs.exclude | string | `"[]"` |  |
 | node.containers.logs.include | string | `"[\"/var/log/pods/*/*/*.log\", \"/var/log/kube-apiserver-audit.log\"]"` |  |
@@ -342,8 +347,12 @@ Chart to install K8s collection stack based on Observe Agent
 | node.containers.logs.retryOnFailure.maxInterval | string | `"30s"` |  |
 | node.containers.logs.startAt | string | `"end"` |  |
 | node.containers.metrics.enabled | bool | `true` |  |
+| node.containers.metrics.interval | string | `"60s"` |  |
 | node.enabled | bool | `true` |  |
 | node.metrics.enabled | bool | `true` |  |
+| node.metrics.fileSystem.excludeMountPoints | string | `"[\"/dev/*\",\"/proc/*\",\"/sys/*\",\"/run/k3s/containerd/*\",\"/var/lib/docker/*\",\"/var/lib/kubelet/*\",\"/snap/*\"]"` |  |
+| node.metrics.fileSystem.rootPath | string | `"/hostfs"` |  |
+| node.metrics.interval | string | `"60s"` |  |
 | observe.collectionEndpoint.value | string | `""` |  |
 | observe.entityToken.create | bool | `false` |  |
 | observe.entityToken.use | bool | `false` |  |

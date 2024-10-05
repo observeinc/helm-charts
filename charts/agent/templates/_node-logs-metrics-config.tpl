@@ -15,9 +15,10 @@ exporters:
 {{ end }}
 receivers:
   {{- if .Values.node.metrics.enabled }}
+  # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/hostmetricsreceiver
   hostmetrics:
-    collection_interval: 10s
-    root_path: /hostfs
+    collection_interval: {{.Values.node.metrics.interval}}
+    root_path: {{.Values.node.metrics.fileSystem.rootPath}}
     scrapers:
       cpu: null
       disk: null
@@ -50,21 +51,14 @@ receivers:
           match_type: strict
         exclude_mount_points:
           match_type: regexp
-          mount_points:
-          - /dev/*
-          - /proc/*
-          - /sys/*
-          - /run/k3s/containerd/*
-          - /var/lib/docker/*
-          - /var/lib/kubelet/*
-          - /snap/*
+          mount_points: {{.Values.node.metrics.fileSystem.excludeMountPoints}}
       load: null
       memory: null
       network: null
   {{ end -}}
   {{- if .Values.node.containers.metrics.enabled }}
   kubeletstats:
-    collection_interval: 10s
+    collection_interval: {{.Values.node.containers.metrics.interval}}
     auth_type: 'serviceAccount'
     endpoint: '${env:K8S_NODE_NAME}:10250'
     node: '${env:K8S_NODE_NAME}'

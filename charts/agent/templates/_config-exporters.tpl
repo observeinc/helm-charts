@@ -19,6 +19,8 @@ prometheusremotewrite:
         authorization: "${env:OBSERVE_TOKEN}"
     resource_to_telemetry_conversion:
         enabled: true # Convert resource attributes to metric labels
+    send_metadata: true
+
 {{- end -}}
 
 {{- define "config.exporters.debug" -}}

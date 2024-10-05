@@ -10,6 +10,8 @@ exporters:
 receivers:
   # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/k8sclusterreceiver/documentation.md
   k8s_cluster:
+    collection_interval: {{.Values.cluster.metrics.interval}}
+    metadata_collection_interval: 5m
     auth_type: serviceAccount
     node_conditions_to_report:
     - Ready
@@ -20,6 +22,7 @@ receivers:
     - memory
     - storage
     - ephemeral-storage
+    # defaults and optional - https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/k8sclusterreceiver/documentation.md
     metrics:
       k8s.node.condition:
         enabled: true
