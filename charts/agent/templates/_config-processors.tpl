@@ -81,3 +81,24 @@ memory_limiter:
 # needs to come after transform/watch_objects in pipelines
 observek8sattributes:
 {{- end -}}
+
+{{- define "config.processors.transform.observe_common"}}
+transform/observe_common:
+    error_mode: ignore
+    log_statements:
+      - context: log
+        statements:
+        # This is tricky, but essentially context:resource ensures that the
+        # TARGET of this transformation is written in resource[attributes],
+        # whereas the input attributes are taken from the attributes (not nested
+        # inside resource).
+        # So we perform a regex extraction on attributes["file.log.path"] and we
+        # put it in resource["attributes"]["k8s.container.id"]
+          - set(resource.attributes["k8s.container.id"], ExtractPatterns(attributes["file.log.path"], "(?P<containerID>[^\\/]+)\\.log$")) where attributes["file.log.path"] != nil
+        # The above madness does the following:
+        # - Extract a regex pattern from the target
+        # - The pattern must have at least one named capture group (?P<name>...)
+        # - The result is put in a map, indexed by captured group names
+        # - The file extension ".log" is outside the capture group because that's obviously not part of the container ID
+        # - We take the value of the capture group's name from that map at the end with ["containerID"]
+{{- end -}}
