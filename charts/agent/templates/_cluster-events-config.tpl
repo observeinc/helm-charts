@@ -408,6 +408,8 @@ processors:
           # identifiers
           - set(attributes["observe_transform"]["identifiers"]["clusterName"], attributes["k8s.cluster.name"])
           - set(attributes["observe_transform"]["identifiers"]["clusterUid"], attributes["k8s.cluster.uid"])
+          - set(resource.attributes["clusterName"], attributes["k8s.cluster.name"])
+          - set(resource.attributes["clusterUid"], attributes["k8s.cluster.uid"])
           - set(attributes["observe_transform"]["identifiers"]["uid"], attributes["k8s.cluster.uid"])
           - set(attributes["observe_transform"]["identifiers"]["kind"], "Cluster")
           - set(attributes["observe_transform"]["identifiers"]["name"], attributes["k8s.cluster.name"])
