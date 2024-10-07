@@ -121,6 +121,8 @@ receivers:
         enabled: true
       k8s.pod.uptime:
         enabled: true
+    extra_metadata_labels:
+      - container.id
   {{ end -}}
   {{- if .Values.node.containers.logs.enabled }}
   filelog:
@@ -151,6 +153,8 @@ processors:
 {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
 
 {{- include "config.processors.attributes.observe_common" . | nindent 2 }}
+
+{{- include "config.processors.transform.observe_common" . | nindent 2 }}
   # attributes to append to objects
   attributes/debug_source_pod_logs:
     actions:
@@ -171,24 +175,25 @@ processors:
 service:
   extensions: [health_check, file_storage]
   pipelines:
-      {{- if .Values.node.containers.logs.enabled }}
-      logs:
-        receivers: [filelog]
-        processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, attributes/debug_source_pod_logs]
-        exporters: [otlphttp/observe/base, debug/override]
-      {{- end -}}
-      {{- if .Values.node.metrics.enabled }}
-      metrics/hostmetrics:
-        receivers: [hostmetrics]
-        processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, attributes/debug_source_hostmetrics]
-        exporters: [prometheusremotewrite, debug/override]
-      {{- end -}}
-      {{- if .Values.node.containers.metrics.enabled }}
-      metrics/kubeletstats:
-        receivers: [kubeletstats]
-        processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, attributes/debug_source_kubletstats_metrics]
-        exporters: [prometheusremotewrite, debug/override]
-      {{- end -}}
+    {{- if .Values.node.containers.logs.enabled }}
+    logs:
+      receivers: [filelog]
+      # processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, attributes/debug_source_pod_logs]
+      processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, transform/observe_common, attributes/debug_source_pod_logs]
+      exporters: [otlphttp/observe/base, debug/override]
+    {{- end -}}
+    {{- if .Values.node.metrics.enabled }}
+    metrics/hostmetrics:
+      receivers: [hostmetrics]
+      processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, attributes/debug_source_hostmetrics]
+      exporters: [prometheusremotewrite, debug/override]
+    {{- end -}}
+    {{- if .Values.node.containers.metrics.enabled }}
+    metrics/kubeletstats:
+      receivers: [kubeletstats]
+      processors: [memory_limiter, batch, resourcedetection/cloud, k8sattributes, attributes/observe_common, attributes/debug_source_kubletstats_metrics]
+      exporters: [prometheusremotewrite, debug/override]
+    {{- end -}}
 {{- include "config.service.telemetry" . | nindent 2 }}
 
 {{- end }}
