@@ -85,7 +85,6 @@ processors:
   transform/object:
     error_mode: ignore
     log_statements:
-      # Comment logic
       - context: log
         statements:
           - set(attributes["observe_filter"], "objects_pull_watch")
@@ -104,6 +103,8 @@ processors:
           # identifiers
           - set(attributes["observe_transform"]["identifiers"]["clusterName"], attributes["k8s.cluster.name"])
           - set(attributes["observe_transform"]["identifiers"]["clusterUid"], attributes["k8s.cluster.uid"])
+          - set(resource.attributes["clusterName"], attributes["k8s.cluster.name"])
+          - set(resource.attributes["clusterUid"], attributes["k8s.cluster.uid"])
           - set(attributes["observe_transform"]["identifiers"]["kind"], body["kind"])
           - set(attributes["observe_transform"]["identifiers"]["name"], body["metadata"]["name"])
           - set(attributes["observe_transform"]["identifiers"]["namespaceName"], body["metadata"]["namespace"])
