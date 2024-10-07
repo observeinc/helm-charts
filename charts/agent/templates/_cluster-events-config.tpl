@@ -77,6 +77,8 @@ processors:
 
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
 
+{{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
+
 {{- include "config.processors.attributes.observek8sattributes" . | nindent 2 }}
 
   # transform for k8s objects
