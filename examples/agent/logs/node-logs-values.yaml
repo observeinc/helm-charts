@@ -17,7 +17,8 @@ node:
       # log lines above this size will be truncated
       maxLogSize: 512kb
       # If true, the receiver will pause reading a file and attempt to resend the current batch of logs if it encounters an error from downstream components.
-      retryOnFailure: true
+      retryOnFailure:
+        enabled: true
       # A list of file glob patterns that match the file paths to be read.
       include: '["/var/log/pods/*/*/*.log", "/var/log/kube-apiserver-audit.log"]'
       # A list of file glob patterns to exclude from reading. This is applied against the paths matched by include.

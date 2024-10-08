@@ -1,10 +1,13 @@
+# This section is for configuring agent to send data to Observe endpoints
+# we recommend using --set token.value=YOUR_TOKEN for values you want to keep secret
+# supplying a token creates a secret on your cluster
 observe:
   # If create = false it is assumed that a secret named agent-credentials with key: OBSERVE_TOKEN already exists
   token:
     create: true
     value: ""
-  # ex -  https://12345678.collect.observeinc.com
   collectionEndpoint:
+    # ex -  https://12345678.collect.observeinc.com
     value: ""
   # this is temporary and will be removed
   entityToken:
@@ -15,42 +18,36 @@ observe:
     use: false
 
 cluster:
+  # name given to your cluster
   name: observe-agent-monitored-cluster
+  # configure the collection of resources and events
   events:
+    # how often to pull resources from cluster
     pullInterval: 20m
     enabled: true
+  # cluster-level metrics and entity events (as metrics) from the Kubernetes API server. It uses the K8s API to listen for updates.
   metrics:
     enabled: true
-
+    interval: 60s
+  # namespace to use/create
   namespaceOverride:
-    # ! This needs to have same value as namespaceOverride in deployments and daemonsets below
+    # !!! IMPORTANT !!! This needs to have same value as namespaceOverride in deployments and daemonsets below
     value: observe
+  # typically the clusterUid is set to kube-system namespace uid - if you need a different value use this override
   uidOverride:
     value: ""
 
-application:
-  # use this option to scrape prometheus metrics from pods
-  # cluster.metrics.enabled must be set to true
-  prometheusScrape:
-    enabled: false
-    interval: 10s
-    # namespaces to exclude from scraping
-    # drop is processed first so all namespaces that match regex will be dropped
-    namespaceDropRegex: (.*istio.*|.*ingress.*|kube-system)
-    # namespaces to explicity include for scraping - can use or (ns1|ns2)
-    # keep is processed after drop so only remaining namespaces that match regex will be kept
-    namespaceKeepRegex: (.*)
-    # port names to scrape from - can use or .*metrics|otherportname
-    portKeepRegex: .*metrics
-    # metrics to drop
-    metricDropRegex: .*bucket
-    # metrics to keep
-    metricKeepRegex: (.*)
-
 node:
+  # enables agent for collection of node logs and metrics
+  # what nodes metrics and logs are collected from is configured with affinity in node-logs-metrics section below
   enabled: true
+  # collects host level metrics from node
   metrics:
     enabled: true
+    interval: 60s
+    fileSystem:
+      rootPath: /hostfs
+      excludeMountPoints: '["/dev/*","/proc/*","/sys/*","/run/k3s/containerd/*","/var/lib/docker/*","/var/lib/kubelet/*","/snap/*"]'
   containers:
     logs:
       enabled: true
@@ -73,17 +70,39 @@ node:
       lookbackPeriod: 24h
       # At startup, where to start reading logs from the file. Options are beginning or end.
       startAt: end
-
+    # pulls node, pod, and container metrics from the API server on a kubelet and sends it down the metric pipeline for further processing.
     metrics:
       enabled: true
+      interval: 60s
+
+application:
+  # use this option to scrape prometheus metrics from pods
+  # !!! IMPORTANT !!! cluster.metrics.enabled must be set to true
+  # To enable/disable auto discovery of metrics - besides option below - you can annotate your pods
+  # See helm-charts/examples/agent/pod_metrics for more information
+  prometheusScrape:
+    enabled: false
+    interval: 60s
+    # namespaces to exclude from scraping
+    # drop is processed first so all namespaces that match regex will be dropped
+    namespaceDropRegex: (.*istio.*|.*ingress.*|kube-system)
+    # namespaces to explicity include for scraping - can use or (ns1|ns2)
+    # keep is processed after drop so only remaining namespaces that match regex will be kept
+    namespaceKeepRegex: (.*)
+    # port names to scrape from - can use or .*metrics|otherportname
+    portKeepRegex: .*metrics
+    # metrics to drop
+    metricDropRegex: .*bucket
+    # metrics to keep
+    metricKeepRegex: (.*)
 
 agent:
   config:
     global:
       processors:
         batch:
-          send_batch_size: 100
-          send_batch_max_size: 100
+          send_batch_size: 4096
+          send_batch_max_size: 4096
       service:
         telemetry:
           metrics_level: normal
@@ -103,6 +122,7 @@ cluster-events:
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
   nameOverride: "cluster-events"
+  # !!! IMPORTANT !!! This needs to have same value as namespaceOverride in cluster above
   namespaceOverride: "observe"
 
   configMap:
@@ -176,6 +196,8 @@ cluster-events:
                 operator: NotIn
                 values: [windows]
 
+  tolerations: []
+
   ports:
     metrics:
       # The metrics port is disabled by default. However you need to enable the port
@@ -239,6 +261,7 @@ cluster-metrics:
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
   nameOverride: "cluster-metrics"
+  # !!! IMPORTANT !!! This needs to have same value as namespaceOverride in cluster above
   namespaceOverride: "observe"
 
   configMap:
@@ -311,6 +334,8 @@ cluster-metrics:
                 operator: NotIn
                 values: [windows]
 
+  tolerations: []
+
   ports:
     metrics:
       # The metrics port is disabled by default. However you need to enable the port
@@ -367,6 +392,7 @@ node-logs-metrics:
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
   nameOverride: "node-logs-metrics"
+  # !!! IMPORTANT !!! This needs to have same value as namespaceOverride in cluster above
   namespaceOverride: "observe"
 
   configMap:
@@ -438,6 +464,8 @@ node-logs-metrics:
               - key: kubernetes.io/os
                 operator: NotIn
                 values: [windows]
+
+  tolerations: []
 
   ports:
     metrics:
@@ -528,6 +556,7 @@ monitor:
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
   nameOverride: "monitor"
+  # !!! IMPORTANT !!! This needs to have same value as namespaceOverride in cluster above
   namespaceOverride: "observe"
 
   configMap:
@@ -599,6 +628,8 @@ monitor:
               - key: kubernetes.io/os
                 operator: NotIn
                 values: [windows]
+
+  tolerations: []
 
   ports:
     metrics:
