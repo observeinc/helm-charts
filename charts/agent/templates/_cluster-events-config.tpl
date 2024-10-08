@@ -215,6 +215,8 @@ processors:
         statements:
           - set(attributes["observe_transform"]["identifiers"]["jobName"], body["metadata"]["name"])
           - set(attributes["observe_transform"]["identifiers"]["jobUid"], body["metadata"]["uid"])
+          - set(attributes["observe_transform"]["facets"]["cronJobName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "CronJob"
+          - set(attributes["observe_transform"]["facets"]["cronJobUid"], body["metadata"]["ownerReferences"][0]["uid"]) where body["metadata"]["ownerReferences"][0]["kind"] == "CronJob"
           # spec
           - set(attributes["observe_transform"]["facets"]["completions"], body["spec"]["completions"])
           - set(attributes["observe_transform"]["facets"]["parallelism"], body["spec"]["parallelism"])
