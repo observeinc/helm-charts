@@ -179,6 +179,9 @@ processors:
           # spec
           - set(attributes["observe_transform"]["facets"]["selector"], body["spec"]["selector"]["matchLabels"])
           - set(attributes["observe_transform"]["facets"]["desiredReplicas"], body["spec"]["replicas"])
+          # custom
+          - set(attributes["observe_transform"]["facets"]["deploymentStatus"], "Healthy") where attributes["observe_transform"]["facets"]["readyReplicas"] == attributes["observe_transform"]["facets"]["desiredReplicas"]
+          - set(attributes["observe_transform"]["facets"]["deploymentStatus"], "Unhealthy") where attributes["observe_transform"]["facets"]["readyReplicas"] != attributes["observe_transform"]["facets"]["desiredReplicas"]
       # ReplicaSet
       - context: log
         conditions:
