@@ -15,6 +15,8 @@ permissions:
     id-token: write
     contents: write
     pull-requests: write
+    actions: write
+    checks: write 
 
 env:
     TF_VAR_observe_url: ${{secrets.OBSERVE_URL}}
@@ -23,9 +25,8 @@ env:
 
 
 jobs:
-
   helm-charts-agent-integration-tests:
-    name: helm-charts-agent-integration-tests-${{ matrix.namespace }}-${{ matrix.values }}
+    name: ns-${{ matrix.namespace }}+values-${{ matrix.values }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -33,7 +34,7 @@ jobs:
           values:
             - default.yaml
             - node_affinity.yaml
-            - node_taint.yaml
+            - anode_taint.yaml
           namespace:
             - observe
           include: # Test not-observe namespace with default values only
@@ -65,7 +66,7 @@ jobs:
         - name: Setup Terraform
           uses: hashicorp/setup-terraform@v3
           with:
-            terraform_version: 1.9.5
+            terraform_version: "1.10.0-alpha20240918"
 
         - name: Terraform Init
           id: init
@@ -78,4 +79,29 @@ jobs:
         - name: Terraform Test
           id: test
           run: |
-            terraform test -verbose
+            terraform test -verbose -junit-xml=results-ns-${{ matrix.namespace }}+values-${{ matrix.values }}.xml            
+        
+        - uses: actions/upload-artifact@v4
+          if: success() || failure()
+          with:
+            name: results-ns-${{ matrix.namespace }}+values-${{ matrix.values }}
+            path: ${{ github.workspace }}/integration/*.xml          
+        
+
+        # - name: Publish Test Report
+        #   id: test-results
+        #   uses: dorny/test-reporter@v1
+        #   if: success() || failure() # always run even if the previous step fails
+        #   with:            
+        #     name: results-ns-${{ matrix.namespace }}+values-${{ matrix.values }}
+        #     path: test.xml                    
+        #     reporter: java-junit           
+        #     working-directory: ${{ github.workspace }}/integration           
+
+        # - name: Get Check Run Summary
+        #   if: always()
+        #   run: |
+        #     CHECK_RUN_ID=$(echo "${{ steps.test-results.outputs_url }}" | grep -oE '[0-9]+$')
+        #     CHECK_RUN=$(gh api repos/${{ github.repository }}/check-runs/$CHECK_RUN_ID)
+        #     SUMMARY=$(echo "$CHECK_RUN" | jq -r '.output.summary')
+        #     echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
