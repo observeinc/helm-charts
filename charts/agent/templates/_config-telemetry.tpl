@@ -1,9 +1,9 @@
 {{- define "config.service.telemetry" -}}
 telemetry:
     metrics:
-      level: {{ .Values.agent.config.global.service.telemetry.metrics_level }}
+      level: {{ .Values.agent.config.global.service.telemetry.metricsLevel }}
       address: {{ template "config.local_host"}}:8888
     logs:
-      level: {{ .Values.agent.config.global.service.telemetry.logging_level }}
-      encoding: {{ .Values.agent.config.global.service.telemetry.logging_encoding }}
+      level: {{ .Values.agent.config.global.service.telemetry.loggingLevel }}
+      encoding: {{ .Values.agent.config.global.service.telemetry.loggingEncoding }}
 {{- end -}}

@@ -3,6 +3,13 @@ otlphttp/observe/base:
     endpoint: "{{ .Values.observe.collectionEndpoint.value | toString | trimSuffix "/" }}/v2/otel"
     headers:
         authorization: "${env:OBSERVE_TOKEN}"
+    sending_queue:
+      enabled: {{ .Values.agent.config.global.exporters.sendingQueue.enabled }}
+    retry_on_failure:
+      enabled: {{ .Values.agent.config.global.exporters.retryOnFailure.enabled }}
+      initial_interval: {{ .Values.agent.config.global.exporters.retryOnFailure.initialInterval }}
+      max_interval: {{ .Values.agent.config.global.exporters.retryOnFailure.maxInterval }}
+      max_elapsed_time: {{ .Values.agent.config.global.exporters.retryOnFailure.maxElapsedTime }}
     compression: zstd
 {{- end -}}
 
@@ -11,6 +18,13 @@ otlphttp/observe/entity:
     logs_endpoint: "{{ .Values.observe.collectionEndpoint.value | toString | trimSuffix "/" }}/v1/kubernetes/v1/entity"
     headers:
         authorization: "Bearer ${env:ENTITY_TOKEN}"
+    sending_queue:
+      enabled: {{ .Values.agent.config.global.exporters.sendingQueue.enabled }}
+    retry_on_failure:
+      enabled: {{ .Values.agent.config.global.exporters.retryOnFailure.enabled }}
+      initial_interval: {{ .Values.agent.config.global.exporters.retryOnFailure.initialInterval }}
+      max_interval: {{ .Values.agent.config.global.exporters.retryOnFailure.maxInterval }}
+      max_elapsed_time: {{ .Values.agent.config.global.exporters.retryOnFailure.maxElapsedTime }}
     compression: zstd
 {{- end -}}
 

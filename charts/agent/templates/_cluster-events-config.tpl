@@ -19,11 +19,10 @@ receivers:
         mode: pull
         interval: {{ .Values.cluster.events.pullInterval }}
 
-  # this pulls all objects listed below
+  # retrieves descriptions of all resources listed below
   k8sobjects/objects:
     auth_type: serviceAccount
     objects:
-      ## P1
       - {name: events, mode: pull, interval: 15m}
       - {name: events, mode: watch}
       - {name: pods, mode: pull, interval: 15m}
@@ -40,7 +39,6 @@ receivers:
       - {name: configmaps, mode: watch}
       - {name: endpoints, mode: pull, interval: 15m}
       - {name: endpoints, mode: watch}
-      ## P2
       - {name: jobs, mode: pull, interval: 15m}
       - {name: jobs, mode: watch}
       - {name: cronjobs, mode: pull, interval: 15m}

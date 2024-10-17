@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.23.1](https://img.shields.io/badge/Version-0.23.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
+![Version: 0.24.0](https://img.shields.io/badge/Version-0.24.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 > [!CAUTION]
 > This chart is under active development and is not meant to be installed yet.
@@ -27,11 +27,16 @@ Chart to install K8s collection stack based on Observe Agent
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | agent.config.global.debug.verbosity | string | `"basic"` |  |
-| agent.config.global.processors.batch.send_batch_max_size | int | `4096` |  |
-| agent.config.global.processors.batch.send_batch_size | int | `4096` |  |
-| agent.config.global.service.telemetry.logging_encoding | string | `"console"` |  |
-| agent.config.global.service.telemetry.logging_level | string | `"WARN"` |  |
-| agent.config.global.service.telemetry.metrics_level | string | `"normal"` |  |
+| agent.config.global.exporters.retryOnFailure.enabled | bool | `true` |  |
+| agent.config.global.exporters.retryOnFailure.initialInterval | string | `"1s"` |  |
+| agent.config.global.exporters.retryOnFailure.maxElapsedTime | string | `"5m"` |  |
+| agent.config.global.exporters.retryOnFailure.maxInterval | string | `"30s"` |  |
+| agent.config.global.exporters.sendingQueue.enabled | bool | `true` |  |
+| agent.config.global.processors.batch.sendBatchMaxSize | int | `4096` |  |
+| agent.config.global.processors.batch.sendBatchSize | int | `4096` |  |
+| agent.config.global.service.telemetry.loggingEncoding | string | `"console"` |  |
+| agent.config.global.service.telemetry.loggingLevel | string | `"WARN"` |  |
+| agent.config.global.service.telemetry.metricsLevel | string | `"normal"` |  |
 | agent.selfMonitor.enabled | bool | `true` |  |
 | application.prometheusScrape.enabled | bool | `false` |  |
 | application.prometheusScrape.interval | string | `"60s"` |  |

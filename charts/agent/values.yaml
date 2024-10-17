@@ -101,13 +101,24 @@ agent:
     global:
       processors:
         batch:
-          send_batch_size: 4096
-          send_batch_max_size: 4096
+          sendBatchSize: 4096
+          sendBatchMaxSize: 4096
+      exporters:
+        sendingQueue:
+          enabled: true
+        retryOnFailure:
+          enabled: true
+          # Time to wait after the first failure before retrying.
+          initialInterval: 1s
+          # Upper bound on retry backoff interval. Once this value is reached the delay between consecutive retries will remain constant at the specified value.
+          maxInterval: 30s
+          # Maximum amount of time (including retries) spent trying to send a logs batch to a downstream consumer. Once this value is reached, the data is discarded. Retrying never stops if set to 0.
+          maxElapsedTime: 5m
       service:
         telemetry:
-          metrics_level: normal
-          logging_level: WARN
-          logging_encoding: console
+          metricsLevel: normal
+          loggingLevel: WARN
+          loggingEncoding: console
       debug:
         # values basic, normal, detailed
         verbosity: basic
