@@ -72,7 +72,7 @@ service:
   pipelines:
       metrics:
         receivers: [prometheus/collector]
-        processors: [memory_limiter, batch, attributes/observe_common, k8sattributes, attributes/debug_source_agent_monitor]
+        processors: [memory_limiter, k8sattributes, batch, attributes/observe_common, attributes/debug_source_agent_monitor]
         exporters: [prometheusremotewrite]
 {{- include "config.service.telemetry" . | nindent 2 }}
 

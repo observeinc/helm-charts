@@ -4,8 +4,8 @@ agent:
       global:
         service:
           telemetry:
-            logging_encoding: json
-            logging_level: INFO
+            loggingEncoding: json
+            loggingLevel: INFO
 
 #Common for namepsace/url/token
 observe:
