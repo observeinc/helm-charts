@@ -3,6 +3,7 @@ otlphttp/observe/base:
     endpoint: "{{ .Values.observe.collectionEndpoint.value | toString | trimSuffix "/" }}/v2/otel"
     headers:
         authorization: "${env:OBSERVE_TOKEN}"
+    compression: zstd
 {{- end -}}
 
 {{- define "config.exporters.otlphttp.observe.entity" -}}
@@ -10,6 +11,7 @@ otlphttp/observe/entity:
     logs_endpoint: "{{ .Values.observe.collectionEndpoint.value | toString | trimSuffix "/" }}/v1/kubernetes/v1/entity"
     headers:
         authorization: "Bearer ${env:ENTITY_TOKEN}"
+    compression: zstd
 {{- end -}}
 
 {{- define "config.exporters.prometheusremotewrite" -}}
