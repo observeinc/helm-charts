@@ -75,7 +75,7 @@ processors:
 
 {{- include "config.processors.batch" . | nindent 2 }}
 
-{{- include "config.processors.attributes.observe_common" . | nindent 2 }}
+{{- include "config.processors.resource.observe_common" . | nindent 2 }}
 
 {{- include "config.processors.attributes.observek8sattributes" . | nindent 2 }}
 
@@ -99,10 +99,8 @@ processors:
           - set(attributes["observe_transform"]["control"]["isDelete"], false) where attributes["observe_transform"]["control"]["isDelete"] == nil
           - set(attributes["observe_transform"]["control"]["version"], body["metadata"]["resourceVersion"])
           # identifiers
-          - set(attributes["observe_transform"]["identifiers"]["clusterName"], attributes["k8s.cluster.name"])
-          - set(attributes["observe_transform"]["identifiers"]["clusterUid"], attributes["k8s.cluster.uid"])
-          - set(resource.attributes["clusterName"], attributes["k8s.cluster.name"])
-          - set(resource.attributes["clusterUid"], attributes["k8s.cluster.uid"])
+          - set(attributes["observe_transform"]["identifiers"]["clusterName"], resource.attributes["k8s.cluster.name"])
+          - set(attributes["observe_transform"]["identifiers"]["clusterUid"], resource.attributes["k8s.cluster.uid"])
           - set(attributes["observe_transform"]["identifiers"]["kind"], body["kind"])
           - set(attributes["observe_transform"]["identifiers"]["name"], body["metadata"]["name"])
           - set(attributes["observe_transform"]["identifiers"]["namespaceName"], body["metadata"]["namespace"])
@@ -415,10 +413,8 @@ processors:
           - set(attributes["observe_transform"]["control"]["isDelete"], false) where attributes["observe_transform"]["control"]["isDelete"] == nil
           - set(attributes["observe_transform"]["control"]["version"], body["metadata"]["resourceVersion"])
           # identifiers
-          - set(attributes["observe_transform"]["identifiers"]["clusterName"], attributes["k8s.cluster.name"])
-          - set(attributes["observe_transform"]["identifiers"]["clusterUid"], attributes["k8s.cluster.uid"])
-          - set(resource.attributes["clusterName"], attributes["k8s.cluster.name"])
-          - set(resource.attributes["clusterUid"], attributes["k8s.cluster.uid"])
+          - set(attributes["observe_transform"]["identifiers"]["clusterName"], resource.attributes["k8s.cluster.name"])
+          - set(attributes["observe_transform"]["identifiers"]["clusterUid"], resource.attributes["k8s.cluster.uid"])
           - set(attributes["observe_transform"]["identifiers"]["uid"], attributes["k8s.cluster.uid"])
           - set(attributes["observe_transform"]["identifiers"]["kind"], "Cluster")
           - set(attributes["observe_transform"]["identifiers"]["name"], attributes["k8s.cluster.name"])
@@ -434,20 +430,20 @@ service:
   pipelines:
       logs/objects:
         receivers: [k8sobjects/objects]
-        processors: [memory_limiter, batch, attributes/observe_common, transform/object, observek8sattributes]
+        processors: [memory_limiter, batch, resource/observe_common, transform/object, observek8sattributes]
         exporters: [otlphttp/observe/base, debug/override]
       logs/cluster:
         receivers: [k8sobjects/cluster]
-        processors: [memory_limiter, batch, attributes/observe_common, filter/cluster, transform/cluster]
+        processors: [memory_limiter, batch, resource/observe_common, filter/cluster, transform/cluster]
         exporters: [otlphttp/observe/base, debug/override]
       {{ if .Values.observe.entityToken.use  -}}
       logs/entity:
         receivers: [k8sobjects/objects]
-        processors: [memory_limiter, batch, attributes/observe_common, transform/object, observek8sattributes]
+        processors: [memory_limiter, batch, resource/observe_common, transform/object, observek8sattributes]
         exporters: [otlphttp/observe/entity, debug/override]
       logs/cluster/entity:
         receivers: [k8sobjects/cluster]
-        processors: [memory_limiter, batch, attributes/observe_common, filter/cluster, transform/cluster]
+        processors: [memory_limiter, batch, resource/observe_common, filter/cluster, transform/cluster]
         exporters: [otlphttp/observe/entity, debug/override]
       {{- end }}
 
