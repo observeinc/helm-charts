@@ -28,6 +28,7 @@ k8sattributes:
     - k8s.cluster.uid
     - k8s.node.name
     - k8s.node.uid
+    - container.id
   passthrough: false
   pod_association:
   - sources:

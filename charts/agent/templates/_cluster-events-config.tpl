@@ -77,6 +77,8 @@ processors:
 
 {{- include "config.processors.attributes.observe_common" . | nindent 2 }}
 
+{{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
+
 {{- include "config.processors.attributes.observek8sattributes" . | nindent 2 }}
 
   # transform for k8s objects
@@ -101,8 +103,6 @@ processors:
           # identifiers
           - set(attributes["observe_transform"]["identifiers"]["clusterName"], attributes["k8s.cluster.name"])
           - set(attributes["observe_transform"]["identifiers"]["clusterUid"], attributes["k8s.cluster.uid"])
-          - set(resource.attributes["clusterName"], attributes["k8s.cluster.name"])
-          - set(resource.attributes["clusterUid"], attributes["k8s.cluster.uid"])
           - set(attributes["observe_transform"]["identifiers"]["kind"], body["kind"])
           - set(attributes["observe_transform"]["identifiers"]["name"], body["metadata"]["name"])
           - set(attributes["observe_transform"]["identifiers"]["namespaceName"], body["metadata"]["namespace"])
@@ -417,8 +417,6 @@ processors:
           # identifiers
           - set(attributes["observe_transform"]["identifiers"]["clusterName"], attributes["k8s.cluster.name"])
           - set(attributes["observe_transform"]["identifiers"]["clusterUid"], attributes["k8s.cluster.uid"])
-          - set(resource.attributes["clusterName"], attributes["k8s.cluster.name"])
-          - set(resource.attributes["clusterUid"], attributes["k8s.cluster.uid"])
           - set(attributes["observe_transform"]["identifiers"]["uid"], attributes["k8s.cluster.uid"])
           - set(attributes["observe_transform"]["identifiers"]["kind"], "Cluster")
           - set(attributes["observe_transform"]["identifiers"]["name"], attributes["k8s.cluster.name"])
