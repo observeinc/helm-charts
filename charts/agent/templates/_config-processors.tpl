@@ -28,6 +28,7 @@ k8sattributes:
     - k8s.cluster.uid
     - k8s.node.name
     - k8s.node.uid
+    - k8s.container.name
   passthrough: false
   pod_association:
   - sources:
@@ -35,14 +36,17 @@ k8sattributes:
       name: k8s.pod.ip
   - sources:
     - from: resource_attribute
+      name: k8s.container.restart_count
+  - sources:
+    - from: resource_attribute
       name: k8s.pod.uid
   - sources:
     - from: connection
 {{- end -}}
 
-{{- define "config.processors.attributes.observe_common" -}}
-attributes/observe_common:
-  actions:
+{{- define "config.processors.resource.observe_common" -}}
+resource/observe_common:
+  attributes:
     - key: k8s.cluster.name
       action: insert
       value: ${env:OBSERVE_CLUSTER_NAME}
