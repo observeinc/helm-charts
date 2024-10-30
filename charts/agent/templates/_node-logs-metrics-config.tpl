@@ -115,6 +115,8 @@ receivers:
         enabled: true
       k8s.pod.uptime:
         enabled: true
+    extra_metadata_labels:
+      - container.id
   {{ end -}}
   {{- if .Values.node.containers.logs.enabled }}
   filelog:
