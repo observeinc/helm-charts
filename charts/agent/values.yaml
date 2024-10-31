@@ -63,9 +63,11 @@ node:
         # Maximum amount of time (including retries) spent trying to send a logs batch to a downstream consumer. Once this value is reached, the data is discarded. Retrying never stops if set to 0.
         maxElapsedTime: 5m
       # A list of file glob patterns that match the file paths to be read. Need to put inside of '' to avoid helm stripping commas and quotes.
-      include: '["/var/log/pods/*/*/*.log", "/var/log/kube-apiserver-audit.log"]'
+      # Log rotation glob assumes rename of file follows this pattern *.log.*
+      include: '["/var/log/pods/*/*/*.log", "/var/log/pods/*/*/*.log.*", "/var/log/kube-apiserver-audit.log"]'
       # A list of file glob patterns to exclude from reading. This is applied against the paths matched by include. Need to put inside of '' to avoid helm stripping commas and quotes.
-      exclude: '[]'
+      #  Log rotation exclude glob assumes files previously rotated and renamed are zipped after latest rotated file is created
+      exclude: '["/var/log/pods/*/*/*.log.*.gz"]'
       # time unit 1m, 1h
       lookbackPeriod: 24h
       # At startup, where to start reading logs from the file. Options are beginning or end.
