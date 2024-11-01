@@ -100,6 +100,7 @@ processors:
           # control
           - set(attributes["observe_transform"]["control"]["isDelete"], false) where attributes["observe_transform"]["control"]["isDelete"] == nil
           - set(attributes["observe_transform"]["control"]["version"], body["metadata"]["resourceVersion"])
+          - set(attributes["observe_transform"]["control"]["agentVersion"], "{{ index .Values "cluster-events" "image" "tag" }}")
           # identifiers
           - set(attributes["observe_transform"]["identifiers"]["clusterName"], resource.attributes["k8s.cluster.name"])
           - set(attributes["observe_transform"]["identifiers"]["clusterUid"], resource.attributes["k8s.cluster.uid"])
