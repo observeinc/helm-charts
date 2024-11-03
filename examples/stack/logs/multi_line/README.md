@@ -2,7 +2,7 @@
 
 See line 4-19 helm-charts/examples/agent/logs/README.md for instruction on how to deploy sample pods.
 
-## Deploy collection 
+## Deploy collection
 Assumes metrics pod not deployed
 
 Assumes observe namespace created

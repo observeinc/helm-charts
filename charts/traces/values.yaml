@@ -98,8 +98,7 @@ opentelemetry-collector:
   # opentelemetry-collector configuration
   config:
     exporters:
-      logging:
-        loglevel: info
+      debug: {}
       otlphttp:
         endpoint: '{{ include "observe.collectionEndpoint" . }}{{ .Values.global.observe.otelPath }}'
         headers:
@@ -149,12 +148,12 @@ opentelemetry-collector:
         traces:
           receivers: [otlp, zipkin]
           processors: [probabilistic_sampler, k8sattributes, memory_limiter, batch]
-          exporters: [otlphttp, logging]
+          exporters: [otlphttp, debug]
         metrics:
           receivers: [otlp]
           processors: [k8sattributes, memory_limiter, batch]
-          exporters: [otlphttp, logging]
+          exporters: [otlphttp, debug]
         logs:
           receivers: [otlp]
           processors: [k8sattributes, memory_limiter, batch]
-          exporters: [otlphttp, logging]
+          exporters: [otlphttp, debug]

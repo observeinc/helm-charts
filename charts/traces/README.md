@@ -1,6 +1,6 @@
 # traces
 
-![Version: 1.0.6](https://img.shields.io/badge/Version-1.0.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.0.7](https://img.shields.io/badge/Version-1.0.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe OpenTelemetry trace collection
 
@@ -16,7 +16,7 @@ Observe OpenTelemetry trace collection
 |------------|------|---------|
 | file://../endpoint | endpoint | 0.1.12 |
 | file://../proxy | proxy | 0.1.8 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | opentelemetry-collector | 0.106.0 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | opentelemetry-collector | 0.108.0 |
 
 ## Values
 
@@ -38,7 +38,7 @@ Observe OpenTelemetry trace collection
 | opentelemetry-collector.clusterRole.rules[0].verbs[1] | string | `"list"` |  |
 | opentelemetry-collector.clusterRole.rules[0].verbs[2] | string | `"watch"` |  |
 | opentelemetry-collector.command.extraArgs[0] | string | `"--set=service.telemetry.metrics.address=:58888"` |  |
-| opentelemetry-collector.config.exporters.logging.loglevel | string | `"info"` |  |
+| opentelemetry-collector.config.exporters.debug | object | `{}` |  |
 | opentelemetry-collector.config.exporters.otlphttp.endpoint | string | `"{{ include \"observe.collectionEndpoint\" . }}{{ .Values.global.observe.otelPath }}"` |  |
 | opentelemetry-collector.config.exporters.otlphttp.headers.authorization | string | `"Bearer ${OBSERVE_TOKEN}"` |  |
 | opentelemetry-collector.config.exporters.otlphttp.retry_on_failure.enabled | bool | `true` |  |
@@ -64,19 +64,19 @@ Observe OpenTelemetry trace collection
 | opentelemetry-collector.config.receivers.otlp.protocols.http | object | `{}` |  |
 | opentelemetry-collector.config.receivers.zipkin | object | `{}` |  |
 | opentelemetry-collector.config.service.pipelines.logs.exporters[0] | string | `"otlphttp"` |  |
-| opentelemetry-collector.config.service.pipelines.logs.exporters[1] | string | `"logging"` |  |
+| opentelemetry-collector.config.service.pipelines.logs.exporters[1] | string | `"debug"` |  |
 | opentelemetry-collector.config.service.pipelines.logs.processors[0] | string | `"k8sattributes"` |  |
 | opentelemetry-collector.config.service.pipelines.logs.processors[1] | string | `"memory_limiter"` |  |
 | opentelemetry-collector.config.service.pipelines.logs.processors[2] | string | `"batch"` |  |
 | opentelemetry-collector.config.service.pipelines.logs.receivers[0] | string | `"otlp"` |  |
 | opentelemetry-collector.config.service.pipelines.metrics.exporters[0] | string | `"otlphttp"` |  |
-| opentelemetry-collector.config.service.pipelines.metrics.exporters[1] | string | `"logging"` |  |
+| opentelemetry-collector.config.service.pipelines.metrics.exporters[1] | string | `"debug"` |  |
 | opentelemetry-collector.config.service.pipelines.metrics.processors[0] | string | `"k8sattributes"` |  |
 | opentelemetry-collector.config.service.pipelines.metrics.processors[1] | string | `"memory_limiter"` |  |
 | opentelemetry-collector.config.service.pipelines.metrics.processors[2] | string | `"batch"` |  |
 | opentelemetry-collector.config.service.pipelines.metrics.receivers[0] | string | `"otlp"` |  |
 | opentelemetry-collector.config.service.pipelines.traces.exporters[0] | string | `"otlphttp"` |  |
-| opentelemetry-collector.config.service.pipelines.traces.exporters[1] | string | `"logging"` |  |
+| opentelemetry-collector.config.service.pipelines.traces.exporters[1] | string | `"debug"` |  |
 | opentelemetry-collector.config.service.pipelines.traces.processors[0] | string | `"probabilistic_sampler"` |  |
 | opentelemetry-collector.config.service.pipelines.traces.processors[1] | string | `"k8sattributes"` |  |
 | opentelemetry-collector.config.service.pipelines.traces.processors[2] | string | `"memory_limiter"` |  |
