@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
 
 import pytest
-import base64
-import json, yaml
-import re
-import time
-
 
 @pytest.mark.tags(
         "default.yaml",
@@ -25,7 +20,11 @@ def test_errors_logs(kube_client, helm_config):
     ignore_error_patterns = [
         "failed to retrieve ConfigMap kube-system/aws-auth",
         "Exporting failed. Will retry the request after interval",
-        "The resourceVersion for the provided watch is too old"
+        "The resourceVersion for the provided watch is too old",
+        # Sometimes the container operator of filelog doesn't understand the logs' format
+        # This most likely happens when the log is corrupted or in a weird state
+        # Let's prevent these errors from blocking integration tests.
+        "failed to detect a valid container log format: entry cannot be parsed as container logs"
     ]
     expected_good_logs = [
         "Starting observe-agent"
