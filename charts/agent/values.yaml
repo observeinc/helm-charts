@@ -154,7 +154,7 @@ cluster-events:
     repository: observeinc/observe-agent
     # Overrides the image tag whose default is the chart appVersion.
     # The service's name will be applied to the end of this value.
-    tag: "1.3.1-dadc4eca-nightly"
+    tag: "1.3.0"
     pullPolicy: IfNotPresent
 
   command:
@@ -293,7 +293,7 @@ cluster-metrics:
     repository: observeinc/observe-agent
     # # Overrides the image tag whose default is the chart appVersion.
     # # The service's name will be applied to the end of this value.
-    tag: "1.3.1-dadc4eca-nightly"
+    tag: "1.3.0"
     pullPolicy: IfNotPresent
 
   command:
@@ -424,7 +424,7 @@ node-logs-metrics:
     repository: observeinc/observe-agent
     # # Overrides the image tag whose default is the chart appVersion.
     # # The service's name will be applied to the end of this value.
-    tag: "1.3.1-dadc4eca-nightly"
+    tag: "1.3.0"
     pullPolicy: IfNotPresent
 
   command:
@@ -588,7 +588,7 @@ monitor:
     repository: observeinc/observe-agent
     # # Overrides the image tag whose default is the chart appVersion.
     # # The service's name will be applied to the end of this value.
-    tag: "1.3.1-dadc4eca-nightly"
+    tag: "1.3.0"
     pullPolicy: IfNotPresent
 
   command:
