@@ -24,7 +24,9 @@ def test_errors_logs(kube_client, helm_config):
         # Sometimes the container operator of filelog doesn't understand the logs' format
         # This most likely happens when the log is corrupted or in a weird state
         # Let's prevent these errors from blocking integration tests.
-        "failed to detect a valid container log format: entry cannot be parsed as container logs"
+        "failed to detect a valid container log format: entry cannot be parsed as container logs",
+        # containerID is empty when a container is just created.
+        " has an empty containerID"
     ]
     expected_good_logs = [
         "Starting observe-agent"
