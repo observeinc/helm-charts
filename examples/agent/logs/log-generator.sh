@@ -57,6 +57,15 @@ generate_custom_logs() {
   done
 }
 
+generate_custom_multiline_logs() {
+  for i in $(seq 1 $LOG_LENGTH); do
+    echo "$(date +%Y-%m-%dT%H:%M:%S) | CUSTOM_LOG | $(generate_random_string $LINE_LENGTH)"
+    echo "  This is the first line of the log message."
+    echo "  This is the second line."
+    echo "  And this is the third line."
+  done
+}
+
 # Logic to select the log type
 case "$LOG_TYPE" in
   apache)
@@ -86,6 +95,12 @@ case "$LOG_TYPE" in
   custom)
     while true; do
         generate_custom_logs
+        sleep $SLEEP_LENGTH
+    done
+    ;;
+  custom-multiline)
+    while true; do
+        generate_custom_multiline_logs
         sleep $SLEEP_LENGTH
     done
     ;;
