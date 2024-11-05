@@ -19,3 +19,4 @@ __pycache__
 .pytest_*
 
 local*
+integration/source
