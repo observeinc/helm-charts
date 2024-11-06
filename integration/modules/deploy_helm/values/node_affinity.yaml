@@ -12,6 +12,7 @@ observe:
   collectionEndpoint:
     value: ${observe_url}
   token:
+    create: true
     value: ${observe_token}
 cluster:
   namespaceOverride:
