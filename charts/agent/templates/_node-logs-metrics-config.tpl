@@ -2,8 +2,7 @@
 
 extensions:
 {{- include "config.extensions.health_check" . | nindent 2 }}
-  file_storage:
-    directory: /var/lib/otelcol
+{{- include "config.extensions.file_storage" . | nindent 2 }}
 
 exporters:
 {{- include "config.exporters.debug" . | nindent 2 }}
