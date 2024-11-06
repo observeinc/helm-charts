@@ -4,3 +4,8 @@
 health_check:
   endpoint: "{{ template "config.local_host"}}:13133"
 {{- end -}}
+
+{{- define "config.extensions.file_storage" -}}
+file_storage:
+  create_directory: true
+{{- end -}}
