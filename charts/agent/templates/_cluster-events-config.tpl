@@ -350,6 +350,7 @@ processors:
           - set(attributes["observe_transform"]["identifiers"]["ingressUid"], body["metadata"]["uid"])
           # spec
           - set(attributes["observe_transform"]["facets"]["class"], body["spec"]["ingressClassName"])
+          - set(attributes["observe_transform"]["facets"]["class"], body["metadata"]["annotations"]["kubernetes.io/ingress.class"]) where attributes["observe_transform"]["facets"]["class"] == nil
       - context: log
         conditions:
           - body["kind"] == "RoleBinding"
