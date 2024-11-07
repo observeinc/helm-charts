@@ -1,10 +1,8 @@
 # This section is for configuring agent to send data to Observe endpoints
-# we recommend using --set token.value=YOUR_TOKEN for values you want to keep secret
-# supplying a token creates a secret on your cluster
 observe:
   # If create = false it is assumed that a secret named agent-credentials with key: OBSERVE_TOKEN already exists
   token:
-    create: true
+    create: false
     value: ""
   collectionEndpoint:
     # ex -  https://12345678.collect.observeinc.com
@@ -66,7 +64,7 @@ node:
       # Log rotation glob assumes rename of file follows this pattern *.log.*
       include: '["/var/log/pods/*/*/*.log", "/var/log/pods/*/*/*.log.*", "/var/log/kube-apiserver-audit.log"]'
       # A list of file glob patterns to exclude from reading. This is applied against the paths matched by include. Need to put inside of '' to avoid helm stripping commas and quotes.
-      #  Log rotation exclude glob assumes files previously rotated and renamed are zipped after latest rotated file is created
+      #  Log rotation exclude glob assumes files previously rotated and renamed are zipped after 1.4.0 rotated file is created
       exclude: '["/var/log/pods/*/*/*.log.*.gz"]'
       # time unit 1m, 1h
       lookbackPeriod: 24h
@@ -152,9 +150,7 @@ cluster-events:
 
   image:
     repository: observeinc/observe-agent
-    # Overrides the image tag whose default is the chart appVersion.
-    # The service's name will be applied to the end of this value.
-    tag: "1.3.0"
+    tag: 1.4.0
     pullPolicy: IfNotPresent
 
   command:
@@ -291,9 +287,7 @@ cluster-metrics:
 
   image:
     repository: observeinc/observe-agent
-    # # Overrides the image tag whose default is the chart appVersion.
-    # # The service's name will be applied to the end of this value.
-    tag: "1.3.0"
+    tag: 1.4.0
     pullPolicy: IfNotPresent
 
   command:
@@ -422,9 +416,7 @@ node-logs-metrics:
 
   image:
     repository: observeinc/observe-agent
-    # # Overrides the image tag whose default is the chart appVersion.
-    # # The service's name will be applied to the end of this value.
-    tag: "1.3.0"
+    tag: 1.4.0
     pullPolicy: IfNotPresent
 
   command:
@@ -586,9 +578,7 @@ monitor:
 
   image:
     repository: observeinc/observe-agent
-    # # Overrides the image tag whose default is the chart appVersion.
-    # # The service's name will be applied to the end of this value.
-    tag: "1.3.0"
+    tag: 1.4.0
     pullPolicy: IfNotPresent
 
   command:

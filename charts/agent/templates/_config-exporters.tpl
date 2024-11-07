@@ -15,9 +15,13 @@ otlphttp/observe/base:
 
 {{- define "config.exporters.otlphttp.observe.entity" -}}
 otlphttp/observe/entity:
-    logs_endpoint: "{{ .Values.observe.collectionEndpoint.value | toString | trimSuffix "/" }}/v1/kubernetes/v1/entity"
+    endpoint: "{{ .Values.observe.collectionEndpoint.value | toString | trimSuffix "/" }}/v2/otel"
     headers:
+    {{- if .Values.observe.entityToken.use -}}
         authorization: "Bearer ${env:ENTITY_TOKEN}"
+    {{- else }}
+        authorization: "${env:OBSERVE_TOKEN}"
+    {{- end }}
     sending_queue:
       enabled: {{ .Values.agent.config.global.exporters.sendingQueue.enabled }}
     retry_on_failure:
