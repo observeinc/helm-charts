@@ -15,7 +15,7 @@ otlphttp/observe/base:
 
 {{- define "config.exporters.otlphttp.observe.entity" -}}
 otlphttp/observe/entity:
-    endpoint: "{{ .Values.observe.collectionEndpoint.value | toString | trimSuffix "/" }}/v1/kubernetes/v1/entity"
+    logs_endpoint: "{{ .Values.observe.collectionEndpoint.value | toString | trimSuffix "/" }}/v1/kubernetes/v1/entity"
     headers:
     {{- if .Values.observe.entityToken.use }}
         authorization: "Bearer ${env:ENTITY_TOKEN}"
