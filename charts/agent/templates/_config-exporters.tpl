@@ -17,7 +17,7 @@ otlphttp/observe/base:
 otlphttp/observe/entity:
     endpoint: "{{ .Values.observe.collectionEndpoint.value | toString | trimSuffix "/" }}/v2/otel"
     headers:
-    {{- if .Values.observe.entityToken.use -}}
+    {{- if .Values.observe.entityToken.use }}
         authorization: "Bearer ${env:ENTITY_TOKEN}"
     {{- else }}
         authorization: "${env:OBSERVE_TOKEN}"
