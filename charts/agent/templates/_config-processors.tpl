@@ -82,7 +82,8 @@ memory_limiter:
   spike_limit_percentage: 25
 {{- end -}}
 
+# This processor might edit the log body in-place, which might affect the output of transform/object.
+# Therefore, this processor must always be placed before transform/object in the pipeline.
 {{- define "config.processors.attributes.observek8sattributes" -}}
-# needs to come after transform/watch_objects in pipelines
 observek8sattributes:
 {{- end -}}
