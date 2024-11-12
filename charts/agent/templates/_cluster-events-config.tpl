@@ -429,7 +429,7 @@ service:
   pipelines:
       logs/objects:
         receivers: [k8sobjects/objects]
-        processors: [memory_limiter, batch, resource/observe_common, transform/object, observek8sattributes]
+        processors: [memory_limiter, batch, resource/observe_common, observek8sattributes, transform/object]
         exporters: [otlphttp/observe/entity, debug/override]
       logs/cluster:
         receivers: [k8sobjects/cluster]
