@@ -35,9 +35,9 @@ k8sattributes:
   - sources:
     - from: resource_attribute
       name: k8s.pod.ip
-  - sources:
-    - from: resource_attribute
-      name: k8s.container.restart_count
+  # - sources:
+  #   - from: resource_attribute
+  #     name: k8s.container.restart_count
   - sources:
     - from: resource_attribute
       name: k8s.pod.uid
