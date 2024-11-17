@@ -1,6 +1,6 @@
 # stack
 
-![Version: 1.1.1](https://img.shields.io/badge/Version-1.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.1.2](https://img.shields.io/badge/Version-1.1.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe Kubernetes agent stack
 
@@ -15,10 +15,10 @@ Observe Kubernetes agent stack
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../events | events | 0.2.0 |
-| file://../logs | logs | 0.1.34 |
+| file://../logs | logs | 0.1.35 |
 | file://../metrics | metrics | 0.3.25 |
 | file://../proxy | proxy | 0.1.8 |
-| file://../traces | traces | 1.0.7 |
+| file://../traces | traces | 1.0.8 |
 
 ## Values
 
