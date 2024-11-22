@@ -89,7 +89,7 @@ logs:
             Rotate_Wait         {{.Values.config.rotate_wait}}
             Refresh_Interval    {{.Values.config.refresh_interval}}
             Inotify_Watcher     {{.Values.config.inotify_watcher}}
-        
+
         [INPUT]
             Name                tail
             Tag                 k8snode
@@ -113,13 +113,13 @@ logs:
             Match               k8slogs
             Call                remove_timestamp_flags_and_eol
             Code                function remove_timestamp_flags_and_eol(tag, timestamp, record) if record["log"] then record["log"] = string.gsub(record["log"], "%s?%d+-%d+-%d+T%d+:%d+:%d+.%d+Z stdout%sF%s", ""); record["log"] = string.gsub(record["log"], "[\n\r]+$", ""); end return 2, timestamp, record end
-        
+
         [FILTER]
             Name                record_modifier
             Alias               add_nodename
             Match               *
             Record              nodeName ${NODE}
-        
+
         [FILTER]
             Name                parser
             Alias               parse_filename
@@ -127,7 +127,7 @@ logs:
             Key_Name            filename
             Reserve_Data        True
             Parser              kube-custom
-        
+
         [FILTER]
             Name                record_modifier
             Alias               filter_docker
@@ -138,7 +138,7 @@ logs:
             Whitelist_key       podName
             Whitelist_key       namespace
             Whitelist_key       nodeName
-        
+
         [FILTER]
             Name                grep
             Alias               exclude
@@ -150,7 +150,7 @@ logs:
         # [OUTPUT]
         #     Name        stdout
         #     Match       k8slogs
-        
+
         [OUTPUT]
             Name                http
             Match               k8slogs*
@@ -170,7 +170,7 @@ logs:
             net.keepalive_idle_timeout  {{.Values.config.keepalive_idle_timeout}}
             net.keepalive_max_recycle   {{.Values.config.keepalive_max_recycle}}
             net.max_worker_connections  {{.Values.config.max_worker_connections}}
-        
+
         [OUTPUT]
             Name                http
             Match               k8snode*
@@ -190,7 +190,7 @@ logs:
             net.keepalive_idle_timeout  {{.Values.config.keepalive_idle_timeout}}
             net.keepalive_max_recycle   {{.Values.config.keepalive_max_recycle}}
             net.max_worker_connections  {{.Values.config.max_worker_connections}}
-        
+
         {{- include "observe.includeExtraFiles" . }}
 
       customParsers: |
@@ -198,11 +198,11 @@ logs:
             Name        kube-custom
             Format      regex
             Regex       (?<podName>[a-z0-9](?:[-a-z0-9]*[a-z0-9])?(?:\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*)_(?<namespace>[^_]+)_(?<containerName>.+)-(?<containerId>[a-f0-9]{64})\.log$
-        
+
         [MULTILINE_PARSER]
             name          multilinecontainerd
             type          regex
-            flush_timeout 1000           
+            flush_timeout 1000
             rule      "start_state"   "/^\S+ stdout P.*$/"  "cont"
             rule      "cont"          "/^\S+ stdout F.*$/"  "cont"
 

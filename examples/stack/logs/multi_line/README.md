@@ -14,7 +14,7 @@ helm install --namespace=observe observe-stack observe/stack \
 ```
 
 ## Deploy containerd runtime collection to combine lines above 16k
-`containerd` logs are split into 16KB chunks due to the design of `containerd`’s logging mechanism, the `containerd-multiline.yaml` will combine the multiline log files. 
+`containerd` logs are split into 16KB chunks due to the design of `containerd`’s logging mechanism, the `containerd-multiline.yaml` will combine the multiline log files.
 
 ```
 helm install --namespace=observe observe-stack observe/stack \
