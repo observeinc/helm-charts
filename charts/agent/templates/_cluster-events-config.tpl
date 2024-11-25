@@ -76,6 +76,17 @@ processors:
 
 {{- include "config.processors.attributes.observek8sattributes" . | nindent 2 }}
 
+  transform/unify:
+    error_mode: ignore
+    log_statements:
+      - context: log
+        statements:
+          # unwrapping for the object_watch stream
+          - set(attributes["observe_transform"]["control"]["isDelete"], true) where body["object"] != nil and body["type"] == "DELETED"
+          - set(attributes["observe_transform"]["control"]["debug_source"], "watch") where body["object"] != nil and body["type"] != nil
+          - set(attributes["observe_transform"]["control"]["debug_source"], "pull") where body["object"] == nil or body["type"] == nil
+          - set(body, body["object"]) where body["object"] != nil and body["type"] != nil
+
   # transform for k8s objects
   transform/object:
     error_mode: ignore
@@ -83,11 +94,6 @@ processors:
       - context: log
         statements:
           - set(attributes["observe_filter"], "objects_pull_watch")
-          # unwrapping for the object_watch stream
-          - set(attributes["observe_transform"]["control"]["isDelete"], true) where body["object"] != nil and body["type"] == "DELETED"
-          - set(attributes["observe_transform"]["control"]["debug_source"], "watch") where body["object"] != nil and body["type"] != nil
-          - set(attributes["observe_transform"]["control"]["debug_source"], "pull") where body["object"] == nil or body["type"] == nil
-          - set(body, body["object"]) where body["object"] != nil and body["type"] != nil
           # native columns: valid_from, valid_to, kind
           - set(attributes["observe_transform"]["valid_from"], observed_time_unix_nano)
           - set(attributes["observe_transform"]["valid_to"], Int(observed_time_unix_nano) + 5400000000000)
@@ -429,7 +435,7 @@ service:
   pipelines:
       logs/objects:
         receivers: [k8sobjects/objects]
-        processors: [memory_limiter, batch, resource/observe_common, observek8sattributes, transform/object]
+        processors: [memory_limiter, batch, resource/observe_common, transform/unify, observek8sattributes, transform/object]
         exporters: [otlphttp/observe/entity, debug/override]
       logs/cluster:
         receivers: [k8sobjects/cluster]
