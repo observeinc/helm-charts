@@ -87,3 +87,11 @@ memory_limiter:
 {{- define "config.processors.attributes.observek8sattributes" -}}
 observek8sattributes:
 {{- end -}}
+
+{{- define "config.processors.transform.metrics" -}}
+transform/metrics:
+  metric_statements:
+    - context: metric
+      statements:
+        - set(unit, "CPU") where unit == "" and IsMatch(name, ".*cpu.*")
+{{- end -}}
