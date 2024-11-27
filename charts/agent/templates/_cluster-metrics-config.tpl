@@ -151,6 +151,8 @@ processors:
 
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
 
+{{- include "config.processors.transform.metrics" . | nindent 2 }}
+
   # attributes to append to objects
   attributes/debug_source_cluster_metrics:
     actions:
@@ -168,12 +170,12 @@ service:
   pipelines:
       metrics:
         receivers: [k8s_cluster]
-        processors: [memory_limiter, k8sattributes, batch, resource/observe_common, attributes/debug_source_cluster_metrics]
+        processors: [memory_limiter, k8sattributes, batch, resource/observe_common, attributes/debug_source_cluster_metrics, transform/metrics]
         exporters: [prometheusremotewrite, debug/override]
       {{- if .Values.application.prometheusScrape.enabled }}
       metrics/pod_metrics:
         receivers: [prometheus/pod_metrics]
-        processors: [memory_limiter, k8sattributes, batch, resource/observe_common, attributes/debug_source_pod_metrics]
+        processors: [memory_limiter, k8sattributes, batch, resource/observe_common, attributes/debug_source_pod_metrics, transform/metrics]
         exporters: [prometheusremotewrite, debug/override]
       {{ end -}}
 {{- include "config.service.telemetry" . | nindent 2 }}
