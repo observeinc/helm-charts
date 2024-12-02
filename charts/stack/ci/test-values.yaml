@@ -29,3 +29,5 @@ events:
       - apps/v1/replicasets
     includeTargets:
       - apps/v1/deployments
+  customLabels:
+    foo: bar
