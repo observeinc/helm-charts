@@ -65,7 +65,7 @@ node:
       include: '["/var/log/pods/*/*/*.log", "/var/log/pods/*/*/*.log.*", "/var/log/kube-apiserver-audit.log"]'
       # A list of file glob patterns to exclude from reading. This is applied against the paths matched by include. Need to put inside of '' to avoid helm stripping commas and quotes.
       #  Log rotation exclude glob assumes files previously rotated and renamed are zipped after 1.4.0 rotated file is created
-      exclude: '["/var/log/pods/*/*/*.log.*.gz"]'
+      exclude: '["/var/log/pods/*/*/*.log.*.gz", "/var/log/pods/*/*/*.tmp"]'
       # time unit 1m, 1h
       lookbackPeriod: 24h
       # At startup, where to start reading logs from the file. Options are beginning or end.
