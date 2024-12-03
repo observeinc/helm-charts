@@ -49,7 +49,7 @@ k8sattributes:
 resource/observe_common:
   attributes:
     - key: k8s.cluster.name
-      action: insert
+      action: upsert
       value: ${env:OBSERVE_CLUSTER_NAME}
     - key: k8s.cluster.uid
       action: insert
