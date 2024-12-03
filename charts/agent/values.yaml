@@ -120,6 +120,7 @@ agent:
           loggingLevel: WARN
           loggingEncoding: console
       debug:
+        enabled: false
         # values basic, normal, detailed
         verbosity: basic
     # additional otel collector config for cluster-events deployment
