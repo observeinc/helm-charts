@@ -430,17 +430,25 @@ processors:
           # this is a fake object, there is no k8s yaml object for it
           - set(body, "")
 
+{{- $objectsExporters := (list "otlphttp/observe/entity") -}}
+{{- $logsClusterExporters := (list "otlphttp/observe/entity") -}}
+
+{{- if eq .Values.agent.config.global.debug.enabled true }}
+  {{- $objectsExporters = concat $objectsExporters ( list "debug/override" ) | uniq }}
+  {{- $logsClusterExporters = concat $logsClusterExporters ( list "debug/override" ) | uniq }}
+{{- end }}
+
 service:
   extensions: [health_check]
   pipelines:
       logs/objects:
         receivers: [k8sobjects/objects]
         processors: [memory_limiter, batch, resource/observe_common, transform/unify, observek8sattributes, transform/object]
-        exporters: [otlphttp/observe/entity, debug/override]
+        exporters: [{{ join ", " $objectsExporters }}]
       logs/cluster:
         receivers: [k8sobjects/cluster]
         processors: [memory_limiter, batch, resource/observe_common, filter/cluster, transform/cluster]
-        exporters: [otlphttp/observe/entity, debug/override]
+        exporters: [{{ join ", " $logsClusterExporters }}]
 
 {{- include "config.service.telemetry" . | nindent 2 }}
 
