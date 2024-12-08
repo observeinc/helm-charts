@@ -13,6 +13,6 @@ dependencies:
   version: 0.1.8
 - name: traces
   repository: file://../traces
-  version: 1.0.9
-digest: sha256:02ead20784b4517eef07115797df4ca1dcbeae95c1921fdaf4af84cacd8b2bc8
-generated: "2024-12-01T00:27:03.591081354Z"
+  version: 1.0.10
+digest: sha256:f458bee133a3755c93c2704bc4682acd8a27edb68c6b97c0df99bd3eba8a51e5
+generated: "2024-12-08T00:24:36.032329642Z"
