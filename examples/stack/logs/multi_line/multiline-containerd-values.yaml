@@ -15,6 +15,9 @@ events:
       cpu: 50m
       memory: 256Mi
 
+metrics:
+  enabled: false
+
 logs:
   fluent-bit:
     resources:
@@ -205,6 +208,3 @@ logs:
             flush_timeout 1000
             rule      "start_state"   "/^\S+ stdout P.*$/"  "cont"
             rule      "cont"          "/^\S+ stdout F.*$/"  "cont"
-
-metrics:
-  enabled: false
