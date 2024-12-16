@@ -1,6 +1,7 @@
 import pytest
 import os
 import time
+import json
 from kubernetes import client, config
 
 def pytest_addoption(parser):
@@ -160,3 +161,30 @@ def has_affinity(pod, key, operator, value):
                     (value in expression.values or value is None)):
                     return True
     return False
+
+
+@pytest.helpers.register
+#Function to parse pod logs to json
+def parseLogs(pod_logs):
+    """_summary_
+
+    Args:
+        pod_logs (Any): Output of kube_client.read_namespaced_pod_log(name=pod_name, namespace=helm_config['namespace'])
+
+    Returns:
+        parsed_logs (list): List of parsed logs
+          Ex: [{'level':'info', .....},{'level':'error', ....}]
+    """
+    pod_logs_lines=pod_logs.splitlines()[:250]  #Get the first 250 lines
+
+    #  Parse each log line into JSON.
+    #  Each parse log line is a json entry in this list (eg: [{'level':'info'},{'level':'error'}])
+    parsed_logs = []
+    for line in pod_logs_lines:
+        try:
+            # Attempt to parse the line as JSON
+            parsed_logs.append(json.loads(line))
+        except json.JSONDecodeError:
+            # Skip lines that aren't valid JSON
+            pass
+    return parsed_logs
