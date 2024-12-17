@@ -1,0 +1,214 @@
+global:
+  observe:
+    collectionEndpoint: ""
+
+observe:
+  token:
+    value: ""
+
+events:
+  resources:
+    limits:
+      cpu: 50m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 256Mi
+
+metrics:
+  enabled: false
+
+logs:
+  fluent-bit:
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+    config:
+        buffer_chunk_size: 32k
+        buffer_max_size: 256k
+        dns_mode: UDP
+        dns_resolver: LEGACY
+        flush: 2
+        grace: 10
+        hc_errors_count: 5
+        hc_retry_failure_count: 5
+        hc_period: 10
+        log_level: warning
+        mem_buf_limit: 10MB
+        node_log_include_path: /var/log/kube-apiserver-audit.log
+        node_log_exclude_path: nomatch
+        read_from_head: "true"
+        ignore_older: "2d"
+        refresh_interval: 2
+        retry_limit: 5
+        rotate_wait: 5
+        storage_metrics: "off"
+        grep_match_tag: "nothing"
+        grep_exclude: "nomatch ^$"
+        inotify_watcher: "true"
+        workers: 2
+        connect_timeout: 10
+        keepalive: "on"
+        keepalive_idle_timeout: 30
+        keepalive_max_recycle: 2000
+        max_worker_connections: 25
+
+        service: |
+          [SERVICE]
+              Flush                  {{.Values.config.flush}}
+              Grace                  {{.Values.config.grace}}
+              Daemon                 Off
+              Log_Level              {{.Values.config.log_level}}
+              Parsers_File           custom_parsers.conf
+              HTTP_Server            On
+              HTTP_Listen            0.0.0.0
+              HTTP_PORT              2020
+              Health_Check           On
+              HC_Errors_Count        {{.Values.config.hc_errors_count}}
+              HC_Retry_Failure_Count {{.Values.config.hc_retry_failure_count}}
+              HC_Period              {{.Values.config.hc_period}}
+              dns.mode               {{.Values.config.dns_mode}}
+              dns.resolver           {{.Values.config.dns_resolver}}
+              storage.metrics        {{.Values.config.storage_metrics}}
+
+        inputs: |
+          [INPUT]
+              Name                tail
+              Tag                 k8slogs
+              Alias               k8slogs
+              Path                /var/log/containers/*.log
+              Path_Key            filename
+              DB                  /var/log/flb_kube_${NAMESPACE}.db
+              Skip_Long_Lines     Off
+              multiline.parser    match_timestamps_format
+              Read_From_Head      {{.Values.config.read_from_head}}
+              Mem_Buf_Limit       {{.Values.config.mem_buf_limit}}
+              Buffer_Chunk_Size   {{.Values.config.buffer_chunk_size}}
+              Buffer_Max_Size     {{.Values.config.buffer_max_size}}
+              Rotate_Wait         {{.Values.config.rotate_wait}}
+              Refresh_Interval    {{.Values.config.refresh_interval}}
+              Inotify_Watcher     {{.Values.config.inotify_watcher}}
+
+          [INPUT]
+              Name                tail
+              Tag                 k8snode
+              Alias               k8snode
+              Path                {{.Values.config.node_log_include_path}}
+              Exclude_Path        {{.Values.config.node_log_exclude_path}}
+              Path_Key            filename
+              DB                  /var/log/flb_node_${NAMESPACE}.db
+              Skip_Long_Lines     On
+              Read_From_Head      {{.Values.config.read_from_head}}
+              Ignore_Older        {{.Values.config.ignore_older}}
+              Mem_Buf_Limit       {{.Values.config.mem_buf_limit}}
+              Buffer_Chunk_Size   {{.Values.config.buffer_chunk_size}}
+              Buffer_Max_Size     {{.Values.config.buffer_max_size}}
+              Rotate_Wait         {{.Values.config.rotate_wait}}
+              Inotify_Watcher     {{.Values.config.inotify_watcher}}
+
+        filters: |
+          [FILTER]
+              Name                lua
+              Match               k8slogs*
+              Call                keep_first_timestamp_and_clean
+              # Remove containerd timestamps from joined lines, retaining the first containerd timestamp.
+              Code                function keep_first_timestamp_and_clean(tag, timestamp, record) if record["log"] then local first_entry = string.match(record["log"], "^%s?%d+-%d+-%d+T%d+:%d+:%d+.%d+Z stdout%sF%s"); if first_entry then record["log"] = first_entry .. string.gsub(string.gsub(record["log"], "(%s?%d+-%d+-%d+T%d+:%d+:%d+.%d+Z stdout%sF%s)", "", 1), "%s?%d+-%d+-%d+T%d+:%d+:%d+.%d+Z stdout%sF%s", ""); end end return 2, timestamp, record; end
+
+          [FILTER]
+              Name                record_modifier
+              Alias               add_nodename
+              Match               *
+              Record              nodeName ${NODE}
+
+          [FILTER]
+              Name                parser
+              Alias               parse_filename
+              Match               k8slogs*
+              Key_Name            filename
+              Reserve_Data        True
+              Parser              kube-custom
+
+          [FILTER]
+              Name                record_modifier
+              Alias               filter_docker
+              Match               k8slogs*
+              Whitelist_key       containerId
+              Whitelist_key       containerName
+              Whitelist_key       log
+              Whitelist_key       podName
+              Whitelist_key       namespace
+              Whitelist_key       nodeName
+
+          [FILTER]
+              Name                grep
+              Alias               exclude
+              Match               {{.Values.config.grep_match_tag}}
+              Exclude             {{.Values.config.grep_exclude}}
+
+        outputs: |
+          # uncomment below for additional debugging
+          # [OUTPUT]
+          #     Name        stdout
+          #     Match       k8slogs
+
+          [OUTPUT]
+              Name                http
+              Match               k8slogs*
+              Alias               k8slogs
+              Host                {{ include "observe.collectorHost" . }}
+              Port                {{ include "observe.collectorPort" . }}
+              TLS                 {{ include "observe.useTLS" . }}
+              URI                 /v1/http/kubernetes/logs?clusterUid=${OBSERVE_CLUSTER}
+              Format              msgpack
+              Header              X-Observe-Decoder fluent
+              Header              Authorization Bearer ${OBSERVE_TOKEN}
+              Compress            gzip
+              Retry_Limit         {{.Values.config.retry_limit}}
+              Workers             {{.Values.config.workers}}
+              net.connect_timeout         {{.Values.config.connect_timeout}}
+              net.keepalive               {{.Values.config.keepalive}}
+              net.keepalive_idle_timeout  {{.Values.config.keepalive_idle_timeout}}
+              net.keepalive_max_recycle   {{.Values.config.keepalive_max_recycle}}
+              net.max_worker_connections  {{.Values.config.max_worker_connections}}
+
+          [OUTPUT]
+              Name                http
+              Match               k8snode*
+              Alias               k8snode
+              Host                {{ include "observe.collectorHost" . }}
+              Port                {{ include "observe.collectorPort" . }}
+              TLS                 {{ include "observe.useTLS" . }}
+              URI                 /v1/http/kubernetes/node?clusterUid=${OBSERVE_CLUSTER}
+              Format              msgpack
+              Header              X-Observe-Decoder fluent
+              Header              Authorization Bearer ${OBSERVE_TOKEN}
+              Compress            gzip
+              Retry_Limit         {{.Values.config.retry_limit}}
+              Workers             {{.Values.config.workers}}
+              net.connect_timeout         {{.Values.config.connect_timeout}}
+              net.keepalive               {{.Values.config.keepalive}}
+              net.keepalive_idle_timeout  {{.Values.config.keepalive_idle_timeout}}
+              net.keepalive_max_recycle   {{.Values.config.keepalive_max_recycle}}
+              net.max_worker_connections  {{.Values.config.max_worker_connections}}
+
+          {{- include "observe.includeExtraFiles" . }}
+
+        customParsers: |
+          [PARSER]
+              Name        kube-custom
+              Format      regex
+              Regex       (?<podName>[a-z0-9](?:[-a-z0-9]*[a-z0-9])?(?:\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*)_(?<namespace>[^_]+)_(?<containerName>.+)-(?<containerId>[a-f0-9]{64})\.log$
+
+          [MULTILINE_PARSER]
+              name                      match_timestamps_format
+              type                      regex
+              flush_timeout             1000
+              key_content               log
+              # Match any line that begins with any of the following timestamps 2024-12-03 07:31:12,563, 07:31:20,550, [2024-12-03 07:31:28.353]
+              rule      "start_state"   "/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s+(stdout|stderr)\s+F\s(\[\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d{3}\]|\d{2}:\d{2}:\d{2}.\d{3}|\d{2}:\d{2}:\d{2},\d{3}|\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}.\d{3}).*$/"  "cont"
+              # Continue to merge until we encounter a timestamp at the beginnnig of a line
+              rule      "cont"          "/^(?!\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s+(stdout|stderr)\s+F\s(\[\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d{3}\]|\d{2}:\d{2}:\d{2}.\d{3}|\d{2}:\d{2}:\d{2},\d{3}|\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}.\d{3})).*$/"  "cont"
