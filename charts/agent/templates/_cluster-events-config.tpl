@@ -123,7 +123,6 @@ processors:
           - set(attributes["observe_transform"]["facets"]["cronJobName"], attributes["observe_transform"]["facets"]["jobName"]) where IsMatch(attributes["observe_transform"]["facets"]["jobName"], ".*-\\d{8}$")
           - replace_pattern(attributes["observe_transform"]["facets"]["cronJobName"], "-\\d{8}$$", "")
           - set(attributes["observe_transform"]["facets"]["statefulSetName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "StatefulSet"
-          - set(attributes["observe_transform"]["facets"]["deploymentName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "ReplicaSet"
           - replace_pattern(attributes["observe_transform"]["facets"]["deploymentName"], "^(.*)-[0-9a-f]+$$", "$$1")
           - set(attributes["observe_transform"]["facets"]["deploymentName"], body["metadata"]["ownerReferences"][0]["name"]) where body["metadata"]["ownerReferences"][0]["kind"] == "Deployment"
       # Pod
