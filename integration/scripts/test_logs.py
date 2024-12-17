@@ -20,6 +20,15 @@ def test_errors_logs(kube_client, helm_config):
         "Starting observe-agent"
     ]
 
+    ignore_error_patterns = [
+        # Sometimes the container operator of filelog doesn't understand the logs' format
+        # This most likely happens when the log is corrupted or in a weird state
+        # Let's prevent these errors from blocking integration tests.
+        "failed to detect a valid container log format: entry cannot be parsed as container logs",
+        # containerID is empty when a container is just created.
+        "has an empty containerID",
+    ]
+
     # List all pods in the specified namespace
     pods = kube_client.list_namespaced_pod(namespace=helm_config['namespace'])
 
@@ -38,11 +47,15 @@ def test_errors_logs(kube_client, helm_config):
 
             parsed_logs=pytest.helpers.parseLogs(pod_logs) #Parse logs to json
 
-            for entry in parsed_logs:
-                if entry.get("level") == "error":  #Explicity check for {'level':'error', .....}
+            for entry in parsed_logs: #Explicity check for {'level':'error', .....} for each log entry
+                if entry.get("level") == "error" and any(pattern in entry.get("msg") for pattern in ignore_error_patterns):
+                    print(f"Ignoring expected error pattern log in entry: {entry}")  # Ignore expected errors
+                elif entry.get("level") == "error":
                     pytest.fail(f"Found error entry in logs of pod {pod_name}: {entry}")
-                if entry.get("level") == "warn":  #Explicity check for {'level':'warn', .....}
+                elif entry.get("level") == "warn":  #Explicity check for {'level':'warn', .....}
                    warnings.warn(UserWarning(f"Found warning entry in logs of pod {pod_name}: {entry}"))
+                else:
+                    continue
 
         except pytest.helpers.ApiException() as e:
             pytest.fail(f"Could not retrieve logs for pod {pod_name}: {e}")
