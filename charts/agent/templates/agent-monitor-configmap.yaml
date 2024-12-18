@@ -6,5 +6,5 @@ metadata:
   namespace: {{ template "observe-agent.namespace" . }}
 data:
   relay: |
-      {{- include "observe.deployment.agentMonitor.config" . | nindent 4 -}}
+      {{- include "observe.deployment.applyAgentMonitorConfig" . | nindent 4 -}}
 {{ end -}}

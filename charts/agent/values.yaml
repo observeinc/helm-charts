@@ -182,7 +182,6 @@ cluster-events:
     enabled: true
     egressRules: [{}]
 
-
   podAnnotations: {
     # This stops optional prometheus scrape config from picking up these pods
     observeinc_com_scrape: 'false',
