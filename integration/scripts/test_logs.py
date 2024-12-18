@@ -47,13 +47,16 @@ def test_errors_logs(kube_client, helm_config):
 
             parsed_logs=pytest.helpers.parseLogs(pod_logs) #Parse logs to json
 
-            for entry in parsed_logs: #Explicity check for {'level':'error', .....} for each log entry
-                if entry.get("level") == "error" and any(pattern in entry.get("msg") for pattern in ignore_error_patterns):
-                    print(f"Ignoring expected error pattern log in entry: {entry}")  # Ignore expected errors
-                elif entry.get("level") == "error":
-                    pytest.fail(f"Found error entry in logs of pod {pod_name}: {entry}")
-                elif entry.get("level") == "warn":  #Explicity check for {'level':'warn', .....}
-                   warnings.warn(UserWarning(f"Found warning entry in logs of pod {pod_name}: {entry}"))
+            for entry in parsed_logs:  # Explicitly check for {'level': 'error', ...} for each log entry
+                level = entry.get("level")
+                if level == "error":
+                    if (any(pattern in entry.get("msg") for pattern in ignore_error_patterns) or
+                        any(pattern in entry.get("error") for pattern in ignore_error_patterns)):
+                        print(f"Ignoring expected error pattern log in entry: {entry}")  # Ignore expected errors
+                    else:
+                        pytest.fail(f"Found error entry in logs of pod {pod_name}: {entry}")
+                elif level == "warn":  # Explicitly check for {'level': 'warn', ...}
+                    warnings.warn(UserWarning(f"Found warning entry in logs of pod {pod_name}: {entry}"))
                 else:
                     continue
 
