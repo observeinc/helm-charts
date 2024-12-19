@@ -6,5 +6,5 @@ metadata:
   namespace: {{ template "observe-agent.namespace" . }}
 data:
   relay: |
-      {{- include "observe.daemonset.logsMetrics.config" . | nindent 4 -}}
+      {{- include "observe.deployment.applyNodeLogsMetricsConfig" . | nindent 4 -}}
 {{ end -}}
