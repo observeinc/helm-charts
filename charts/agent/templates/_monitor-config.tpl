@@ -67,13 +67,19 @@ processors:
         action: insert
         value: agent_monitor
 
+{{- $metricsExporters := (list "prometheusremotewrite") -}}
+
+{{- if eq .Values.agent.config.global.debug.enabled true }}
+  {{- $metricsExporters = concat $metricsExporters ( list "debug/override" ) | uniq }}
+{{- end }}
+
 service:
   extensions: [health_check]
   pipelines:
       metrics:
         receivers: [prometheus/collector]
         processors: [memory_limiter, k8sattributes, batch, resource/observe_common, attributes/debug_source_agent_monitor]
-        exporters: [prometheusremotewrite]
+        exporters: [{{ join ", " $metricsExporters }}]
 {{- include "config.service.telemetry" . | nindent 2 }}
 
  {{- end }}
