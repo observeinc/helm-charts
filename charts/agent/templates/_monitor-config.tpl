@@ -12,12 +12,12 @@ receivers:
         config:
           scrape_configs:
           - job_name: opentelemetry-collector-self
-            scrape_interval: 10s
+            scrape_interval: {{ .Values.agent.selfMonitor.metrics.scrapeInterval }}
             static_configs:
             - targets:
               - ${env:MY_POD_IP}:8888
           - job_name: opentelemetry-collector-other
-            scrape_interval: 10s
+            scrape_interval: {{ .Values.agent.selfMonitor.metrics.scrapeInterval }}
             honor_labels: true
             kubernetes_sd_configs:
             - role: pod

@@ -124,6 +124,8 @@ agent:
         verbosity: basic
   selfMonitor:
     enabled: true
+    metrics:
+      scrapeInterval: 60s
 
 
 ################################################

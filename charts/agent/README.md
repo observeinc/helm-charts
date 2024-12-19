@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.30.8](https://img.shields.io/badge/Version-0.30.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
+![Version: 0.31.0](https://img.shields.io/badge/Version-0.31.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 > [!CAUTION]
 > This chart is under active development and is not meant to be installed yet.
@@ -38,6 +38,7 @@ Chart to install K8s collection stack based on Observe Agent
 | agent.config.global.service.telemetry.loggingLevel | string | `"WARN"` |  |
 | agent.config.global.service.telemetry.metricsLevel | string | `"normal"` |  |
 | agent.selfMonitor.enabled | bool | `true` |  |
+| agent.selfMonitor.metrics.scrapeInterval | string | `"60s"` |  |
 | application.prometheusScrape.enabled | bool | `false` |  |
 | application.prometheusScrape.interval | string | `"60s"` |  |
 | application.prometheusScrape.metricDropRegex | string | `".*bucket"` |  |
