@@ -122,6 +122,14 @@ agent:
       debug:
         # values basic, normal, detailed
         verbosity: basic
+    # additional otel collector config for cluster-events deployment
+    clusterEvents:
+    # additional otel collector config for cluster-metrics deployment
+    clusterMetrics:
+    # additional otel collector config for node-logs-metrics daemonset
+    nodeLogsMetrics:
+    # additional otel collector config for monitor deployment
+    monitor:
   selfMonitor:
     enabled: true
 
@@ -181,7 +189,6 @@ cluster-events:
   networkPolicy:
     enabled: true
     egressRules: [{}]
-
 
   podAnnotations: {
     # This stops optional prometheus scrape config from picking up these pods

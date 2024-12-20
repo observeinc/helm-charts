@@ -1,0 +1,49 @@
+agent:
+  config:
+    nodeLogsMetrics:
+      # This config specifies both a new receiver and exporter and sets up a new metrics pipeline with them
+      receivers:
+        otlp/custom:
+          protocols:
+            grpc:
+              endpoint: ${env:MY_POD_IP}:4317
+            http:
+              endpoint: ${env:MY_POD_IP}:4318
+      exporters:
+        otlphttp/custom:
+          endpoint: "CUSTOM_URL"
+      service:
+        pipelines:
+          metrics/custom:
+            receivers: [otlp/custom]
+            exporters: [otlp/additional]
+    clusterEvents:
+      # Here we configure a separate exporter and reuse an existing component from the default config as the receiver
+      exporters:
+        otlphttp/custom:
+          endpoint: "CUSTOM_URL"
+      service:
+        pipelines:
+          logs/custom:
+            receivers: [k8sobjects/cluster]
+            exporters: [otlp/additional]
+    clusterMetrics:
+      # Here we configure a separate exporter and reuse an existing component from the default config as the receiver
+      exporters:
+        otlphttp/custom:
+          endpoint: "CUSTOM_URL"
+      service:
+        pipelines:
+          metrics/custom:
+            receivers: [k8s_cluster]
+            exporters: [otlphttp/custom]
+    monitor:
+      # Here we configure a separate exporter and reuse an existing component from the default config as the receiver
+      exporters:
+        otlphttp/custom:
+          endpoint: "CUSTOM_URL"
+      service:
+        pipelines:
+          metrics/custom:
+            receivers: [prometheus/collector]
+            exporters: [otlphttp/custom]
