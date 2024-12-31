@@ -154,6 +154,19 @@ logs:
                 Whitelist_key       labels
                 Whitelist_key       log
                 Whitelist_key       filename
+            ################################
+            # ADD rewrite_tag and grep filter
+            # Keeps logs as is and only include the logs we want
+            ################################
+	    [FILTER]
+		Name     rewrite_tag
+		Match    k8slogs
+		Rule     $podName ^(observe-traces-agent*) $TAG.$podName false
+
+	    [FILTER]
+		Name        grep
+		Match       k8slogs.observe-traces-agent*
+		Regex       log /.*TracesExporter.*/
 
             [FILTER]
                 Name                record_modifier
