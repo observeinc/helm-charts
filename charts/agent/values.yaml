@@ -132,6 +132,8 @@ agent:
     monitor:
   selfMonitor:
     enabled: true
+    metrics:
+      scrapeInterval: 60s
 
 
 ################################################

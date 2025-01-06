@@ -42,6 +42,7 @@ Chart to install K8s collection stack based on Observe Agent
 | agent.config.monitor | string | `nil` |  |
 | agent.config.nodeLogsMetrics | string | `nil` |  |
 | agent.selfMonitor.enabled | bool | `true` |  |
+| agent.selfMonitor.metrics.scrapeInterval | string | `"60s"` |  |
 | application.prometheusScrape.enabled | bool | `false` |  |
 | application.prometheusScrape.interval | string | `"60s"` |  |
 | application.prometheusScrape.metricDropRegex | string | `".*bucket"` |  |
