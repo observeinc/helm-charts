@@ -290,12 +290,10 @@ Chart to install K8s collection stack based on Observe Agent
 | node-logs-metrics.extraVolumeMounts[2].mountPath | string | `"/var/lib/docker/containers"` |  |
 | node-logs-metrics.extraVolumeMounts[2].name | string | `"varlibdockercontainers"` |  |
 | node-logs-metrics.extraVolumeMounts[2].readOnly | bool | `true` |  |
-| node-logs-metrics.extraVolumeMounts[3].mountPath | string | `"/var/lib/otelcol"` |  |
-| node-logs-metrics.extraVolumeMounts[3].name | string | `"varlibotelcol"` |  |
-| node-logs-metrics.extraVolumeMounts[4].mountPath | string | `"/hostfs"` |  |
-| node-logs-metrics.extraVolumeMounts[4].mountPropagation | string | `"HostToContainer"` |  |
-| node-logs-metrics.extraVolumeMounts[4].name | string | `"hostfs"` |  |
-| node-logs-metrics.extraVolumeMounts[4].readOnly | bool | `true` |  |
+| node-logs-metrics.extraVolumeMounts[3].mountPath | string | `"/hostfs"` |  |
+| node-logs-metrics.extraVolumeMounts[3].mountPropagation | string | `"HostToContainer"` |  |
+| node-logs-metrics.extraVolumeMounts[3].name | string | `"hostfs"` |  |
+| node-logs-metrics.extraVolumeMounts[3].readOnly | bool | `true` |  |
 | node-logs-metrics.extraVolumes[0].configMap.defaultMode | int | `420` |  |
 | node-logs-metrics.extraVolumes[0].configMap.items[0].key | string | `"relay"` |  |
 | node-logs-metrics.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
@@ -305,11 +303,8 @@ Chart to install K8s collection stack based on Observe Agent
 | node-logs-metrics.extraVolumes[1].name | string | `"varlogpods"` |  |
 | node-logs-metrics.extraVolumes[2].hostPath.path | string | `"/var/lib/docker/containers"` |  |
 | node-logs-metrics.extraVolumes[2].name | string | `"varlibdockercontainers"` |  |
-| node-logs-metrics.extraVolumes[3].hostPath.path | string | `"/var/lib/otelcol"` |  |
-| node-logs-metrics.extraVolumes[3].hostPath.type | string | `"DirectoryOrCreate"` |  |
-| node-logs-metrics.extraVolumes[3].name | string | `"varlibotelcol"` |  |
-| node-logs-metrics.extraVolumes[4].hostPath.path | string | `"/"` |  |
-| node-logs-metrics.extraVolumes[4].name | string | `"hostfs"` |  |
+| node-logs-metrics.extraVolumes[3].hostPath.path | string | `"/"` |  |
+| node-logs-metrics.extraVolumes[3].name | string | `"hostfs"` |  |
 | node-logs-metrics.image.pullPolicy | string | `"IfNotPresent"` |  |
 | node-logs-metrics.image.repository | string | `"observeinc/observe-agent"` |  |
 | node-logs-metrics.image.tag | string | `"1.4.0"` |  |
@@ -341,8 +336,8 @@ Chart to install K8s collection stack based on Observe Agent
 | node-logs-metrics.readinessProbe.initialDelaySeconds | int | `30` |  |
 | node-logs-metrics.readinessProbe.periodSeconds | int | `5` |  |
 | node-logs-metrics.resources | object | `{"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
-| node-logs-metrics.securityContext.runAsGroup | int | `0` |  |
-| node-logs-metrics.securityContext.runAsUser | int | `0` |  |
+| node-logs-metrics.securityContext.runAsGroup | int | `79` |  |
+| node-logs-metrics.securityContext.runAsUser | int | `79` |  |
 | node-logs-metrics.serviceAccount.create | bool | `false` |  |
 | node-logs-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | node-logs-metrics.tolerations | list | `[]` |  |
