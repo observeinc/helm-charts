@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.32.0](https://img.shields.io/badge/Version-0.32.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
+![Version: 0.33.0](https://img.shields.io/badge/Version-0.33.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 > [!CAUTION]
 > This chart is under active development and is not meant to be installed yet.
@@ -115,7 +115,7 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster-events.readinessProbe.httpGet.port | int | `13133` |  |
 | cluster-events.readinessProbe.initialDelaySeconds | int | `30` |  |
 | cluster-events.readinessProbe.periodSeconds | int | `5` |  |
-| cluster-events.resources | object | `{"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| cluster-events.resources | object | `{"limits":{"memory":"256Mi"},"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | cluster-events.serviceAccount.create | bool | `false` |  |
 | cluster-events.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | cluster-events.tolerations | list | `[]` |  |
@@ -180,7 +180,7 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster-metrics.readinessProbe.httpGet.port | int | `13133` |  |
 | cluster-metrics.readinessProbe.initialDelaySeconds | int | `30` |  |
 | cluster-metrics.readinessProbe.periodSeconds | int | `5` |  |
-| cluster-metrics.resources | object | `{"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| cluster-metrics.resources | object | `{"limits":{"memory":"256Mi"},"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | cluster-metrics.serviceAccount.create | bool | `false` |  |
 | cluster-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | cluster-metrics.tolerations | list | `[]` |  |
@@ -252,7 +252,7 @@ Chart to install K8s collection stack based on Observe Agent
 | monitor.readinessProbe.httpGet.port | int | `13133` |  |
 | monitor.readinessProbe.initialDelaySeconds | int | `30` |  |
 | monitor.readinessProbe.periodSeconds | int | `5` |  |
-| monitor.resources | object | `{"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| monitor.resources | object | `{"limits":{"memory":"256Mi"},"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | monitor.serviceAccount.create | bool | `false` |  |
 | monitor.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | monitor.tolerations | list | `[]` |  |
@@ -340,7 +340,7 @@ Chart to install K8s collection stack based on Observe Agent
 | node-logs-metrics.readinessProbe.httpGet.port | int | `13133` |  |
 | node-logs-metrics.readinessProbe.initialDelaySeconds | int | `30` |  |
 | node-logs-metrics.readinessProbe.periodSeconds | int | `5` |  |
-| node-logs-metrics.resources | object | `{"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| node-logs-metrics.resources | object | `{"limits":{"memory":"256Mi"},"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | node-logs-metrics.securityContext.runAsGroup | int | `0` |  |
 | node-logs-metrics.securityContext.runAsUser | int | `0` |  |
 | node-logs-metrics.serviceAccount.create | bool | `false` |  |

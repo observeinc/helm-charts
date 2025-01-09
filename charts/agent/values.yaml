@@ -157,6 +157,8 @@ cluster-events:
     requests:
       cpu: 250m
       memory: 256Mi
+    limits:
+      memory: 256Mi
 
   image:
     repository: observeinc/observe-agent
@@ -293,6 +295,8 @@ cluster-metrics:
     requests:
       cpu: 250m
       memory: 256Mi
+    limits:
+      memory: 256Mi
 
   image:
     repository: observeinc/observe-agent
@@ -421,6 +425,8 @@ node-logs-metrics:
   resources:
     requests:
       cpu: 250m
+      memory: 256Mi
+    limits:
       memory: 256Mi
 
   image:
@@ -583,6 +589,8 @@ monitor:
   resources:
     requests:
       cpu: 250m
+      memory: 256Mi
+    limits:
       memory: 256Mi
 
   image:
