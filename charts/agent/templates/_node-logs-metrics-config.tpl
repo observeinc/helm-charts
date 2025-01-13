@@ -2,7 +2,6 @@
 
 extensions:
 {{- include "config.extensions.health_check" . | nindent 2 }}
-{{- include "config.extensions.file_storage" . | nindent 2 }}
 
 exporters:
 {{- include "config.exporters.debug" . | nindent 2 }}
@@ -134,7 +133,6 @@ receivers:
       max_interval: {{ .Values.node.containers.logs.retryOnFailure.maxInterval }}
       max_elapsed_time: {{ .Values.node.containers.logs.retryOnFailure.maxElapsedTime }}
     start_at: {{ .Values.node.containers.logs.startAt }}
-    storage: file_storage
   {{ end }}
 processors:
 {{- include "config.processors.memory_limiter" . | nindent 2 }}
@@ -164,7 +162,7 @@ processors:
         value: kubeletstats_metrics
 
 service:
-  extensions: [health_check, file_storage]
+  extensions: [health_check]
   pipelines:
       {{- if .Values.node.containers.logs.enabled }}
       logs:
