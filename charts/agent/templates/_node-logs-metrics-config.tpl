@@ -1,3 +1,8 @@
+{{- define "observe.daemonset.logsMetrics.config.filelog.multiline" -}}
+multiline:
+  {{- toYaml .Values.node.containers.logs.multiline | nindent 2 }}
+{{- end }}
+
 {{- define "observe.daemonset.logsMetrics.config" -}}
 
 extensions:
@@ -135,6 +140,9 @@ receivers:
       max_elapsed_time: {{ .Values.node.containers.logs.retryOnFailure.maxElapsedTime }}
     start_at: {{ .Values.node.containers.logs.startAt }}
     storage: file_storage
+    {{- if .Values.node.containers.logs.multiline }}
+    {{- include "observe.daemonset.logsMetrics.config.filelog.multiline" . | nindent 4 }}
+    {{ end }}
   {{ end }}
 processors:
 {{- include "config.processors.memory_limiter" . | nindent 2 }}

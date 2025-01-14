@@ -1,0 +1,7 @@
+node:
+  enabled: true
+  containers:
+    logs:
+      enabled: true
+      multiline:
+        line_start_pattern: ^Exception
