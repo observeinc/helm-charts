@@ -163,6 +163,17 @@ processors:
         action: insert
         value: kubeletstats_metrics
 
+# Create intermediate lists for pipeline arrays to then modify based on values.yaml
+{{- $logsExporters := (list "otlphttp/observe/base") -}}
+{{- $hostmetricsExporters := (list "prometheusremotewrite") -}}
+{{- $kubeletstatsExporters := (list "prometheusremotewrite") -}}
+
+{{- if eq .Values.agent.config.global.debug.enabled true }}
+  {{- $logsExporters = concat $logsExporters ( list "debug/override" ) | uniq }}
+  {{- $hostmetricsExporters = concat $hostmetricsExporters ( list "debug/override" ) | uniq }}
+  {{- $kubeletstatsExporters = concat $kubeletstatsExporters ( list "debug/override" ) | uniq }}
+{{- end }}
+
 service:
   extensions: [health_check, file_storage]
   pipelines:
@@ -170,19 +181,19 @@ service:
       logs:
         receivers: [filelog]
         processors: [memory_limiter, k8sattributes, batch, resourcedetection/cloud, resource/observe_common, attributes/debug_source_pod_logs]
-        exporters: [otlphttp/observe/base, debug/override]
+        exporters: [{{ join ", " $logsExporters }}]
       {{- end -}}
       {{- if .Values.node.metrics.enabled }}
       metrics/hostmetrics:
         receivers: [hostmetrics]
         processors: [memory_limiter, k8sattributes, batch, resourcedetection/cloud, resource/observe_common, attributes/debug_source_hostmetrics]
-        exporters: [prometheusremotewrite, debug/override]
+        exporters: [{{ join ", " $hostmetricsExporters }}]
       {{- end -}}
       {{- if .Values.node.containers.metrics.enabled }}
       metrics/kubeletstats:
         receivers: [kubeletstats]
         processors: [memory_limiter, k8sattributes, batch, resourcedetection/cloud, resource/observe_common, attributes/debug_source_kubletstats_metrics]
-        exporters: [prometheusremotewrite, debug/override]
+        exporters: [{{ join ", " $kubeletstatsExporters }}]
       {{- end -}}
 {{- include "config.service.telemetry" . | nindent 2 }}
 

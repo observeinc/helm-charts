@@ -163,18 +163,26 @@ processors:
         action: insert
         value: pod_metrics
 
+{{- $metricsExporters := (list "prometheusremotewrite") -}}
+{{- $podMetricsExporters := (list "prometheusremotewrite") -}}
+
+{{- if eq .Values.agent.config.global.debug.enabled true }}
+  {{- $metricsExporters = concat $metricsExporters ( list "debug/override" ) | uniq }}
+  {{- $podMetricsExporters = concat $podMetricsExporters ( list "debug/override" ) | uniq }}
+{{- end }}
+
 service:
   extensions: [health_check]
   pipelines:
       metrics:
         receivers: [k8s_cluster]
         processors: [memory_limiter, k8sattributes, batch, resource/observe_common, attributes/debug_source_cluster_metrics]
-        exporters: [prometheusremotewrite, debug/override]
+        exporters: [{{ join ", " $metricsExporters }}]
       {{- if .Values.application.prometheusScrape.enabled }}
       metrics/pod_metrics:
         receivers: [prometheus/pod_metrics]
         processors: [memory_limiter, k8sattributes, batch, resource/observe_common, attributes/debug_source_pod_metrics]
-        exporters: [prometheusremotewrite, debug/override]
+        exporters: [{{ join ", " $podMetricsExporters }}]
       {{ end -}}
 {{- include "config.service.telemetry" . | nindent 2 }}
 
