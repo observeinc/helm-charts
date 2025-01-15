@@ -5,7 +5,7 @@ type: application
 version: 0.1.36
 dependencies:
   - name: fluent-bit
-    version: 0.48.3
+    version: 0.48.4
     repository: https://fluent.github.io/helm-charts
   - name: endpoint
     version: 0.1.12
