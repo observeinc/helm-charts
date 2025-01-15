@@ -32,6 +32,21 @@ otlphttp/observe/entity:
     compression: zstd
 {{- end -}}
 
+{{- define "config.exporters.otlphttp.observe.trace" -}}
+otlphttp/observe/forward/trace:
+    endpoint: "{{ .Values.observe.collectionEndpoint.value | toString | trimSuffix "/" }}/v2/otel"
+    headers:
+        authorization: "Bearer ${env:TRACE_TOKEN}"
+    sending_queue:
+      enabled: {{ .Values.agent.config.global.exporters.sendingQueue.enabled }}
+    retry_on_failure:
+      enabled: {{ .Values.agent.config.global.exporters.retryOnFailure.enabled }}
+      initial_interval: {{ .Values.agent.config.global.exporters.retryOnFailure.initialInterval }}
+      max_interval: {{ .Values.agent.config.global.exporters.retryOnFailure.maxInterval }}
+      max_elapsed_time: {{ .Values.agent.config.global.exporters.retryOnFailure.maxElapsedTime }}
+    compression: zstd
+{{- end -}}
+
 {{- define "config.exporters.prometheusremotewrite" -}}
 prometheusremotewrite:
     endpoint: "{{ .Values.observe.collectionEndpoint.value | toString | trimSuffix "/" }}/v1/prometheus"

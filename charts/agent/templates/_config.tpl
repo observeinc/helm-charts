@@ -19,6 +19,13 @@
 {{- toYaml $config | indent 2 }}
 {{- end }}
 
+{{- define "observe.daemonset.applyForwarderConfig" -}}
+{{- $values := deepCopy .Values }}
+{{- $data := dict "Values" $values | mustMergeOverwrite (deepCopy .) }}
+{{- $config := mustMergeOverwrite ( include "observe.daemonset.forwarder.config" $data |  fromYaml ) ($values.agent.config.forwarder) -}}
+{{- toYaml $config | indent 2 }}
+{{- end }}
+
 {{- define "observe.deployment.applyAgentMonitorConfig" -}}
 {{- $values := deepCopy .Values }}
 {{- $data := dict "Values" $values | mustMergeOverwrite (deepCopy .) }}
