@@ -1,0 +1,72 @@
+name: Update PR Metadata before merging
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  workflow_dispatch:  # Allows for manual runs
+
+jobs:
+  update_commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1  # Ensures we have the latest commit only
+
+      - name: Set up Git user (use PR author details)
+        run: |
+          AUTHOR_NAME=$(git log -1 --pretty=format:'%an')
+          AUTHOR_EMAIL=$(git log -1 --pretty=format:'%ae')
+          git config user.name "$AUTHOR_NAME"
+          git config user.email "$AUTHOR_EMAIL"
+
+      - name: Install updatecli and pre-commit in the runner
+        uses: updatecli/updatecli-action@v2
+
+      - name: Install helm-docs
+        uses: losisin/helm-docs-github-action@v1
+
+      - name: Run updatecli
+        run: |
+          make updatecli/internal
+        env:
+          UPDATECLI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Show changes
+        run: |
+          git diff
+
+      - name: Run pre-commit
+        uses: pre-commit/action@v3.0.1
+        with:
+          extra_args: -a
+        # This is expected to fail, since it will update READMEs with the bumped chart version
+        continue-on-error: true
+
+      - name: Show changes
+        run: |
+          git diff
+
+      - name: Amend the commit with changes
+        run: |
+          if [[ -n $(git status --porcelain --untracked-files=no) ]]; then
+            echo "Amending the commit with updated chart version and READMEs"
+
+            echo "Current branch is: ${{ github.event.pull_request.head.ref }}"
+
+            git log -1
+
+            # Stage the changes
+            git add -u
+
+            # Amend the previous commit to include the staged changes
+            git commit --amend --no-edit
+
+            git push origin ${{ github.event.pull_request.head.ref }} --force
+
+          else
+            echo "The commit doesn't require bumping the chart version or updating READMEs!"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
