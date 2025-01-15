@@ -452,4 +452,4 @@ service:
 
 {{- include "config.service.telemetry" . | nindent 2 }}
 
-{{- end }}
+ {{- end }}
