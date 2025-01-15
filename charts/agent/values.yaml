@@ -76,7 +76,8 @@ node:
     metrics:
       enabled: true
       interval: 60s
-
+  forwarder:
+    enabled: true
 application:
   # use this option to scrape prometheus metrics from pods
   # !!! IMPORTANT !!! cluster.metrics.enabled must be set to true
@@ -529,6 +530,12 @@ node-logs-metrics:
         secretKeyRef:
           name: agent-credentials
           key: OBSERVE_TOKEN
+          optional: true
+    - name: TRACES_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: agent-credentials
+          key: TRACES_TOKEN
           optional: true
   extraEnvsFrom: []
   extraVolumes:

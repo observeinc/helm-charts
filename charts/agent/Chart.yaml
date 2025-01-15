@@ -25,6 +25,11 @@ dependencies:
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     alias: monitor
     condition: agent.selfMonitor.enabled
+  - name: opentelemetry-collector
+    version: 0.101.1
+    repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+    alias: forwarder
+    condition: node.forwarder.enabled
 maintainers:
   - name: Observe
     email: support@observeinc.com

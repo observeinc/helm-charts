@@ -21,6 +21,7 @@ Chart to install K8s collection stack based on Observe Agent
 | https://open-telemetry.github.io/opentelemetry-helm-charts | cluster-metrics(opentelemetry-collector) | 0.101.1 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | node-logs-metrics(opentelemetry-collector) | 0.101.1 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | monitor(opentelemetry-collector) | 0.101.1 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | forwarder(opentelemetry-collector) | 0.101.1 |
 
 ## Values
 
@@ -283,6 +284,10 @@ Chart to install K8s collection stack based on Observe Agent
 | node-logs-metrics.extraEnvs[3].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
 | node-logs-metrics.extraEnvs[3].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
 | node-logs-metrics.extraEnvs[3].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| node-logs-metrics.extraEnvs[4].name | string | `"TRACES_TOKEN"` |  |
+| node-logs-metrics.extraEnvs[4].valueFrom.secretKeyRef.key | string | `"TRACES_TOKEN"` |  |
+| node-logs-metrics.extraEnvs[4].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| node-logs-metrics.extraEnvs[4].valueFrom.secretKeyRef.optional | bool | `true` |  |
 | node-logs-metrics.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | node-logs-metrics.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | node-logs-metrics.extraVolumeMounts[1].mountPath | string | `"/var/log/pods"` |  |
@@ -361,6 +366,7 @@ Chart to install K8s collection stack based on Observe Agent
 | node.containers.metrics.enabled | bool | `true` |  |
 | node.containers.metrics.interval | string | `"60s"` |  |
 | node.enabled | bool | `true` |  |
+| node.forwarder.enabled | bool | `true` |  |
 | node.metrics.enabled | bool | `true` |  |
 | node.metrics.fileSystem.excludeMountPoints | string | `"[\"/dev/*\",\"/proc/*\",\"/sys/*\",\"/run/k3s/containerd/*\",\"/var/lib/docker/*\",\"/var/lib/kubelet/*\",\"/snap/*\"]"` |  |
 | node.metrics.fileSystem.rootPath | string | `"/hostfs"` |  |
