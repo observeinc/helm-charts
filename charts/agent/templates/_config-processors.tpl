@@ -52,7 +52,7 @@ resource/observe_common:
       action: upsert
       value: ${env:OBSERVE_CLUSTER_NAME}
     - key: k8s.cluster.uid
-      action: insert
+      action: upsert
       {{ if .Values.cluster.uidOverride.value -}}
       value:  {{ .Values.cluster.uidOverride.value }}
       {{ else -}}
