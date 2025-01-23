@@ -11,6 +11,11 @@ batch:
   send_batch_max_size: {{ .Values.agent.config.global.processors.batch.sendBatchMaxSize }}
 {{- end -}}
 
+{{- define "config.processors.deltatocumulative" -}}
+deltatocumulative/observe:
+  max_stale: 5m
+{{- end -}}
+
 {{- define "config.processors.attributes.k8sattributes" -}}
 k8sattributes:
   extract:

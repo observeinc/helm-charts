@@ -67,7 +67,7 @@ processors:
         action: insert
         value: agent_monitor
 
-{{- $metricsExporters := (list "prometheusremotewrite") -}}
+{{- $metricsExporters := (list "prometheusremotewrite/observe") -}}
 
 {{- if eq .Values.agent.config.global.debug.enabled true }}
   {{- $metricsExporters = concat $metricsExporters ( list "debug/override" ) | uniq }}

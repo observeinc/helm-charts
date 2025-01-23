@@ -163,8 +163,8 @@ processors:
         action: insert
         value: pod_metrics
 
-{{- $metricsExporters := (list "prometheusremotewrite") -}}
-{{- $podMetricsExporters := (list "prometheusremotewrite") -}}
+{{- $metricsExporters := (list "prometheusremotewrite/observe") -}}
+{{- $podMetricsExporters := (list "prometheusremotewrite/observe") -}}
 
 {{- if eq .Values.agent.config.global.debug.enabled true }}
   {{- $metricsExporters = concat $metricsExporters ( list "debug/override" ) | uniq }}
