@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.37.0](https://img.shields.io/badge/Version-0.37.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
+![Version: 0.38.0](https://img.shields.io/badge/Version-0.38.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 > [!CAUTION]
 > This chart is under active development and is not meant to be installed yet.
@@ -21,6 +21,7 @@ Chart to install K8s collection stack based on Observe Agent
 | https://open-telemetry.github.io/opentelemetry-helm-charts | cluster-metrics(opentelemetry-collector) | 0.101.1 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | node-logs-metrics(opentelemetry-collector) | 0.101.1 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | monitor(opentelemetry-collector) | 0.101.1 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | forwarder(opentelemetry-collector) | 0.101.1 |
 
 ## Values
 
@@ -192,6 +193,79 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster.name | string | `"observe-agent-monitored-cluster"` |  |
 | cluster.namespaceOverride.value | string | `"observe"` |  |
 | cluster.uidOverride.value | string | `""` |  |
+| forwarder.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
+| forwarder.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"DoesNotExist"` |  |
+| forwarder.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].key | string | `"kubernetes.io/os"` |  |
+| forwarder.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].operator | string | `"NotIn"` |  |
+| forwarder.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].values[0] | string | `"windows"` |  |
+| forwarder.clusterRole.create | bool | `false` |  |
+| forwarder.clusterRole.name | string | `"observe-agent-cluster-role"` |  |
+| forwarder.command.extraArgs[0] | string | `"start"` |  |
+| forwarder.command.extraArgs[1] | string | `"--config=/observe-agent-conf/observe-agent.yaml"` |  |
+| forwarder.command.extraArgs[2] | string | `"--otel-config=/conf/relay.yaml"` |  |
+| forwarder.command.name | string | `"observe-agent"` |  |
+| forwarder.configMap.create | bool | `false` |  |
+| forwarder.configMap.existingName | string | `"forwarder"` |  |
+| forwarder.extraEnvsFrom | list | `[]` |  |
+| forwarder.extraEnvs[0].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
+| forwarder.extraEnvs[0].valueFrom.configMapKeyRef.key | string | `"name"` |  |
+| forwarder.extraEnvs[0].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
+| forwarder.extraEnvs[1].name | string | `"OBSERVE_CLUSTER_UID"` |  |
+| forwarder.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"id"` |  |
+| forwarder.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
+| forwarder.extraEnvs[2].name | string | `"K8S_NODE_NAME"` |  |
+| forwarder.extraEnvs[2].valueFrom.fieldRef.fieldPath | string | `"spec.nodeName"` |  |
+| forwarder.extraEnvs[3].name | string | `"TOKEN"` |  |
+| forwarder.extraEnvs[3].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
+| forwarder.extraEnvs[3].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| forwarder.extraEnvs[3].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| forwarder.extraEnvs[4].name | string | `"TRACE_TOKEN"` |  |
+| forwarder.extraEnvs[4].valueFrom.secretKeyRef.key | string | `"TRACE_TOKEN"` |  |
+| forwarder.extraEnvs[4].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| forwarder.extraEnvs[4].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| forwarder.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
+| forwarder.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
+| forwarder.extraVolumes[0].configMap.defaultMode | int | `420` |  |
+| forwarder.extraVolumes[0].configMap.items[0].key | string | `"relay"` |  |
+| forwarder.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
+| forwarder.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
+| forwarder.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
+| forwarder.image.pullPolicy | string | `"IfNotPresent"` |  |
+| forwarder.image.repository | string | `"observeinc/observe-agent"` |  |
+| forwarder.image.tag | string | `"1.6.0"` |  |
+| forwarder.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
+| forwarder.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
+| forwarder.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.1"` |  |
+| forwarder.initContainers[0].imagePullPolicy | string | `"Always"` |  |
+| forwarder.initContainers[0].name | string | `"kube-cluster-info"` |  |
+| forwarder.livenessProbe.httpGet.path | string | `"/status"` |  |
+| forwarder.livenessProbe.httpGet.port | int | `13133` |  |
+| forwarder.livenessProbe.initialDelaySeconds | int | `30` |  |
+| forwarder.livenessProbe.periodSeconds | int | `5` |  |
+| forwarder.mode | string | `"daemonset"` |  |
+| forwarder.nameOverride | string | `"forwarder"` | --------------------------------------- # Different for each deployment/daemonset # |
+| forwarder.namespaceOverride | string | `"observe"` |  |
+| forwarder.networkPolicy.egressRules[0] | object | `{}` |  |
+| forwarder.networkPolicy.enabled | bool | `true` |  |
+| forwarder.podAnnotations.observe_monitor_path | string | `"/metrics"` |  |
+| forwarder.podAnnotations.observe_monitor_port | string | `"8888"` |  |
+| forwarder.podAnnotations.observe_monitor_purpose | string | `"observecollection"` |  |
+| forwarder.podAnnotations.observe_monitor_scrape | string | `"false"` |  |
+| forwarder.podAnnotations.observeinc_com_scrape | string | `"false"` |  |
+| forwarder.ports.metrics.containerPort | int | `8888` |  |
+| forwarder.ports.metrics.enabled | bool | `true` |  |
+| forwarder.ports.metrics.protocol | string | `"TCP"` |  |
+| forwarder.ports.metrics.servicePort | int | `8888` |  |
+| forwarder.readinessProbe.httpGet.path | string | `"/status"` |  |
+| forwarder.readinessProbe.httpGet.port | int | `13133` |  |
+| forwarder.readinessProbe.initialDelaySeconds | int | `30` |  |
+| forwarder.readinessProbe.periodSeconds | int | `5` |  |
+| forwarder.resources | object | `{"limits":{"memory":"256Mi"},"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| forwarder.service.enabled | bool | `true` |  |
+| forwarder.service.type | string | `"ClusterIP"` |  |
+| forwarder.serviceAccount.create | bool | `false` |  |
+| forwarder.serviceAccount.name | string | `"observe-agent-service-account"` |  |
+| forwarder.tolerations | list | `[]` |  |
 | monitor.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
 | monitor.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"DoesNotExist"` |  |
 | monitor.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].key | string | `"kubernetes.io/os"` |  |
@@ -283,6 +357,10 @@ Chart to install K8s collection stack based on Observe Agent
 | node-logs-metrics.extraEnvs[3].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
 | node-logs-metrics.extraEnvs[3].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
 | node-logs-metrics.extraEnvs[3].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| node-logs-metrics.extraEnvs[4].name | string | `"TRACES_TOKEN"` |  |
+| node-logs-metrics.extraEnvs[4].valueFrom.secretKeyRef.key | string | `"TRACES_TOKEN"` |  |
+| node-logs-metrics.extraEnvs[4].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| node-logs-metrics.extraEnvs[4].valueFrom.secretKeyRef.optional | bool | `true` |  |
 | node-logs-metrics.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | node-logs-metrics.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | node-logs-metrics.extraVolumeMounts[1].mountPath | string | `"/var/log/pods"` |  |
@@ -326,17 +404,21 @@ Chart to install K8s collection stack based on Observe Agent
 | node-logs-metrics.mode | string | `"daemonset"` |  |
 | node-logs-metrics.nameOverride | string | `"node-logs-metrics"` | --------------------------------------- # Different for each deployment/daemonset # |
 | node-logs-metrics.namespaceOverride | string | `"observe"` |  |
-| node-logs-metrics.networkPolicy.egressRules[0] | object | `{}` |  |
-| node-logs-metrics.networkPolicy.enabled | bool | `true` |  |
 | node-logs-metrics.podAnnotations.observe_monitor_path | string | `"/metrics"` |  |
 | node-logs-metrics.podAnnotations.observe_monitor_port | string | `"8888"` |  |
 | node-logs-metrics.podAnnotations.observe_monitor_purpose | string | `"observecollection"` |  |
 | node-logs-metrics.podAnnotations.observe_monitor_scrape | string | `"true"` |  |
 | node-logs-metrics.podAnnotations.observeinc_com_scrape | string | `"false"` |  |
+| node-logs-metrics.ports.jaeger-compact.enabled | bool | `false` |  |
+| node-logs-metrics.ports.jaeger-grpc.enabled | bool | `false` |  |
+| node-logs-metrics.ports.jaeger-thrift.enabled | bool | `false` |  |
 | node-logs-metrics.ports.metrics.containerPort | int | `8888` |  |
 | node-logs-metrics.ports.metrics.enabled | bool | `true` |  |
 | node-logs-metrics.ports.metrics.protocol | string | `"TCP"` |  |
 | node-logs-metrics.ports.metrics.servicePort | int | `8888` |  |
+| node-logs-metrics.ports.otlp-http.enabled | bool | `false` |  |
+| node-logs-metrics.ports.otlp.enabled | bool | `false` |  |
+| node-logs-metrics.ports.zipkin.enabled | bool | `false` |  |
 | node-logs-metrics.readinessProbe.httpGet.path | string | `"/status"` |  |
 | node-logs-metrics.readinessProbe.httpGet.port | int | `13133` |  |
 | node-logs-metrics.readinessProbe.initialDelaySeconds | int | `30` |  |
@@ -361,6 +443,10 @@ Chart to install K8s collection stack based on Observe Agent
 | node.containers.metrics.enabled | bool | `true` |  |
 | node.containers.metrics.interval | string | `"60s"` |  |
 | node.enabled | bool | `true` |  |
+| node.forwarder.enabled | bool | `false` |  |
+| node.forwarder.logs.enabled | bool | `true` |  |
+| node.forwarder.metrics.enabled | bool | `true` |  |
+| node.forwarder.traces.enabled | bool | `true` |  |
 | node.metrics.enabled | bool | `true` |  |
 | node.metrics.fileSystem.excludeMountPoints | string | `"[\"/dev/*\",\"/proc/*\",\"/sys/*\",\"/run/k3s/containerd/*\",\"/var/lib/docker/*\",\"/var/lib/kubelet/*\",\"/snap/*\"]"` |  |
 | node.metrics.fileSystem.rootPath | string | `"/hostfs"` |  |
@@ -371,3 +457,5 @@ Chart to install K8s collection stack based on Observe Agent
 | observe.entityToken.value | string | `""` |  |
 | observe.token.create | bool | `false` |  |
 | observe.token.value | string | `""` |  |
+| observe.traceToken.create | bool | `false` |  |
+| observe.traceToken.value | string | `""` |  |

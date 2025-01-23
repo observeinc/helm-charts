@@ -14,6 +14,9 @@ observe:
     value: ""
     # To use exporter
     use: false
+  traceToken:
+    create: false
+    value: ""
 
 cluster:
   # name given to your cluster
@@ -76,6 +79,14 @@ node:
     metrics:
       enabled: true
       interval: 60s
+  forwarder:
+    enabled: false
+    traces:
+      enabled: true
+    metrics:
+      enabled: true
+    logs:
+      enabled: true
 
 application:
   # use this option to scrape prometheus metrics from pods
@@ -462,10 +473,6 @@ node-logs-metrics:
     initialDelaySeconds: 30
     periodSeconds: 5
 
-  networkPolicy:
-    enabled: true
-    egressRules: [{}]
-
   podAnnotations: {
     # This stops optional prometheus scrape config from picking up these pods
     observeinc_com_scrape: 'false',
@@ -491,6 +498,18 @@ node-logs-metrics:
   tolerations: []
 
   ports:
+    otlp:
+      enabled: false
+    otlp-http:
+      enabled: false
+    jaeger-compact:
+      enabled: false
+    jaeger-thrift:
+      enabled: false
+    jaeger-grpc:
+      enabled: false
+    zipkin:
+      enabled: false
     metrics:
       # The metrics port is disabled by default. However you need to enable the port
       # in order to use the ServiceMonitor (serviceMonitor.enabled) or PodMonitor (podMonitor.enabled).
@@ -529,6 +548,12 @@ node-logs-metrics:
         secretKeyRef:
           name: agent-credentials
           key: OBSERVE_TOKEN
+          optional: true
+    - name: TRACES_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: agent-credentials
+          key: TRACES_TOKEN
           optional: true
   extraEnvsFrom: []
   extraVolumes:
@@ -689,6 +714,150 @@ monitor:
         secretKeyRef:
           name: agent-credentials
           key: OBSERVE_TOKEN
+          optional: true
+  extraEnvsFrom: []
+  extraVolumes:
+    - name: "observe-agent-deployment-config"
+      configMap:
+        name: "observe-agent"
+        items:
+          - key: "relay"
+            path: "observe-agent.yaml"
+        defaultMode: 420
+  extraVolumeMounts:
+    - name: observe-agent-deployment-config
+      mountPath: /observe-agent-conf
+  # ----------------------------------------- #
+
+forwarder:
+  mode: daemonset
+  # ----------------------------------------- #
+  # Different for each deployment/daemonset #
+  nameOverride: "forwarder"
+  # !!! IMPORTANT !!! This needs to have same value as namespaceOverride in cluster above
+  namespaceOverride: "observe"
+
+  configMap:
+    create: false
+    existingName: "forwarder"
+  # ----------------------------------------- #
+
+  # ----------------------------------------- #
+  # Same for each deployment/daemonset      #
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      memory: 256Mi
+
+  image:
+    repository: observeinc/observe-agent
+    tag: 1.6.0
+    pullPolicy: IfNotPresent
+
+  command:
+    name: "observe-agent"
+    extraArgs: ["start", "--config=/observe-agent-conf/observe-agent.yaml", "--otel-config=/conf/relay.yaml"]
+
+  serviceAccount:
+    create: false
+    name: "observe-agent-service-account"
+  clusterRole:
+    create: false
+    name: "observe-agent-cluster-role"
+
+  livenessProbe:
+    httpGet:
+      port: 13133
+      path: /status
+    initialDelaySeconds: 30
+    periodSeconds: 5
+
+  readinessProbe:
+    httpGet:
+      port: 13133
+      path: /status
+    initialDelaySeconds: 30
+    periodSeconds: 5
+
+  service:
+    enabled: true
+    type: ClusterIP
+
+  networkPolicy:
+    enabled: true
+    egressRules: [{}]
+
+  podAnnotations: {
+    # This stops optional prometheus scrape config from picking up these pods
+    observeinc_com_scrape: 'false',
+    observe_monitor_purpose: observecollection,
+    observe_monitor_scrape: 'false',
+    observe_monitor_path: '/metrics',
+    observe_monitor_port: '8888',
+  }
+
+  # Standard anti-affinity rules will exclude any node labeled with observeinc.com/unschedulable or using windows os
+  # See helm-charts/examples/agent/affinity/README.md for more information
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: observeinc.com/unschedulable
+                operator: DoesNotExist
+              - key: kubernetes.io/os
+                operator: NotIn
+                values: [windows]
+
+  tolerations: []
+
+  ports:
+    metrics:
+      # The metrics port is disabled by default. However you need to enable the port
+      # in order to use the ServiceMonitor (serviceMonitor.enabled) or PodMonitor (podMonitor.enabled).
+      enabled: true
+      containerPort: 8888
+      servicePort: 8888
+      protocol: TCP
+  # this init container provides the cluster uid (kube-system namespace) as config map
+  initContainers:
+    - name: kube-cluster-info
+      image: observeinc/kube-cluster-info:v0.11.1
+      imagePullPolicy: Always
+      env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+  # extract clusteruid from configmap create by init container
+  extraEnvs:
+    - name: OBSERVE_CLUSTER_NAME
+      valueFrom:
+        configMapKeyRef:
+          name: cluster-name
+          key: name
+    - name: OBSERVE_CLUSTER_UID
+      valueFrom:
+        configMapKeyRef:
+          name: cluster-info
+          key: id
+    - name: K8S_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+    - name: TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: agent-credentials
+          key: OBSERVE_TOKEN
+          optional: true
+    - name: TRACE_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: agent-credentials
+          key: TRACE_TOKEN
           optional: true
   extraEnvsFrom: []
   extraVolumes:
