@@ -1,5 +1,57 @@
 {{- define "observe.deployment.clusterEvents.config" -}}
 
+{{ $resourcesList := list
+  (dict "name" "events" "mode" "pull" "interval" "15m")
+  (dict "name" "events" "mode" "watch")
+  (dict "name" "pods" "mode" "pull" "interval" "15m")
+  (dict "name" "pods" "mode" "watch" )
+  (dict "name" "namespaces" "mode" "pull" "interval" "15m")
+  (dict "name" "namespaces" "mode" "watch" )
+  (dict "name" "nodes" "mode" "pull" "interval" "15m")
+  (dict "name" "nodes" "mode" "watch" )
+  (dict "name" "deployments" "mode" "pull" "interval" "15m")
+  (dict "name" "deployments" "mode" "watch" )
+  (dict "name" "replicasets" "mode" "pull" "interval" "15m")
+  (dict "name" "replicasets" "mode" "watch" )
+  (dict "name" "configmaps" "mode" "pull" "interval" "15m")
+  (dict "name" "configmaps" "mode" "watch" )
+  (dict "name" "endpoints" "mode" "pull" "interval" "15m")
+  (dict "name" "endpoints" "mode" "watch" )
+  (dict "name" "jobs" "mode" "pull" "interval" "15m")
+  (dict "name" "jobs" "mode" "watch" )
+  (dict "name" "cronjobs" "mode" "pull" "interval" "15m")
+  (dict "name" "cronjobs" "mode" "watch" )
+  (dict "name" "daemonsets" "mode" "pull" "interval" "15m")
+  (dict "name" "daemonsets" "mode" "watch" )
+  (dict "name" "statefulsets" "mode" "pull" "interval" "15m")
+  (dict "name" "statefulsets" "mode" "watch" )
+  (dict "name" "services" "mode" "pull" "interval" "15m")
+  (dict "name" "services" "mode" "watch" )
+  (dict "name" "ingresses" "mode" "pull" "interval" "15m")
+  (dict "name" "ingresses" "mode" "watch" )
+  (dict "name" "secrets" "mode" "pull" "interval" "15m")
+  (dict "name" "secrets" "mode" "watch" )
+  (dict "name" "persistentvolumeclaims" "mode" "pull" "interval" "15m")
+  (dict "name" "persistentvolumeclaims" "mode" "watch" )
+  (dict "name" "persistentvolumes" "mode" "pull" "interval" "15m")
+  (dict "name" "persistentvolumes" "mode" "watch" )
+  (dict "name" "storageclasses" "mode" "pull" "interval" "15m")
+  (dict "name" "storageclasses" "mode" "watch" )
+  (dict "name" "roles" "mode" "pull" "interval" "15m")
+  (dict "name" "roles" "mode" "watch" )
+  (dict "name" "rolebindings" "mode" "pull" "interval" "15m")
+  (dict "name" "rolebindings" "mode" "watch" )
+  (dict "name" "clusterroles" "mode" "pull" "interval" "15m")
+  (dict "name" "clusterroles" "mode" "watch" )
+  (dict "name" "clusterrolebindings" "mode" "pull" "interval" "15m")
+  (dict "name" "clusterrolebindings" "mode" "watch" )
+  (dict "name" "serviceaccounts" "mode" "pull" "interval" "15m")
+  (dict "name" "serviceaccounts" "mode" "watch" )
+}}
+{{ if .Values.cluster.events.additionalResources }}
+{{ $resourcesList = concat $resourcesList .Values.cluster.events.additionalResources }}
+{{ end }}
+
 extensions:
 {{- include "config.extensions.health_check" . | nindent 2 }}
 
@@ -19,53 +71,7 @@ receivers:
   # retrieves descriptions of all resources listed below
   k8sobjects/objects:
     auth_type: serviceAccount
-    objects:
-      - {name: events, mode: pull, interval: 15m}
-      - {name: events, mode: watch}
-      - {name: pods, mode: pull, interval: 15m}
-      - {name: pods, mode: watch}
-      - {name: namespaces, mode: pull, interval: 15m}
-      - {name: namespaces, mode: watch}
-      - {name: nodes, mode: pull, interval: 15m}
-      - {name: nodes, mode: watch}
-      - {name: deployments, mode: pull, interval: 15m}
-      - {name: deployments, mode: watch}
-      - {name: replicasets, mode: pull, interval: 15m}
-      - {name: replicasets, mode: watch}
-      - {name: configmaps, mode: pull, interval: 15m}
-      - {name: configmaps, mode: watch}
-      - {name: endpoints, mode: pull, interval: 15m}
-      - {name: endpoints, mode: watch}
-      - {name: jobs, mode: pull, interval: 15m}
-      - {name: jobs, mode: watch}
-      - {name: cronjobs, mode: pull, interval: 15m}
-      - {name: cronjobs, mode: watch}
-      - {name: daemonsets, mode: pull, interval: 15m}
-      - {name: daemonsets, mode: watch}
-      - {name: statefulsets, mode: pull, interval: 15m}
-      - {name: statefulsets, mode: watch}
-      - {name: services, mode: pull, interval: 15m}
-      - {name: services, mode: watch}
-      - {name: ingresses, mode: pull, interval: 15m}
-      - {name: ingresses, mode: watch}
-      - {name: secrets, mode: pull, interval: 15m}
-      - {name: secrets, mode: watch}
-      - {name: persistentvolumeclaims, mode: pull, interval: 15m}
-      - {name: persistentvolumeclaims, mode: watch}
-      - {name: persistentvolumes, mode: pull, interval: 15m}
-      - {name: persistentvolumes, mode: watch}
-      - {name: storageclasses, mode: pull, interval: 15m}
-      - {name: storageclasses, mode: watch}
-      - {name: roles, mode: pull, interval: 15m}
-      - {name: roles, mode: watch}
-      - {name: rolebindings, mode: pull, interval: 15m}
-      - {name: rolebindings, mode: watch}
-      - {name: clusterroles, mode: pull, interval: 15m}
-      - {name: clusterroles, mode: watch}
-      - {name: clusterrolebindings, mode: pull, interval: 15m}
-      - {name: clusterrolebindings, mode: watch}
-      - {name: serviceaccounts, mode: pull, interval: 15m}
-      - {name: serviceaccounts, mode: watch}
+    objects: {{ $resourcesList | toYaml | nindent 4 }}
 
 processors:
 {{- include "config.processors.memory_limiter" . | nindent 2 }}
