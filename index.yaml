@@ -3780,6 +3780,39 @@ entries:
     version: 0.1.0
   stack:
   - apiVersion: v2
+    created: "2025-01-27T17:59:12.796502267Z"
+    dependencies:
+    - condition: logs.enabled
+      name: logs
+      repository: file://../logs
+      version: 0.1.37
+    - condition: metrics.enabled
+      name: metrics
+      repository: file://../metrics
+      version: 0.3.25
+    - condition: events.enabled
+      name: events
+      repository: file://../events
+      version: 0.3.0
+    - condition: proxy.enabled
+      name: proxy
+      repository: file://../proxy
+      version: 0.1.8
+    - condition: traces.enabled
+      name: traces
+      repository: file://../traces
+      version: 1.0.12
+    description: Observe Kubernetes agent stack
+    digest: 1098cba3321fd3e3ea8091a8c136484f5c62869f88028070de7e649fdbc3c95b
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: stack
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/stack-1.2.2/stack-1.2.2.tgz
+    version: 1.2.2
+  - apiVersion: v2
     created: "2025-01-23T21:00:48.46093637Z"
     dependencies:
     - condition: logs.enabled
@@ -5919,6 +5952,29 @@ entries:
     version: 0.1.0
   traces:
   - apiVersion: v2
+    created: "2025-01-27T17:59:12.945095221Z"
+    dependencies:
+    - name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.115.0
+    - name: endpoint
+      repository: file://../endpoint
+      version: 0.1.12
+    - condition: proxy.enabled
+      name: proxy
+      repository: file://../proxy
+      version: 0.1.8
+    description: Observe OpenTelemetry trace collection
+    digest: 2e1153b14144a2d3f1e3ddc5e641965127702d226cd3f378f8706215e34a0daf
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: traces
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/traces-1.0.12/traces-1.0.12.tgz
+    version: 1.0.12
+  - apiVersion: v2
     created: "2025-01-23T21:00:48.620783562Z"
     dependencies:
     - name: opentelemetry-collector
@@ -6992,4 +7048,4 @@ entries:
     urls:
     - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.0/traces-0.1.0.tgz
     version: 0.1.0
-generated: "2025-01-23T21:00:48.62142463Z"
+generated: "2025-01-27T17:59:12.945727893Z"
