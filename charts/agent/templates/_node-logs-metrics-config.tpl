@@ -165,7 +165,7 @@ processors:
       - key: debug_source
         action: insert
         value: hostmetrics
-  attributes/debug_source_kubletstats_metrics:
+  attributes/debug_source_kubeletstats_metrics:
     actions:
       - key: debug_source
         action: insert
@@ -173,8 +173,8 @@ processors:
 
 # Create intermediate lists for pipeline arrays to then modify based on values.yaml
 {{- $logsExporters := (list "otlphttp/observe/base") -}}
-{{- $hostmetricsExporters := (list "prometheusremotewrite") -}}
-{{- $kubeletstatsExporters := (list "prometheusremotewrite") -}}
+{{- $hostmetricsExporters := (list "prometheusremotewrite/observe") -}}
+{{- $kubeletstatsExporters := (list "prometheusremotewrite/observe") -}}
 
 {{- if eq .Values.agent.config.global.debug.enabled true }}
   {{- $logsExporters = concat $logsExporters ( list "debug/override" ) | uniq }}
@@ -200,7 +200,7 @@ service:
       {{- if .Values.node.containers.metrics.enabled }}
       metrics/kubeletstats:
         receivers: [kubeletstats]
-        processors: [memory_limiter, k8sattributes, batch, resourcedetection/cloud, resource/observe_common, attributes/debug_source_kubletstats_metrics]
+        processors: [memory_limiter, k8sattributes, batch, resourcedetection/cloud, resource/observe_common, attributes/debug_source_kubeletstats_metrics]
         exporters: [{{ join ", " $kubeletstatsExporters }}]
       {{- end -}}
 {{- include "config.service.telemetry" . | nindent 2 }}

@@ -48,7 +48,7 @@ otlphttp/observe/forward/trace:
 {{- end -}}
 
 {{- define "config.exporters.prometheusremotewrite" -}}
-prometheusremotewrite:
+prometheusremotewrite/observe:
     endpoint: "{{ .Values.observe.collectionEndpoint.value | toString | trimSuffix "/" }}/v1/prometheus"
     headers:
         authorization: "${env:OBSERVE_TOKEN}"
