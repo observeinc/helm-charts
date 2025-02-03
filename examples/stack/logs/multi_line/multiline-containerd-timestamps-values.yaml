@@ -116,7 +116,7 @@ logs:
               Match               k8slogs*
               Call                keep_first_timestamp_and_clean
               # Remove containerd timestamps from joined lines, retaining the first containerd timestamp.
-              Code                function keep_first_timestamp_and_clean(tag, timestamp, record) if record["log"] then local first_entry = string.match(record["log"], "^%s?%d+-%d+-%d+T%d+:%d+:%d+.%d+Z stdout%sF%s"); if first_entry then record["log"] = first_entry .. string.gsub(string.gsub(record["log"], "(%s?%d+-%d+-%d+T%d+:%d+:%d+.%d+Z stdout%sF%s)", "", 1), "%s?%d+-%d+-%d+T%d+:%d+:%d+.%d+Z stdout%sF%s", ""); end end return 2, timestamp, record; end
+              Code                function keep_first_timestamp_and_clean(tag, timestamp, record) if record["log"] then local first_entry = string.match(record["log"], "^%s?%d+-%d+-%d+T%d+:%d+:%d+.%d+Z stdout%s[FP]%s"); if first_entry then record["log"] = first_entry .. string.gsub(string.gsub(record["log"], "(%s?%d+-%d+-%d+T%d+:%d+:%d+.%d+Z stdout%s[FP]%s)", "", 1), "%s?%d+-%d+-%d+T%d+:%d+:%d+.%d+Z stdout%s[FP]%s", ""); end end return 2, timestamp, record; end
 
           [FILTER]
               Name                record_modifier
@@ -209,6 +209,6 @@ logs:
               flush_timeout             1000
               key_content               log
               # Match any line that begins with any of the following timestamps 2024-12-03 07:31:12,563, 07:31:20,550, [2024-12-03 07:31:28.353]
-              rule      "start_state"   "/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s+(stdout|stderr)\s+F\s(\[\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d{3}\]|\d{2}:\d{2}:\d{2}.\d{3}|\d{2}:\d{2}:\d{2},\d{3}|\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}.\d{3}).*$/"  "cont"
+              rule      "start_state"   "/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s+(stdout|stderr)\s+[FP]\s(\[\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d{3}\]|\d{2}:\d{2}:\d{2}.\d{3}|\d{2}:\d{2}:\d{2},\d{3}|\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}.\d{3}).*$/"  "cont"
               # Continue to merge until we encounter a timestamp at the beginnnig of a line
-              rule      "cont"          "/^(?!\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s+(stdout|stderr)\s+F\s(\[\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d{3}\]|\d{2}:\d{2}:\d{2}.\d{3}|\d{2}:\d{2}:\d{2},\d{3}|\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}.\d{3})).*$/"  "cont"
+              rule      "cont"          "/^(?!\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s+(stdout|stderr)\s+[FP]\s(\[\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d{3}\]|\d{2}:\d{2}:\d{2}.\d{3}|\d{2}:\d{2}:\d{2},\d{3}|\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}.\d{3})).*$/"  "cont"
