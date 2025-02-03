@@ -14,6 +14,9 @@ observe:
   token:
     create: true
     value: ${observe_token}
+  traceToken:
+    create: true
+    value: ${trace_token}
 cluster:
   namespaceOverride:
     value: ${helm_chart_agent_test_namespace}
@@ -29,4 +32,6 @@ cluster-metrics:
 node-logs-metrics:
   namespaceOverride:  ${helm_chart_agent_test_namespace}
 monitor:
+  namespaceOverride:  ${helm_chart_agent_test_namespace}
+forwarder:
   namespaceOverride:  ${helm_chart_agent_test_namespace}

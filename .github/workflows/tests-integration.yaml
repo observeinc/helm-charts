@@ -21,6 +21,7 @@ permissions:
 env:
     TF_VAR_observe_url: ${{secrets.OBSERVE_URL}}
     TF_VAR_observe_token: ${{secrets.OBSERVE_TOKEN}}
+    TF_VAR_trace_token: ${{secrets.OBSERVE_TOKEN}}
     TF_VAR_helm_chart_agent_test_release_name: helm-charts-agent-gha-integration-tests
 
 

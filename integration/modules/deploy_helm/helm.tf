@@ -13,6 +13,7 @@ resource "helm_release" "observe-agent" {
       {
         observe_url                     = var.observe_url,
         observe_token                   = var.observe_token,
+        trace_token                     = var.observe_token,
         helm_chart_agent_test_namespace = var.helm_chart_agent_test_namespace
     })
   ]

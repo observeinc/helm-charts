@@ -11,7 +11,7 @@ import re
         "node_taint.yaml")
 def test_helm_correctness(apps_client, helm_config):
     """
-    Test to verify there are 3 deployments and 1 daemonset in the cluster.
+    Test to verify there are 3 deployments and 2 daemonsets in the cluster.
     """
     # Retrieve the deployments in the specified namespace
     print(f"Checking Deployments in namespace: {helm_config['namespace']}")
@@ -21,7 +21,7 @@ def test_helm_correctness(apps_client, helm_config):
     # Retrieve the daemonsets in the specified namespace
     print(f"Checking Daemonsets  in namespace: {helm_config['namespace']}")
     daemonsets = apps_client.list_namespaced_daemon_set(namespace=helm_config['namespace']).items
-    assert len(daemonsets) == 1, f"Expected 1 daemonset in namespace '{helm_config['namespace']}', but found {len(daemonsets)}"
+    assert len(daemonsets) == 2, f"Expected 2 daemonsets in namespace '{helm_config['namespace']}', but found {len(daemonsets)}"
 
     print("All expected deployments and daemonsets found.")
 

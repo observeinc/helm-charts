@@ -80,7 +80,7 @@ node:
       enabled: true
       interval: 60s
   forwarder:
-    enabled: false
+    enabled: true
     traces:
       enabled: true
     metrics:
