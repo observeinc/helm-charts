@@ -26,6 +26,8 @@ cluster:
     # how often to pull resources from cluster
     pullInterval: 20m
     enabled: true
+    # additional custom resource definitions to gather events for
+    additionalResources:
   # cluster-level metrics and entity events (as metrics) from the Kubernetes API server. It uses the K8s API to listen for updates.
   metrics:
     enabled: true

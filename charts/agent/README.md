@@ -186,6 +186,7 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster-metrics.serviceAccount.create | bool | `false` |  |
 | cluster-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | cluster-metrics.tolerations | list | `[]` |  |
+| cluster.events.additionalResources | string | `nil` |  |
 | cluster.events.enabled | bool | `true` |  |
 | cluster.events.pullInterval | string | `"20m"` |  |
 | cluster.metrics.enabled | bool | `true` |  |
