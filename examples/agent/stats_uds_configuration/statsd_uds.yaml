@@ -8,9 +8,9 @@ agent:
     nodeLogsMetrics:
       exporters:
         otlphttp/observe-traces:
-          endpoint: https://155863311937.collect.observe-staging.com/v2/otel
+          endpoint: {Collection_Endpoint}
           headers:
-            authorization: Bearer ds1FrCWu7SKNWpkXM3zZ:5LVBck1BubpDuV1Vpnum2DYY6abgWvd0
+            authorization: Bearer {Token}
         debug:
           verbosity: detailed
       processors:
@@ -48,16 +48,6 @@ agent:
             - otlphttp/observe-traces
             receivers:
             - statsd/uds
-node-logs-metrics:
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-          - matchExpressions:
-              - key: kubernetes.io/hostname
-                operator: In
-                values:
-                  - ip-10-0-3-190.us-west-2.compute.internal
   extraVolumeMounts:
     - mountPath: /conf
       name: node-logs-metrics-configmap
@@ -112,17 +102,17 @@ node-logs-metrics:
       hostPath:
         path: /tmp
   image:
-    repository: 692859915504.dkr.ecr.us-west-2.amazonaws.com/observe-agent
+    repository: observeinc/observe-agent
     tag: latest
     pullPolicy: IfNotPresent
 cluster-events:
   image:
-    repository: 692859915504.dkr.ecr.us-west-2.amazonaws.com/observe-agent
+    repository: observeinc/observe-agent
     tag: latest
     pullPolicy: IfNotPresent
 cluster-metrics:
   image:
-    repository: 692859915504.dkr.ecr.us-west-2.amazonaws.com/observe-agent
+    repository: observeinc/observe-agent
     tag: latest
     pullPolicy: IfNotPresent
 cluster:

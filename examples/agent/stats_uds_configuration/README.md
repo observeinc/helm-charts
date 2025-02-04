@@ -13,7 +13,7 @@ helm upgrade --reuse-values observe-agent observe/agent -n observe -f agent-valu
 ```
 
 ### Testing the configuration 
-After logging into the agent pod or host, you can test our configuration with the below comman.
+After logging into the agent pod or host, you can test our configuration with the below command.
 
 ```
 echo "example.counter:1|c" | socat - UNIX-SENDTO:/var/run/statsd-receiver.sock
