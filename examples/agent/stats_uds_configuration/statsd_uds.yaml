@@ -1,0 +1,133 @@
+agent:
+  config:
+    global:
+      debug:
+      # values basic, normal, detailed
+        verbosity: detailed
+        enabled: True
+    nodeLogsMetrics:
+      exporters:
+        otlphttp/observe-traces:
+          endpoint: https://155863311937.collect.observe-staging.com/v2/otel
+          headers:
+            authorization: Bearer ds1FrCWu7SKNWpkXM3zZ:5LVBck1BubpDuV1Vpnum2DYY6abgWvd0
+        debug:
+          verbosity: detailed
+      processors:
+        attributes/debug_source_app_logs:
+          actions:
+          - action: insert
+            key: debug_source
+            value: app_logs
+        attributes/debug_source_app_metrics:
+          actions:
+          - action: insert
+            key: debug_source
+            value: app_metrics
+        attributes/debug_source_app_traces:
+          actions:
+          - action: insert
+            key: debug_source
+            value: app_traces
+      receivers:
+        otlp/app-telemetry:
+          protocols:
+            grpc:
+              endpoint: ${env:MY_POD_IP}:4319
+            http:
+              endpoint: ${env:MY_POD_IP}:4320
+        statsd/uds:
+          transport: "unixgram"
+          aggregation_interval: 60s
+          endpoint: ///var/run/obssocket/std.socket
+      service:
+        pipelines:
+          metrics/observe-forward:
+            exporters:
+            - debug
+            - otlphttp/observe-traces
+            receivers:
+            - statsd/uds
+node-logs-metrics:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                  - ip-10-0-3-190.us-west-2.compute.internal
+  extraVolumeMounts:
+    - mountPath: /conf
+      name: node-logs-metrics-configmap
+    - mountPath: /observe-agent-conf
+      name: observe-agent-deployment-config
+    - mountPath: /var/log/pods
+      name: varlogpods
+      readOnly: true
+    - mountPath: /var/lib/docker/container
+      name: varlibdockercontainers
+      readOnly: true
+    - mountPath: /var/lib/otelcol
+      name: varlibotelcol
+    - mountPath: /hostfs
+      mountPropagation: HostToContainer
+      name: hostfs
+      readOnly: true
+    - name: obssocket
+      mountPath: /var/run/obssocket
+  extraVolumes:
+    - configMap:
+        defaultMode: 420
+        items:
+        - key: relay
+          path: relay.yaml
+        name: node-logs-metrics
+      name: node-logs-metrics-configmap
+    - configMap:
+        defaultMode: 420
+        items:
+        - key: relay
+          path: observe-agent.yaml
+        name: observe-agent
+      name: observe-agent-deployment-config
+    - hostPath:
+        path: /var/log/pods
+        type: ""
+      name: varlogpods
+    - hostPath:
+        path: /var/lib/docker/containers
+        type: ""
+      name: varlibdockercontainers
+    - hostPath:
+        path: /var/lib/otelcol
+        type: DirectoryOrCreate
+      name: varlibotelcol
+    - hostPath:
+        path: /
+        type: ""
+      name: hostfs
+    - name: obssocket
+      hostPath:
+        path: /tmp
+  image:
+    repository: 692859915504.dkr.ecr.us-west-2.amazonaws.com/observe-agent
+    tag: latest
+    pullPolicy: IfNotPresent
+cluster-events:
+  image:
+    repository: 692859915504.dkr.ecr.us-west-2.amazonaws.com/observe-agent
+    tag: latest
+    pullPolicy: IfNotPresent
+cluster-metrics:
+  image:
+    repository: 692859915504.dkr.ecr.us-west-2.amazonaws.com/observe-agent
+    tag: latest
+    pullPolicy: IfNotPresent
+cluster:
+  events:
+    enabled: false
+  # cluster-level metrics and entity events (as metrics) from the Kubernetes API server. It uses the K8s API to listen for updates.
+  metrics:
+    enabled: false
