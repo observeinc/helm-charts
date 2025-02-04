@@ -17,11 +17,7 @@ otlphttp/observe/base:
 otlphttp/observe/entity:
     logs_endpoint: "{{ .Values.observe.collectionEndpoint.value | toString | trimSuffix "/" }}/v1/kubernetes/v1/entity"
     headers:
-    {{- if .Values.observe.entityToken.use }}
-        authorization: "Bearer ${env:ENTITY_TOKEN}"
-    {{- else }}
-        authorization: "${env:OBSERVE_TOKEN}"
-    {{- end }}
+      authorization: "${env:OBSERVE_TOKEN}"
     sending_queue:
       enabled: {{ .Values.agent.config.global.exporters.sendingQueue.enabled }}
     retry_on_failure:
