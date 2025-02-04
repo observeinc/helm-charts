@@ -268,12 +268,6 @@ cluster-events:
           name: agent-credentials
           key: OBSERVE_TOKEN
           optional: true
-    - name: ENTITY_TOKEN
-      valueFrom:
-        secretKeyRef:
-          name: agent-credentials
-          key: ENTITY_TOKEN
-          optional: true
   extraEnvsFrom: []
   extraVolumes:
     - name: "observe-agent-deployment-config"
