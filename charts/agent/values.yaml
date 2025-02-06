@@ -176,12 +176,12 @@ cluster-events:
 
   image:
     repository: observeinc/observe-agent
-    tag: 1.6.0
+    tag: 2.0.0
     pullPolicy: IfNotPresent
 
   command:
     name: "observe-agent"
-    extraArgs: ["start", "--config=/observe-agent-conf/observe-agent.yaml", "--otel-config=/conf/relay.yaml"]
+    extraArgs: ["start", "--observe-config=/observe-agent-conf/observe-agent.yaml", "--config=/conf/relay.yaml"]
 
   serviceAccount:
     create: false
@@ -308,12 +308,12 @@ cluster-metrics:
 
   image:
     repository: observeinc/observe-agent
-    tag: 1.6.0
+    tag: 2.0.0
     pullPolicy: IfNotPresent
 
   command:
     name: "observe-agent"
-    extraArgs: ["start", "--config=/observe-agent-conf/observe-agent.yaml", "--otel-config=/conf/relay.yaml"]
+    extraArgs: ["start", "--observe-config=/observe-agent-conf/observe-agent.yaml", "--config=/conf/relay.yaml"]
 
   serviceAccount:
     create: false
@@ -439,12 +439,12 @@ node-logs-metrics:
 
   image:
     repository: observeinc/observe-agent
-    tag: 1.6.0
+    tag: 2.0.0
     pullPolicy: IfNotPresent
 
   command:
     name: "observe-agent"
-    extraArgs: ["start", "--config=/observe-agent-conf/observe-agent.yaml", "--otel-config=/conf/relay.yaml"]
+    extraArgs: ["start", "--observe-config=/observe-agent-conf/observe-agent.yaml", "--config=/conf/relay.yaml"]
 
   serviceAccount:
     create: false
@@ -617,12 +617,12 @@ monitor:
 
   image:
     repository: observeinc/observe-agent
-    tag: 1.6.0
+    tag: 2.0.0
     pullPolicy: IfNotPresent
 
   command:
     name: "observe-agent"
-    extraArgs: ["start", "--config=/observe-agent-conf/observe-agent.yaml", "--otel-config=/conf/relay.yaml"]
+    extraArgs: ["start", "--observe-config=/observe-agent-conf/observe-agent.yaml", "--config=/conf/relay.yaml"]
 
   serviceAccount:
     create: false
@@ -747,12 +747,12 @@ forwarder:
 
   image:
     repository: observeinc/observe-agent
-    tag: 1.6.0
+    tag: 2.0.0
     pullPolicy: IfNotPresent
 
   command:
     name: "observe-agent"
-    extraArgs: ["start", "--config=/observe-agent-conf/observe-agent.yaml", "--otel-config=/conf/relay.yaml"]
+    extraArgs: ["start", "--observe-config=/observe-agent-conf/observe-agent.yaml", "--config=/conf/relay.yaml"]
 
   serviceAccount:
     create: false
