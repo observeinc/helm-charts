@@ -1,4 +1,5 @@
 {{- define "observe.observe-agent" -}}
+observe_url: {{ .Values.observe.collectionEndpoint.value }}
 token: {{ .Values.observe.token.value }}
 
 debug: false
