@@ -3,6 +3,45 @@ entries:
   agent:
   - apiVersion: v2
     appVersion: 1.1.0
+    created: "2025-02-06T20:59:36.274425514Z"
+    dependencies:
+    - alias: cluster-events
+      condition: cluster.events.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.101.1
+    - alias: cluster-metrics
+      condition: cluster.metrics.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.101.1
+    - alias: node-logs-metrics
+      condition: node.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.101.1
+    - alias: monitor
+      condition: agent.selfMonitor.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.101.1
+    - alias: forwarder
+      condition: node.forwarder.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.101.1
+    description: Chart to install K8s collection stack based on Observe Agent
+    digest: f1ade2a97c993666069cd1bf5b48abfd4844c3e6dafaac8c6eb490506f60096b
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: agent
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/agent-0.42.0/agent-0.42.0.tgz
+    version: 0.42.0
+  - apiVersion: v2
+    appVersion: 1.1.0
     created: "2025-02-05T17:23:00.29503409Z"
     dependencies:
     - alias: cluster-events
@@ -7165,4 +7204,4 @@ entries:
     urls:
     - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.0/traces-0.1.0.tgz
     version: 0.1.0
-generated: "2025-02-05T17:23:00.295522317Z"
+generated: "2025-02-06T20:59:36.274986235Z"
