@@ -1,8 +1,8 @@
 {{- define "config.exporters.otlphttp.observe.base" -}}
 otlphttp/observe/base:
-    endpoint: "{{ .Values.observe.collectionEndpoint.value | toString | trimSuffix "/" }}/v2/otel"
+    endpoint: "${env:OBSERVE_OTEL_ENDPOINT}"
     headers:
-        authorization: "${env:OBSERVE_TOKEN}"
+        authorization: "${env:OBSERVE_AUTHORIZATION_HEADER}"
     sending_queue:
       enabled: {{ .Values.agent.config.global.exporters.sendingQueue.enabled }}
     retry_on_failure:
@@ -15,9 +15,9 @@ otlphttp/observe/base:
 
 {{- define "config.exporters.otlphttp.observe.entity" -}}
 otlphttp/observe/entity:
-    logs_endpoint: "{{ .Values.observe.collectionEndpoint.value | toString | trimSuffix "/" }}/v1/kubernetes/v1/entity"
+    logs_endpoint: "${env:OBSERVE_COLLECTOR_URL}/v1/kubernetes/v1/entity"
     headers:
-      authorization: "${env:OBSERVE_TOKEN}"
+      authorization: "${env:OBSERVE_AUTHORIZATION_HEADER}"
     sending_queue:
       enabled: {{ .Values.agent.config.global.exporters.sendingQueue.enabled }}
     retry_on_failure:
@@ -30,7 +30,7 @@ otlphttp/observe/entity:
 
 {{- define "config.exporters.otlphttp.observe.trace" -}}
 otlphttp/observe/forward/trace:
-    endpoint: "{{ .Values.observe.collectionEndpoint.value | toString | trimSuffix "/" }}/v2/otel"
+    endpoint: "${env:OBSERVE_OTEL_ENDPOINT}"
     headers:
         authorization: "Bearer ${env:TRACE_TOKEN}"
     sending_queue:
@@ -45,9 +45,9 @@ otlphttp/observe/forward/trace:
 
 {{- define "config.exporters.prometheusremotewrite" -}}
 prometheusremotewrite/observe:
-    endpoint: "{{ .Values.observe.collectionEndpoint.value | toString | trimSuffix "/" }}/v1/prometheus"
+    endpoint: "${env:OBSERVE_PROMETHEUS_ENDPOINT}"
     headers:
-        authorization: "${env:OBSERVE_TOKEN}"
+        authorization: "${env:OBSERVE_AUTHORIZATION_HEADER}"
     resource_to_telemetry_conversion:
         enabled: true # Convert resource attributes to metric labels
     send_metadata: true

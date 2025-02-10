@@ -176,7 +176,7 @@ cluster-events:
 
   image:
     repository: observeinc/observe-agent
-    tag: 2.0.0
+    tag: 2.0.1
     pullPolicy: IfNotPresent
 
   command:
@@ -308,7 +308,7 @@ cluster-metrics:
 
   image:
     repository: observeinc/observe-agent
-    tag: 2.0.0
+    tag: 2.0.1
     pullPolicy: IfNotPresent
 
   command:
@@ -439,7 +439,7 @@ node-logs-metrics:
 
   image:
     repository: observeinc/observe-agent
-    tag: 2.0.0
+    tag: 2.0.1
     pullPolicy: IfNotPresent
 
   command:
@@ -617,7 +617,7 @@ monitor:
 
   image:
     repository: observeinc/observe-agent
-    tag: 2.0.0
+    tag: 2.0.1
     pullPolicy: IfNotPresent
 
   command:
@@ -747,7 +747,7 @@ forwarder:
 
   image:
     repository: observeinc/observe-agent
-    tag: 2.0.0
+    tag: 2.0.1
     pullPolicy: IfNotPresent
 
   command:
