@@ -124,6 +124,7 @@ receivers:
   {{ end -}}
   {{- if .Values.node.containers.logs.enabled }}
   filelog:
+    poll_interval: 20ms
     exclude: {{ .Values.node.containers.logs.exclude }}
     include: {{ .Values.node.containers.logs.include }}
     include_file_name: false
