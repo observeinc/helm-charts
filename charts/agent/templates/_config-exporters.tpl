@@ -5,6 +5,7 @@ otlphttp/observe/base:
     endpoint: "${env:OBSERVE_OTEL_ENDPOINT}"
     headers:
         authorization: "${env:OBSERVE_AUTHORIZATION_HEADER}"
+        x-observe-target-package: "Kubernetes Explorer"
     sending_queue:
       enabled: {{ .Values.agent.config.global.exporters.sendingQueue.enabled }}
     retry_on_failure:
@@ -22,6 +23,7 @@ otlphttp/observe/entity:
     logs_endpoint: "${env:OBSERVE_COLLECTOR_URL}/v1/kubernetes/v1/entity"
     headers:
       authorization: "${env:OBSERVE_AUTHORIZATION_HEADER}"
+      x-observe-target-package: "Kubernetes Explorer"
     sending_queue:
       enabled: {{ .Values.agent.config.global.exporters.sendingQueue.enabled }}
     retry_on_failure:
@@ -39,6 +41,7 @@ otlphttp/observe/forward/trace:
     endpoint: "${env:OBSERVE_OTEL_ENDPOINT}"
     headers:
         authorization: "Bearer ${env:TRACE_TOKEN}"
+        x-observe-target-package: "Tracing"
     sending_queue:
       enabled: {{ .Values.agent.config.global.exporters.sendingQueue.enabled }}
     retry_on_failure:
@@ -56,6 +59,7 @@ prometheusremotewrite/observe:
     endpoint: "${env:OBSERVE_PROMETHEUS_ENDPOINT}"
     headers:
         authorization: "${env:OBSERVE_AUTHORIZATION_HEADER}"
+        x-observe-target-package: "Kubernetes Explorer"
     resource_to_telemetry_conversion:
         enabled: true # Convert resource attributes to metric labels
     send_metadata: true
