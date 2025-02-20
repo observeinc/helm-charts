@@ -12,7 +12,7 @@ agent:
           aggregation_interval: 60s
           enable_metric_type: true
           endpoint: ///var/run/obssocket/statsd.socket
-          is_monotonic_counter: true
+          is_monotonic_counter: true # Sets all counter type metrics received as monotonic. https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/statsdreceiver/README.md
           transport: unixgram
       service:
         pipelines:
@@ -26,7 +26,7 @@ agent:
             - resourcedetection/cloud
             - resource/observe_common
             - attributes/debug_source_statsd_metrics
-            - deltatocumulative
+            - deltatocumulative # It converts metrics from delta temporality to cumulative. https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/processor/deltatocumulativeprocessor/README.md
             receivers:
             - statsd/uds
 forwarder:
@@ -38,6 +38,7 @@ forwarder:
     - hostPath:
         path: /tmp
       name: obssocket
+  # This postStart lifecycle hook waits for 20 seconds after container creation, then changes. For more details on lifecycle hooks see: https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/
   lifecycleHooks:
     postStart:
       exec:

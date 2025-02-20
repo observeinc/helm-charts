@@ -1,4 +1,6 @@
 # Statsd uds(unix domain socket) metrics scrape example
+[Link to StatsD Receiver](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/statsdreceiver/README.md)
+
 Once you deployed our agent by following kubernetes explorer add data portal instructions into your eks cluster. You can upgrade it using the below command to add statsd uds required configuration to forwarder component of observe agent.
 
 ```
@@ -28,6 +30,12 @@ echo "example.counter:1|c" | socat - UNIX-SENDTO:/var/run/statsd-receiver.sock
 ```
 
 ### Cleanup
+To clean up and reset to default agent configuration, use the below 
+```
+helm upgrade observe-agent observe -n observe --reset-values
+```
+
+To delete the agent entirely, we can use the below command. 
 ```
 helm delete observe-agent -n observe
 ```

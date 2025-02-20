@@ -4,32 +4,43 @@ metadata:
   name: metrics-writer-script
 data:
   metrics_writer.py: |
-    import socket
-    import time
-    from datetime import datetime
+      import socket
+      import time
+      from datetime import datetime
 
-    def write_metrics(sock):
-        while True:
-            now = datetime.now()
-            sock.send(b"metric1:1|c\n")
-            sock.send(b"metric2:20|g\n")
-            timestamp_str = now.strftime("%Y-%m-%d %H:%M:%S")
-            print(f"[{timestamp_str}]", flush=True)
-            print("sock.send", flush=True)
-            time.sleep(5)  # Sleep for 5 seconds before sending next metrics
+      def write_metrics(sock):
+          """
+          Continuously write metrics to the provided socket.
 
-    if __name__ == "__main__":
-        sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
-        try:
-            sourcepath = '/var/run/obssocket/statsd.socket'
-            print("try", flush=True)
-            sock.connect(sourcepath)
-            write_metrics(sock)
-        except Exception as e:
-            print(f"Error connecting to socket: {e}")
-        finally:
-            print("close", flush=True)
-            sock.close()
+          Sends 'metric1' and 'metric2' to the socket every 5 seconds,
+          along with printing a timestamp and confirmation message.
+
+          Args:
+              sock (socket.socket): The socket object for sending metrics.
+          """
+          while True:
+              now = datetime.now()
+              sock.send(b"metric1:1|c\n")
+              sock.send(b"metric2:20|g\n")
+              timestamp_str = now.strftime("%Y-%m-%d %H:%M:%S")
+              print(f"[{timestamp_str}]", flush=True)
+              print("sock.send", flush=True)
+              time.sleep(5)  # Sleep for 5 seconds before sending next metrics
+
+      if __name__ == "__main__":
+          # Initializing the socket object
+          sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+          try:
+              sourcepath = '/var/run/obssocket/statsd.socket'
+              print("try", flush=True)
+              sock.connect(sourcepath)
+              write_metrics(sock)
+          except Exception as e:
+              print(f"Error connecting to socket: {e}")
+          finally:
+              print("close", flush=True)
+              sock.close()
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -45,19 +56,9 @@ spec:
       labels:
         app: metrics-writer
     spec:
-# You can set this based on where forwarder pod running. 
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: kubernetes.io/hostname
-                    operator: In
-                    values:
-                      - ip-10-0-5-244.us-west-2.compute.internal
       containers:
       - name: metrics-writer
-        image: python:3.9-slim
+        image: python:3.13-slim
         command: ["/bin/sh", "-c"]
         args: ['python3 /app/metrics_writer.py']
         volumeMounts:
