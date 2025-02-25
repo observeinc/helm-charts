@@ -1,9 +1,6 @@
 # agent
 
-![Version: 0.45.0](https://img.shields.io/badge/Version-0.45.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
-
-> [!CAUTION]
-> This chart is under active development and is not meant to be installed yet.
+![Version: 0.46.0](https://img.shields.io/badge/Version-0.46.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -85,7 +82,7 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster-events.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
 | cluster-events.image.pullPolicy | string | `"IfNotPresent"` |  |
 | cluster-events.image.repository | string | `"observeinc/observe-agent"` |  |
-| cluster-events.image.tag | string | `"2.0.1"` |  |
+| cluster-events.image.tag | string | `"2.1.0"` |  |
 | cluster-events.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | cluster-events.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | cluster-events.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.1"` |  |
@@ -150,7 +147,7 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster-metrics.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
 | cluster-metrics.image.pullPolicy | string | `"IfNotPresent"` |  |
 | cluster-metrics.image.repository | string | `"observeinc/observe-agent"` |  |
-| cluster-metrics.image.tag | string | `"2.0.1"` |  |
+| cluster-metrics.image.tag | string | `"2.1.0"` |  |
 | cluster-metrics.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | cluster-metrics.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | cluster-metrics.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.1"` |  |
@@ -228,7 +225,7 @@ Chart to install K8s collection stack based on Observe Agent
 | forwarder.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
 | forwarder.image.pullPolicy | string | `"IfNotPresent"` |  |
 | forwarder.image.repository | string | `"observeinc/observe-agent"` |  |
-| forwarder.image.tag | string | `"2.0.1"` |  |
+| forwarder.image.tag | string | `"2.1.0"` |  |
 | forwarder.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | forwarder.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | forwarder.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.1"` |  |
@@ -295,7 +292,7 @@ Chart to install K8s collection stack based on Observe Agent
 | monitor.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
 | monitor.image.pullPolicy | string | `"IfNotPresent"` |  |
 | monitor.image.repository | string | `"observeinc/observe-agent"` |  |
-| monitor.image.tag | string | `"2.0.1"` |  |
+| monitor.image.tag | string | `"2.1.0"` |  |
 | monitor.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | monitor.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | monitor.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.1"` |  |
@@ -387,7 +384,7 @@ Chart to install K8s collection stack based on Observe Agent
 | node-logs-metrics.extraVolumes[4].name | string | `"hostfs"` |  |
 | node-logs-metrics.image.pullPolicy | string | `"IfNotPresent"` |  |
 | node-logs-metrics.image.repository | string | `"observeinc/observe-agent"` |  |
-| node-logs-metrics.image.tag | string | `"2.0.1"` |  |
+| node-logs-metrics.image.tag | string | `"2.1.0"` |  |
 | node-logs-metrics.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | node-logs-metrics.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | node-logs-metrics.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.1"` |  |
