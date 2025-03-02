@@ -2,10 +2,10 @@ apiVersion: v2
 name: logs
 description: Observe logs collection
 type: application
-version: 0.1.37
+version: 0.1.38
 dependencies:
   - name: fluent-bit
-    version: 0.48.5
+    version: 0.48.8
     repository: https://fluent.github.io/helm-charts
   - name: endpoint
     version: 0.1.12

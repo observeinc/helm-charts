@@ -1,6 +1,6 @@
 # logs
 
-![Version: 0.1.37](https://img.shields.io/badge/Version-0.1.37-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.1.38](https://img.shields.io/badge/Version-0.1.38-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Observe logs collection
 
@@ -15,7 +15,7 @@ Observe logs collection
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../endpoint | endpoint | 0.1.12 |
-| https://fluent.github.io/helm-charts | fluent-bit | 0.48.5 |
+| https://fluent.github.io/helm-charts | fluent-bit | 0.48.8 |
 
 ## Values
 
