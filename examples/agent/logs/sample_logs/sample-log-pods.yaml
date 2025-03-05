@@ -272,3 +272,81 @@ spec:
       - name: script-volume
         configMap:
           name: log-generator-script
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-generator-java-multiline
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-generator-java-multiline
+  template:
+    metadata:
+      labels:
+        app: log-generator-java-multiline
+    spec:
+      containers:
+      - name: log-generator-java-multiline
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          cp /scripts/log-generator.sh /tmp/log-generator.sh && chmod +x /tmp/log-generator.sh && /tmp/log-generator.sh
+        env:
+        - name: LOG_TYPE
+          value: "java-multiline"  # Default log format, can be overridden at runtime
+        - name: LOG_LENGTH
+          value: "1"
+        - name: LINE_LENGTH
+          value: "10"
+        - name: SLEEP_LENGTH
+          value: "2"
+        volumeMounts:
+        - name: script-volume
+          mountPath: /scripts
+          readOnly: true
+      volumes:
+      - name: script-volume
+        configMap:
+          name: log-generator-script
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-generator-python-multiline
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-generator-python-multiline
+  template:
+    metadata:
+      labels:
+        app: log-generator-python-multiline
+    spec:
+      containers:
+      - name: log-generator-python-multiline
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          cp /scripts/log-generator.sh /tmp/log-generator.sh && chmod +x /tmp/log-generator.sh && /tmp/log-generator.sh
+        env:
+        - name: LOG_TYPE
+          value: "python-multiline"  # Default log format, can be overridden at runtime
+        - name: LOG_LENGTH
+          value: "1"
+        - name: LINE_LENGTH
+          value: "10"
+        - name: SLEEP_LENGTH
+          value: "2"
+        volumeMounts:
+        - name: script-volume
+          mountPath: /scripts
+          readOnly: true
+      volumes:
+      - name: script-volume
+        configMap:
+          name: log-generator-script

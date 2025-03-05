@@ -66,6 +66,26 @@ generate_custom_multiline_logs() {
   done
 }
 
+# Function to generate Java logs
+generate_java_multiline_logs() {
+  for i in $(seq 1 $LOG_LENGTH); do
+    echo "$(date +%Y-%m-%dT%H:%M:%S) Exception in thread 1 main java.lang.NullPointerException"
+    echo "     at com.example.myproject.Book.getTitle(Book.java:16)"
+    echo "     at com.example.myproject.Author.getBookTitles(Author.java:25)"
+    echo "     at com.example.myproject.Bootstrap.main(Bootstrap.java:14)"
+  done
+}
+
+# Function to generate Python logs
+generate_python_multiline_logs() {
+  for i in $(seq 1 $LOG_LENGTH); do
+    echo "$(date +%Y-%m-%dT%H:%M:%S) ERROR in app: Exception example"
+    echo "Traceback (most recent call last):"
+    echo "     This is an example of python traceback"
+    echo "     This is the end of the traceback example"
+  done
+}
+
 # Logic to select the log type
 case "$LOG_TYPE" in
   apache)
@@ -99,6 +119,18 @@ case "$LOG_TYPE" in
     done
     ;;
   custom-multiline)
+    while true; do
+        generate_custom_multiline_logs
+        sleep $SLEEP_LENGTH
+    done
+    ;;
+  java-multiline)
+    while true; do
+        generate_custom_multiline_logs
+        sleep $SLEEP_LENGTH
+    done
+    ;;
+  python-multiline)
     while true; do
         generate_custom_multiline_logs
         sleep $SLEEP_LENGTH

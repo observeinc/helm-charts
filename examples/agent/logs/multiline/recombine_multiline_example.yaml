@@ -1,0 +1,30 @@
+agent:
+  config:
+    nodeLogsMetrics:
+      receivers:
+        filelog:
+          include:
+            - /var/log/pods/*/*/*.log
+            - /var/log/kube-apiserver-audit.log
+          exclude:
+            - /var/log/pods/default_log-generator-csv*/**
+          include_file_name: true
+          include_file_path: true
+          start_at: beginning
+          operators:
+            - type: regex_parser
+              regex: '^(?P<timestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d*Z) (?P<stream>(stdout|stderr)) (?P<level>[A-Z]+) (?P<message>.*)$'
+              parser_from: body.message
+            - type: move
+              from: attributes.message
+              to: body
+            - id: container-parser
+              type: container
+              format: crio
+            - id: recombine
+              type: recombine
+              source_identifier: attributes["log.file.path"]
+              combine_field: body
+              combine_with: "\n "
+              is_first_entry: body matches "^Exception|^127.0.0.1|^\\s*INFO|^\\s*\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}|^\\["
+              overwrite_with: "newest"
