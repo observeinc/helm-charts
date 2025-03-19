@@ -163,17 +163,17 @@ cluster-events:
   configMap:
     create: false
     existingName: "cluster-events"
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      memory: 128Mi
   # ----------------------------------------- #
 
   # ----------------------------------------- #
   # Same for each deployment/daemonset      #
-  resources:
-    requests:
-      cpu: 250m
-      memory: 256Mi
-    limits:
-      memory: 256Mi
-
   image:
     repository: observeinc/observe-agent
     tag: 2.1.0
@@ -295,17 +295,17 @@ cluster-metrics:
   configMap:
     create: false
     existingName: "cluster-metrics"
-  # ----------------------------------------- #
 
-  # ----------------------------------------- #
-  # Same for each deployment/daemonset      #
   resources:
     requests:
       cpu: 250m
       memory: 256Mi
     limits:
       memory: 256Mi
+  # ----------------------------------------- #
 
+  # ----------------------------------------- #
+  # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
     tag: 2.1.0
@@ -426,17 +426,17 @@ node-logs-metrics:
   configMap:
     create: false
     existingName: "node-logs-metrics"
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      memory: 512Mi
   # ----------------------------------------- #
 
   # ----------------------------------------- #
   # Same for each deployment/daemonset      #
-  resources:
-    requests:
-      cpu: 250m
-      memory: 256Mi
-    limits:
-      memory: 256Mi
-
   image:
     repository: observeinc/observe-agent
     tag: 2.1.0
@@ -604,17 +604,17 @@ monitor:
   configMap:
     create: false
     existingName: "monitor"
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      memory: 128Mi
   # ----------------------------------------- #
 
   # ----------------------------------------- #
   # Same for each deployment/daemonset      #
-  resources:
-    requests:
-      cpu: 250m
-      memory: 256Mi
-    limits:
-      memory: 256Mi
-
   image:
     repository: observeinc/observe-agent
     tag: 2.1.0
@@ -734,17 +734,17 @@ forwarder:
   configMap:
     create: false
     existingName: "forwarder"
+
+  resources:
+    requests:
+      cpu: 300m
+      memory: 512Mi
+    limits:
+      memory: 512Mi
   # ----------------------------------------- #
 
   # ----------------------------------------- #
   # Same for each deployment/daemonset      #
-  resources:
-    requests:
-      cpu: 250m
-      memory: 256Mi
-    limits:
-      memory: 256Mi
-
   image:
     repository: observeinc/observe-agent
     tag: 2.1.0

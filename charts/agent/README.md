@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.46.0](https://img.shields.io/badge/Version-0.46.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
+![Version: 0.47.0](https://img.shields.io/badge/Version-0.47.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -80,9 +80,7 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster-events.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | cluster-events.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | cluster-events.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| cluster-events.image.pullPolicy | string | `"IfNotPresent"` |  |
-| cluster-events.image.repository | string | `"observeinc/observe-agent"` |  |
-| cluster-events.image.tag | string | `"2.1.0"` |  |
+| cluster-events.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.1.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | cluster-events.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | cluster-events.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | cluster-events.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.1"` |  |
@@ -110,7 +108,9 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster-events.readinessProbe.httpGet.port | int | `13133` |  |
 | cluster-events.readinessProbe.initialDelaySeconds | int | `30` |  |
 | cluster-events.readinessProbe.periodSeconds | int | `5` |  |
-| cluster-events.resources | object | `{"limits":{"memory":"256Mi"},"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| cluster-events.resources.limits.memory | string | `"128Mi"` |  |
+| cluster-events.resources.requests.cpu | string | `"100m"` |  |
+| cluster-events.resources.requests.memory | string | `"128Mi"` |  |
 | cluster-events.serviceAccount.create | bool | `false` |  |
 | cluster-events.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | cluster-events.tolerations | list | `[]` |  |
@@ -145,9 +145,7 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster-metrics.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | cluster-metrics.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | cluster-metrics.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| cluster-metrics.image.pullPolicy | string | `"IfNotPresent"` |  |
-| cluster-metrics.image.repository | string | `"observeinc/observe-agent"` |  |
-| cluster-metrics.image.tag | string | `"2.1.0"` |  |
+| cluster-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.1.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | cluster-metrics.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | cluster-metrics.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | cluster-metrics.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.1"` |  |
@@ -175,7 +173,9 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster-metrics.readinessProbe.httpGet.port | int | `13133` |  |
 | cluster-metrics.readinessProbe.initialDelaySeconds | int | `30` |  |
 | cluster-metrics.readinessProbe.periodSeconds | int | `5` |  |
-| cluster-metrics.resources | object | `{"limits":{"memory":"256Mi"},"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| cluster-metrics.resources.limits.memory | string | `"256Mi"` |  |
+| cluster-metrics.resources.requests.cpu | string | `"250m"` |  |
+| cluster-metrics.resources.requests.memory | string | `"256Mi"` |  |
 | cluster-metrics.serviceAccount.create | bool | `false` |  |
 | cluster-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | cluster-metrics.tolerations | list | `[]` |  |
@@ -223,9 +223,7 @@ Chart to install K8s collection stack based on Observe Agent
 | forwarder.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | forwarder.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | forwarder.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| forwarder.image.pullPolicy | string | `"IfNotPresent"` |  |
-| forwarder.image.repository | string | `"observeinc/observe-agent"` |  |
-| forwarder.image.tag | string | `"2.1.0"` |  |
+| forwarder.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.1.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | forwarder.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | forwarder.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | forwarder.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.1"` |  |
@@ -253,7 +251,9 @@ Chart to install K8s collection stack based on Observe Agent
 | forwarder.readinessProbe.httpGet.port | int | `13133` |  |
 | forwarder.readinessProbe.initialDelaySeconds | int | `30` |  |
 | forwarder.readinessProbe.periodSeconds | int | `5` |  |
-| forwarder.resources | object | `{"limits":{"memory":"256Mi"},"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| forwarder.resources.limits.memory | string | `"512Mi"` |  |
+| forwarder.resources.requests.cpu | string | `"300m"` |  |
+| forwarder.resources.requests.memory | string | `"512Mi"` |  |
 | forwarder.service.enabled | bool | `true` |  |
 | forwarder.service.type | string | `"ClusterIP"` |  |
 | forwarder.serviceAccount.create | bool | `false` |  |
@@ -290,9 +290,7 @@ Chart to install K8s collection stack based on Observe Agent
 | monitor.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | monitor.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | monitor.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| monitor.image.pullPolicy | string | `"IfNotPresent"` |  |
-| monitor.image.repository | string | `"observeinc/observe-agent"` |  |
-| monitor.image.tag | string | `"2.1.0"` |  |
+| monitor.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.1.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | monitor.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | monitor.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | monitor.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.1"` |  |
@@ -320,7 +318,9 @@ Chart to install K8s collection stack based on Observe Agent
 | monitor.readinessProbe.httpGet.port | int | `13133` |  |
 | monitor.readinessProbe.initialDelaySeconds | int | `30` |  |
 | monitor.readinessProbe.periodSeconds | int | `5` |  |
-| monitor.resources | object | `{"limits":{"memory":"256Mi"},"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| monitor.resources.limits.memory | string | `"128Mi"` |  |
+| monitor.resources.requests.cpu | string | `"100m"` |  |
+| monitor.resources.requests.memory | string | `"128Mi"` |  |
 | monitor.serviceAccount.create | bool | `false` |  |
 | monitor.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | monitor.tolerations | list | `[]` |  |
@@ -382,9 +382,7 @@ Chart to install K8s collection stack based on Observe Agent
 | node-logs-metrics.extraVolumes[3].name | string | `"varlibotelcol"` |  |
 | node-logs-metrics.extraVolumes[4].hostPath.path | string | `"/"` |  |
 | node-logs-metrics.extraVolumes[4].name | string | `"hostfs"` |  |
-| node-logs-metrics.image.pullPolicy | string | `"IfNotPresent"` |  |
-| node-logs-metrics.image.repository | string | `"observeinc/observe-agent"` |  |
-| node-logs-metrics.image.tag | string | `"2.1.0"` |  |
+| node-logs-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.1.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | node-logs-metrics.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | node-logs-metrics.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | node-logs-metrics.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.1"` |  |
@@ -416,7 +414,9 @@ Chart to install K8s collection stack based on Observe Agent
 | node-logs-metrics.readinessProbe.httpGet.port | int | `13133` |  |
 | node-logs-metrics.readinessProbe.initialDelaySeconds | int | `30` |  |
 | node-logs-metrics.readinessProbe.periodSeconds | int | `5` |  |
-| node-logs-metrics.resources | object | `{"limits":{"memory":"256Mi"},"requests":{"cpu":"250m","memory":"256Mi"}}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| node-logs-metrics.resources.limits.memory | string | `"512Mi"` |  |
+| node-logs-metrics.resources.requests.cpu | string | `"250m"` |  |
+| node-logs-metrics.resources.requests.memory | string | `"512Mi"` |  |
 | node-logs-metrics.securityContext.runAsGroup | int | `0` |  |
 | node-logs-metrics.securityContext.runAsUser | int | `0` |  |
 | node-logs-metrics.serviceAccount.create | bool | `false` |  |
