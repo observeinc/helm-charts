@@ -117,20 +117,6 @@ receivers:
           target_label: __address__
         ################################################################
 
-        # Maps all Kubernetes pod labels to Prometheus labels with the prefix removed (e.g., __meta_kubernetes_pod_label_app becomes app).
-        - action: labelmap
-          regex: __meta_kubernetes_pod_label_(.+)
-
-        # adds new label
-        - source_labels: [__meta_kubernetes_namespace]
-          action: replace
-          target_label: kubernetes_namespace
-
-        # adds new label
-        - source_labels: [__meta_kubernetes_pod_name]
-          action: replace
-          target_label: kubernetes_pod_name
-
         metric_relabel_configs:
           - action: drop
             regex: {{.Values.application.prometheusScrape.metricDropRegex}}
@@ -150,6 +136,28 @@ processors:
 {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
 
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
+  resource/drop_additional_pod_metrics_labels:
+    attributes:
+    - key: http.scheme
+      action: delete
+    - key: net.host.name
+      action: delete
+    - key: net.host.port
+      action: delete
+    - key: server.address
+      action: delete
+    - key: server.port
+      action: delete
+    - key: service.instance.id
+      action: delete
+    - key: url.scheme
+      action: delete
+    - key: instance
+      action: delete
+    - key: k8s.pod.uid
+      action: delete
+    - key: job
+      action: delete
 
   # attributes to append to objects
   attributes/debug_source_cluster_metrics:
@@ -181,7 +189,7 @@ service:
       {{- if .Values.application.prometheusScrape.enabled }}
       metrics/pod_metrics:
         receivers: [prometheus/pod_metrics]
-        processors: [memory_limiter, k8sattributes, batch, resource/observe_common, attributes/debug_source_pod_metrics]
+        processors: [memory_limiter, k8sattributes, resource/drop_additional_pod_metrics_labels, batch, resource/observe_common, attributes/debug_source_pod_metrics]
         exporters: [{{ join ", " $podMetricsExporters }}]
       {{ end -}}
 {{- include "config.service.telemetry" . | nindent 2 }}

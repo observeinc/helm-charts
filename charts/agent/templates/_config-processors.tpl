@@ -32,17 +32,32 @@ k8sattributes:
     - k8s.pod.uid
     - k8s.cluster.uid
     - k8s.node.name
-    - k8s.node.uid
     - k8s.container.name
     - container.id
+    labels:
+    - tag_name: app.kubernetes.io/name
+      key: app.kubernetes.io/name
+      from: pod
+    - tag_name: app.kubernetes.io/instance
+      key: app.kubernetes.io/instance
+      from: pod
+    - tag_name: app.kubernetes.io/version
+      key: app.kubernetes.io/version
+      from: pod
+    - tag_name: app.kubernetes.io/component
+      key: app.kubernetes.io/component
+      from: pod
+    - tag_name: app.kubernetes.io/part-of
+      key: app.kubernetes.io/part-of
+      from: pod
+    - tag_name: app.kubernetes.io/managed-by
+      key: app.kubernetes.io/managed-by
+      from: pod
   passthrough: false
   pod_association:
   - sources:
     - from: resource_attribute
       name: k8s.pod.ip
-  # - sources:
-  #   - from: resource_attribute
-  #     name: k8s.container.restart_count
   - sources:
     - from: resource_attribute
       name: k8s.pod.uid
