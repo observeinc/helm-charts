@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.48.0](https://img.shields.io/badge/Version-0.48.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.1](https://img.shields.io/badge/AppVersion-2.2.1-informational?style=flat-square)
+![Version: 0.49.0](https://img.shields.io/badge/Version-0.49.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.1](https://img.shields.io/badge/AppVersion-2.2.1-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -174,9 +174,9 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster-metrics.readinessProbe.httpGet.port | int | `13133` |  |
 | cluster-metrics.readinessProbe.initialDelaySeconds | int | `30` |  |
 | cluster-metrics.readinessProbe.periodSeconds | int | `5` |  |
-| cluster-metrics.resources.limits.memory | string | `"256Mi"` |  |
+| cluster-metrics.resources.limits.memory | string | `"512Mi"` |  |
 | cluster-metrics.resources.requests.cpu | string | `"250m"` |  |
-| cluster-metrics.resources.requests.memory | string | `"256Mi"` |  |
+| cluster-metrics.resources.requests.memory | string | `"512Mi"` |  |
 | cluster-metrics.serviceAccount.create | bool | `false` |  |
 | cluster-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | cluster-metrics.tolerations | list | `[]` |  |
