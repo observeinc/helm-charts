@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.46.1](https://img.shields.io/badge/Version-0.46.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.1.0](https://img.shields.io/badge/AppVersion-1.1.0-informational?style=flat-square)
+![Version: 0.47.0](https://img.shields.io/badge/Version-0.47.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.1](https://img.shields.io/badge/AppVersion-2.2.1-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -80,7 +80,7 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster-events.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | cluster-events.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | cluster-events.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| cluster-events.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.1.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| cluster-events.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.2.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | cluster-events.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | cluster-events.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | cluster-events.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.1"` |  |
@@ -145,7 +145,7 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster-metrics.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | cluster-metrics.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | cluster-metrics.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| cluster-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.1.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| cluster-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.2.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | cluster-metrics.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | cluster-metrics.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | cluster-metrics.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.1"` |  |
@@ -223,7 +223,7 @@ Chart to install K8s collection stack based on Observe Agent
 | forwarder.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | forwarder.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | forwarder.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| forwarder.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.1.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| forwarder.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.2.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | forwarder.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | forwarder.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | forwarder.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.1"` |  |
@@ -290,7 +290,7 @@ Chart to install K8s collection stack based on Observe Agent
 | monitor.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | monitor.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | monitor.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| monitor.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.1.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| monitor.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.2.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | monitor.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | monitor.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | monitor.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.1"` |  |
@@ -382,7 +382,7 @@ Chart to install K8s collection stack based on Observe Agent
 | node-logs-metrics.extraVolumes[3].name | string | `"varlibotelcol"` |  |
 | node-logs-metrics.extraVolumes[4].hostPath.path | string | `"/"` |  |
 | node-logs-metrics.extraVolumes[4].name | string | `"hostfs"` |  |
-| node-logs-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.1.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| node-logs-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.2.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | node-logs-metrics.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | node-logs-metrics.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | node-logs-metrics.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.1"` |  |
