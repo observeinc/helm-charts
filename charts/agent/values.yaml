@@ -144,6 +144,8 @@ agent:
     nodeLogsMetrics:
     # additional otel collector config for monitor deployment
     monitor:
+    # additional otel collector config for forwarder daemonset
+    forwarder:
   selfMonitor:
     enabled: true
     metrics:
