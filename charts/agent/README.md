@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.49.0](https://img.shields.io/badge/Version-0.49.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.1](https://img.shields.io/badge/AppVersion-2.2.1-informational?style=flat-square)
+![Version: 0.49.1](https://img.shields.io/badge/Version-0.49.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.1](https://img.shields.io/badge/AppVersion-2.2.1-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -109,9 +109,9 @@ Chart to install K8s collection stack based on Observe Agent
 | cluster-events.readinessProbe.httpGet.port | int | `13133` |  |
 | cluster-events.readinessProbe.initialDelaySeconds | int | `30` |  |
 | cluster-events.readinessProbe.periodSeconds | int | `5` |  |
-| cluster-events.resources.limits.memory | string | `"128Mi"` |  |
-| cluster-events.resources.requests.cpu | string | `"100m"` |  |
-| cluster-events.resources.requests.memory | string | `"128Mi"` |  |
+| cluster-events.resources.limits.memory | string | `"256Mi"` |  |
+| cluster-events.resources.requests.cpu | string | `"150m"` |  |
+| cluster-events.resources.requests.memory | string | `"256Mi"` |  |
 | cluster-events.serviceAccount.create | bool | `false` |  |
 | cluster-events.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | cluster-events.tolerations | list | `[]` |  |
@@ -319,9 +319,9 @@ Chart to install K8s collection stack based on Observe Agent
 | monitor.readinessProbe.httpGet.port | int | `13133` |  |
 | monitor.readinessProbe.initialDelaySeconds | int | `30` |  |
 | monitor.readinessProbe.periodSeconds | int | `5` |  |
-| monitor.resources.limits.memory | string | `"128Mi"` |  |
-| monitor.resources.requests.cpu | string | `"100m"` |  |
-| monitor.resources.requests.memory | string | `"128Mi"` |  |
+| monitor.resources.limits.memory | string | `"256Mi"` |  |
+| monitor.resources.requests.cpu | string | `"150m"` |  |
+| monitor.resources.requests.memory | string | `"256Mi"` |  |
 | monitor.serviceAccount.create | bool | `false` |  |
 | monitor.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | monitor.tolerations | list | `[]` |  |

@@ -168,10 +168,10 @@ cluster-events:
 
   resources:
     requests:
-      cpu: 100m
-      memory: 128Mi
+      cpu: 150m
+      memory: 256Mi
     limits:
-      memory: 128Mi
+      memory: 256Mi
   # ----------------------------------------- #
 
   # ----------------------------------------- #
@@ -609,10 +609,10 @@ monitor:
 
   resources:
     requests:
-      cpu: 100m
-      memory: 128Mi
+      cpu: 150m
+      memory: 256Mi
     limits:
-      memory: 128Mi
+      memory: 256Mi
   # ----------------------------------------- #
 
   # ----------------------------------------- #
