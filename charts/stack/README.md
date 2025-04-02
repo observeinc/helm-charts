@@ -1,24 +1,20 @@
 # stack
 
-![Version: 1.2.3](https://img.shields.io/badge/Version-1.2.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+> **:exclamation: This Helm Chart is deprecated!**
 
-Observe Kubernetes agent stack
+![Version: 1.3.0](https://img.shields.io/badge/Version-1.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
-## Maintainers
-
-| Name | Email | Url |
-| ---- | ------ | --- |
-| Observe | <support@observeinc.com> |  |
+DEPRECATED Observe Kubernetes agent stack
 
 ## Requirements
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../events | events | 0.3.0 |
-| file://../logs | logs | 0.1.38 |
-| file://../metrics | metrics | 0.3.25 |
+| file://../events | events | 0.4.0 |
+| file://../logs | logs | 0.2.0 |
+| file://../metrics | metrics | 0.4.0 |
 | file://../proxy | proxy | 0.1.8 |
-| file://../traces | traces | 1.0.13 |
+| file://../traces | traces | 1.1.0 |
 
 ## Values
 

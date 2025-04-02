@@ -1,20 +1,16 @@
 # events
 
-![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.11.1](https://img.shields.io/badge/AppVersion-v0.11.1-informational?style=flat-square)
+> **:exclamation: This Helm Chart is deprecated!**
 
-Observe kubernetes event collection
+![Version: 0.4.0](https://img.shields.io/badge/Version-0.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.11.1](https://img.shields.io/badge/AppVersion-v0.11.1-informational?style=flat-square)
 
-## Maintainers
-
-| Name | Email | Url |
-| ---- | ------ | --- |
-| Observe | <support@observeinc.com> |  |
+DEPRECATED Observe kubernetes event collection
 
 ## Requirements
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../endpoint | endpoint | 0.1.12 |
+| file://../endpoint | endpoint | 0.2.0 |
 
 ## Values
 

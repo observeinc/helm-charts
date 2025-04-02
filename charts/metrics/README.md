@@ -1,20 +1,16 @@
 # metrics
 
-![Version: 0.3.25](https://img.shields.io/badge/Version-0.3.25-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+> **:exclamation: This Helm Chart is deprecated!**
 
-Observe metrics collection
+![Version: 0.4.0](https://img.shields.io/badge/Version-0.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
-## Maintainers
-
-| Name | Email | Url |
-| ---- | ------ | --- |
-| Observe | <support@observeinc.com> |  |
+DEPRECATED Observe metrics collection
 
 ## Requirements
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../endpoint | endpoint | 0.1.12 |
+| file://../endpoint | endpoint | 0.2.0 |
 | https://grafana.github.io/helm-charts | grafana-agent | 0.42.0 |
 
 ## Values

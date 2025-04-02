@@ -1,20 +1,16 @@
 # logs
 
-![Version: 0.1.38](https://img.shields.io/badge/Version-0.1.38-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+> **:exclamation: This Helm Chart is deprecated!**
 
-Observe logs collection
+![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
-## Maintainers
-
-| Name | Email | Url |
-| ---- | ------ | --- |
-| Observe | <support@observeinc.com> |  |
+DEPRECATED Observe logs collection
 
 ## Requirements
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../endpoint | endpoint | 0.1.12 |
+| file://../endpoint | endpoint | 0.2.0 |
 | https://fluent.github.io/helm-charts | fluent-bit | 0.48.8 |
 
 ## Values

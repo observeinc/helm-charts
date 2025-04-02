@@ -1,8 +1,25 @@
 # agent
 
-![Version: 0.50.1](https://img.shields.io/badge/Version-0.50.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.1](https://img.shields.io/badge/AppVersion-2.2.1-informational?style=flat-square)
+![Version: 0.52.0](https://img.shields.io/badge/Version-0.52.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.1](https://img.shields.io/badge/AppVersion-2.2.1-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
+
+# Components
+
+## node-logs-metrics
+This service is a *daemonset* which means it runs on every node in the cluster. It is responsible for collecting logs from pods that are running on the node. In addition, it scrapes the API of the kubelet running on the node for metrics about the node and the pods running on the node.
+
+## cluster-events
+This service is a *single-instance deployment*. It's critical that this service is only a single instance since otherwise it would produce duplicate data. It is responsible for both scraping for Kubernetes events on startup as well as registering as a listener for any new Kubernetes events produced by the cluster. These events are then transformed and become the basis for the representation of all the resources in your Kubernetes cluster as well as any events that happen on those resources.
+
+## cluster-metrics
+This service is a *single-instance deployment*. It's critical that this service is only a single instance since otherwise it would produce duplicate data. It is responsible for pulling metrics from the Kubernetes API server and sending them to Observe. In addition, this is also where the Prometheus receiver that scrapes pods for Prometheus metrics is configured and runs.
+
+## forwarder
+This service is a *daemonset* which means it runs on every node in the cluster. It is responsible for receiving telemetry from the other services, specifically via an OTLP receiver and forwarding it to Observe. It can be used as the target for various instrumentation SDK's and clients as well. See (here)[https://docs.observeinc.com/en/latest/content/observe-agent/ConfigureApplicationInstrumentation.html] for more details.
+
+## monitor
+This service is a *single-instance deployment*. It's critical that this service is only a single instance since otherwise it would produce duplicate data. It is responsible for monitoring the other containers of Observe Agent running by scraping the exposed Prometheus metrics of those agents. It's best practice to separate the monitoring of the agents from the agents themselves since if problems develop in those pipelines, we would need the agent telemetry to keep flowing in order to diagnose.
 
 ## Maintainers
 

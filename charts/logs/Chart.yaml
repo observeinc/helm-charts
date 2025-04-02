@@ -1,15 +1,13 @@
 apiVersion: v2
 name: logs
-description: Observe logs collection
+description: DEPRECATED Observe logs collection
 type: application
-version: 0.1.38
+version: 0.2.0
+deprecated: true
 dependencies:
   - name: fluent-bit
     version: 0.48.8
     repository: https://fluent.github.io/helm-charts
   - name: endpoint
-    version: 0.1.12
+    version: 0.2.0
     repository: file://../endpoint
-maintainers:
-  - name: Observe
-    email: support@observeinc.com

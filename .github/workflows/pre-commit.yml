@@ -51,7 +51,7 @@ jobs:
         if: failure()
         uses: thollander/actions-comment-pull-request@v3
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          filePath: ./formatted_diff.txt
-          comment_tag: chart-bump-changes
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          file-path: ./formatted_diff.txt
+          comment-tag: chart-bump-changes
           reactions: eyes

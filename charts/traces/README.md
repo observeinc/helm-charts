@@ -1,20 +1,16 @@
 # traces
 
-![Version: 1.0.13](https://img.shields.io/badge/Version-1.0.13-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+> **:exclamation: This Helm Chart is deprecated!**
 
-Observe OpenTelemetry trace collection
+![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
-## Maintainers
-
-| Name | Email | Url |
-| ---- | ------ | --- |
-| Observe | <support@observeinc.com> |  |
+DEPRECATED Observe OpenTelemetry trace collection
 
 ## Requirements
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../endpoint | endpoint | 0.1.12 |
+| file://../endpoint | endpoint | 0.2.0 |
 | file://../proxy | proxy | 0.1.8 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | opentelemetry-collector | 0.117.1 |
 
