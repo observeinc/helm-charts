@@ -79,6 +79,10 @@ node:
     metrics:
       enabled: true
       interval: 60s
+  kubeletstats:
+    # Explicitly toggles between K8S_NODE_IP and K8S_NODE_NAME. When set to false, it uses the default value of K8S_NODE_NAME from open-telemetry/opentelemetry-collector-contrib.
+    # this resolves issues similar to https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/26481#issuecomment-1720797914 for `no such host` or `connection refused`.
+    useNodeIp: false
   forwarder:
     enabled: true
     traces:
@@ -539,6 +543,10 @@ node-logs-metrics:
       valueFrom:
         fieldRef:
           fieldPath: spec.nodeName
+    - name: K8S_NODE_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.hostIP
     - name: TOKEN
       valueFrom:
         secretKeyRef:

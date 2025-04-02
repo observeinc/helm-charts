@@ -64,7 +64,7 @@ receivers:
   kubeletstats:
     collection_interval: {{.Values.node.containers.metrics.interval}}
     auth_type: 'serviceAccount'
-    endpoint: '${env:K8S_NODE_NAME}:10250'
+    endpoint: {{ if .Values.node.kubeletstats.useNodeIp }}"${env:K8S_NODE_IP}:10250"{{ else }}"${env:K8S_NODE_NAME}:10250"{{ end }}
     node: '${env:K8S_NODE_NAME}'
     insecure_skip_verify: true
     k8s_api_config:
