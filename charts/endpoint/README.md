@@ -1,14 +1,10 @@
 # endpoint
 
-![Version: 0.1.12](https://img.shields.io/badge/Version-0.1.12-informational?style=flat-square) ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square)
+> **:exclamation: This Helm Chart is deprecated!**
 
-Observe collection endpoint utility functions
+![Version: 0.1.13](https://img.shields.io/badge/Version-0.1.13-informational?style=flat-square) ![Type: library](https://img.shields.io/badge/Type-library-informational?style=flat-square)
 
-## Maintainers
-
-| Name | Email | Url |
-| ---- | ------ | --- |
-| Observe | <support@observeinc.com> |  |
+DEPRECATED Observe collection endpoint utility functions
 
 ## Values
 

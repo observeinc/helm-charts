@@ -4,6 +4,6 @@ dependencies:
   version: 0.42.0
 - name: endpoint
   repository: file://../endpoint
-  version: 0.1.12
-digest: sha256:d7c5e99560824a68c3605ff385415f9dc056b445d3326dedaed078511aa5b2ea
-generated: "2024-09-05T12:22:06.735161-07:00"
+  version: 0.1.13
+digest: sha256:5dd4423106d42152b09dc8a1e2569cde6cf4a05105e1efb4bd1121e774c668ae
+generated: "2025-04-02T14:13:25.005668-07:00"

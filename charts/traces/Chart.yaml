@@ -1,19 +1,17 @@
 apiVersion: v2
 name: traces
-description: Observe OpenTelemetry trace collection
+description: DEPRECATED Observe OpenTelemetry trace collection
 type: application
-version: 1.0.13
+version: 1.1.0
+deprecated: true
 dependencies:
   - name: opentelemetry-collector
     version: 0.117.1
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
   - name: endpoint
-    version: 0.1.12
+    version: 0.1.13
     repository: file://../endpoint
   - name: proxy
     version: 0.1.8
     repository: file://../proxy
     condition: proxy.enabled
-maintainers:
-  - name: Observe
-    email: support@observeinc.com
