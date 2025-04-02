@@ -1,0 +1,50 @@
+{{ template "chart.header" . }}
+{{ template "chart.deprecationWarning" . }}
+
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+## Installing Traces
+
+The values for `${OBSERVE_COLLECTION_ENDPOINT}` and `${OBSERVE_TOKEN}` are provided
+when you install the OpenTelemetry app in Observe, and set up a new connection.
+
+The same token should not be re-used for the `stack` (Kubernetes) and `traces` (OpenTelemetry)
+charts. Instead, create a new connection for the OpenTelemetry app, and provide the new token
+you are prompted to create.
+
+```
+helm install --namespace=observe observe-traces observe/traces \
+	--set global.observe.collectionEndpoint="${OBSERVE_COLLECTION_ENDPOINT}" \
+  --set observe.token.value="${OBSERVE_TOKEN}" \
+  --create-namespace
+
+
+# store values for further configuration and upgrades
+helm -n observe get values observe-traces -o yaml > observe-traces-values.yaml
+```
+
+## Traces
+
+```bash
+kubectl -n observe create secret generic otel-credentials --from-literal='OBSERVE_TOKEN=<opentelemetry datastream token>'
+```
+
+## Uninstall Traces
+```helm -n observe uninstall observe-traces```
+
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "chart.maintainersSection" . }}
+
+{{ template "chart.sourcesSection" . }}
+
+{{ template "chart.requirementsSection" . }}
+
+{{ template "chart.valuesSection" . }}
+
+{{- if not .SkipVersionFooter }}
+{{ template "helm-docs.versionFooter" . }}
+{{- end }}

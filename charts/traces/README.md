@@ -1,20 +1,44 @@
 # traces
 
-![Version: 1.0.13](https://img.shields.io/badge/Version-1.0.13-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+> **:exclamation: This Helm Chart is deprecated!**
 
-Observe OpenTelemetry trace collection
+![Version: 1.1.0](https://img.shields.io/badge/Version-1.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
-## Maintainers
+DEPRECATED Observe OpenTelemetry trace collection
 
-| Name | Email | Url |
-| ---- | ------ | --- |
-| Observe | <support@observeinc.com> |  |
+## Installing Traces
+
+The values for `${OBSERVE_COLLECTION_ENDPOINT}` and `${OBSERVE_TOKEN}` are provided
+when you install the OpenTelemetry app in Observe, and set up a new connection.
+
+The same token should not be re-used for the `stack` (Kubernetes) and `traces` (OpenTelemetry)
+charts. Instead, create a new connection for the OpenTelemetry app, and provide the new token
+you are prompted to create.
+
+```
+helm install --namespace=observe observe-traces observe/traces \
+	--set global.observe.collectionEndpoint="${OBSERVE_COLLECTION_ENDPOINT}" \
+  --set observe.token.value="${OBSERVE_TOKEN}" \
+  --create-namespace
+
+# store values for further configuration and upgrades
+helm -n observe get values observe-traces -o yaml > observe-traces-values.yaml
+```
+
+## Traces
+
+```bash
+kubectl -n observe create secret generic otel-credentials --from-literal='OBSERVE_TOKEN=<opentelemetry datastream token>'
+```
+
+## Uninstall Traces
+```helm -n observe uninstall observe-traces```
 
 ## Requirements
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../endpoint | endpoint | 0.1.12 |
+| file://../endpoint | endpoint | 0.1.13 |
 | file://../proxy | proxy | 0.1.8 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | opentelemetry-collector | 0.117.1 |
 
