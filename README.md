@@ -55,10 +55,10 @@ helm -n observe get values observe-agent -o yaml > observe-agent-values.yaml
 ```
 
 ## Installing Traces
-Traces and other app telemetry such as metrics can be sent to the `forwarder` daemonset that's installed as part of the `agent` stack. For more details please see the docs (here)[https://docs.observeinc.com/en/latest/content/observe-agent/ConfigureApplicationInstrumentation.html]
+Traces and other app telemetry such as metrics can be sent to the `forwarder` daemonset that's installed as part of the `agent` stack. For more details please see the docs [here](https://docs.observeinc.com/en/latest/content/observe-agent/ConfigureApplicationInstrumentation.html)
 
 ## Sizing
-For more details on default sizing and how to tune the services in the helm chart, please see the docs (here)[https://docs.observeinc.com/en/latest/content/observe-agent/tune_services.html].
+For more details on default sizing and how to tune the services in the helm chart, please see the docs [here](https://docs.observeinc.com/en/latest/content/observe-agent/tune_services.html).
 
 # Uninstall Stack
 ```helm -n observe uninstall observe-agent```
