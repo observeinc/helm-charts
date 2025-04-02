@@ -3,6 +3,45 @@ entries:
   agent:
   - apiVersion: v2
     appVersion: 2.2.1
+    created: "2025-04-02T21:53:25.842299187Z"
+    dependencies:
+    - alias: cluster-events
+      condition: cluster.events.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.101.1
+    - alias: cluster-metrics
+      condition: cluster.metrics.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.101.1
+    - alias: node-logs-metrics
+      condition: node.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.101.1
+    - alias: monitor
+      condition: agent.selfMonitor.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.101.1
+    - alias: forwarder
+      condition: node.forwarder.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.101.1
+    description: Chart to install K8s collection stack based on Observe Agent
+    digest: 40acebe6f07f0e7336b522ccb718973bc0e136ac6a5530fd1682edfb4922ebfa
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: agent
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/agent-0.51.0/agent-0.51.0.tgz
+    version: 0.51.0
+  - apiVersion: v2
+    appVersion: 2.2.1
     created: "2025-04-02T13:18:19.681444495Z"
     dependencies:
     - alias: cluster-events
@@ -2743,6 +2782,16 @@ entries:
     version: 0.1.0
   endpoint:
   - apiVersion: v2
+    created: "2025-04-02T21:53:26.021055036Z"
+    deprecated: true
+    description: DEPRECATED Observe collection endpoint utility functions
+    digest: 3de81259ab9a53ae5448acdf35d8aa887a97a5d53c2d49833d9eceea88df77c5
+    name: endpoint
+    type: library
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/endpoint-0.1.13/endpoint-0.1.13.tgz
+    version: 0.1.13
+  - apiVersion: v2
     created: "2024-09-06T11:54:22.017044618Z"
     description: Observe collection endpoint utility functions
     digest: dda9252e20d6222416de9c5fa5872fc237cd5528bd3d6261c6555e88e774345b
@@ -2863,6 +2912,21 @@ entries:
     - https://github.com/observeinc/helm-charts/releases/download/endpoint-0.1.3/endpoint-0.1.3.tgz
     version: 0.1.3
   events:
+  - apiVersion: v2
+    appVersion: v0.11.1
+    created: "2025-04-02T21:53:26.185180961Z"
+    dependencies:
+    - name: endpoint
+      repository: file://../endpoint
+      version: 0.1.13
+    deprecated: true
+    description: DEPRECATED Observe kubernetes event collection
+    digest: 19f7a3ff980bc2d425fe06f92fa1468fd046a6c2e107c4745104ffb5619e598a
+    name: events
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/events-0.4.0/events-0.4.0.tgz
+    version: 0.4.0
   - apiVersion: v2
     appVersion: v0.11.1
     created: "2024-12-11T18:21:44.480774531Z"
@@ -3170,6 +3234,23 @@ entries:
     - https://github.com/observeinc/helm-charts/releases/download/events-0.1.8/events-0.1.8.tgz
     version: 0.1.8
   logs:
+  - apiVersion: v2
+    created: "2025-04-02T21:53:26.356796457Z"
+    dependencies:
+    - name: fluent-bit
+      repository: https://fluent.github.io/helm-charts
+      version: 0.48.8
+    - name: endpoint
+      repository: file://../endpoint
+      version: 0.1.13
+    deprecated: true
+    description: DEPRECATED Observe logs collection
+    digest: 15926ad0e191424d3ee7b6fc216dda4441e970438ffe5b12a1bb9d2b3781567b
+    name: logs
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/logs-0.2.0/logs-0.2.0.tgz
+    version: 0.2.0
   - apiVersion: v2
     created: "2025-03-05T22:06:36.401185825Z"
     dependencies:
@@ -3760,6 +3841,23 @@ entries:
     - https://github.com/observeinc/helm-charts/releases/download/logs-0.1.5/logs-0.1.5.tgz
     version: 0.1.5
   metrics:
+  - apiVersion: v2
+    created: "2025-04-02T21:53:26.546008167Z"
+    dependencies:
+    - name: grafana-agent
+      repository: https://grafana.github.io/helm-charts
+      version: 0.42.0
+    - name: endpoint
+      repository: file://../endpoint
+      version: 0.1.13
+    deprecated: true
+    description: DEPRECATED Observe metrics collection
+    digest: bd6bee6d019b456b34dda11bbca7c9e588598378d76ddbd2a94f9e8aa58dab7b
+    name: metrics
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/metrics-0.4.0/metrics-0.4.0.tgz
+    version: 0.4.0
   - apiVersion: v2
     created: "2024-09-09T13:26:48.228611671Z"
     dependencies:
@@ -4383,6 +4481,37 @@ entries:
     - https://github.com/observeinc/helm-charts/releases/download/proxy-0.1.0/proxy-0.1.0.tgz
     version: 0.1.0
   stack:
+  - apiVersion: v2
+    created: "2025-04-02T21:53:26.807324849Z"
+    dependencies:
+    - condition: logs.enabled
+      name: logs
+      repository: file://../logs
+      version: 0.2.0
+    - condition: metrics.enabled
+      name: metrics
+      repository: file://../metrics
+      version: 0.4.0
+    - condition: events.enabled
+      name: events
+      repository: file://../events
+      version: 0.4.0
+    - condition: proxy.enabled
+      name: proxy
+      repository: file://../proxy
+      version: 0.1.8
+    - condition: traces.enabled
+      name: traces
+      repository: file://../traces
+      version: 1.1.0
+    deprecated: true
+    description: DEPRECATED Observe Kubernetes agent stack
+    digest: dc0c9ed9ef23dd27f1ca5f823dc12639e94228a9773861df9efdfe132a298a61
+    name: stack
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/stack-1.3.0/stack-1.3.0.tgz
+    version: 1.3.0
   - apiVersion: v2
     created: "2025-03-05T22:06:36.6271983Z"
     dependencies:
@@ -6589,6 +6718,27 @@ entries:
     version: 0.1.0
   traces:
   - apiVersion: v2
+    created: "2025-04-02T21:53:27.044710993Z"
+    dependencies:
+    - name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.117.1
+    - name: endpoint
+      repository: file://../endpoint
+      version: 0.1.13
+    - condition: proxy.enabled
+      name: proxy
+      repository: file://../proxy
+      version: 0.1.8
+    deprecated: true
+    description: DEPRECATED Observe OpenTelemetry trace collection
+    digest: f3cdb76ece482c79d46983b3ce87fb31cef8bf46aaf3e661ed2f7eb409179824
+    name: traces
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/traces-1.1.0/traces-1.1.0.tgz
+    version: 1.1.0
+  - apiVersion: v2
     created: "2025-03-05T22:06:36.82581044Z"
     dependencies:
     - name: opentelemetry-collector
@@ -7708,4 +7858,4 @@ entries:
     urls:
     - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.0/traces-0.1.0.tgz
     version: 0.1.0
-generated: "2025-04-02T13:18:19.682240871Z"
+generated: "2025-04-02T21:53:27.0455768Z"
