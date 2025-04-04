@@ -1,7 +1,7 @@
 # Charts will have their dependencies built in the order defined here. Endpoint is
 # a dependency of all charts, and should thus always be first in the list. Stack
 # and traces are umbrella charts and should always be at the end of the list.
-CHARTS := endpoint proxy events logs metrics stack traces
+CHARTS := endpoint proxy events logs metrics agent stack traces
 
 .PHONY: all
 all: build-deps lint test
