@@ -797,7 +797,7 @@ forwarder:
     # This stops optional prometheus scrape config from picking up these pods
     observeinc_com_scrape: 'false',
     observe_monitor_purpose: observecollection,
-    observe_monitor_scrape: 'false',
+    observe_monitor_scrape: 'true',
     observe_monitor_path: '/metrics',
     observe_monitor_port: '8888',
   }
