@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.51.1](https://img.shields.io/badge/Version-0.51.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.1](https://img.shields.io/badge/AppVersion-2.2.1-informational?style=flat-square)
+![Version: 0.51.2](https://img.shields.io/badge/Version-0.51.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.1](https://img.shields.io/badge/AppVersion-2.2.1-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -259,7 +259,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | forwarder.podAnnotations.observe_monitor_path | string | `"/metrics"` |  |
 | forwarder.podAnnotations.observe_monitor_port | string | `"8888"` |  |
 | forwarder.podAnnotations.observe_monitor_purpose | string | `"observecollection"` |  |
-| forwarder.podAnnotations.observe_monitor_scrape | string | `"false"` |  |
+| forwarder.podAnnotations.observe_monitor_scrape | string | `"true"` |  |
 | forwarder.podAnnotations.observeinc_com_scrape | string | `"false"` |  |
 | forwarder.ports.metrics.containerPort | int | `8888` |  |
 | forwarder.ports.metrics.enabled | bool | `true` |  |
