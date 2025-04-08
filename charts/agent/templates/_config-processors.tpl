@@ -20,29 +20,42 @@ deltatocumulative/observe:
 k8sattributes:
   extract:
     metadata:
-    - k8s.namespace.name
-    - k8s.deployment.name
-    - k8s.replicaset.name
-    - k8s.statefulset.name
-    - k8s.daemonset.name
-    - k8s.cronjob.name
-    - k8s.job.name
-    - k8s.node.name
-    - k8s.pod.name
-    - k8s.pod.uid
-    - k8s.cluster.uid
-    - k8s.node.name
-    - k8s.node.uid
-    - k8s.container.name
-    - container.id
+      - k8s.namespace.name
+      - k8s.deployment.name
+      - k8s.replicaset.name
+      - k8s.statefulset.name
+      - k8s.daemonset.name
+      - k8s.cronjob.name
+      - k8s.job.name
+      - k8s.node.name
+      - k8s.node.uid
+      - k8s.pod.name
+      - k8s.pod.uid
+      - k8s.cluster.uid
+      - k8s.container.name
+      - container.id
+    labels:
+      # Extract app.kubernetes.io/* labels from the pod as the full tag.
+      - tag_name: $1
+        key_regex: (app\.kubernetes\.io/.+)
+        from: pod
+      # Extract service.name from the pod's app.kubernetes.io/name label
+      # TODO remove this when the `service_attributes.enabled` config is released
+      # https://github.com/open-telemetry/opentelemetry-collector-contrib/pull/39335
+      - tag_name: service.name
+        key: app.kubernetes.io/name
+        from: pod
+    annotations:
+      # TODO remove this when the `otel_annotations` config is released
+      # https://github.com/open-telemetry/opentelemetry-collector-contrib/commit/6682df519bd87b8ce33afa83bc09e345f2f4fc6b
+      - tag_name: $1
+        key_regex: resource\.opentelemetry\.io/(.+)
+        from: pod
   passthrough: false
   pod_association:
   - sources:
     - from: resource_attribute
       name: k8s.pod.ip
-  # - sources:
-  #   - from: resource_attribute
-  #     name: k8s.container.restart_count
   - sources:
     - from: resource_attribute
       name: k8s.pod.uid
