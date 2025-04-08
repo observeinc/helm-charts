@@ -7,14 +7,14 @@ if [ -z "$CHART_PATH" ]; then
     exit 1
 fi
 
-# Check for unstaged, staged, and committed changes to the Chart.yaml
-UNSTAGED_CHANGES=$(git diff --name-only $CHART_PATH/Chart.yaml)
-STAGED_CHANGES=$(git diff --cached --name-only $CHART_PATH/Chart.yaml)
-COMMITTED_CHANGES=$(git diff --name-only origin/main...HEAD $CHART_PATH/Chart.yaml)
+# Check for unstaged, staged, and committed changes to the chart folder
+UNSTAGED_CHANGES=$(git diff --name-only $CHART_PATH)
+STAGED_CHANGES=$(git diff --cached --name-only $CHART_PATH)
+COMMITTED_CHANGES=$(git diff --name-only origin/main...HEAD $CHART_PATH)
 
 # If no changes in any of the categories, exit
 if [ -z "$UNSTAGED_CHANGES" ] && [ -z "$STAGED_CHANGES" ] && [ -z "$COMMITTED_CHANGES" ]; then
-    echo "No changes detected in $CHART_PATH/Chart.yaml, skipping bump."
+    echo "No changes detected in $CHART_PATH, skipping bump."
     exit 0
 fi
 
@@ -32,4 +32,4 @@ fi
 BUMPED_VERSION=$(echo $CURRENT_VERSION | awk -F. '{$NF = $NF + 1;} 1' OFS=.)
 
 # Replace the version in Chart.yaml
-sed -i "s/^version: $CURRENT_VERSION/version: $BUMPED_VERSION/" $CHART_PATH/Chart.yaml
+sed -i '' -e "s/^version: $CURRENT_VERSION/version: $BUMPED_VERSION/" $CHART_PATH/Chart.yaml
