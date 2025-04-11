@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.57.0](https://img.shields.io/badge/Version-0.57.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.3.0](https://img.shields.io/badge/AppVersion-2.3.0-informational?style=flat-square)
+![Version: 0.58.0](https://img.shields.io/badge/Version-0.58.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.3.0](https://img.shields.io/badge/AppVersion-2.3.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -40,12 +40,12 @@ This service is a *single-instance deployment*. It's critical that this service 
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://open-telemetry.github.io/opentelemetry-helm-charts | cluster-events(opentelemetry-collector) | 0.101.1 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | cluster-metrics(opentelemetry-collector) | 0.101.1 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | prometheus-scraper(opentelemetry-collector) | 0.101.1 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | node-logs-metrics(opentelemetry-collector) | 0.101.1 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | monitor(opentelemetry-collector) | 0.101.1 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | forwarder(opentelemetry-collector) | 0.101.1 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | cluster-events(opentelemetry-collector) | 0.125.0 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | cluster-metrics(opentelemetry-collector) | 0.125.0 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | prometheus-scraper(opentelemetry-collector) | 0.125.0 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | node-logs-metrics(opentelemetry-collector) | 0.125.0 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | monitor(opentelemetry-collector) | 0.125.0 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | forwarder(opentelemetry-collector) | 0.125.0 |
 
 ## Values
 
