@@ -6,7 +6,6 @@ multiline:
 {{- define "observe.daemonset.logsMetrics.config" -}}
 
 extensions:
-{{- include "config.extensions.health_check" . | nindent 2 }}
 {{- include "config.extensions.file_storage" . | nindent 2 }}
 
 exporters:
@@ -184,7 +183,6 @@ processors:
 {{- end }}
 
 service:
-  extensions: [health_check, file_storage]
   pipelines:
       {{- if .Values.node.containers.logs.enabled }}
       logs:
