@@ -1,8 +1,5 @@
 {{- define "observe.deployment.clusterEvents.config" -}}
 
-extensions:
-{{- include "config.extensions.health_check" . | nindent 2 }}
-
 exporters:
 {{- include "config.exporters.debug" . | nindent 2 }}
 {{- include "config.exporters.otlphttp.observe.entity" . | nindent 2 }}
@@ -439,7 +436,6 @@ processors:
 {{- end }}
 
 service:
-  extensions: [health_check]
   pipelines:
       logs/objects:
         receivers: [k8sobjects/objects]
