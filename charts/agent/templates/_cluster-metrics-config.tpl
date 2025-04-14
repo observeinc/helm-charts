@@ -149,15 +149,8 @@ processors:
 {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
 
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
-  memory_limiter/pod_metrics:
-    check_interval: 5s
-    limit_percentage: 60
-    spike_limit_percentage: 5
 
-  memory_limiter/cluster_metrics:
-    check_interval: 5s
-    limit_percentage: 30
-    spike_limit_percentage: 5
+{{- include "config.processors.memory_limiter" . | nindent 2 }}
 
   # attributes to append to objects
   attributes/debug_source_cluster_metrics:
@@ -184,12 +177,12 @@ service:
   pipelines:
       metrics:
         receivers: [k8s_cluster]
-        processors: [memory_limiter/cluster_metrics, k8sattributes, batch, resource/observe_common, attributes/debug_source_cluster_metrics]
+        processors: [memory_limiter, k8sattributes, batch, resource/observe_common, attributes/debug_source_cluster_metrics]
         exporters: [{{ join ", " $metricsExporters }}]
       {{- if .Values.application.prometheusScrape.enabled }}
       metrics/pod_metrics:
         receivers: [prometheus/pod_metrics]
-        processors: [memory_limiter/pod_metrics, k8sattributes, batch, resource/observe_common, attributes/debug_source_pod_metrics]
+        processors: [memory_limiter, k8sattributes, batch, resource/observe_common, attributes/debug_source_pod_metrics]
         exporters: [{{ join ", " $podMetricsExporters }}]
       {{ end -}}
 {{- include "config.service.telemetry" . | nindent 2 }}
