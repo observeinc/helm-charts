@@ -1,0 +1,7 @@
+# Dockerfile
+FROM --platform=linux/amd64 openjdk:11-jdk-slim
+
+WORKDIR /app
+COPY ExceptionGenerator.java /app/
+RUN javac ExceptionGenerator.java
+CMD ["java", "ExceptionGenerator"]
