@@ -3,7 +3,7 @@ agent:
     nodeLogsMetrics:
       receivers:
         filelog:
-          exclude: 
+          exclude:
           - "/var/log/pods/default_exception-generator-java-*_*/*/*.log"
           - '**/*.gz'
           - '**/*.tmp'
