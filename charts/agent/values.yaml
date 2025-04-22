@@ -183,6 +183,7 @@ cluster-events:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
+    # TODO bump agent version
     tag: 2.2.1
     pullPolicy: IfNotPresent
 
@@ -315,6 +316,7 @@ cluster-metrics:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
+    # TODO bump agent version
     tag: 2.2.1
     pullPolicy: IfNotPresent
 
@@ -577,6 +579,7 @@ node-logs-metrics:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
+    # TODO bump agent version
     tag: 2.2.1
     pullPolicy: IfNotPresent
 
@@ -759,6 +762,7 @@ monitor:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
+    # TODO bump agent version
     tag: 2.2.1
     pullPolicy: IfNotPresent
 
@@ -889,6 +893,7 @@ forwarder:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
+    # TODO bump agent version
     tag: 2.2.1
     pullPolicy: IfNotPresent
 
