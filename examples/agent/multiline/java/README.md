@@ -1,8 +1,8 @@
 # Java Multiline Exception example
-This example demonstrates the deployment of a Java multiline exception generator app into kubernetes cluster and onboard those logs to Observe and how to fix the multines with updated multiline values.yaml using our Observe agent. This example multiline values.yaml assumes the app is running on kubernetes with runtime log-format being one of these (Containerd, CRI or Docker). Basically, with app being deployed in Kubernetes, the app logs will be wrapped around with one of these formats. So our values.yaml will have the fix for merging the multiline logs into single line. And adding this an example for our future multiline dragons. Follow the below steps to continue. 
+This example demonstrates the deployment of a Java multiline exception generator app into kubernetes cluster and onboard those logs to Observe and how to fix the multines with updated multiline values.yaml using our Observe agent. This example multiline values.yaml assumes the app is running on kubernetes with runtime log-format being one of these (Containerd, CRI or Docker). Basically, with app being deployed in Kubernetes, the app logs will be wrapped around with one of these formats. So our values.yaml will have the fix for merging the multiline logs into single line. And adding this an example for our future multiline dragons. Follow the below steps to continue.
 
 # Pre-requisites
-I have built the docker image with the java app and put into public repository so you don't have to worry about building docker image and pushing it to repository and then deploying it. I have just added all files for clarity. You just have to follow the instructions below. 
+I have built the docker image with the java app and put into public repository so you don't have to worry about building docker image and pushing it to repository and then deploying it. I have just added all files for clarity. You just have to follow the instructions below.
 
 # Deploy a Java Multiline Exception Generator pod
 Deploy the java multiline app into your k8s lab. You can deploy with below command.
@@ -29,7 +29,7 @@ kubectl rollout restart daemonset -n observe
 ```
 
 ## Validate metrics in Observe tenant
-You can validate by going into your observe test tenant and filter on exception-generator-java logs to see if it fixed the multilines. 
+You can validate by going into your observe test tenant and filter on exception-generator-java logs to see if it fixed the multilines.
 
 ### Cleanup
 To clean up and reset to default agent configuration, use the below
@@ -44,5 +44,5 @@ helm delete observe-agent -n observe
 ```
 
 ```
-kubectl delete deployment exception-generator-java -n default 
+kubectl delete deployment exception-generator-java -n default
 ```
