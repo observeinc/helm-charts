@@ -12,6 +12,13 @@
 {{- toYaml $config | indent 2 }}
 {{- end }}
 
+{{- define "observe.deployment.applyPrometheusScraperConfig" -}}
+{{- $values := deepCopy .Values }}
+{{- $data := dict "Values" $values | mustMergeOverwrite (deepCopy .) }}
+{{- $config := mustMergeOverwrite ( include "observe.deployment.prometheusScraper.config" $data |  fromYaml ) ($values.agent.config.prometheusScraper) -}}
+{{- toYaml $config | indent 2 }}
+{{- end }}
+
 {{- define "observe.daemonset.applyNodeLogsMetricsConfig" -}}
 {{- $values := deepCopy .Values }}
 {{- $data := dict "Values" $values | mustMergeOverwrite (deepCopy .) }}
