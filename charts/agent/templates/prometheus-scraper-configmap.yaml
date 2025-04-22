@@ -1,0 +1,10 @@
+{{ if .Values.cluster.metrics.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-scraper
+  namespace: {{ template "observe-agent.namespace" . }}
+data:
+  relay: |
+      {{- include "observe.deployment.applyPrometheusScraperConfig" . | nindent 4 -}}
+{{ end -}}

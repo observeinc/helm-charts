@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.52.1](https://img.shields.io/badge/Version-0.52.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.1](https://img.shields.io/badge/AppVersion-2.2.1-informational?style=flat-square)
+![Version: 0.53.0](https://img.shields.io/badge/Version-0.53.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.1](https://img.shields.io/badge/AppVersion-2.2.1-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -33,6 +33,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 |------------|------|---------|
 | https://open-telemetry.github.io/opentelemetry-helm-charts | cluster-events(opentelemetry-collector) | 0.101.1 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | cluster-metrics(opentelemetry-collector) | 0.101.1 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | prometheus-scraper(opentelemetry-collector) | 0.101.1 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | node-logs-metrics(opentelemetry-collector) | 0.101.1 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | monitor(opentelemetry-collector) | 0.101.1 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | forwarder(opentelemetry-collector) | 0.101.1 |
@@ -58,6 +59,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | agent.config.global.service.telemetry.metricsLevel | string | `"normal"` |  |
 | agent.config.monitor | string | `nil` |  |
 | agent.config.nodeLogsMetrics | string | `nil` |  |
+| agent.config.prometheusScraper | string | `nil` |  |
 | agent.selfMonitor.enabled | bool | `true` |  |
 | agent.selfMonitor.metrics.scrapeInterval | string | `"60s"` |  |
 | application.prometheusScrape.enabled | bool | `false` |  |
@@ -473,3 +475,68 @@ This service is a *single-instance deployment*. It's critical that this service 
 | observe.token.value | string | `""` |  |
 | observe.traceToken.create | bool | `false` |  |
 | observe.traceToken.value | string | `""` |  |
+| prometheus-scraper.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
+| prometheus-scraper.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"DoesNotExist"` |  |
+| prometheus-scraper.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].key | string | `"kubernetes.io/os"` |  |
+| prometheus-scraper.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].operator | string | `"NotIn"` |  |
+| prometheus-scraper.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].values[0] | string | `"windows"` |  |
+| prometheus-scraper.clusterRole.create | bool | `false` |  |
+| prometheus-scraper.clusterRole.name | string | `"observe-agent-cluster-role"` |  |
+| prometheus-scraper.command.extraArgs[0] | string | `"start"` |  |
+| prometheus-scraper.command.extraArgs[1] | string | `"--observe-config=/observe-agent-conf/observe-agent.yaml"` |  |
+| prometheus-scraper.command.extraArgs[2] | string | `"--config=/conf/relay.yaml"` |  |
+| prometheus-scraper.command.name | string | `"observe-agent"` |  |
+| prometheus-scraper.configMap.create | bool | `false` |  |
+| prometheus-scraper.configMap.existingName | string | `"prometheus-scraper"` |  |
+| prometheus-scraper.extraEnvsFrom | list | `[]` |  |
+| prometheus-scraper.extraEnvs[0].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
+| prometheus-scraper.extraEnvs[0].valueFrom.configMapKeyRef.key | string | `"name"` |  |
+| prometheus-scraper.extraEnvs[0].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
+| prometheus-scraper.extraEnvs[1].name | string | `"OBSERVE_CLUSTER_UID"` |  |
+| prometheus-scraper.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"id"` |  |
+| prometheus-scraper.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
+| prometheus-scraper.extraEnvs[2].name | string | `"TOKEN"` |  |
+| prometheus-scraper.extraEnvs[2].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
+| prometheus-scraper.extraEnvs[2].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| prometheus-scraper.extraEnvs[2].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| prometheus-scraper.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
+| prometheus-scraper.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
+| prometheus-scraper.extraVolumes[0].configMap.defaultMode | int | `420` |  |
+| prometheus-scraper.extraVolumes[0].configMap.items[0].key | string | `"relay"` |  |
+| prometheus-scraper.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
+| prometheus-scraper.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
+| prometheus-scraper.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
+| prometheus-scraper.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.2.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| prometheus-scraper.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
+| prometheus-scraper.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
+| prometheus-scraper.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.1"` |  |
+| prometheus-scraper.initContainers[0].imagePullPolicy | string | `"Always"` |  |
+| prometheus-scraper.initContainers[0].name | string | `"kube-cluster-info"` |  |
+| prometheus-scraper.livenessProbe.httpGet.path | string | `"/status"` |  |
+| prometheus-scraper.livenessProbe.httpGet.port | int | `13133` |  |
+| prometheus-scraper.livenessProbe.initialDelaySeconds | int | `30` |  |
+| prometheus-scraper.livenessProbe.periodSeconds | int | `5` |  |
+| prometheus-scraper.mode | string | `"deployment"` |  |
+| prometheus-scraper.nameOverride | string | `"prometheus-scraper"` | --------------------------------------- # Different for each deployment/daemonset # |
+| prometheus-scraper.namespaceOverride | string | `"observe"` |  |
+| prometheus-scraper.networkPolicy.egressRules[0] | object | `{}` |  |
+| prometheus-scraper.networkPolicy.enabled | bool | `true` |  |
+| prometheus-scraper.podAnnotations.observe_monitor_path | string | `"/metrics"` |  |
+| prometheus-scraper.podAnnotations.observe_monitor_port | string | `"8888"` |  |
+| prometheus-scraper.podAnnotations.observe_monitor_purpose | string | `"observecollection"` |  |
+| prometheus-scraper.podAnnotations.observe_monitor_scrape | string | `"true"` |  |
+| prometheus-scraper.podAnnotations.observeinc_com_scrape | string | `"false"` |  |
+| prometheus-scraper.ports.metrics.containerPort | int | `8888` |  |
+| prometheus-scraper.ports.metrics.enabled | bool | `true` |  |
+| prometheus-scraper.ports.metrics.protocol | string | `"TCP"` |  |
+| prometheus-scraper.ports.metrics.servicePort | int | `8888` |  |
+| prometheus-scraper.readinessProbe.httpGet.path | string | `"/status"` |  |
+| prometheus-scraper.readinessProbe.httpGet.port | int | `13133` |  |
+| prometheus-scraper.readinessProbe.initialDelaySeconds | int | `30` |  |
+| prometheus-scraper.readinessProbe.periodSeconds | int | `5` |  |
+| prometheus-scraper.resources.limits.memory | string | `"512Mi"` |  |
+| prometheus-scraper.resources.requests.cpu | string | `"250m"` |  |
+| prometheus-scraper.resources.requests.memory | string | `"512Mi"` |  |
+| prometheus-scraper.serviceAccount.create | bool | `false` |  |
+| prometheus-scraper.serviceAccount.name | string | `"observe-agent-service-account"` |  |
+| prometheus-scraper.tolerations | list | `[]` |  |
