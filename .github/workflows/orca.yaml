@@ -1,0 +1,50 @@
+name:  SAST, SCA & IaC Scan Workflow
+
+on:
+  # Scan for each push event on your protected branch.
+  push:
+    branches: ["main"]
+  schedule:
+  - cron: '0 0 * * 0' # Every Sunday at midnight UTC
+  workflow_dispatch:
+
+
+jobs:
+  orca-scan:
+    name: Orca Scan
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_KEY: observeinc-helm-charts
+    steps:
+      # Checkout your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          # Important for pull request diff-awareness report
+          fetch-depth: 0
+      - name: Run Orca SAST Scan
+        uses: orcasecurity/shiftleft-sast-action@v1
+        with:
+          api_token: ${{ secrets.ORCA_SECURITY_API_TOKEN }}
+          project_key: ${{ env.PROJECT_KEY }}
+          path:
+            # scanning the entire repository
+            "."
+
+      - name: Run Orca FS Scan
+        if: always()
+        uses: orcasecurity/shiftleft-fs-action@v1
+        with:
+          api_token: ${{ secrets.ORCA_SECURITY_API_TOKEN }}
+          project_key: ${{ env.PROJECT_KEY }}
+          path: "."
+
+      - name: Run Orca IaC Scan
+        if: always()
+        uses: orcasecurity/shiftleft-iac-action@v1
+        with:
+          api_token: ${{ secrets.ORCA_SECURITY_API_TOKEN }}
+          project_key: ${{ env.PROJECT_KEY }}
+          path:
+             # scanning the entire repository
+            "."
