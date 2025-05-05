@@ -63,7 +63,7 @@ prometheusremotewrite/observe:
     resource_to_telemetry_conversion:
         enabled: true # Convert resource attributes to metric labels
     send_metadata: true
-
+    timeout: 10s
 {{- end -}}
 
 {{- define "config.exporters.debug" -}}

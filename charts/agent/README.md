@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.53.1](https://img.shields.io/badge/Version-0.53.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.1](https://img.shields.io/badge/AppVersion-2.2.1-informational?style=flat-square)
+![Version: 0.53.2](https://img.shields.io/badge/Version-0.53.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.1](https://img.shields.io/badge/AppVersion-2.2.1-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -54,6 +54,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | agent.config.global.exporters.sendingQueue.enabled | bool | `true` |  |
 | agent.config.global.processors.batch.sendBatchMaxSize | int | `4096` |  |
 | agent.config.global.processors.batch.sendBatchSize | int | `4096` |  |
+| agent.config.global.processors.batch.timeout | string | `"5s"` |  |
 | agent.config.global.service.telemetry.loggingEncoding | string | `"console"` |  |
 | agent.config.global.service.telemetry.loggingLevel | string | `"WARN"` |  |
 | agent.config.global.service.telemetry.metricsLevel | string | `"normal"` |  |
