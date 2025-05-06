@@ -9,6 +9,7 @@ resourcedetection/cloud:
 batch:
   send_batch_size: {{ .Values.agent.config.global.processors.batch.sendBatchSize }}
   send_batch_max_size: {{ .Values.agent.config.global.processors.batch.sendBatchMaxSize }}
+  timeout: {{ .Values.agent.config.global.processors.batch.timeout }}
 {{- end -}}
 
 {{- define "config.processors.deltatocumulative" -}}
@@ -87,8 +88,8 @@ memory_limiter:
   spike_limit_percentage: 15
 {{- end -}}
 
+{{- define "config.processors.attributes.observek8sattributes" -}}
 # This processor might edit the log body in-place, which might affect the output of transform/object.
 # Therefore, this processor must always be placed before transform/object in the pipeline.
-{{- define "config.processors.attributes.observek8sattributes" -}}
 observek8sattributes:
 {{- end -}}

@@ -119,6 +119,7 @@ agent:
         batch:
           sendBatchSize: 4096
           sendBatchMaxSize: 4096
+          timeout: 5s
       exporters:
         sendingQueue:
           enabled: true
