@@ -11,7 +11,7 @@ DEPRECATED Observe metrics collection
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../endpoint | endpoint | 0.1.13 |
-| https://grafana.github.io/helm-charts | grafana-agent | 0.42.0 |
+| https://grafana.github.io/helm-charts | grafana-agent | 0.44.2 |
 
 ## Values
 
