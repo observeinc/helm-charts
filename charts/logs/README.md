@@ -11,7 +11,7 @@ DEPRECATED Observe logs collection
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../endpoint | endpoint | 0.1.13 |
-| https://fluent.github.io/helm-charts | fluent-bit | 0.48.8 |
+| https://fluent.github.io/helm-charts | fluent-bit | 0.49.0 |
 
 ## Values
 
