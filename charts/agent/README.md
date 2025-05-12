@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.53.2](https://img.shields.io/badge/Version-0.53.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.1](https://img.shields.io/badge/AppVersion-2.2.1-informational?style=flat-square)
+![Version: 0.54.0](https://img.shields.io/badge/Version-0.54.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.1](https://img.shields.io/badge/AppVersion-2.2.1-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -145,6 +145,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | cluster-metrics.command.extraArgs[0] | string | `"start"` |  |
 | cluster-metrics.command.extraArgs[1] | string | `"--observe-config=/observe-agent-conf/observe-agent.yaml"` |  |
 | cluster-metrics.command.extraArgs[2] | string | `"--config=/conf/relay.yaml"` |  |
+| cluster-metrics.command.extraArgs[3] | string | `"--feature-gates=+exporter.prometheusremotewritexporter.EnableMultipleWorkers"` |  |
 | cluster-metrics.command.name | string | `"observe-agent"` |  |
 | cluster-metrics.configMap.create | bool | `false` |  |
 | cluster-metrics.configMap.existingName | string | `"cluster-metrics"` |  |
@@ -290,6 +291,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | monitor.command.extraArgs[0] | string | `"start"` |  |
 | monitor.command.extraArgs[1] | string | `"--observe-config=/observe-agent-conf/observe-agent.yaml"` |  |
 | monitor.command.extraArgs[2] | string | `"--config=/conf/relay.yaml"` |  |
+| monitor.command.extraArgs[3] | string | `"--feature-gates=+exporter.prometheusremotewritexporter.EnableMultipleWorkers"` |  |
 | monitor.command.name | string | `"observe-agent"` |  |
 | monitor.configMap.create | bool | `false` |  |
 | monitor.configMap.existingName | string | `"monitor"` |  |
@@ -355,6 +357,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | node-logs-metrics.command.extraArgs[0] | string | `"start"` |  |
 | node-logs-metrics.command.extraArgs[1] | string | `"--observe-config=/observe-agent-conf/observe-agent.yaml"` |  |
 | node-logs-metrics.command.extraArgs[2] | string | `"--config=/conf/relay.yaml"` |  |
+| node-logs-metrics.command.extraArgs[3] | string | `"--feature-gates=+exporter.prometheusremotewritexporter.EnableMultipleWorkers"` |  |
 | node-logs-metrics.command.name | string | `"observe-agent"` |  |
 | node-logs-metrics.configMap.create | bool | `false` |  |
 | node-logs-metrics.configMap.existingName | string | `"node-logs-metrics"` |  |
@@ -486,6 +489,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | prometheus-scraper.command.extraArgs[0] | string | `"start"` |  |
 | prometheus-scraper.command.extraArgs[1] | string | `"--observe-config=/observe-agent-conf/observe-agent.yaml"` |  |
 | prometheus-scraper.command.extraArgs[2] | string | `"--config=/conf/relay.yaml"` |  |
+| prometheus-scraper.command.extraArgs[3] | string | `"--feature-gates=+exporter.prometheusremotewritexporter.EnableMultipleWorkers"` |  |
 | prometheus-scraper.command.name | string | `"observe-agent"` |  |
 | prometheus-scraper.configMap.create | bool | `false` |  |
 | prometheus-scraper.configMap.existingName | string | `"prometheus-scraper"` |  |

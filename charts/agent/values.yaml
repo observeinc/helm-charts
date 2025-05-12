@@ -321,7 +321,7 @@ cluster-metrics:
 
   command:
     name: "observe-agent"
-    extraArgs: ["start", "--observe-config=/observe-agent-conf/observe-agent.yaml", "--config=/conf/relay.yaml"]
+    extraArgs: ["start", "--observe-config=/observe-agent-conf/observe-agent.yaml", "--config=/conf/relay.yaml", "--feature-gates=+exporter.prometheusremotewritexporter.EnableMultipleWorkers"]
 
   serviceAccount:
     create: false
@@ -452,7 +452,7 @@ prometheus-scraper:
 
   command:
     name: "observe-agent"
-    extraArgs: ["start", "--observe-config=/observe-agent-conf/observe-agent.yaml", "--config=/conf/relay.yaml"]
+    extraArgs: ["start", "--observe-config=/observe-agent-conf/observe-agent.yaml", "--config=/conf/relay.yaml", "--feature-gates=+exporter.prometheusremotewritexporter.EnableMultipleWorkers"]
 
   serviceAccount:
     create: false
@@ -583,7 +583,7 @@ node-logs-metrics:
 
   command:
     name: "observe-agent"
-    extraArgs: ["start", "--observe-config=/observe-agent-conf/observe-agent.yaml", "--config=/conf/relay.yaml"]
+    extraArgs: ["start", "--observe-config=/observe-agent-conf/observe-agent.yaml", "--config=/conf/relay.yaml", "--feature-gates=+exporter.prometheusremotewritexporter.EnableMultipleWorkers"]
 
   serviceAccount:
     create: false
@@ -765,7 +765,7 @@ monitor:
 
   command:
     name: "observe-agent"
-    extraArgs: ["start", "--observe-config=/observe-agent-conf/observe-agent.yaml", "--config=/conf/relay.yaml"]
+    extraArgs: ["start", "--observe-config=/observe-agent-conf/observe-agent.yaml", "--config=/conf/relay.yaml", "--feature-gates=+exporter.prometheusremotewritexporter.EnableMultipleWorkers"]
 
   serviceAccount:
     create: false
