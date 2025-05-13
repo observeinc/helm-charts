@@ -2,6 +2,11 @@ name: Helm Charts Agent - Integration Tests
 
 on:
   workflow_dispatch:
+    inputs:
+      branch:
+        description: "The branch on which to run the integration tests"
+        required: true
+        default: "main"
   pull_request:
   push:
     branches:
@@ -47,6 +52,9 @@ jobs:
     steps:
         - name: Checkout code
           uses: actions/checkout@v4
+          with:
+            fetch-depth: 0
+            ref: ${{ github.event.inputs.branch }}
 
         - name: Setup Terraform Variables for matrixing
           run:  |
