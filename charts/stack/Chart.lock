@@ -1,7 +1,7 @@
 dependencies:
 - name: logs
   repository: file://../logs
-  version: 0.2.0
+  version: 0.3.0
 - name: metrics
   repository: file://../metrics
   version: 0.4.0
@@ -14,5 +14,5 @@ dependencies:
 - name: traces
   repository: file://../traces
   version: 1.1.0
-digest: sha256:c3aba9529c2a5616cc71e1e11955fdb92c660e4085f128637981c84442ea39b0
-generated: "2025-04-01T16:00:54.833167-07:00"
+digest: sha256:2475d6b1a1727f5594308be4e1ee96a448403d9bb36e569a06cf01b8db4ab704
+generated: "2025-05-13T14:52:05.688651-05:00"
