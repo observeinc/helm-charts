@@ -2,6 +2,50 @@ apiVersion: v1
 entries:
   agent:
   - apiVersion: v2
+    appVersion: 2.3.0
+    created: "2025-05-14T17:38:01.145180368Z"
+    dependencies:
+    - alias: cluster-events
+      condition: cluster.events.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.101.1
+    - alias: cluster-metrics
+      condition: cluster.metrics.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.101.1
+    - alias: prometheus-scraper
+      condition: application.prometheusScrape.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.101.1
+    - alias: node-logs-metrics
+      condition: node.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.101.1
+    - alias: monitor
+      condition: agent.selfMonitor.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.101.1
+    - alias: forwarder
+      condition: node.forwarder.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.101.1
+    description: Chart to install K8s collection stack based on Observe Agent
+    digest: 76190ad34d1430a46e253c59ccf321a49b2c4ca3b3738d3ff6db80bc1254fa37
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: agent
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/agent-0.55.0/agent-0.55.0.tgz
+    version: 0.55.0
+  - apiVersion: v2
     appVersion: 2.2.1
     created: "2025-05-13T18:06:36.713272186Z"
     dependencies:
@@ -3567,6 +3611,23 @@ entries:
     version: 0.1.8
   logs:
   - apiVersion: v2
+    created: "2025-05-14T17:38:01.352702728Z"
+    dependencies:
+    - name: fluent-bit
+      repository: https://fluent.github.io/helm-charts
+      version: 0.49.0
+    - name: endpoint
+      repository: file://../endpoint
+      version: 0.1.13
+    deprecated: true
+    description: DEPRECATED Observe logs collection
+    digest: d2c2b60aa6a4106563e839ae9d5cc4d814c40338659a47ffd9fbc5a7b3ad1849
+    name: logs
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/logs-0.3.0/logs-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
     created: "2025-04-02T21:53:26.356796457Z"
     dependencies:
     - name: fluent-bit
@@ -4813,6 +4874,37 @@ entries:
     - https://github.com/observeinc/helm-charts/releases/download/proxy-0.1.0/proxy-0.1.0.tgz
     version: 0.1.0
   stack:
+  - apiVersion: v2
+    created: "2025-05-14T17:38:01.573078833Z"
+    dependencies:
+    - condition: logs.enabled
+      name: logs
+      repository: file://../logs
+      version: 0.3.0
+    - condition: metrics.enabled
+      name: metrics
+      repository: file://../metrics
+      version: 0.4.0
+    - condition: events.enabled
+      name: events
+      repository: file://../events
+      version: 0.4.0
+    - condition: proxy.enabled
+      name: proxy
+      repository: file://../proxy
+      version: 0.1.8
+    - condition: traces.enabled
+      name: traces
+      repository: file://../traces
+      version: 1.1.0
+    deprecated: true
+    description: DEPRECATED Observe Kubernetes agent stack
+    digest: 5b2fc91e956e463c9e64c9470991106ec73d2dc84f1e1f1d9e1a32474130216d
+    name: stack
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/stack-1.4.0/stack-1.4.0.tgz
+    version: 1.4.0
   - apiVersion: v2
     created: "2025-04-02T21:53:26.807324849Z"
     dependencies:
@@ -8190,4 +8282,4 @@ entries:
     urls:
     - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.0/traces-0.1.0.tgz
     version: 0.1.0
-generated: "2025-05-13T18:06:36.713818067Z"
+generated: "2025-05-14T17:38:01.573819329Z"
