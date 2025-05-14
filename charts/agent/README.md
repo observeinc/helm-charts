@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.55.0](https://img.shields.io/badge/Version-0.55.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.3.0](https://img.shields.io/badge/AppVersion-2.3.0-informational?style=flat-square)
+![Version: 0.55.1](https://img.shields.io/badge/Version-0.55.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.3.0](https://img.shields.io/badge/AppVersion-2.3.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -397,8 +397,8 @@ This service is a *single-instance deployment*. It's critical that this service 
 | node-logs-metrics.extraVolumeMounts[2].mountPath | string | `"/var/lib/docker/containers"` |  |
 | node-logs-metrics.extraVolumeMounts[2].name | string | `"varlibdockercontainers"` |  |
 | node-logs-metrics.extraVolumeMounts[2].readOnly | bool | `true` |  |
-| node-logs-metrics.extraVolumeMounts[3].mountPath | string | `"/var/lib/otelcol"` |  |
-| node-logs-metrics.extraVolumeMounts[3].name | string | `"varlibotelcol"` |  |
+| node-logs-metrics.extraVolumeMounts[3].mountPath | string | `"/var/lib/observe-agent"` |  |
+| node-logs-metrics.extraVolumeMounts[3].name | string | `"varlibobserveagent"` |  |
 | node-logs-metrics.extraVolumeMounts[4].mountPath | string | `"/hostfs"` |  |
 | node-logs-metrics.extraVolumeMounts[4].mountPropagation | string | `"HostToContainer"` |  |
 | node-logs-metrics.extraVolumeMounts[4].name | string | `"hostfs"` |  |
@@ -412,9 +412,9 @@ This service is a *single-instance deployment*. It's critical that this service 
 | node-logs-metrics.extraVolumes[1].name | string | `"varlogpods"` |  |
 | node-logs-metrics.extraVolumes[2].hostPath.path | string | `"/var/lib/docker/containers"` |  |
 | node-logs-metrics.extraVolumes[2].name | string | `"varlibdockercontainers"` |  |
-| node-logs-metrics.extraVolumes[3].hostPath.path | string | `"/var/lib/otelcol"` |  |
+| node-logs-metrics.extraVolumes[3].hostPath.path | string | `"/var/lib/observe-agent"` |  |
 | node-logs-metrics.extraVolumes[3].hostPath.type | string | `"DirectoryOrCreate"` |  |
-| node-logs-metrics.extraVolumes[3].name | string | `"varlibotelcol"` |  |
+| node-logs-metrics.extraVolumes[3].name | string | `"varlibobserveagent"` |  |
 | node-logs-metrics.extraVolumes[4].hostPath.path | string | `"/"` |  |
 | node-logs-metrics.extraVolumes[4].name | string | `"hostfs"` |  |
 | node-logs-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.3.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
