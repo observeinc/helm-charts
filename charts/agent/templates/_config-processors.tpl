@@ -93,3 +93,11 @@ memory_limiter:
 # Therefore, this processor must always be placed before transform/object in the pipeline.
 observek8sattributes:
 {{- end -}}
+
+{{- define "config.processors.attributes.pod_metrics" -}}
+attributes/debug_source_pod_metrics:
+  actions:
+    - key: debug_source
+      action: insert
+      value: pod_metrics
+{{- end -}}

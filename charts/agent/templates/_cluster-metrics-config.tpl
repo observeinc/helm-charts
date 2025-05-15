@@ -27,6 +27,10 @@ receivers:
       k8s.node.condition:
         enabled: true
 
+{{- if and (eq .Values.application.prometheusScrape.enabled true) (eq .Values.application.prometheusScrape.independentDeployment false) }}
+{{- include "config.receivers.prometheus.pod_metrics" . | nindent 2 }}
+{{- end }}
+
 processors:
 {{- include "config.processors.memory_limiter" . | nindent 2 }}
 
@@ -35,6 +39,10 @@ processors:
 {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
 
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
+
+{{- if and (eq .Values.application.prometheusScrape.enabled true) (eq .Values.application.prometheusScrape.independentDeployment false) }}
+{{- include "config.processors.attributes.pod_metrics" . | nindent 2 }}
+{{- end }}
 
   # attributes to append to objects
   attributes/debug_source_cluster_metrics:
@@ -56,6 +64,12 @@ service:
         receivers: [k8s_cluster]
         processors: [memory_limiter, k8sattributes, batch, resource/observe_common, attributes/debug_source_cluster_metrics]
         exporters: [{{ join ", " $metricsExporters }}]
+{{- if and (eq .Values.application.prometheusScrape.enabled true) (eq .Values.application.prometheusScrape.independentDeployment false) }}
+      metrics/pod_metrics:
+        receivers: [prometheus/pod_metrics]
+        processors: [memory_limiter, k8sattributes, batch, resource/observe_common, attributes/debug_source_pod_metrics]
+        exporters: [{{ join ", " $metricsExporters }}]
+{{- end }}
 {{- include "config.service.telemetry" . | nindent 2 }}
 
  {{- end }}
