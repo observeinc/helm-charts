@@ -2,7 +2,7 @@
 
 > **:exclamation: This Helm Chart is deprecated!**
 
-![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 DEPRECATED Observe logs collection
 
@@ -11,7 +11,7 @@ DEPRECATED Observe logs collection
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../endpoint | endpoint | 0.1.13 |
-| https://fluent.github.io/helm-charts | fluent-bit | 0.49.0 |
+| https://fluent.github.io/helm-charts | fluent-bit | 0.48.8 |
 
 ## Values
 
