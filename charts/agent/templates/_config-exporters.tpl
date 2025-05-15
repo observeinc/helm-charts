@@ -75,3 +75,7 @@ debug/override:
     sampling_initial: 2
     sampling_thereafter: 1
 {{- end -}}
+
+{{- define "config.exporters.nop" -}}
+nop:
+{{- end -}}

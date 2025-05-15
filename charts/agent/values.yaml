@@ -98,6 +98,9 @@ application:
   # See helm-charts/examples/agent/pod_metrics for more information
   prometheusScrape:
     enabled: false
+    # add another dedicated deployment instead of scraping from cluster-metrics service
+    independentDeployment: false
+    # scrape interval
     interval: 60s
     # namespaces to exclude from scraping
     # drop is processed first so all namespaces that match regex will be dropped

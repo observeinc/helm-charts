@@ -2,7 +2,7 @@ apiVersion: v2
 name: agent
 description: Chart to install K8s collection stack based on Observe Agent
 type: application
-version: 0.55.0
+version: 0.55.1
 appVersion: "2.3.0"
 dependencies:
   - name: opentelemetry-collector
@@ -19,7 +19,7 @@ dependencies:
     version: 0.101.1
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     alias: prometheus-scraper
-    condition: application.prometheusScrape.enabled
+    condition: application.prometheusScrape.independentDeployment
   - name: opentelemetry-collector
     version: 0.101.1
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
