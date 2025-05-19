@@ -143,6 +143,8 @@ agent:
         enabled: false
         # values basic, normal, detailed
         verbosity: basic
+      # additional otel collector config for all agent deployments/daemonsets
+      overrides:
     # additional otel collector config for cluster-events deployment
     clusterEvents:
     # additional otel collector config for cluster-metrics deployment
