@@ -7,6 +7,7 @@ exporters:
 {{- include "config.exporters.debug" . | nindent 2 }}
 {{- include "config.exporters.otlphttp.observe.base" . | nindent 2 }}
 {{- include "config.exporters.otlphttp.observe.trace" . | nindent 2 }}
+{{- include "config.exporters.otlphttp.observe.metrics.otel" . | nindent 2 }}
 {{- include "config.exporters.prometheusremotewrite" . | nindent 2 }}
 
 receivers:
@@ -47,12 +48,28 @@ processors:
 
 {{- $traceExporters := (list "otlphttp/observe/forward/trace") -}}
 {{- $logsExporters := (list "otlphttp/observe/base") -}}
-{{- $metricsExporters := (list "prometheusremotewrite/observe") -}}
+{{- $metricsExporters := (list) -}}
+
+{{ if eq .Values.node.forwarder.metrics.outputFormat "prometheus" -}}
+  {{- $metricsExporters = concat $metricsExporters ( list "prometheusremotewrite/observe" ) | uniq }}
+{{- else if eq .Values.node.forwarder.metrics.outputFormat "otel" -}}
+  {{- $metricsExporters = concat $metricsExporters ( list "otlphttp/observe/otel_metrics" ) | uniq }}
+{{- end }}
 
 {{- if eq .Values.agent.config.global.debug.enabled true }}
   {{- $traceExporters = concat $traceExporters ( list "debug/override" ) | uniq }}
   {{- $logsExporters = concat $logsExporters ( list "debug/override" ) | uniq }}
   {{- $metricsExporters = concat $metricsExporters ( list "debug/override" ) | uniq }}
+{{- end }}
+
+{{- $metricsProcessors := (list) -}}
+
+{{ if eq .Values.node.forwarder.metrics.outputFormat "prometheus" -}}
+  {{- $metricsProcessors = (list "memory_limiter" "k8sattributes" "deltatocumulative/observe" "batch" "resourcedetection/cloud" "resource/observe_common" "attributes/debug_source_app_metrics") }}
+{{- else if eq .Values.node.forwarder.metrics.outputFormat "otel" -}}
+  {{- $metricsProcessors = (list "memory_limiter" "k8sattributes" "batch" "resourcedetection/cloud" "resource/observe_common" "attributes/debug_source_app_metrics") }}
+{{- else }}
+{{- fail "Invalid output format for forwarder metrics, valid values are 'prometheus' and 'otel'." }}
 {{- end }}
 
 service:
@@ -68,7 +85,7 @@ service:
       exporters: [{{ join ", " $logsExporters }}]
     metrics/observe-forward:
       receivers: [otlp/app-telemetry]
-      processors: [memory_limiter, k8sattributes, deltatocumulative/observe, batch, resourcedetection/cloud, resource/observe_common, attributes/debug_source_app_metrics]
+      processors:  [{{ join ", " $metricsProcessors }}]
       exporters: [{{ join ", " $metricsExporters }}]
 
 {{- include "config.service.telemetry" . | nindent 2 }}
