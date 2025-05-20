@@ -89,6 +89,8 @@ node:
       enabled: true
     metrics:
       enabled: true
+      # -- (string) The format of the outbound metrics from the forwarder to Observe. Valid values are "prometheus" and "otel"
+      outputFormat: "prometheus"
     logs:
       enabled: true
 
