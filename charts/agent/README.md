@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.56.0](https://img.shields.io/badge/Version-0.56.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.3.0](https://img.shields.io/badge/AppVersion-2.3.0-informational?style=flat-square)
+![Version: 0.57.0](https://img.shields.io/badge/Version-0.57.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.3.0](https://img.shields.io/badge/AppVersion-2.3.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -476,6 +476,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | node.forwarder.enabled | bool | `true` |  |
 | node.forwarder.logs.enabled | bool | `true` |  |
 | node.forwarder.metrics.enabled | bool | `true` |  |
+| node.forwarder.metrics.outputFormat | string | `"prometheus"` | The format of the outbound metrics from the forwarder to Observe. Valid values are "prometheus" and "otel" |
 | node.forwarder.traces.enabled | bool | `true` |  |
 | node.kubeletstats.useNodeIp | bool | `false` |  |
 | node.metrics.enabled | bool | `true` |  |
