@@ -6,12 +6,6 @@ on:
       - main
 
 jobs:
-  validate-commit:
-    uses: observeinc/.github/.github/workflows/shared_commit-validation.yaml@main
-    secrets: inherit
-    with:
-      skip: '{}'
-
   pre-commit:
     runs-on: ubuntu-latest
     steps:
