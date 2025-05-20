@@ -398,8 +398,8 @@ This service is a *single-instance deployment*. It's critical that this service 
 | node-logs-metrics.extraVolumeMounts[2].mountPath | string | `"/var/lib/docker/containers"` |  |
 | node-logs-metrics.extraVolumeMounts[2].name | string | `"varlibdockercontainers"` |  |
 | node-logs-metrics.extraVolumeMounts[2].readOnly | bool | `true` |  |
-| node-logs-metrics.extraVolumeMounts[3].mountPath | string | `"/var/lib/otelcol"` |  |
-| node-logs-metrics.extraVolumeMounts[3].name | string | `"varlibotelcol"` |  |
+| node-logs-metrics.extraVolumeMounts[3].mountPath | string | `"/var/lib/observe-agent"` |  |
+| node-logs-metrics.extraVolumeMounts[3].name | string | `"varlibobserveagent"` |  |
 | node-logs-metrics.extraVolumeMounts[4].mountPath | string | `"/hostfs"` |  |
 | node-logs-metrics.extraVolumeMounts[4].mountPropagation | string | `"HostToContainer"` |  |
 | node-logs-metrics.extraVolumeMounts[4].name | string | `"hostfs"` |  |
@@ -413,9 +413,9 @@ This service is a *single-instance deployment*. It's critical that this service 
 | node-logs-metrics.extraVolumes[1].name | string | `"varlogpods"` |  |
 | node-logs-metrics.extraVolumes[2].hostPath.path | string | `"/var/lib/docker/containers"` |  |
 | node-logs-metrics.extraVolumes[2].name | string | `"varlibdockercontainers"` |  |
-| node-logs-metrics.extraVolumes[3].hostPath.path | string | `"/var/lib/otelcol"` |  |
+| node-logs-metrics.extraVolumes[3].hostPath.path | string | `"/var/lib/observe-agent"` |  |
 | node-logs-metrics.extraVolumes[3].hostPath.type | string | `"DirectoryOrCreate"` |  |
-| node-logs-metrics.extraVolumes[3].name | string | `"varlibotelcol"` |  |
+| node-logs-metrics.extraVolumes[3].name | string | `"varlibobserveagent"` |  |
 | node-logs-metrics.extraVolumes[4].hostPath.path | string | `"/"` |  |
 | node-logs-metrics.extraVolumes[4].name | string | `"hostfs"` |  |
 | node-logs-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.3.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
