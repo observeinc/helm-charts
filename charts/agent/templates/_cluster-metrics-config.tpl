@@ -1,8 +1,5 @@
 {{- define "observe.deployment.clusterMetrics.config" -}}
 
-extensions:
-{{- include "config.extensions.health_check" . | nindent 2 }}
-
 exporters:
 {{- include "config.exporters.debug" . | nindent 2 }}
 {{- include "config.exporters.prometheusremotewrite" . | nindent 2 }}
@@ -58,7 +55,6 @@ processors:
 {{- end }}
 
 service:
-  extensions: [health_check]
   pipelines:
       metrics:
         receivers: [k8s_cluster]
