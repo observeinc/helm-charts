@@ -113,7 +113,7 @@ application:
     # port names to scrape from - can use or .*metrics|otherportname
     portKeepRegex: .*metrics
     # metrics to drop
-    metricDropRegex: .*bucket
+    metricDropRegex: ""
     # metrics to keep
     metricKeepRegex: (.*)
 
