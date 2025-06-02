@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.58.0](https://img.shields.io/badge/Version-0.58.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.3.0](https://img.shields.io/badge/AppVersion-2.3.0-informational?style=flat-square)
+![Version: 0.58.1](https://img.shields.io/badge/Version-0.58.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.3.0](https://img.shields.io/badge/AppVersion-2.3.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -76,7 +76,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | application.prometheusScrape.enabled | bool | `false` |  |
 | application.prometheusScrape.independentDeployment | bool | `false` |  |
 | application.prometheusScrape.interval | string | `"60s"` |  |
-| application.prometheusScrape.metricDropRegex | string | `".*bucket"` |  |
+| application.prometheusScrape.metricDropRegex | string | `""` |  |
 | application.prometheusScrape.metricKeepRegex | string | `"(.*)"` |  |
 | application.prometheusScrape.namespaceDropRegex | string | `"(.*istio.*|.*ingress.*|kube-system)"` |  |
 | application.prometheusScrape.namespaceKeepRegex | string | `"(.*)"` |  |
