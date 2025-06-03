@@ -258,7 +258,7 @@ cluster-events:
   # this init container provides the cluster uid (kube-system namespace) as config map
   initContainers:
     - name: kube-cluster-info
-      image: observeinc/kube-cluster-info:v0.11.1
+      image: observeinc/kube-cluster-info:v0.11.5
       imagePullPolicy: Always
       env:
         - name: NAMESPACE
@@ -390,7 +390,7 @@ cluster-metrics:
   # this init container provides the cluster uid (kube-system namespace) as config map
   initContainers:
     - name: kube-cluster-info
-      image: observeinc/kube-cluster-info:v0.11.1
+      image: observeinc/kube-cluster-info:v0.11.5
       imagePullPolicy: Always
       env:
         - name: NAMESPACE
@@ -521,7 +521,7 @@ prometheus-scraper:
   # this init container provides the cluster uid (kube-system namespace) as config map
   initContainers:
     - name: kube-cluster-info
-      image: observeinc/kube-cluster-info:v0.11.1
+      image: observeinc/kube-cluster-info:v0.11.5
       imagePullPolicy: Always
       env:
         - name: NAMESPACE
@@ -660,7 +660,7 @@ node-logs-metrics:
   # this init container provides the cluster uid (kube-system namespace) as config map
   initContainers:
     - name: kube-cluster-info
-      image: observeinc/kube-cluster-info:v0.11.1
+      image: observeinc/kube-cluster-info:v0.11.5
       imagePullPolicy: Always
       env:
         - name: NAMESPACE
@@ -834,7 +834,7 @@ monitor:
   # this init container provides the cluster uid (kube-system namespace) as config map
   initContainers:
     - name: kube-cluster-info
-      image: observeinc/kube-cluster-info:v0.11.1
+      image: observeinc/kube-cluster-info:v0.11.5
       imagePullPolicy: Always
       env:
         - name: NAMESPACE
@@ -968,7 +968,7 @@ forwarder:
   # this init container provides the cluster uid (kube-system namespace) as config map
   initContainers:
     - name: kube-cluster-info
-      image: observeinc/kube-cluster-info:v0.11.1
+      image: observeinc/kube-cluster-info:v0.11.5
       imagePullPolicy: Always
       env:
         - name: NAMESPACE
