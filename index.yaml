@@ -3,6 +3,50 @@ entries:
   agent:
   - apiVersion: v2
     appVersion: 2.3.0
+    created: "2025-06-04T15:25:05.510823309Z"
+    dependencies:
+    - alias: cluster-events
+      condition: cluster.events.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.125.0
+    - alias: cluster-metrics
+      condition: cluster.metrics.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.125.0
+    - alias: prometheus-scraper
+      condition: application.prometheusScrape.independentDeployment
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.125.0
+    - alias: node-logs-metrics
+      condition: node.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.125.0
+    - alias: monitor
+      condition: agent.selfMonitor.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.125.0
+    - alias: forwarder
+      condition: node.forwarder.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.125.0
+    description: Chart to install K8s collection stack based on Observe Agent
+    digest: 9b09712af1ba6b2010361aa420877c88d2102c7e7751441e7079ae74ed7e9122
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: agent
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/agent-0.59.0/agent-0.59.0.tgz
+    version: 0.59.0
+  - apiVersion: v2
+    appVersion: 2.3.0
     created: "2025-06-02T21:32:47.550006014Z"
     dependencies:
     - alias: cluster-events
@@ -3509,6 +3553,21 @@ entries:
     version: 0.1.3
   events:
   - apiVersion: v2
+    appVersion: v0.11.5
+    created: "2025-06-04T15:25:05.716234701Z"
+    dependencies:
+    - name: endpoint
+      repository: file://../endpoint
+      version: 0.1.13
+    deprecated: true
+    description: DEPRECATED Observe kubernetes event collection
+    digest: 38135af8ee8720d0e9155e92ce331224e52966bde56ca0b518485d22e8b2a03d
+    name: events
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/events-0.5.0/events-0.5.0.tgz
+    version: 0.5.0
+  - apiVersion: v2
     appVersion: v0.11.1
     created: "2025-04-02T21:53:26.185180961Z"
     dependencies:
@@ -5094,6 +5153,37 @@ entries:
     - https://github.com/observeinc/helm-charts/releases/download/proxy-0.1.0/proxy-0.1.0.tgz
     version: 0.1.0
   stack:
+  - apiVersion: v2
+    created: "2025-06-04T15:25:06.036746839Z"
+    dependencies:
+    - condition: logs.enabled
+      name: logs
+      repository: file://../logs
+      version: 0.3.0
+    - condition: metrics.enabled
+      name: metrics
+      repository: file://../metrics
+      version: 0.4.0
+    - condition: events.enabled
+      name: events
+      repository: file://../events
+      version: 0.5.0
+    - condition: proxy.enabled
+      name: proxy
+      repository: file://../proxy
+      version: 0.1.8
+    - condition: traces.enabled
+      name: traces
+      repository: file://../traces
+      version: 1.1.0
+    deprecated: true
+    description: DEPRECATED Observe Kubernetes agent stack
+    digest: f8b49f4f07e590a2d16c118b5a6fb794328599b019b25385db6b43e56076dd70
+    name: stack
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/stack-1.5.0/stack-1.5.0.tgz
+    version: 1.5.0
   - apiVersion: v2
     created: "2025-05-14T17:38:01.573078833Z"
     dependencies:
@@ -8502,4 +8592,4 @@ entries:
     urls:
     - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.0/traces-0.1.0.tgz
     version: 0.1.0
-generated: "2025-06-02T21:32:47.550536851Z"
+generated: "2025-06-04T15:25:06.037379194Z"
