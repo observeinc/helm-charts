@@ -7,12 +7,12 @@ dependencies:
   version: 0.4.0
 - name: events
   repository: file://../events
-  version: 0.4.0
+  version: 0.5.0
 - name: proxy
   repository: file://../proxy
   version: 0.1.8
 - name: traces
   repository: file://../traces
   version: 1.1.0
-digest: sha256:2475d6b1a1727f5594308be4e1ee96a448403d9bb36e569a06cf01b8db4ab704
-generated: "2025-05-13T14:52:05.688651-05:00"
+digest: sha256:f705ffcb9b88a2c0f84f5e7a24feea50f50826058e1dc9c113bdf2de2ee6053a
+generated: "2025-06-03T16:35:36.216048-05:00"

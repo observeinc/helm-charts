@@ -2,7 +2,7 @@
 
 > **:exclamation: This Helm Chart is deprecated!**
 
-![Version: 1.4.0](https://img.shields.io/badge/Version-1.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.5.0](https://img.shields.io/badge/Version-1.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 DEPRECATED Observe Kubernetes agent stack
 
@@ -174,7 +174,7 @@ logs:
 
 | Repository | Name | Version |
 |------------|------|---------|
-| file://../events | events | 0.4.0 |
+| file://../events | events | 0.5.0 |
 | file://../logs | logs | 0.3.0 |
 | file://../metrics | metrics | 0.4.0 |
 | file://../proxy | proxy | 0.1.8 |
