@@ -1,3 +1,9 @@
+{{- if .Values.node.containers.logs.multiline }}
+{{- if .Values.node.containers.logs.autoMultilineDetection }}
+{{- fail "multiline configuration and autoMultilineDetection cannot both be provided. Please choose one or the other." }}
+{{- end }}
+{{- end }}
+
 {{- define "observe.daemonset.logsMetrics.config.filelog.multiline" -}}
 multiline:
   {{- toYaml .Values.node.containers.logs.multiline | nindent 2 }}
@@ -133,6 +139,12 @@ receivers:
     - id: container-parser
       max_log_size: 102400
       type: container
+    {{- if .Values.node.containers.logs.autoMultilineDetection }}
+    - id: multiline-recombine
+      type: recombine
+      combine_field: body
+      is_first_entry: body matches "^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z?|[A-Za-z]+ \d{1,2} \d{2}:\d{2}:\d{2}|\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2})"
+    {{- end }}
     retry_on_failure:
       enabled: {{ .Values.node.containers.logs.retryOnFailure.enabled }}
       initial_interval: {{ .Values.node.containers.logs.retryOnFailure.initialInterval }}

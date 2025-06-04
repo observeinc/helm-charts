@@ -459,6 +459,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | node-logs-metrics.serviceAccount.create | bool | `false` |  |
 | node-logs-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | node-logs-metrics.tolerations | list | `[]` |  |
+| node.containers.logs.autoMultilineDetection | bool | `false` |  |
 | node.containers.logs.enabled | bool | `true` |  |
 | node.containers.logs.exclude | string | `"[\"**/*.gz\", \"**/*.tmp\"]"` |  |
 | node.containers.logs.include | string | `"[\"/var/log/pods/*/*/*.log\", \"/var/log/pods/*/*/*.log.*\", \"/var/log/kube-apiserver-audit.log\"]"` |  |
