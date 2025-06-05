@@ -73,9 +73,15 @@ node:
       lookbackPeriod: 24h
       # At startup, where to start reading logs from the file. Options are beginning or end.
       startAt: end
-      # multiline config block, for more information see https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/filelogreceiver/README.md#multiline-configuration
+      # -- Multiline config block. Cannot be combined with automatic multiline detection.
+      # For more information see https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/filelogreceiver/README.md#multiline-configuration
       multiline:
-      # try to automatically detect multiline logs that start with a timestamp
+      # -- Enable automatic detection of multiline logs that start with a timestamp. Cannot be combined with multiline config block.
+      # Examples of supported timestamp formats:
+      # `2025-03-28 13:45:30`,
+      # `2025-03-28T14:33:53.743350Z`,
+      # `Jul 15 15:16:01`,
+      # `2025/05/16 19:46:15`
       autoMultilineDetection: false
     # pulls node, pod, and container metrics from the API server on a kubelet and sends it down the metric pipeline for further processing.
     metrics:
