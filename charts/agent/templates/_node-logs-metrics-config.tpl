@@ -143,7 +143,7 @@ receivers:
     - id: multiline-recombine
       type: recombine
       combine_field: body
-      is_first_entry: body matches "^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}|\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z?|[A-Za-z]+ \d{1,2} \d{2}:\d{2}:\d{2}|\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2})"
+      is_first_entry: body matches "^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}|\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z?|[A-Za-z]+ \\d{1,2} \\d{2}:\\d{2}:\\d{2}|\\d{4}\\/\\d{2}\\/\\d{2} \\d{2}:\\d{2}:\\d{2})"
     {{- end }}
     retry_on_failure:
       enabled: {{ .Values.node.containers.logs.retryOnFailure.enabled }}
