@@ -49,6 +49,8 @@ node:
     fileSystem:
       rootPath: /hostfs
       excludeMountPoints: '["/dev/*","/proc/*","/sys/*","/run/k3s/containerd/*","/var/lib/docker/*","/var/lib/kubelet/*","/snap/*"]'
+    cadvisor:
+      enabled: false
   containers:
     logs:
       enabled: true
