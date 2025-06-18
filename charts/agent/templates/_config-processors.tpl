@@ -20,6 +20,7 @@ deltatocumulative/observe:
 {{- define "config.processors.attributes.k8sattributes" -}}
 k8sattributes:
   extract:
+    otel_annotations: true
     metadata:
       - k8s.namespace.name
       - k8s.deployment.name
@@ -35,22 +36,14 @@ k8sattributes:
       - k8s.cluster.uid
       - k8s.container.name
       - container.id
+      - service.namespace
+      - service.name
+      - service.version
+      - service.instance.id
     labels:
       # Extract app.kubernetes.io/* labels from the pod as the full tag.
       - tag_name: $1
         key_regex: (app\.kubernetes\.io/.+)
-        from: pod
-      # Extract service.name from the pod's app.kubernetes.io/name label
-      # TODO remove this when the `service_attributes.enabled` config is released
-      # https://github.com/open-telemetry/opentelemetry-collector-contrib/pull/39335
-      - tag_name: service.name
-        key: app.kubernetes.io/name
-        from: pod
-    annotations:
-      # TODO remove this when the `otel_annotations` config is released
-      # https://github.com/open-telemetry/opentelemetry-collector-contrib/commit/6682df519bd87b8ce33afa83bc09e345f2f4fc6b
-      - tag_name: $1
-        key_regex: resource\.opentelemetry\.io/(.+)
         from: pod
   passthrough: false
   pod_association:
