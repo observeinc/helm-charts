@@ -14,11 +14,13 @@ processors:
 
 {{- include "config.processors.batch" . | nindent 2 }}
 
-{{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
+{{- include "config.processors.attributes.k8sattributes" (merge . (dict "target" "pod_metrics")) | nindent 2 }}
+{{- include "config.processors.attributes.drop_container_info" (merge . (dict "target" "pod_metrics")) | nindent 2 }}
 
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
 
 {{- include "config.processors.attributes.pod_metrics" . | nindent 2 }}
+
 
 # Set up receivers
 {{- $podMetricsReceivers := (list "prometheus/pod_metrics") -}}
@@ -39,8 +41,8 @@ service:
   pipelines:
     metrics/pod_metrics:
       receivers: [{{ join ", " $podMetricsReceivers }}]
-      processors: [memory_limiter, k8sattributes, batch, resource/observe_common, attributes/debug_source_pod_metrics]
+      processors: [memory_limiter, k8sattributes, batch, resource/observe_common, resource/drop_container_info, attributes/debug_source_pod_metrics]
       exporters: [{{ join ", " $podMetricsExporters }}]
 {{- include "config.service.telemetry" . | nindent 2 }}
 
- {{- end }}
+{{- end }}
