@@ -33,7 +33,8 @@ processors:
 
 {{- include "config.processors.batch" . | nindent 2 }}
 
-{{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
+{{- include "config.processors.attributes.k8sattributes" (merge . (dict "target" "cluster_metrics")) | nindent 2 }}
+{{- include "config.processors.attributes.drop_container_info" . | nindent 2 }}
 
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
 
@@ -58,7 +59,7 @@ service:
   pipelines:
       metrics:
         receivers: [k8s_cluster]
-        processors: [memory_limiter, k8sattributes, batch, resource/observe_common, attributes/debug_source_cluster_metrics]
+        processors: [memory_limiter, k8sattributes, batch, resource/observe_common, resource/drop_container_info, attributes/debug_source_cluster_metrics]
         exporters: [{{ join ", " $metricsExporters }}]
 {{- if and (eq .Values.application.prometheusScrape.enabled true) (eq .Values.application.prometheusScrape.independentDeployment false) }}
       metrics/pod_metrics:
