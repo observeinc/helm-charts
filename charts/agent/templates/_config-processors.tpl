@@ -34,9 +34,11 @@ k8sattributes:
       - k8s.pod.name
       - k8s.pod.uid
       - k8s.cluster.uid
+      {{- if (ne .target "pod_metrics") }}
       - k8s.container.name
-      {{- if ne .target "cluster_metrics" }}
+      {{- if (ne .target "cluster_metrics") }}
       - container.id
+      {{- end }}
       {{- end }}
       - service.namespace
       - service.name
@@ -102,4 +104,8 @@ resource/drop_container_info:
   attributes:
     - key: container.id
       action: delete
+{{- if eq .target "pod_metrics" }}
+    - key: k8s.container.name
+      action: delete
+{{- end }}
 {{- end -}}
