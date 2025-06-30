@@ -157,28 +157,7 @@ receivers:
     {{- include "observe.daemonset.logsMetrics.config.filelog.multiline" . | nindent 4 }}
     {{ end }}
   {{ end }}
-  {{- if .Values.node.metrics.cadvisor.enabled }}
-  prometheus/cadvisor:
-    config:
-      scrape_configs:
-        - job_name: 'kubernetes-nodes-cadvisor'
-          scheme: https
-          tls_config:
-            ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-            insecure_skip_verify: true
-          bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
 
-          kubernetes_sd_configs:
-            - role: node
-
-          relabel_configs:
-            - target_label: __address__
-              replacement: kubernetes.default.svc:443
-            - source_labels: [__meta_kubernetes_node_name]
-              regex: (.+)
-              target_label: __metrics_path__
-              replacement: /api/v1/nodes/$$1/proxy/metrics/cadvisor
-    {{ end }}
 processors:
 {{- include "config.processors.memory_limiter" . | nindent 2 }}
 
@@ -205,23 +184,16 @@ processors:
       - key: debug_source
         action: insert
         value: kubeletstats_metrics
-  attributes/debug_source_cadvisor_metrics:
-    actions:
-      - key: debug_source
-        action: insert
-        value: cadvisor_metrics
 
 # Create intermediate lists for pipeline arrays to then modify based on values.yaml
 {{- $logsExporters := (list "otlphttp/observe/base") -}}
 {{- $hostmetricsExporters := (list "prometheusremotewrite/observe") -}}
 {{- $kubeletstatsExporters := (list "prometheusremotewrite/observe") -}}
-{{- $cadvisorMetricsExporters := (list "prometheusremotewrite/observe") -}}
 
 {{- if eq .Values.agent.config.global.debug.enabled true }}
   {{- $logsExporters = concat $logsExporters ( list "debug/override" ) | uniq }}
   {{- $hostmetricsExporters = concat $hostmetricsExporters ( list "debug/override" ) | uniq }}
   {{- $kubeletstatsExporters = concat $kubeletstatsExporters ( list "debug/override" ) | uniq }}
-  {{- $cadvisorMetricsExporters = concat $cadvisorMetricsExporters ( list "debug/override" ) | uniq }}
 {{- end }}
 
 service:
@@ -243,12 +215,6 @@ service:
         receivers: [kubeletstats]
         processors: [memory_limiter, k8sattributes, batch, resourcedetection/cloud, resource/observe_common, attributes/debug_source_kubeletstats_metrics]
         exporters: [{{ join ", " $kubeletstatsExporters }}]
-      {{- end -}}
-      {{- if .Values.node.metrics.cadvisor.enabled }}
-      metrics/cadvisor:
-        receivers: [prometheus/cadvisor]
-        processors: [memory_limiter, k8sattributes, batch, resourcedetection/cloud, resource/observe_common, attributes/debug_source_cadvisor_metrics]
-        exporters: [{{ join ", " $cadvisorMetricsExporters }}]
       {{- end -}}
 {{- include "config.service.telemetry" . | nindent 2 }}
 
