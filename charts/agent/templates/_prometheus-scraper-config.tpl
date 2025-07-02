@@ -8,6 +8,7 @@ exporters:
 receivers:
   nop:
 {{- include "config.receivers.prometheus.pod_metrics" . | nindent 2 }}
+{{- include "config.receivers.prometheus.cadvisor" . | nindent 2 }}
 
 processors:
 {{- include "config.processors.memory_limiter" . | nindent 2 }}
@@ -19,6 +20,12 @@ processors:
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
 
 {{- include "config.processors.attributes.pod_metrics" . | nindent 2 }}
+
+  attributes/debug_source_cadvisor_metrics:
+    actions:
+      - key: debug_source
+        action: insert
+        value: cadvisor_metrics
 
 # Set up receivers
 {{- $podMetricsReceivers := (list "prometheus/pod_metrics") -}}
@@ -41,6 +48,13 @@ service:
       receivers: [{{ join ", " $podMetricsReceivers }}]
       processors: [memory_limiter, k8sattributes, batch, resource/observe_common, attributes/debug_source_pod_metrics]
       exporters: [{{ join ", " $podMetricsExporters }}]
+    {{- if .Values.node.metrics.cadvisor.enabled }}
+    metrics/cadvisor:
+      receivers: [prometheus/cadvisor]
+      processors: [memory_limiter, k8sattributes, batch, resource/observe_common, attributes/debug_source_cadvisor_metrics]
+      exporters: [{{ join ", " $podMetricsExporters }}]
+    {{- end -}}
+
 {{- include "config.service.telemetry" . | nindent 2 }}
 
  {{- end }}
