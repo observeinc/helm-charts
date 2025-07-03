@@ -48,7 +48,7 @@ build-deps: add-repos
 
 .PHONY: test
 test: build-deps build-test-images
-	test/test.sh stack traces
+	test/test.sh agent stack traces
 
 # we need to re-run add-repos inside the docker container to lint correctly
 # also see https://github.com/helm/chart-testing/issues/464 about git safe.directory

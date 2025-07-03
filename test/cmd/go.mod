@@ -1,6 +1,6 @@
 module helm-charts/test
 
-go 1.20
+go 1.23.10
 
 require (
 	github.com/jmespath/go-jmespath v0.4.0

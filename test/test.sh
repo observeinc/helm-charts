@@ -66,7 +66,7 @@ for chart in "$@"; do
     echo charts/$chart tests PASSED
     echo
     echo results:
-    $kc logs test-$chart
+    $kc logs test-$chart || true
     echo
 
     $helm uninstall --wait test-$chart 2>/dev/null
