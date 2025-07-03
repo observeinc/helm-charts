@@ -1,0 +1,23 @@
+observe:
+  collectionEndpoint:
+    collectionEndpoint: "http://test-stack-collector.testing.svc.cluster.local:8080"
+  token:
+    create: true
+    value: "fake-token"
+
+cluster:
+  namespaceOverride:
+    value: "testing"
+
+cluster-events:
+  namespaceOverride: "testing"
+cluster-metrics:
+  namespaceOverride: "testing"
+forwarder:
+  namespaceOverride: "testing"
+monitor:
+  namespaceOverride: "testing"
+node-logs-metrics:
+  namespaceOverride: "testing"
+prometheus-scraper:
+  namespaceOverride: "testing"
