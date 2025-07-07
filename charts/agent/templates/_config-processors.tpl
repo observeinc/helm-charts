@@ -35,7 +35,9 @@ k8sattributes:
       - k8s.pod.uid
       - k8s.cluster.uid
       - k8s.container.name
+      {{- if ne .target "cluster_metrics" }}
       - container.id
+      {{- end }}
       - service.namespace
       - service.name
       - service.version
@@ -93,4 +95,11 @@ attributes/debug_source_pod_metrics:
     - key: debug_source
       action: insert
       value: pod_metrics
+{{- end -}}
+
+{{- define "config.processors.attributes.drop_container_info" -}}
+resource/drop_container_info:
+  attributes:
+    - key: container.id
+      action: delete
 {{- end -}}
