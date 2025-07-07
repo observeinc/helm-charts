@@ -2,7 +2,7 @@ apiVersion: v2
 name: agent
 description: Chart to install K8s collection stack based on Observe Agent
 type: application
-version: 0.63.1
+version: 0.63.2
 appVersion: "2.5.0"
 dependencies:
   - name: opentelemetry-collector
