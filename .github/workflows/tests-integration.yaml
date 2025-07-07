@@ -41,6 +41,10 @@ jobs:
             - default.yaml
             - node_affinity.yaml
             - node_taint.yaml
+            - prom_enabled.yaml
+            - prom_independent.yaml
+            - prom_independent_with_cadvisor.yaml
+            - forward_as_otel.yaml
           namespace:
             - observe
           include: # Test not-observe namespace with default values only

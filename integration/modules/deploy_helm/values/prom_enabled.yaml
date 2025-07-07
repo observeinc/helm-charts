@@ -1,0 +1,40 @@
+## Test prom scraper enabled, without its own deployment
+
+#Common for telemetry
+agent:
+  config:
+      global:
+        service:
+          telemetry:
+            loggingEncoding: json
+            loggingLevel: INFO
+
+#Common for namepsace/url/token
+observe:
+  collectionEndpoint:
+    value: ${observe_url}
+  token:
+    create: true
+    value: ${observe_token}
+  traceToken:
+    create: true
+    value: ${trace_token}
+
+application:
+  prometheusScrape:
+    enabled: true
+    independentDeployment: false
+
+cluster:
+  namespaceOverride:
+    value: ${helm_chart_agent_test_namespace}
+cluster-events:
+  namespaceOverride:  ${helm_chart_agent_test_namespace}
+cluster-metrics:
+  namespaceOverride:  ${helm_chart_agent_test_namespace}
+node-logs-metrics:
+  namespaceOverride:  ${helm_chart_agent_test_namespace}
+monitor:
+  namespaceOverride:  ${helm_chart_agent_test_namespace}
+forwarder:
+  namespaceOverride:  ${helm_chart_agent_test_namespace}
