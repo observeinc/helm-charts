@@ -14,7 +14,21 @@ receivers:
         endpoint: ${env:MY_POD_IP}:4317
       http:
         endpoint: ${env:MY_POD_IP}:4318
+
 processors:
+
+{{- if eq .Values.node.forwarder.traces.maxSpanDuration "none" }}
+{{- else if (regexMatch "^[0-9]+(ns|us|ms|s|m|h)$" .Values.node.forwarder.traces.maxSpanDuration) }}
+  # This drops spans that are longer than the configured time (default 1hr) to match service explorer behavior.
+  filter/drop_long_spans:
+    error_mode: ignore
+    traces:
+      span:
+        - (span.end_time - span.start_time) > Duration("{{ .Values.node.forwarder.traces.maxSpanDuration }}")
+{{- else }}
+{{- fail "Invalid maxSpanDuration for forwarder red metrics, valid values are 'none' or a number with a valid time unit: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/pkg/ottl/ottlfuncs/README.md#duration" }}
+{{- end }}
+
 {{- include "config.processors.memory_limiter" . | nindent 2 }}
 
 {{- include "config.processors.resource_detection.cloud" . | nindent 2 }}
@@ -73,7 +87,16 @@ service:
   pipelines:
     traces/observe-forward:
       receivers: [otlp/app-telemetry]
-      processors: [memory_limiter, k8sattributes, batch, resourcedetection/cloud, resource/observe_common, attributes/debug_source_app_traces]
+      processors:
+        {{- if ne .Values.node.forwarder.traces.maxSpanDuration "none" }}
+        - filter/drop_long_spans
+        {{- end }}
+        - memory_limiter
+        - k8sattributes
+        - batch
+        - resourcedetection/cloud
+        - resource/observe_common
+        - attributes/debug_source_app_traces
       exporters: [{{ join ", " $traceExporters }}]
     logs/observe-forward:
       receivers: [otlp/app-telemetry]

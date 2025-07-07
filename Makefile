@@ -87,6 +87,10 @@ bump-version:
 		fi; \
 	done
 
+.PHONY: pre-commit
+pre-commit:
+	pre-commit run --show-diff-on-failure --color=always --all-files
+
 .PHONY: validate-chart-version
 validate-chart-version:
 	@for chart in $(CHARTS); do \
