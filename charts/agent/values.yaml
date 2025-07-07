@@ -105,6 +105,9 @@ node:
       outputFormat: "prometheus"
     logs:
       enabled: true
+    redMetrics:
+      # -- (bool) Whether to enable generating RED metrics from spans. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview
+      enabled: false
 
 application:
   # use this option to scrape prometheus metrics from pods

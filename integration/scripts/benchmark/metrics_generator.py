@@ -45,7 +45,7 @@ def _make_otelgen_metrics_daemonset(
     rate = math.ceil(cluster_rate / float(num_nodes))
 
     container = client.V1Container(
-        image="460044344528.dkr.ecr.us-west-2.amazonaws.com/observemattc/otelgen-test:latest",
+        image="observemattc/otelgen-test:latest",
         name="sum-metrics",
         command=[
             "/otelgen",
