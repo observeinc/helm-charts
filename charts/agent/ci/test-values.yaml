@@ -5,6 +5,17 @@ observe:
     create: true
     value: "fake-token"
 
+application:
+  prometheusScrape:
+    enabled: true
+    independentDeployment: true
+
+node:
+  forwarder:
+    enabled: true
+    metrics:
+      outputFormat: otel
+
 cluster:
   namespaceOverride:
     value: "testing"

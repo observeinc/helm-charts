@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.63.1](https://img.shields.io/badge/Version-0.63.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.5.0](https://img.shields.io/badge/AppVersion-2.5.0-informational?style=flat-square)
+![Version: 0.64.0](https://img.shields.io/badge/Version-0.64.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.5.0](https://img.shields.io/badge/AppVersion-2.5.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -479,6 +479,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | node.forwarder.metrics.enabled | bool | `true` |  |
 | node.forwarder.metrics.outputFormat | string | `"prometheus"` | The format of the outbound metrics from the forwarder to Observe. Valid values are "prometheus" and "otel" |
 | node.forwarder.traces.enabled | bool | `true` |  |
+| node.forwarder.traces.maxSpanDuration | string | `"1h"` | The max span duration to be considered by the agent, or "none" for no limit. Any span over this limit will be dropped. Durations must be a number with a valid time unit: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/pkg/ottl/ottlfuncs/README.md#duration |
 | node.kubeletstats.useNodeIp | bool | `false` |  |
 | node.metrics.cadvisor.enabled | bool | `false` |  |
 | node.metrics.enabled | bool | `true` |  |
