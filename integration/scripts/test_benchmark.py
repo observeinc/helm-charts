@@ -75,10 +75,10 @@ def test_benchmark(
     setup_sleep_seconds = 4 * 60
     sample_offset_seconds = 5
 
-    cluster_volume_level = VolumeLevel.LOW
-    trace_volume_level = VolumeLevel.MEDIUM
-    metrics_volume_level = VolumeLevel.LOW
-    log_volume_level = VolumeLevel.LOW
+    cluster_volume_level = VolumeLevel.HIGH
+    trace_volume_level = VolumeLevel.HIGH
+    metrics_volume_level = VolumeLevel.HIGH
+    log_volume_level = VolumeLevel.HIGH
     # ================================================================================
     # End of configurable section
     # ================================================================================
@@ -90,15 +90,17 @@ def test_benchmark(
         pod.metadata.name for pod in pods.items if "agent" in pod.metadata.name
     ]
     agent_pods = sorted(agent_pods)
-    num_deployments = 3
+    num_gateway_pods = 3
+    num_singleton_deployments = 4 # cluster metrics, cluster events, monitor, prom scraper
     num_daemonsets = 2
+    non_daemonset_pods = num_gateway_pods + num_singleton_deployments
     # The num nodes is computed assuming `num_pods = num_deployments + num_daemonsets * num_nodes`
-    if len(agent_pods) < (num_deployments + num_daemonsets) or (len(agent_pods) - num_deployments) % num_daemonsets != 0:
+    if len(agent_pods) < (non_daemonset_pods + num_daemonsets) or (len(agent_pods) - non_daemonset_pods) % num_daemonsets != 0:
         raise Exception(
-            "Expected to have %d singleton agent deployments plus %d agent daemonsets, saw %d pods."
-            % (num_deployments, num_daemonsets, len(agent_pods))
+            "Expected to have %d singleton agent deployments plus %d gateway pods plus %d agent daemonsets, saw %d pods."
+            % (num_singleton_deployments, num_gateway_pods, num_daemonsets, len(agent_pods))
         )
-    num_nodes = (len(agent_pods) - num_deployments) // num_daemonsets
+    num_nodes = (len(agent_pods) - non_daemonset_pods) // num_daemonsets
     csv = get_csv_header(agent_pods)
 
     print(

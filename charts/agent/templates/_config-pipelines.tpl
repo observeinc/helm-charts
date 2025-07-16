@@ -14,7 +14,11 @@ traces/spanmetrics:
     {{- if ne .Values.node.forwarder.traces.maxSpanDuration "none" }}
     - filter/drop_long_spans
     {{- end }}
+    {{- if not .Values.gatewayDeployment.traceSampling.enabled }}
+    # This drops RED metric data for span kinds that are not relevant to Service Explorer. When we sample spans, we want to
+    # to generate RED metrics for all span kinds to ensure we have full visibility into the span data.
     - filter/drop_span_kinds_other_than_server_and_consumer_and_peer_client
+    {{- end }}
     - transform/shape_spans_for_red_metrics
     - transform/add_span_status_code
     - resource/add_empty_service_attributes

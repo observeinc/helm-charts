@@ -197,7 +197,9 @@ transform/remove_service_name_for_peer_metrics:
   metric_statements:
     - delete_key(resource.attributes, "service.name") where datapoint.attributes["peer.db.name"] != nil or datapoint.attributes["peer.messaging.system"] != nil
 
-# This drops spans that are not relevant for Service Explorer RED metrics.
+{{- if not .Values.gatewayDeployment.traceSampling.enabled }}
+# This drops spans (and thus RED metric data) for span kinds that are not relevant to Service Explorer. When we sample spans, we want to
+# to generate RED metrics for all span kinds to ensure we have full visibility into the span data.
 filter/drop_span_kinds_other_than_server_and_consumer_and_peer_client:
   error_mode: ignore
   traces:
@@ -206,6 +208,7 @@ filter/drop_span_kinds_other_than_server_and_consumer_and_peer_client:
       - span.kind == SPAN_KIND_UNSPECIFIED
       - span.kind == SPAN_KIND_INTERNAL
       - span.kind == SPAN_KIND_PRODUCER
+{{- end }}
 
 # The spanmetrics connector puts all dimensions as attributes on the datapoint, and copies the resource attributes from an arbitrary span's resource. This cleans that up as well as handling any other renaming.
 transform/fix_red_metrics_resource_attributes:
