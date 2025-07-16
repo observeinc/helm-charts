@@ -25,8 +25,12 @@ for conf in $confs; do
     yq -i 'del(.receivers.hostmetrics.root_path)' $tmp_dir/$conf.yaml
 
     # Remove kubeletstats since it errors outside of kubernetes :(
-    yq -i 'del(.receivers.kubeletstats)' $tmp_dir/$conf.yaml
-    yq -i 'select(.service.pipelines.metrics/kubeletstats).service.pipelines.metrics/kubeletstats.receivers = ["nop"]' $tmp_dir/$conf.yaml
+    yq -i 'del(.receivers.kubeletstats*)' $tmp_dir/$conf.yaml
+    yq -i '(.service.pipelines.*.receivers[] | select(. == "kubeletstats*")) |= "nop"' $tmp_dir/$conf.yaml
+
+    # Remove loadbalancing exporter since it errors outside of kubernetes :(
+    yq -i 'del(.exporters.loadbalancing*)' $tmp_dir/$conf.yaml
+    yq -i '(.service.pipelines.*.exporters[] | select(. == "loadbalancing*")) |= "nop"' $tmp_dir/$conf.yaml
 
     echo "Checking $conf"
     # Set various env vars to match what's provided in our helm chart pod definitions.
