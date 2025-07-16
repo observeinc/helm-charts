@@ -16,6 +16,7 @@ connectors:
       - name: peer.db.name
       - name: peer.messaging.system
       - name: status.message
+      - name: status_code
 {{- end }}
 
 exporters:
@@ -93,8 +94,7 @@ processors:
         - span.kind == SPAN_KIND_INTERNAL
         - span.kind == SPAN_KIND_PRODUCER
 
-  # The spanmetrics connector puts all dimensions as attributes on the datapoint, and copies the resource attributes from an arbitrary span's resource.
-  # This deletes all of the non-dimensional attributes from the resource and deletes all of the resource dimensions from the datapoint attributes.
+  # The spanmetrics connector puts all dimensions as attributes on the datapoint, and copies the resource attributes from an arbitrary span's resource. This cleans that up as well as handling any other renaming.
   transform/fix_red_metrics_resource_attributes:
     error_mode: ignore
     metric_statements:
@@ -104,6 +104,10 @@ processors:
 
       # Drop all datapoint attributes that are resource attributes in the spans.
       - delete_matching_keys(datapoint.attributes, "^(service.name|{{ join "|" $spanmetricsResourceAttributes }})")
+
+      # Rename status.code to response_status to be consistent with Trace Explorer and disambiguate from status_code (with an underscore).
+      - set(datapoint.attributes["response_status"], datapoint.attributes["status.code"])
+      - delete_key(datapoint.attributes, "status.code")
 {{- end }}
 
 {{- include "config.processors.memory_limiter" . | nindent 2 }}
@@ -209,6 +213,7 @@ service:
         {{- end }}
         - filter/drop_span_kinds_other_than_server_and_consumer_and_peer_client
         - transform/shape_spans_for_red_metrics
+        - transform/add_span_status_code
         - k8sattributes
       exporters: [{{ join ", " $tracesSpanmetricsExporters }}]
     metrics/spanmetrics:
