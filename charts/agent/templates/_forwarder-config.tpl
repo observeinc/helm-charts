@@ -40,6 +40,16 @@ processors:
 {{- include "config.processors.deltatocumulative" . | nindent 2 }}
 
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
+
+  transform/add_span_status_code:
+    error_mode: ignore
+    trace_statements:
+      - set(span.attributes["status_code"], Int(span.attributes["rpc.grpc.status_code"])) where span.attributes["status_code"] == nil and span.attributes["rpc.grpc.status_code"] != nil
+      - set(span.attributes["status_code"], Int(span.attributes["grpc.status_code"])) where span.attributes["status_code"] == nil and span.attributes["grpc.status_code"] != nil
+      - set(span.attributes["status_code"], Int(span.attributes["rpc.status_code"])) where span.attributes["status_code"] == nil and span.attributes["rpc.status_code"] != nil
+      - set(span.attributes["status_code"], Int(span.attributes["http.status_code"])) where span.attributes["status_code"] == nil and span.attributes["http.status_code"] != nil
+      - set(span.attributes["status_code"], Int(span.attributes["http.response.status_code"])) where span.attributes["status_code"] == nil and span.attributes["http.response.status_code"] != nil
+
   # attributes to append to objects
   attributes/debug_source_app_traces:
     actions:
@@ -92,6 +102,7 @@ service:
         - filter/drop_long_spans
         {{- end }}
         - memory_limiter
+        - transform/add_span_status_code
         - k8sattributes
         - batch
         - resourcedetection/cloud
