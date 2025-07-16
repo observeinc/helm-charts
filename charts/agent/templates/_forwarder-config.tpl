@@ -1,6 +1,7 @@
 {{- define "observe.daemonset.forwarder.config" -}}
 
-{{- if .Values.application.REDMetrics.enabled }}
+{{- $redMetrics := (and .Values.application.REDMetrics.enabled (not .Values.observeGateway.enabled)) }}
+{{- if $redMetrics }}
 connectors:
 {{- include "config.connectors.spanmetrics" . | nindent 2 }}
 {{- end }}
@@ -11,6 +12,19 @@ exporters:
 {{- include "config.exporters.otlphttp.observe.trace" . | nindent 2 }}
 {{- include "config.exporters.otlphttp.observe.metrics.otel" . | nindent 2 }}
 {{- include "config.exporters.prometheusremotewrite" . | nindent 2 }}
+
+{{- if .Values.observeGateway.enabled }}
+  loadbalancing/observe-gateway:
+    routing_key: "traceID"
+    protocol:
+      otlp:
+        tls:
+            insecure: true
+    resolver:
+      # use k8s service resolver, if collector runs in kubernetes environment
+      k8s:
+        service: {{ include "otelcol-service-name" (merge . (dict "collector" .Values.gateway)) }}.{{ .Values.gateway.namespaceOverride }}
+{{- end }}
 
 receivers:
   otlp/app-telemetry:
@@ -32,7 +46,13 @@ processors:
 {{- include "config.processors.transform.add_span_status_code" . | nindent 2 }}
 {{- include "config.processors.attributes.add_empty_service_attributes" . | nindent 2 }}
 
-{{- if .Values.application.REDMetrics.enabled }}
+{{- if .Values.observeGateway.enabled }}
+  # Use passthrough mode to reduce forwarder compute and push the lookup to the gateway whenever it is enabled.
+  k8sattributes/passthrough:
+    passthrough: true
+{{- end }}
+
+{{- if $redMetrics }}
 {{- include "config.processors.RED_metrics" . | nindent 2 }}
 {{- end }}
 
@@ -53,9 +73,15 @@ processors:
       key: debug_source
       value: app_metrics
 
-{{- $traceExporters := (list "otlphttp/observe/forward/trace") -}}
+{{- $traceExporters := (list) -}}
 {{- $logsExporters := (list "otlphttp/observe/base") -}}
 {{- $metricsExporters := (list) -}}
+
+{{ if .Values.observeGateway.enabled }}
+  {{- $traceExporters = concat $traceExporters (list "loadbalancing/observe-gateway") }}
+{{- else }}
+  {{- $traceExporters = concat $traceExporters (list "otlphttp/observe/forward/trace") }}
+{{- end }}
 
 {{ if eq .Values.node.forwarder.metrics.outputFormat "prometheus" -}}
   {{- $metricsExporters = concat $metricsExporters ( list "prometheusremotewrite/observe" ) | uniq }}
@@ -88,13 +114,19 @@ service:
         - filter/drop_long_spans
         {{- end }}
         - memory_limiter
+        {{- if .Values.observeGateway.enabled }}
+        - k8sattributes/passthrough
+        {{- else }}
         - transform/add_span_status_code
         - resource/add_empty_service_attributes
         - k8sattributes
+        {{- end }}
         - batch
         - resourcedetection/cloud
+        {{- if not .Values.observeGateway.enabled }}
         - resource/observe_common
         - attributes/debug_source_app_traces
+        {{- end }}
       exporters: [{{ join ", " $traceExporters }}]
     logs/observe-forward:
       receivers: [otlp/app-telemetry]
@@ -104,7 +136,7 @@ service:
       receivers: [otlp/app-telemetry]
       processors:  [{{ join ", " $metricsProcessors }}]
       exporters: [{{ join ", " $metricsExporters }}]
-    {{- if .Values.application.REDMetrics.enabled }}
+    {{- if $redMetrics }}
     {{- include "config.pipelines.RED_metrics" . | nindent 4 }}
     {{- end }}
 
