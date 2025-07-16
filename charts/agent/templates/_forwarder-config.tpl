@@ -48,48 +48,61 @@ processors:
 {{- end }}
 
 {{- if .Values.node.forwarder.redMetrics.enabled }}
-  # This handles schema normalization as well as moving status to attributes so it can be a dimension in spanmetrics
-  transform/shape_spans_for_red_metrics:
-    error_mode: ignore
-    trace_statements:
-      - set(span.attributes["peer.db.name"], span.attributes["db.system.name"]) where span.attributes["peer.db.name"] == nil and span.attributes["db.system.name"] != nil
-      - set(span.attributes["peer.db.name"], span.attributes["db.system"]) where span.attributes["peer.db.name"] == nil and span.attributes["db.system"] != nil
-      - set(span.attributes["status.message"], span.status.message) where span.status.message != ""
-
-  # This removes service.name for generated RED metrics associated with peer systems.
-  transform/remove_service_name_for_peer_metrics:
-    error_mode: ignore
-    metric_statements:
-      - delete_key(datapoint.attributes, "service.name") where datapoint.attributes["peer.db.name"] != nil or datapoint.attributes["peer.messaging.system"] != nil
-      - delete_key(resource.attributes, "service.name") where datapoint.attributes["peer.db.name"] != nil or datapoint.attributes["peer.messaging.system"] != nil
-
   attributes/debug_source_span_metrics:
     actions:
       - action: insert
         key: debug_source
         value: span_metrics
 
+  # This handles schema normalization as well as moving status to attributes so it can be a dimension in spanmetrics
+  transform/shape_spans_for_red_metrics:
+    error_mode: ignore
+    trace_statements:
+      - set(span.attributes["peer.db.name"], span.attributes["db.system.name"]) where span.attributes["peer.db.name"] == nil and span.attributes["db.system.name"] != nil
+      - set(span.attributes["peer.db.name"], span.attributes["db.system"]) where span.attributes["peer.db.name"] == nil and span.attributes["db.system"] != nil
+      # Needed because `spanmetrics` connector can only operate on attributes or resource attributes.
+      - set(span.attributes["status.message"], span.status.message) where span.status.message != ""
+
+  # This regroups the metrics by the peer attributes so we can remove `service.name` from the resource when these metric attributes are present
+  # NB: these will be deleted from the metric attributes and added to the resource.
+  groupbyattrs/peers:
+    keys:
+      - peer.db.name
+      - peer.messaging.system
+
+  # This puts moves the peer attributes from the resource back to the datapoint after we have regrouped the metrics.
+  transform/fix_peer_attributes:
+    error_mode: ignore
+    metric_statements:
+      - set(datapoint.attributes["peer.db.name"], resource.attributes["peer.db.name"]) where resource.attributes["peer.db.name"] != nil
+      - set(datapoint.attributes["peer.messaging.system"], resource.attributes["peer.messaging.system"]) where resource.attributes["peer.messaging.system"] != nil
+
+  # This removes service.name for generated RED metrics associated with peer systems.
+  transform/remove_service_name_for_peer_metrics:
+    error_mode: ignore
+    metric_statements:
+      - delete_key(resource.attributes, "service.name") where datapoint.attributes["peer.db.name"] != nil or datapoint.attributes["peer.messaging.system"] != nil
+
   # This drops spans that are not relevant for Service Explorer RED metrics.
   filter/drop_span_kinds_other_than_server_and_consumer_and_peer_client:
     error_mode: ignore
     traces:
       span:
-        - span.kind == SPAN_KIND_CLIENT and span.attributes["peer.messaging.system"] == nil and span.attributes["peer.db.name"] == nil
+        - span.kind == SPAN_KIND_CLIENT and span.attributes["peer.messaging.system"] == nil and span.attributes["peer.db.name"] == nil and span.attributes["db.system.name"] == nil and span.attributes["db.system"] == nil
         - span.kind == SPAN_KIND_UNSPECIFIED
         - span.kind == SPAN_KIND_INTERNAL
         - span.kind == SPAN_KIND_PRODUCER
 
+  # The spanmetrics connector puts all dimensions as attributes on the datapoint, and copies the resource attributes from an arbitrary span's resource.
+  # This deletes all of the non-dimensional attributes from the resource and deletes all of the resource dimensions from the datapoint attributes.
   transform/fix_red_metrics_resource_attributes:
     error_mode: ignore
     metric_statements:
       # Drop all resource attributes that aren't dimensions in the spanmetrics connector.
-      {{/* The service.name is implicit in the spanmetrics connector, so don't include it in spanmetricsResourceAttributes. */}}
+      {{/* The service.name is implicit in the spanmetrics connector, so we can't include it in spanmetricsResourceAttributes and need to list it here. */}}
       - keep_matching_keys(resource.attributes, "^(service.name|{{ join "|" $spanmetricsResourceAttributes }})")
-      # NB: the connector also sets these as resource attributes (because it copies all resource attributes from the first span in the aggregated batch).
-      #     If the connector ever changes, we need to explicitly add them back via the following:
-      # - set(resource.attributes["service.name"], datapoint.attributes["service.name"])
 
-      # Drop all attributes that are resource_attributes in the spans.
+      # Drop all datapoint attributes that are resource attributes in the spans.
       - delete_matching_keys(datapoint.attributes, "^(service.name|{{ join "|" $spanmetricsResourceAttributes }})")
 {{- end }}
 
@@ -194,21 +207,22 @@ service:
         {{- if ne .Values.node.forwarder.traces.maxSpanDuration "none" }}
         - filter/drop_long_spans
         {{- end }}
-        # Normalize the schema before dropping spans.
-        - transform/shape_spans_for_red_metrics
         - filter/drop_span_kinds_other_than_server_and_consumer_and_peer_client
+        - transform/shape_spans_for_red_metrics
         - k8sattributes
-        - resource/observe_common
       exporters: [{{ join ", " $tracesSpanmetricsExporters }}]
     metrics/spanmetrics:
       receivers:
         - spanmetrics
       processors:
         - memory_limiter
+        - groupbyattrs/peers
+        - transform/fix_peer_attributes
         - transform/remove_service_name_for_peer_metrics
         - transform/fix_red_metrics_resource_attributes
         - batch
         - resource/observe_common
+        - resourcedetection/cloud
         - attributes/debug_source_span_metrics
       exporters: [{{ join ", " $metricsSpanmetricsExporters }}]
     {{- end }}
