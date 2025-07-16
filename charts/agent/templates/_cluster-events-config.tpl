@@ -67,7 +67,12 @@ receivers:
 processors:
 {{- include "config.processors.memory_limiter" . | nindent 2 }}
 
-{{- include "config.processors.batch" . | nindent 2 }}
+  # We override the standard batch processor because the k8s objects are large and we need to send smaller batches.
+  # The ingest limit is 50mB, and we routinely see individual entities larger than 20kB. Use a conservative limit of 1024.
+  batch:
+    send_batch_size: {{ min 1024 .Values.agent.config.global.processors.batch.sendBatchSize }}
+    send_batch_max_size: {{ min 1024 .Values.agent.config.global.processors.batch.sendBatchMaxSize }}
+    timeout: {{ .Values.agent.config.global.processors.batch.timeout }}
 
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
 
