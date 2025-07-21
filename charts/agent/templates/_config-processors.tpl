@@ -103,3 +103,10 @@ resource/drop_container_info:
     - key: container.id
       action: delete
 {{- end -}}
+
+{{- define "config.processors.attributes.drop_service_name" -}}
+resource/drop_service_name:
+  attributes:
+    - action: delete
+      key: service.name
+{{- end -}}

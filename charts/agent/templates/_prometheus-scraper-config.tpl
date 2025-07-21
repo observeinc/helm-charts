@@ -21,6 +21,8 @@ processors:
 
 {{- include "config.processors.attributes.pod_metrics" . | nindent 2 }}
 
+{{- include "config.processors.attributes.drop_service_name" . | nindent 2 }}
+
   attributes/debug_source_cadvisor_metrics:
     actions:
       - key: debug_source
@@ -46,7 +48,8 @@ service:
   pipelines:
     metrics/pod_metrics:
       receivers: [{{ join ", " $podMetricsReceivers }}]
-      processors: [memory_limiter, k8sattributes, batch, resource/observe_common, attributes/debug_source_pod_metrics]
+      # Drop the service.name resource attribute (which is set to the prom scrape job name) before the k8sattributes processor
+      processors: [memory_limiter, resource/drop_service_name, k8sattributes, batch, resource/observe_common, attributes/debug_source_pod_metrics]
       exporters: [{{ join ", " $podMetricsExporters }}]
     {{- if .Values.node.metrics.cadvisor.enabled }}
     metrics/cadvisor:

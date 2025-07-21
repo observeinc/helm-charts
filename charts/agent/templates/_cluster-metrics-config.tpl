@@ -35,6 +35,7 @@ processors:
 
 {{- include "config.processors.attributes.k8sattributes" (merge . (dict "target" "cluster_metrics")) | nindent 2 }}
 {{- include "config.processors.attributes.drop_container_info" . | nindent 2 }}
+{{- include "config.processors.attributes.drop_service_name" . | nindent 2 }}
 
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
 
@@ -64,7 +65,8 @@ service:
 {{- if and (eq .Values.application.prometheusScrape.enabled true) (eq .Values.application.prometheusScrape.independentDeployment false) }}
       metrics/pod_metrics:
         receivers: [prometheus/pod_metrics]
-        processors: [memory_limiter, k8sattributes, batch, resource/observe_common, attributes/debug_source_pod_metrics]
+        # Drop the service.name resource attribute (which is set to the prom scrape job name) before the k8sattributes processor
+        processors: [memory_limiter, resource/drop_service_name, k8sattributes, batch, resource/observe_common, attributes/debug_source_pod_metrics]
         exporters: [{{ join ", " $metricsExporters }}]
 {{- end }}
 {{- include "config.service.telemetry" . | nindent 2 }}
