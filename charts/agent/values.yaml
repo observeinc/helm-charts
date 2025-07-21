@@ -168,6 +168,16 @@ agent:
     # additional otel collector config for node-logs-metrics daemonset
     nodeLogsMetrics:
     # additional otel collector config for monitor deployment
+
+    # use the below config to adjust the metrics that are collected via kubeletstats receiver:
+      # receivers:
+      #   kubeletstats:
+      #     metric_groups:
+      #       - container
+      #       - node
+      #       - pod
+      #       - volume
+
     monitor:
     # additional otel collector config for forwarder daemonset
     forwarder:
