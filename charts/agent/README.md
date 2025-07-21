@@ -73,6 +73,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | agent.config.prometheusScraper | string | `nil` |  |
 | agent.selfMonitor.enabled | bool | `true` |  |
 | agent.selfMonitor.metrics.scrapeInterval | string | `"60s"` |  |
+| application.REDMetrics.enabled | bool | `false` | Whether to enable generating RED metrics from spans. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview |
 | application.prometheusScrape.enabled | bool | `false` |  |
 | application.prometheusScrape.independentDeployment | bool | `false` |  |
 | application.prometheusScrape.interval | string | `"60s"` |  |
@@ -112,7 +113,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | cluster-events.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | cluster-events.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | cluster-events.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| cluster-events.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.5.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| cluster-events.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.6.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | cluster-events.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | cluster-events.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | cluster-events.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
@@ -178,7 +179,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | cluster-metrics.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | cluster-metrics.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | cluster-metrics.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| cluster-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.5.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| cluster-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.6.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | cluster-metrics.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | cluster-metrics.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | cluster-metrics.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
@@ -256,7 +257,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | forwarder.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | forwarder.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | forwarder.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| forwarder.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.5.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| forwarder.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.6.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | forwarder.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | forwarder.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | forwarder.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
@@ -324,7 +325,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | monitor.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | monitor.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | monitor.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| monitor.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.5.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| monitor.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.6.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | monitor.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | monitor.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | monitor.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
@@ -419,7 +420,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | node-logs-metrics.extraVolumes[3].name | string | `"varlibotelcol"` |  |
 | node-logs-metrics.extraVolumes[4].hostPath.path | string | `"/"` |  |
 | node-logs-metrics.extraVolumes[4].name | string | `"hostfs"` |  |
-| node-logs-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.5.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| node-logs-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.6.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | node-logs-metrics.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | node-logs-metrics.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | node-logs-metrics.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
@@ -478,7 +479,6 @@ This service is a *single-instance deployment*. It's critical that this service 
 | node.forwarder.logs.enabled | bool | `true` |  |
 | node.forwarder.metrics.enabled | bool | `true` |  |
 | node.forwarder.metrics.outputFormat | string | `"prometheus"` | The format of the outbound metrics from the forwarder to Observe. Valid values are "prometheus" and "otel" |
-| node.forwarder.redMetrics.enabled | bool | `false` | Whether to enable generating RED metrics from spans. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview |
 | node.forwarder.traces.enabled | bool | `true` |  |
 | node.forwarder.traces.maxSpanDuration | string | `"1h"` | The max span duration to be considered by the agent, or "none" for no limit. Any span over this limit will be dropped. Durations must be a number with a valid time unit: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/pkg/ottl/ottlfuncs/README.md#duration |
 | node.kubeletstats.useNodeIp | bool | `false` |  |
@@ -527,7 +527,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | prometheus-scraper.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | prometheus-scraper.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | prometheus-scraper.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| prometheus-scraper.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.5.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| prometheus-scraper.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.6.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | prometheus-scraper.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | prometheus-scraper.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | prometheus-scraper.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |

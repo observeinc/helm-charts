@@ -2,7 +2,7 @@
 
 {{- $spanmetricsResourceAttributes := (list "service.namespace" "service.version" "deployment.environment" "k8s.pod.name" "k8s.cluster.uid" "k8s.namespace.name") -}}
 
-{{- if .Values.node.forwarder.redMetrics.enabled }}
+{{- if .Values.application.REDMetrics.enabled }}
 connectors:
   spanmetrics:
     aggregation_temporality: AGGREGATION_TEMPORALITY_DELTA
@@ -48,7 +48,7 @@ processors:
 {{- fail "Invalid maxSpanDuration for forwarder red metrics, valid values are 'none' or a number with a valid time unit: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/pkg/ottl/ottlfuncs/README.md#duration" }}
 {{- end }}
 
-{{- if .Values.node.forwarder.redMetrics.enabled }}
+{{- if .Values.application.REDMetrics.enabled }}
   attributes/debug_source_span_metrics:
     actions:
       - action: insert
@@ -202,7 +202,7 @@ service:
       receivers: [otlp/app-telemetry]
       processors:  [{{ join ", " $metricsProcessors }}]
       exporters: [{{ join ", " $metricsExporters }}]
-    {{- if .Values.node.forwarder.redMetrics.enabled }}
+    {{- if .Values.application.REDMetrics.enabled }}
     traces/spanmetrics:
       receivers:
         - otlp/app-telemetry

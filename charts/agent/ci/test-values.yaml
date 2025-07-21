@@ -9,6 +9,8 @@ application:
   prometheusScrape:
     enabled: true
     independentDeployment: true
+  REDMetrics:
+    enabled: true
 
 node:
   forwarder:
