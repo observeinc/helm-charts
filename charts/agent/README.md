@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.66.1](https://img.shields.io/badge/Version-0.66.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.5.0](https://img.shields.io/badge/AppVersion-2.5.0-informational?style=flat-square)
+![Version: 0.67.0](https://img.shields.io/badge/Version-0.67.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.5.0](https://img.shields.io/badge/AppVersion-2.5.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -267,7 +267,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | forwarder.livenessProbe.httpGet.port | int | `13133` |  |
 | forwarder.livenessProbe.initialDelaySeconds | int | `30` |  |
 | forwarder.livenessProbe.periodSeconds | int | `5` |  |
-| forwarder.mode | string | `"daemonset"` |  |
+| forwarder.mode | string | `"daemonset"` | The forwarder is run as a daemonset by default, but can be run as a deployment by setting mode to "deployment". Deployment mode must be used when running in a serverless environment (ex: EKS Fargate) where daemonsets are not supported. |
 | forwarder.nameOverride | string | `"forwarder"` | --------------------------------------- # Different for each deployment/daemonset # |
 | forwarder.namespaceOverride | string | `"observe"` |  |
 | forwarder.networkPolicy.egressRules[0] | object | `{}` |  |
@@ -285,6 +285,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | forwarder.readinessProbe.httpGet.port | int | `13133` |  |
 | forwarder.readinessProbe.initialDelaySeconds | int | `30` |  |
 | forwarder.readinessProbe.periodSeconds | int | `5` |  |
+| forwarder.replicaCount | int | `1` | The `replicaCount` is only used when `mode` is set to "deployment". It is ignored when `mode` is set to "daemonset". In deployment mode, this sets the number of replicas (ie the number of forwarder pods to run). |
 | forwarder.resources.limits.memory | string | `"512Mi"` |  |
 | forwarder.resources.requests.cpu | string | `"300m"` |  |
 | forwarder.resources.requests.memory | string | `"512Mi"` |  |
@@ -474,7 +475,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | node.containers.logs.startAt | string | `"end"` |  |
 | node.containers.metrics.enabled | bool | `true` |  |
 | node.containers.metrics.interval | string | `"60s"` |  |
-| node.enabled | bool | `true` |  |
+| node.enabled | bool | `true` | Enables the node-logs-metrics agent daemonset for collection of node logs and metrics. The nodes on which metrics and logs are collected can be configured via `affinity` in the `node-logs-metrics` section below. This should be set to false to disable the node-log-metrics daemonset when running in a serverless environment (ex: EKS Fargate). |
 | node.forwarder.enabled | bool | `true` |  |
 | node.forwarder.logs.enabled | bool | `true` |  |
 | node.forwarder.metrics.enabled | bool | `true` |  |
