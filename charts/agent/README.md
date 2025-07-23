@@ -51,9 +51,9 @@ This service is a *single-instance deployment*. It's critical that this service 
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| agent.config.clusterEvents | string | `nil` |  |
-| agent.config.clusterMetrics | string | `nil` |  |
-| agent.config.forwarder | string | `nil` |  |
+| agent.config.clusterEvents | string | `nil` | Additional OTel collector config for cluster-events deployment |
+| agent.config.clusterMetrics | string | `nil` | Additional OTel collector config for cluster-metrics deployment |
+| agent.config.forwarder | string | `nil` | Additional OTel collector config for forwarder daemonset |
 | agent.config.global.debug.enabled | bool | `false` |  |
 | agent.config.global.debug.verbosity | string | `"basic"` |  |
 | agent.config.global.exporters.retryOnFailure.enabled | bool | `true` |  |
@@ -61,16 +61,16 @@ This service is a *single-instance deployment*. It's critical that this service 
 | agent.config.global.exporters.retryOnFailure.maxElapsedTime | string | `"5m"` |  |
 | agent.config.global.exporters.retryOnFailure.maxInterval | string | `"30s"` |  |
 | agent.config.global.exporters.sendingQueue.enabled | bool | `true` |  |
-| agent.config.global.overrides | string | `nil` |  |
+| agent.config.global.overrides | string | `nil` | Additional OTel collector config for all agent deployments/daemonsets |
 | agent.config.global.processors.batch.sendBatchMaxSize | int | `4096` |  |
 | agent.config.global.processors.batch.sendBatchSize | int | `4096` |  |
 | agent.config.global.processors.batch.timeout | string | `"5s"` |  |
 | agent.config.global.service.telemetry.loggingEncoding | string | `"console"` |  |
 | agent.config.global.service.telemetry.loggingLevel | string | `"WARN"` |  |
 | agent.config.global.service.telemetry.metricsLevel | string | `"normal"` |  |
-| agent.config.monitor | string | `nil` |  |
-| agent.config.nodeLogsMetrics | string | `nil` |  |
-| agent.config.prometheusScraper | string | `nil` |  |
+| agent.config.monitor | string | `nil` | Additional OTel collector config for monitor deployment |
+| agent.config.nodeLogsMetrics | string | `nil` | Additional OTel collector config for node-logs-metrics daemonset |
+| agent.config.prometheusScraper | string | `nil` | Additional OTel collector config for prometheus-scraper deployment |
 | agent.selfMonitor.enabled | bool | `true` |  |
 | agent.selfMonitor.metrics.scrapeInterval | string | `"60s"` |  |
 | application.REDMetrics.enabled | bool | `false` | Whether to enable generating RED metrics from spans. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview |
