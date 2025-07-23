@@ -61,8 +61,11 @@ processors:
   transform/shape_spans_for_red_metrics:
     error_mode: ignore
     trace_statements:
+      # peer.db.name = coalesce(peer.db.name, db.system.name, db.system)
       - set(span.attributes["peer.db.name"], span.attributes["db.system.name"]) where span.attributes["peer.db.name"] == nil and span.attributes["db.system.name"] != nil
       - set(span.attributes["peer.db.name"], span.attributes["db.system"]) where span.attributes["peer.db.name"] == nil and span.attributes["db.system"] != nil
+      # deployment.environment = coalesce(deployment.environment, deployment.environment.name)
+      - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]) where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"] != nil
       # Needed because `spanmetrics` connector can only operate on attributes or resource attributes.
       - set(span.attributes["status.message"], span.status.message) where span.status.message != ""
 
