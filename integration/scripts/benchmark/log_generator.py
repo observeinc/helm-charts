@@ -48,7 +48,7 @@ def _make_loggenerator_daemonset(
     rate = math.ceil(cluster_rate / float(num_nodes))
 
     container = client.V1Container(
-        image="460044344528.dkr.ecr.us-west-2.amazonaws.com/observemattc/loggenerator:latest",
+        image="observemattc/loggenerator:latest",
         name="loggenerator",
         command=[
             "/loggenerator",
