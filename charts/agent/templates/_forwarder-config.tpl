@@ -1,6 +1,6 @@
 {{- define "observe.daemonset.forwarder.config" -}}
 
-{{- $spanmetricsResourceAttributes := (list "service.namespace" "service.version" "deployment.environment" "k8s.pod.name" "k8s.cluster.uid" "k8s.namespace.name") -}}
+{{- $spanmetricsResourceAttributes := (list "service.namespace" "service.version" "deployment.environment" "k8s.pod.name" "k8s.namespace.name") -}}
 
 {{- if .Values.application.REDMetrics.enabled }}
 connectors:
@@ -10,6 +10,8 @@ connectors:
       exponential:
         max_size: 100
     dimensions:
+      # This connector implicitly adds: service.name, span.name, span.kind, and status.code (which we rename to response_status)
+      # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/connector/spanmetricsconnector/connector.go#L528-L540
       {{- range $tag := $spanmetricsResourceAttributes }}
       - name: {{ $tag }}
       {{- end }}
