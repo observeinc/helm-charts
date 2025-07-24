@@ -160,20 +160,51 @@ agent:
         enabled: false
         # values basic, normal, detailed
         verbosity: basic
-      # additional otel collector config for all agent deployments/daemonsets
+      # -- Additional OTel collector config for all agent deployments/daemonsets
       overrides:
-    # additional otel collector config for cluster-events deployment
+
+    # -- Additional OTel collector config for cluster-events deployment
     clusterEvents:
-    # additional otel collector config for cluster-metrics deployment
+    # Put any OTel config overrides here.
+
+    # -- Additional OTel collector config for cluster-metrics deployment
     clusterMetrics:
-    # additional otel collector config for prometheus-scraper deployment
+    # Put any OTel config overrides here.
+
+    # -- Additional OTel collector config for prometheus-scraper deployment
     prometheusScraper:
-    # additional otel collector config for node-logs-metrics daemonset
+    # Put any OTel config overrides here.
+
+    # -- Additional OTel collector config for node-logs-metrics daemonset
     nodeLogsMetrics:
-    # additional otel collector config for monitor deployment
+    # Put any OTel config overrides here. For example, to adjust the metrics that are collected via kubeletstats receiver, you can do the following:
+    # receivers:
+    #   kubeletstats:
+    #     metric_groups:
+    #       - container
+    #       - node
+    #       - pod
+    #       - volume
+
+    # -- Additional OTel collector config for monitor deployment
     monitor:
-    # additional otel collector config for forwarder daemonset
+    # Put any OTel config overrides here.
+
+    # -- Additional OTel collector config for forwarder daemonset
     forwarder:
+    # Put any OTel config overrides here. For example, to forward spans to an additional OTel http endpoint:
+    # exporters:
+    #   otlphttp/extra:
+    #     endpoint: http://my-otel-endpoint:4317
+    #     headers:
+    #       authorization: "Bearer my-token"
+    # service:
+    #   pipelines:
+    #     traces/observe-forward:
+    #       exporters:
+    #         - otlphttp/extra
+    #         - otlphttp/observe/forward/trace
+
   selfMonitor:
     enabled: true
     metrics:
