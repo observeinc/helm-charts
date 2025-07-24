@@ -1,4 +1,4 @@
-{{ if .Values.cluster.metrics.enabled }}
+{{ if .Values.application.prometheusScrape.independentDeployment }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
