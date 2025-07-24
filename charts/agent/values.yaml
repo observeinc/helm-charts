@@ -39,8 +39,9 @@ cluster:
     value: ""
 
 node:
-  # enables agent for collection of node logs and metrics
-  # what nodes metrics and logs are collected from is configured with affinity in node-logs-metrics section below
+  # -- Enables the node-logs-metrics agent daemonset for collection of node logs and metrics.
+  # The nodes on which metrics and logs are collected can be configured via `affinity` in the `node-logs-metrics` section below.
+  # This should be set to false to disable the node-log-metrics daemonset when running in a serverless environment (ex: EKS Fargate).
   enabled: true
   # collects host level metrics from node
   metrics:
@@ -920,7 +921,14 @@ monitor:
   # ----------------------------------------- #
 
 forwarder:
+  # -- The forwarder is run as a daemonset by default, but can be run as a deployment by setting mode to "deployment". Deployment mode
+  # must be used when running in a serverless environment (ex: EKS Fargate) where daemonsets are not supported.
   mode: daemonset
+
+  # -- The `replicaCount` is only used when `mode` is set to "deployment". It is ignored when `mode` is set to "daemonset".
+  # In deployment mode, this sets the number of replicas (ie the number of forwarder pods to run).
+  replicaCount: 1
+
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
   nameOverride: "forwarder"
