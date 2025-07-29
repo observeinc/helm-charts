@@ -33,6 +33,13 @@
 {{- toYaml $config | indent 2 }}
 {{- end }}
 
+{{- define "observe.deployment.applyGatewayConfig" -}}
+{{- $values := deepCopy .Values }}
+{{- $data := dict "Values" $values | mustMergeOverwrite (deepCopy .) }}
+{{- $config := mustMergeOverwrite ( include "observe.deployment.gateway.config" $data |  fromYaml ) ($values.agent.config.gateway) ($values.agent.config.global.overrides) -}}
+{{- toYaml $config | indent 2 }}
+{{- end }}
+
 {{- define "observe.deployment.applyAgentMonitorConfig" -}}
 {{- $values := deepCopy .Values }}
 {{- $data := dict "Values" $values | mustMergeOverwrite (deepCopy .) }}
