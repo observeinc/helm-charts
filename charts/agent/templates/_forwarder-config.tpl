@@ -30,6 +30,7 @@ processors:
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
 {{- include "config.processors.filter.drop_long_spans" . | nindent 2 }}
 {{- include "config.processors.transform.add_span_status_code" . | nindent 2 }}
+{{- include "config.processors.attributes.add_empty_service_attributes" . | nindent 2 }}
 
 {{- if .Values.application.REDMetrics.enabled }}
 {{- include "config.processors.RED_metrics" . | nindent 2 }}
@@ -88,6 +89,7 @@ service:
         {{- end }}
         - memory_limiter
         - transform/add_span_status_code
+        - resource/add_empty_service_attributes
         - k8sattributes
         - batch
         - resourcedetection/cloud
