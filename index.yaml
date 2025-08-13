@@ -3,6 +3,50 @@ entries:
   agent:
   - apiVersion: v2
     appVersion: 2.5.0
+    created: "2025-08-13T20:37:58.388862061Z"
+    dependencies:
+    - alias: cluster-events
+      condition: cluster.events.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.125.0
+    - alias: cluster-metrics
+      condition: cluster.metrics.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.125.0
+    - alias: prometheus-scraper
+      condition: application.prometheusScrape.independentDeployment
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.125.0
+    - alias: node-logs-metrics
+      condition: node.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.125.0
+    - alias: monitor
+      condition: agent.selfMonitor.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.125.0
+    - alias: forwarder
+      condition: node.forwarder.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.125.0
+    description: Chart to install K8s collection stack based on Observe Agent
+    digest: 9b7d14cb3344af2c807bf13efabff7d1a1b7ac4d7f4c5006a80754a1cab737d5
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: agent
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/agent-0.67.1/agent-0.67.1.tgz
+    version: 0.67.1
+  - apiVersion: v2
+    appVersion: 2.5.0
     created: "2025-07-29T16:28:10.733246612Z"
     dependencies:
     - alias: cluster-events
@@ -9164,4 +9208,4 @@ entries:
     urls:
     - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.0/traces-0.1.0.tgz
     version: 0.1.0
-generated: "2025-07-29T16:28:10.733919351Z"
+generated: "2025-08-13T20:37:58.389469211Z"
