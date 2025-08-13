@@ -17,6 +17,7 @@ traces/spanmetrics:
     - filter/drop_span_kinds_other_than_server_and_consumer_and_peer_client
     - transform/shape_spans_for_red_metrics
     - transform/add_span_status_code
+    - resource/add_empty_service_attributes
     - k8sattributes
   exporters: [{{ join ", " $tracesSpanmetricsExporters }}]
 metrics/spanmetrics:

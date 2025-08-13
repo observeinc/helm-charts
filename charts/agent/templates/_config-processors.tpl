@@ -125,6 +125,20 @@ filter/drop_long_spans:
 {{- end }}
 {{- end -}}
 
+{{- define "config.processors.attributes.add_empty_service_attributes" -}}
+resource/add_empty_service_attributes:
+    attributes:
+        - action: insert
+          key: service.name
+          value: ""
+        - action: insert
+          key: service.namespace
+          value: ""
+        - action: insert
+          key: deployment.environment
+          value: ""
+{{- end -}}
+
 {{- define "config.processors.transform.add_span_status_code" -}}
 transform/add_span_status_code:
   error_mode: ignore
