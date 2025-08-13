@@ -143,11 +143,11 @@ resource/add_empty_service_attributes:
 transform/add_span_status_code:
   error_mode: ignore
   trace_statements:
-    - set(span.attributes["status_code"], Int(span.attributes["rpc.grpc.status_code"])) where span.attributes["status_code"] == nil and span.attributes["rpc.grpc.status_code"] != nil
-    - set(span.attributes["status_code"], Int(span.attributes["grpc.status_code"])) where span.attributes["status_code"] == nil and span.attributes["grpc.status_code"] != nil
-    - set(span.attributes["status_code"], Int(span.attributes["rpc.status_code"])) where span.attributes["status_code"] == nil and span.attributes["rpc.status_code"] != nil
-    - set(span.attributes["status_code"], Int(span.attributes["http.status_code"])) where span.attributes["status_code"] == nil and span.attributes["http.status_code"] != nil
-    - set(span.attributes["status_code"], Int(span.attributes["http.response.status_code"])) where span.attributes["status_code"] == nil and span.attributes["http.response.status_code"] != nil
+    - set(span.attributes["observe.status_code"], Int(span.attributes["rpc.grpc.status_code"])) where span.attributes["observe.status_code"] == nil and span.attributes["rpc.grpc.status_code"] != nil
+    - set(span.attributes["observe.status_code"], Int(span.attributes["grpc.status_code"])) where span.attributes["observe.status_code"] == nil and span.attributes["grpc.status_code"] != nil
+    - set(span.attributes["observe.status_code"], Int(span.attributes["rpc.status_code"])) where span.attributes["observe.status_code"] == nil and span.attributes["rpc.status_code"] != nil
+    - set(span.attributes["observe.status_code"], Int(span.attributes["http.status_code"])) where span.attributes["observe.status_code"] == nil and span.attributes["http.status_code"] != nil
+    - set(span.attributes["observe.status_code"], Int(span.attributes["http.response.status_code"])) where span.attributes["observe.status_code"] == nil and span.attributes["http.response.status_code"] != nil
 {{- end -}}
 
 {{- define "config.processors.RED_metrics" -}}
@@ -170,7 +170,7 @@ transform/shape_spans_for_red_metrics:
     # deployment.environment = coalesce(deployment.environment, deployment.environment.name)
     - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]) where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"] != nil
     # Needed because `spanmetrics` connector can only operate on attributes or resource attributes.
-    - set(span.attributes["status.message"], span.status.message) where span.status.message != ""
+    - set(span.attributes["otel.status_description"], span.status.message) where span.status.message != ""
 
 # This regroups the metrics by the peer attributes so we can remove `service.name` from the resource when these metric attributes are present
 # NB: these will be deleted from the metric attributes and added to the resource.
@@ -214,6 +214,7 @@ transform/fix_red_metrics_resource_attributes:
     - delete_matching_keys(datapoint.attributes, "^(service.name|{{ join "|" $spanmetricsResourceAttributes }})")
 
     # Rename status.code to response_status to be consistent with Trace Explorer and disambiguate from status_code (with an underscore).
-    - set(datapoint.attributes["response_status"], datapoint.attributes["status.code"])
+    - set(datapoint.attributes["otel.status_code"], "OK") where datapoint.attributes["status.code"] == "STATUS_CODE_OK"
+    - set(datapoint.attributes["otel.status_code"], "ERROR") where datapoint.attributes["status.code"] == "STATUS_CODE_ERROR"
     - delete_key(datapoint.attributes, "status.code")
 {{- end -}}

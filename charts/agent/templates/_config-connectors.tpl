@@ -8,13 +8,13 @@ spanmetrics:
     exponential:
       max_size: 100
   dimensions:
-    # This connector implicitly adds: service.name, span.name, span.kind, and status.code (which we rename to response_status)
+    # This connector implicitly adds: service.name, span.name, span.kind, and status.code (which we rename to otel.status_code)
     # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/connector/spanmetricsconnector/connector.go#L528-L540
     {{- range $tag := $spanmetricsResourceAttributes }}
     - name: {{ $tag }}
     {{- end }}
     - name: peer.db.name
     - name: peer.messaging.system
-    - name: status.message
-    - name: status_code
+    - name: otel.status_description
+    - name: observe.status_code
 {{- end -}}
