@@ -11,12 +11,16 @@ application:
     independentDeployment: true
   REDMetrics:
     enabled: true
+  traceSampling:
+    enabled: true
 
 node:
   forwarder:
     enabled: true
     metrics:
       outputFormat: otel
+    gateway:
+      enabled: true
 
 cluster:
   namespaceOverride:
@@ -33,4 +37,6 @@ monitor:
 node-logs-metrics:
   namespaceOverride: "testing"
 prometheus-scraper:
+  namespaceOverride: "testing"
+gateway:
   namespaceOverride: "testing"
