@@ -84,7 +84,6 @@ service:
         - memory_limiter
         - k8sattributes
         - batch
-        - resourcedetection/cloud
         - resource/observe_common
         - attributes/debug_source_gateway
       exporters: [{{ join ", " $logsExporters }}]
@@ -97,7 +96,6 @@ service:
         - deltatocumulative/observe
         {{- end }}
         - batch
-        - resourcedetection/cloud
         - resource/observe_common
         - attributes/debug_source_gateway
       exporters: [{{ join ", " $metricsExporters }}]

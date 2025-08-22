@@ -10,7 +10,7 @@ exporters:
 {{- include "config.exporters.debug" . | nindent 2 }}
 
 {{- if .Values.gatewayDeployment.enabled }}
-  loadbalancing/observe-traceID:
+  loadbalancing/observe-gateway:
     routing_key: "traceID"
     protocol:
       otlp:
@@ -21,16 +21,11 @@ exporters:
       k8s:
         service: {{ include "otelcol-service-name" (merge . (dict "collector" .Values.gateway)) }}.{{ .Values.gateway.namespaceOverride }}
 
-  loadbalancing/observe-service:
-    routing_key: "service"
-    protocol:
-      otlp:
-        tls:
-            insecure: true
-    resolver:
-      # use k8s service resolver, if collector runs in kubernetes environment
-      k8s:
-        service: {{ include "otelcol-service-name" (merge . (dict "collector" .Values.gateway)) }}.{{ .Values.gateway.namespaceOverride }}
+  otlp/gateway-service:
+    endpoint: http://{{ include "otelcol-service-name" (merge . (dict "collector" .Values.gateway)) }}.{{ .Values.gateway.namespaceOverride }}.svc.cluster.local:4317
+    tls:
+      insecure: true
+
 {{- else }}
   {{- include "config.exporters.otlphttp.observe.base" . | nindent 2 }}
   {{- include "config.exporters.otlphttp.observe.trace" . | nindent 2 }}
@@ -50,6 +45,7 @@ processors:
 
 {{- include "config.processors.memory_limiter" . | nindent 2 }}
 {{- include "config.processors.batch" . | nindent 2 }}
+{{- include "config.processors.resource_detection.cloud" . | nindent 2 }}
 {{- include "config.processors.filter.drop_long_spans" . | nindent 2 }}
 
 {{- if .Values.gatewayDeployment.enabled }}
@@ -62,7 +58,6 @@ processors:
   {{- include "config.processors.deltatocumulative" . | nindent 2 }}
   {{- include "config.processors.transform.add_span_status_code" . | nindent 2 }}
   {{- include "config.processors.attributes.add_empty_service_attributes" . | nindent 2 }}
-  {{- include "config.processors.resource_detection.cloud" . | nindent 2 }}
 
   # attributes to append to objects
   attributes/debug_source_app_traces:
@@ -91,9 +86,9 @@ processors:
 {{- $metricsExporters := (list) -}}
 
 {{ if .Values.gatewayDeployment.enabled }}
-  {{- $traceExporters = concat $traceExporters (list "loadbalancing/observe-traceID") }}
-  {{- $logsExporters = concat $logsExporters (list "loadbalancing/observe-service") }}
-  {{- $metricsExporters = concat $metricsExporters (list "loadbalancing/observe-service") }}
+  {{- $traceExporters = concat $traceExporters (list "loadbalancing/observe-gateway") }}
+  {{- $logsExporters = concat $logsExporters (list "otlp/gateway-service") }}
+  {{- $metricsExporters = concat $metricsExporters (list "otlp/gateway-service") }}
 {{- else }}
   {{- $traceExporters = concat $traceExporters (list "otlphttp/observe/forward/trace") }}
   {{- $logsExporters = concat $logsExporters (list "otlphttp/observe/base") -}}
@@ -114,7 +109,7 @@ processors:
 {{- $metricsProcessors := (list) -}}
 
 {{ if .Values.gatewayDeployment.enabled -}}
-  {{- $metricsProcessors = (list "memory_limiter" "k8sattributes/passthrough" "batch") }}
+  {{- $metricsProcessors = (list "memory_limiter" "k8sattributes/passthrough" "batch" "resourcedetection/cloud") }}
 {{- else if eq .Values.node.forwarder.metrics.outputFormat "prometheus" -}}
   {{- $metricsProcessors = (list "memory_limiter" "k8sattributes" "deltatocumulative/observe" "batch" "resourcedetection/cloud" "resource/observe_common" "attributes/debug_source_app_metrics") }}
 {{- else if eq .Values.node.forwarder.metrics.outputFormat "otel" -}}
@@ -140,8 +135,8 @@ service:
         - k8sattributes
         {{- end }}
         - batch
-        {{- if not .Values.gatewayDeployment.enabled }}
         - resourcedetection/cloud
+        {{- if not .Values.gatewayDeployment.enabled }}
         - resource/observe_common
         - attributes/debug_source_app_traces
         {{- end }}
@@ -156,8 +151,8 @@ service:
         - k8sattributes
         {{- end }}
         - batch
-        {{- if not .Values.gatewayDeployment.enabled }}
         - resourcedetection/cloud
+        {{- if not .Values.gatewayDeployment.enabled }}
         - resource/observe_common
         - attributes/debug_source_app_logs
         {{- end }}
