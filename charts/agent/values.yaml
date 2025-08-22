@@ -133,7 +133,7 @@ application:
     # -- (bool) Whether to enable generating RED metrics from spans. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview
     enabled: false
 
-observeGateway:
+gatewayDeployment:
   # -- (bool) Whether to enable the gateway deployment. The gateway is responsible for sampling and traces before sending them to Observe.
   enabled: false
   traceSampling:

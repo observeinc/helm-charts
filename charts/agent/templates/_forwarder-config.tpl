@@ -1,6 +1,6 @@
 {{- define "observe.daemonset.forwarder.config" -}}
 
-{{- $redMetrics := (and .Values.application.REDMetrics.enabled (not .Values.observeGateway.enabled)) }}
+{{- $redMetrics := (and .Values.application.REDMetrics.enabled (not .Values.gatewayDeployment.enabled)) }}
 {{- if $redMetrics }}
 connectors:
 {{- include "config.connectors.spanmetrics" . | nindent 2 }}
@@ -8,13 +8,9 @@ connectors:
 
 exporters:
 {{- include "config.exporters.debug" . | nindent 2 }}
-{{- include "config.exporters.otlphttp.observe.base" . | nindent 2 }}
-{{- include "config.exporters.otlphttp.observe.trace" . | nindent 2 }}
-{{- include "config.exporters.otlphttp.observe.metrics.otel" . | nindent 2 }}
-{{- include "config.exporters.prometheusremotewrite" . | nindent 2 }}
 
-{{- if .Values.observeGateway.enabled }}
-  loadbalancing/observe-gateway:
+{{- if .Values.gatewayDeployment.enabled }}
+  loadbalancing/observe-traceID:
     routing_key: "traceID"
     protocol:
       otlp:
@@ -24,6 +20,22 @@ exporters:
       # use k8s service resolver, if collector runs in kubernetes environment
       k8s:
         service: {{ include "otelcol-service-name" (merge . (dict "collector" .Values.gateway)) }}.{{ .Values.gateway.namespaceOverride }}
+
+  loadbalancing/observe-service:
+    routing_key: "service"
+    protocol:
+      otlp:
+        tls:
+            insecure: true
+    resolver:
+      # use k8s service resolver, if collector runs in kubernetes environment
+      k8s:
+        service: {{ include "otelcol-service-name" (merge . (dict "collector" .Values.gateway)) }}.{{ .Values.gateway.namespaceOverride }}
+{{- else }}
+  {{- include "config.exporters.otlphttp.observe.base" . | nindent 2 }}
+  {{- include "config.exporters.otlphttp.observe.trace" . | nindent 2 }}
+  {{- include "config.exporters.otlphttp.observe.metrics.otel" . | nindent 2 }}
+  {{- include "config.exporters.prometheusremotewrite" . | nindent 2 }}
 {{- end }}
 
 receivers:
@@ -37,24 +49,20 @@ receivers:
 processors:
 
 {{- include "config.processors.memory_limiter" . | nindent 2 }}
-{{- include "config.processors.resource_detection.cloud" . | nindent 2 }}
 {{- include "config.processors.batch" . | nindent 2 }}
-{{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
-{{- include "config.processors.deltatocumulative" . | nindent 2 }}
-{{- include "config.processors.resource.observe_common" . | nindent 2 }}
 {{- include "config.processors.filter.drop_long_spans" . | nindent 2 }}
-{{- include "config.processors.transform.add_span_status_code" . | nindent 2 }}
-{{- include "config.processors.attributes.add_empty_service_attributes" . | nindent 2 }}
 
-{{- if .Values.observeGateway.enabled }}
+{{- if .Values.gatewayDeployment.enabled }}
   # Use passthrough mode to reduce forwarder compute and push the lookup to the gateway whenever it is enabled.
   k8sattributes/passthrough:
     passthrough: true
-{{- end }}
-
-{{- if $redMetrics }}
-{{- include "config.processors.RED_metrics" . | nindent 2 }}
-{{- end }}
+{{- else }}
+  {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
+  {{- include "config.processors.resource.observe_common" . | nindent 2 }}
+  {{- include "config.processors.deltatocumulative" . | nindent 2 }}
+  {{- include "config.processors.transform.add_span_status_code" . | nindent 2 }}
+  {{- include "config.processors.attributes.add_empty_service_attributes" . | nindent 2 }}
+  {{- include "config.processors.resource_detection.cloud" . | nindent 2 }}
 
   # attributes to append to objects
   attributes/debug_source_app_traces:
@@ -72,22 +80,30 @@ processors:
     - action: insert
       key: debug_source
       value: app_metrics
+{{- end }}
+
+{{- if $redMetrics }}
+{{- include "config.processors.RED_metrics" . | nindent 2 }}
+{{- end }}
 
 {{- $traceExporters := (list) -}}
-{{- $logsExporters := (list "otlphttp/observe/base") -}}
+{{- $logsExporters := (list) -}}
 {{- $metricsExporters := (list) -}}
 
-{{ if .Values.observeGateway.enabled }}
-  {{- $traceExporters = concat $traceExporters (list "loadbalancing/observe-gateway") }}
+{{ if .Values.gatewayDeployment.enabled }}
+  {{- $traceExporters = concat $traceExporters (list "loadbalancing/observe-traceID") }}
+  {{- $logsExporters = concat $logsExporters (list "loadbalancing/observe-service") }}
+  {{- $metricsExporters = concat $metricsExporters (list "loadbalancing/observe-service") }}
 {{- else }}
   {{- $traceExporters = concat $traceExporters (list "otlphttp/observe/forward/trace") }}
+  {{- $logsExporters = concat $logsExporters (list "otlphttp/observe/base") -}}
+  {{ if eq .Values.node.forwarder.metrics.outputFormat "prometheus" -}}
+    {{- $metricsExporters = concat $metricsExporters ( list "prometheusremotewrite/observe" ) | uniq }}
+  {{- else if eq .Values.node.forwarder.metrics.outputFormat "otel" -}}
+    {{- $metricsExporters = concat $metricsExporters ( list "otlphttp/observe/otel_metrics" ) | uniq }}
+  {{- end }}
 {{- end }}
 
-{{ if eq .Values.node.forwarder.metrics.outputFormat "prometheus" -}}
-  {{- $metricsExporters = concat $metricsExporters ( list "prometheusremotewrite/observe" ) | uniq }}
-{{- else if eq .Values.node.forwarder.metrics.outputFormat "otel" -}}
-  {{- $metricsExporters = concat $metricsExporters ( list "otlphttp/observe/otel_metrics" ) | uniq }}
-{{- end }}
 
 {{- if eq .Values.agent.config.global.debug.enabled true }}
   {{- $traceExporters = concat $traceExporters ( list "debug/override" ) | uniq }}
@@ -97,7 +113,9 @@ processors:
 
 {{- $metricsProcessors := (list) -}}
 
-{{ if eq .Values.node.forwarder.metrics.outputFormat "prometheus" -}}
+{{ if .Values.gatewayDeployment.enabled -}}
+  {{- $metricsProcessors = (list "memory_limiter" "k8sattributes/passthrough" "batch") }}
+{{- else if eq .Values.node.forwarder.metrics.outputFormat "prometheus" -}}
   {{- $metricsProcessors = (list "memory_limiter" "k8sattributes" "deltatocumulative/observe" "batch" "resourcedetection/cloud" "resource/observe_common" "attributes/debug_source_app_metrics") }}
 {{- else if eq .Values.node.forwarder.metrics.outputFormat "otel" -}}
   {{- $metricsProcessors = (list "memory_limiter" "k8sattributes" "batch" "resourcedetection/cloud" "resource/observe_common" "attributes/debug_source_app_metrics") }}
@@ -114,7 +132,7 @@ service:
         - filter/drop_long_spans
         {{- end }}
         - memory_limiter
-        {{- if .Values.observeGateway.enabled }}
+        {{- if .Values.gatewayDeployment.enabled }}
         - k8sattributes/passthrough
         {{- else }}
         - transform/add_span_status_code
@@ -122,15 +140,27 @@ service:
         - k8sattributes
         {{- end }}
         - batch
+        {{- if not .Values.gatewayDeployment.enabled }}
         - resourcedetection/cloud
-        {{- if not .Values.observeGateway.enabled }}
         - resource/observe_common
         - attributes/debug_source_app_traces
         {{- end }}
       exporters: [{{ join ", " $traceExporters }}]
     logs/observe-forward:
       receivers: [otlp/app-telemetry]
-      processors: [memory_limiter, k8sattributes, batch, resourcedetection/cloud, resource/observe_common, attributes/debug_source_app_logs]
+      processors:
+        - memory_limiter
+        {{- if .Values.gatewayDeployment.enabled }}
+        - k8sattributes/passthrough
+        {{- else }}
+        - k8sattributes
+        {{- end }}
+        - batch
+        {{- if not .Values.gatewayDeployment.enabled }}
+        - resourcedetection/cloud
+        - resource/observe_common
+        - attributes/debug_source_app_logs
+        {{- end }}
       exporters: [{{ join ", " $logsExporters }}]
     metrics/observe-forward:
       receivers: [otlp/app-telemetry]

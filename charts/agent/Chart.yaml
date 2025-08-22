@@ -39,7 +39,7 @@ dependencies:
     version: 0.130.2
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     alias: gateway
-    condition: observeGateway.enabled
+    condition: gatewayDeployment.enabled
 maintainers:
   - name: Observe
     email: support@observeinc.com

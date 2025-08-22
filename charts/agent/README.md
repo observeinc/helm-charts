@@ -368,6 +368,10 @@ This service is a *single-instance deployment*. It's critical that this service 
 | gateway.serviceAccount.create | bool | `false` |  |
 | gateway.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | gateway.tolerations | list | `[]` |  |
+| gatewayDeployment.enabled | bool | `false` | Whether to enable the gateway deployment. The gateway is responsible for sampling and traces before sending them to Observe. |
+| gatewayDeployment.traceSampling.config | object | `{"policies":[{"name":"sample-all-errors","status_code":{"status_codes":["ERROR"]},"type":"status_code"},{"name":"sample-probabilistically-10-percent","probabilistic":{"sampling_percentage":10},"type":"probabilistic"}]}` | Full configuration for the tail sampling processor. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor |
+| gatewayDeployment.traceSampling.config.policies | list | `[{"name":"sample-all-errors","status_code":{"status_codes":["ERROR"]},"type":"status_code"},{"name":"sample-probabilistically-10-percent","probabilistic":{"sampling_percentage":10},"type":"probabilistic"}]` | List of sampling policies to apply. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor#a-practical-example |
+| gatewayDeployment.traceSampling.enabled | bool | `true` | Whether to enable trace sampling. Sampling will only occur if the gateway deployment is enabled. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor#tail-sampling-processor |
 | monitor.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
 | monitor.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"DoesNotExist"` |  |
 | monitor.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].key | string | `"kubernetes.io/os"` |  |
@@ -570,10 +574,6 @@ This service is a *single-instance deployment*. It's critical that this service 
 | observe.token.value | string | `""` |  |
 | observe.traceToken.create | bool | `false` |  |
 | observe.traceToken.value | string | `""` |  |
-| observeGateway.enabled | bool | `false` | Whether to enable the gateway deployment. The gateway is responsible for sampling and traces before sending them to Observe. |
-| observeGateway.traceSampling.config | object | `{"policies":[{"name":"sample-all-errors","status_code":{"status_codes":["ERROR"]},"type":"status_code"},{"name":"sample-probabilistically-10-percent","probabilistic":{"sampling_percentage":10},"type":"probabilistic"}]}` | Full configuration for the tail sampling processor. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor |
-| observeGateway.traceSampling.config.policies | list | `[{"name":"sample-all-errors","status_code":{"status_codes":["ERROR"]},"type":"status_code"},{"name":"sample-probabilistically-10-percent","probabilistic":{"sampling_percentage":10},"type":"probabilistic"}]` | List of sampling policies to apply. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor#a-practical-example |
-| observeGateway.traceSampling.enabled | bool | `true` | Whether to enable trace sampling. Sampling will only occur if the gateway deployment is enabled. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor#tail-sampling-processor |
 | prometheus-scraper.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
 | prometheus-scraper.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"DoesNotExist"` |  |
 | prometheus-scraper.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].key | string | `"kubernetes.io/os"` |  |
