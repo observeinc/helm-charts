@@ -1,0 +1,10 @@
+{{ if .Values.gatewayDeployment.enabled  -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway
+  namespace: {{ template "observe-agent.namespace" . }}
+data:
+  relay: |
+      {{- include "observe.deployment.applyGatewayConfig" . | nindent 4 -}}
+{{ end -}}
