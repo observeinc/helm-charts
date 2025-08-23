@@ -225,6 +225,7 @@ cluster-events:
   configMap:
     create: false
     existingName: "cluster-events"
+    existingPath: "cluster-events-configmap.yaml"
 
   resources:
     requests:
@@ -357,6 +358,7 @@ cluster-metrics:
   configMap:
     create: false
     existingName: "cluster-metrics"
+    existingPath: "cluster-metrics-configmap.yaml"
 
   resources:
     requests:
@@ -488,6 +490,7 @@ prometheus-scraper:
   configMap:
     create: false
     existingName: "prometheus-scraper"
+    existingPath: "prometheus-scraper-configmap.yaml"
 
   resources:
     requests:
@@ -619,6 +622,7 @@ node-logs-metrics:
   configMap:
     create: false
     existingName: "node-logs-metrics"
+    existingPath: "node-logs-metrics-configmap.yaml"
 
   resources:
     requests:
@@ -801,6 +805,7 @@ monitor:
   configMap:
     create: false
     existingName: "monitor"
+    existingPath: "agent-monitor-configmap.yaml"
 
   resources:
     requests:
@@ -938,6 +943,7 @@ forwarder:
   configMap:
     create: false
     existingName: "forwarder"
+    existingPath: "forwarder-configmap.yaml"
 
   resources:
     requests:
