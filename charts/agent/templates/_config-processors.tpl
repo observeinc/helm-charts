@@ -72,6 +72,11 @@ resource/observe_common:
       {{ else -}}
       value:  ${env:OBSERVE_CLUSTER_UID}
       {{ end -}}
+    {{ if .Values.cluster.deploymentEnvironment.name }}
+    - key: deployment.environment.name
+      action: upsert
+      value: {{ .Values.cluster.deploymentEnvironment.name }}
+    {{ end }}
 {{- end -}}
 
 {{- define "config.processors.memory_limiter" -}}

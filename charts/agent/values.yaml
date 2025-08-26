@@ -19,8 +19,13 @@ observe:
     value: ""
 
 cluster:
-  # name given to your cluster
+  # -- name given to your cluster.
+  # popuplates to k8s.cluster.name per https://opentelemetry.io/docs/specs/semconv/resource/k8s/#cluster
   name: observe-agent-monitored-cluster
+  deploymentEnvironment:
+    # -- deployment environment cluster runs in (e.g. testing, production, etc).
+    # populates to deployment.environment.name per https://opentelemetry.io/docs/specs/semconv/resource/deployment-environment/
+    name: ""
   # configure the collection of resources and events
   events:
     # how often to pull resources from cluster
