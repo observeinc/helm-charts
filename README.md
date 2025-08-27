@@ -29,9 +29,9 @@ kubectl create namespace observe
 
 ## Installing Agent stack
 ### Creating the token secret
-The first step is to provision an Observe Ingest Token and create a secret in the `observe` namespace.
+The first step is to provision an Observe Ingest Token and create a secret in the `observe` namespace:
 ```
-  kubectl -n observe create secret generic agent-credentials --from-literal=OBSERVE_TOKEN=${YOUR_INGEST_TOKEN} --from-literal=TRACE_TOKEN=${YOUR_INGEST_TOKEN}
+kubectl -n observe create secret generic agent-credentials --from-literal=OBSERVE_TOKEN=${YOUR_INGEST_TOKEN}
 
 kubectl annotate secret agent-credentials -n observe \
   meta.helm.sh/release-name=observe-agent \
@@ -48,6 +48,7 @@ After the secret is created, you can install the agent stack.
 helm install observe-agent observe/agent -n observe \
 --set observe.collectionEndpoint.value="${OBSERVE_COLLECTION_ENDPOINT}" \
 --set cluster.name="${CLUSTER_NAME}" \
+--set cluster.deploymentEnvironment.name="${DEPLOYMENT_ENVIRONMENT_NAME}" \
 
 
 # store values for further configuration and upgrades

@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.67.3](https://img.shields.io/badge/Version-0.67.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.5.0](https://img.shields.io/badge/AppVersion-2.5.0-informational?style=flat-square)
+![Version: 0.68.0](https://img.shields.io/badge/Version-0.68.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.5.0](https://img.shields.io/badge/AppVersion-2.5.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -213,11 +213,12 @@ This service is a *single-instance deployment*. It's critical that this service 
 | cluster-metrics.serviceAccount.create | bool | `false` |  |
 | cluster-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | cluster-metrics.tolerations | list | `[]` |  |
+| cluster.deploymentEnvironment.name | string | `""` | deployment environment cluster runs in (e.g. testing, production, etc). populates to deployment.environment.name per https://opentelemetry.io/docs/specs/semconv/resource/deployment-environment/ |
 | cluster.events.enabled | bool | `true` |  |
 | cluster.events.pullInterval | string | `"20m"` |  |
 | cluster.metrics.enabled | bool | `true` |  |
 | cluster.metrics.interval | string | `"60s"` |  |
-| cluster.name | string | `"observe-agent-monitored-cluster"` |  |
+| cluster.name | string | `"observe-agent-monitored-cluster"` | name given to your cluster. popuplates to k8s.cluster.name per https://opentelemetry.io/docs/specs/semconv/resource/k8s/#cluster |
 | cluster.namespaceOverride.value | string | `"observe"` |  |
 | cluster.uidOverride.value | string | `""` |  |
 | forwarder.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
