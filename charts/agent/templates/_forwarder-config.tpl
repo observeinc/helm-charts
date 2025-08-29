@@ -108,6 +108,4 @@ service:
     {{- include "config.pipelines.RED_metrics" . | nindent 4 }}
     {{- end }}
 
-{{- include "config.service.telemetry" . | nindent 2 }}
-
 {{- end }}

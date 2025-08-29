@@ -79,13 +79,6 @@ receivers:
       - pod
       - container
     metrics:
-      # Disable deprecated metrics
-      k8s.node.cpu.utilization:
-        enabled: false
-      k8s.pod.cpu.utilization:
-        enabled: false
-      container.cpu.utilization:
-        enabled: false
       # The following metrics are optional and must be enabled manually as per:
       # https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/kubeletstatsreceiver/documentation.md#optional-metrics
       container.cpu.usage:
@@ -160,14 +153,11 @@ receivers:
 
 processors:
 {{- include "config.processors.memory_limiter" . | nindent 2 }}
-
 {{- include "config.processors.resource_detection.cloud" . | nindent 2 }}
-
 {{- include "config.processors.batch" . | nindent 2 }}
-
 {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
-
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
+
   # attributes to append to objects
   attributes/debug_source_pod_logs:
     actions:
@@ -184,6 +174,19 @@ processors:
       - key: debug_source
         action: insert
         value: kubeletstats_metrics
+
+  # convert new k8s metric names to the names our Kubernetes Explorer relies on
+  metricstransform/duplicate_k8s_cpu_metrics:
+    transforms:
+      - include: container.cpu.usage
+        action: insert
+        new_name: container.cpu.utilization
+      - include: k8s.pod.cpu.usage
+        action: insert
+        new_name: k8s.pod.cpu.utilization
+      - include: k8s.node.cpu.usage
+        action: insert
+        new_name: k8s.node.cpu.utilization
 
 # Create intermediate lists for pipeline arrays to then modify based on values.yaml
 {{- $logsExporters := (list "otlphttp/observe/base") -}}
@@ -213,9 +216,8 @@ service:
       {{- if .Values.node.containers.metrics.enabled }}
       metrics/kubeletstats:
         receivers: [kubeletstats]
-        processors: [memory_limiter, k8sattributes, batch, resourcedetection/cloud, resource/observe_common, attributes/debug_source_kubeletstats_metrics]
+        processors: [memory_limiter, metricstransform/duplicate_k8s_cpu_metrics, k8sattributes, batch, resourcedetection/cloud, resource/observe_common, attributes/debug_source_kubeletstats_metrics]
         exporters: [{{ join ", " $kubeletstatsExporters }}]
       {{- end -}}
-{{- include "config.service.telemetry" . | nindent 2 }}
 
 {{- end }}

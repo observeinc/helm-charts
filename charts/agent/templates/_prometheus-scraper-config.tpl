@@ -58,6 +58,4 @@ service:
       exporters: [{{ join ", " $podMetricsExporters }}]
     {{- end -}}
 
-{{- include "config.service.telemetry" . | nindent 2 }}
-
- {{- end }}
+{{- end }}

@@ -451,6 +451,4 @@ service:
         processors: [memory_limiter, batch, resource/observe_common, filter/cluster, transform/cluster]
         exporters: [{{ join ", " $logsClusterExporters }}]
 
-{{- include "config.service.telemetry" . | nindent 2 }}
-
 {{- end }}
