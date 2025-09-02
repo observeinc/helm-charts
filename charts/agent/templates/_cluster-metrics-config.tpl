@@ -69,6 +69,5 @@ service:
         processors: [memory_limiter, resource/drop_service_name, k8sattributes, batch, resource/observe_common, attributes/debug_source_pod_metrics]
         exporters: [{{ join ", " $metricsExporters }}]
 {{- end }}
-{{- include "config.service.telemetry" . | nindent 2 }}
 
- {{- end }}
+{{- end }}

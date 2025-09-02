@@ -19,6 +19,7 @@ internal_telemetry:
   logs:
     enabled: true
     level: {{ .Values.agent.config.global.service.telemetry.loggingLevel }}
+    encoding: {{ .Values.agent.config.global.service.telemetry.loggingEncoding }}
 
 
 forwarding:
