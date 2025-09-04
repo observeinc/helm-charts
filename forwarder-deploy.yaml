@@ -1,0 +1,14 @@
+node:
+  # Disables the node-logs-metrics daemonset.
+  # This workload is currently not supported in serverless kubernetes.
+  enabled: false
+  fargateMode: true
+  forwarder:
+    enabled: true
+
+forwarder:
+  # Changes the forwarder from a daemonset to a deployment
+  mode: deployment
+  # Sets the number of replicas for the forwarder deployment.
+  # This can be adjusted based on your needs.
+  replicaCount: 2

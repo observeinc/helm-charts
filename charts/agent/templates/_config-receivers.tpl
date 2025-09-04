@@ -137,3 +137,26 @@ prometheus/cadvisor:
             replacement: /api/v1/nodes/$$1/proxy/metrics/cadvisor
 {{ end }}
 {{ end }}
+
+{{- define "config.receivers.prometheus.kubeletstats" -}}
+prometheus/kubeletstats:
+  config:
+    scrape_configs:
+      - job_name: 'kubernetes-nodes-kubeletstats'
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          insecure_skip_verify: true
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+
+        kubernetes_sd_configs:
+          - role: node
+
+        relabel_configs:
+          - target_label: __address__
+            replacement: kubernetes.default.svc:443
+          - source_labels: [__meta_kubernetes_node_name]
+            regex: (.+)
+            target_label: __metrics_path__
+            replacement: /api/v1/nodes/$$1/proxy/stats/summary
+{{- end -}}

@@ -40,6 +40,11 @@ dependencies:
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     alias: gateway
     condition: gatewayDeployment.enabled
+  - name: opentelemetry-operator
+    version: 0.93.1
+    repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+    alias: fargate-sidecar-injector
+    condition: node.fargateMode
 maintainers:
   - name: Observe
     email: support@observeinc.com
