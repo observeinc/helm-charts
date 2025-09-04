@@ -72,7 +72,7 @@ processors:
 {{- $metricsProcessors := (list) -}}
 
 {{ if eq .Values.node.forwarder.metrics.outputFormat "prometheus" -}}
-  {{- $metricsProcessors = (list "memory_limiter" "k8sattributes" "deltatocumulative/observe" "batch" "resourcedetection/cloud" "resource/observe_common" "attributes/debug_source_app_metrics") }}
+  {{- $metricsProcessors = (list "memory_limiter" "k8sattributes" "deltatocumulative/observe" "batch" "resourcedetection/cloud" "resource/observe_common" "attributes/debug_source_app_metrics" "metricstransform") }}
 {{- else if eq .Values.node.forwarder.metrics.outputFormat "otel" -}}
   {{- $metricsProcessors = (list "memory_limiter" "k8sattributes" "batch" "resourcedetection/cloud" "resource/observe_common" "attributes/debug_source_app_metrics") }}
 {{- else }}
