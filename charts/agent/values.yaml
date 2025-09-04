@@ -1075,3 +1075,5 @@ forwarder:
     - name: observe-agent-deployment-config
       mountPath: /observe-agent-conf
   # ----------------------------------------- #
+image:
+  repository: "otel/opentelemetry-collector-k8s"
