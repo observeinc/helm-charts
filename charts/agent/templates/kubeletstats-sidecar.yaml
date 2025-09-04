@@ -1,0 +1,10 @@
+{{- if .Values.node.fargateSidecar.enabled }}
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: fargate-sidecar-metrics
+spec:
+  mode: sidecar
+  config:
+    {{- include "observe.sidecar.applyFargateSidecarMetricsConfig" . | nindent 4 -}}
+{{- end }}
