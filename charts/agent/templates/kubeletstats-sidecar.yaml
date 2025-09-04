@@ -1,0 +1,24 @@
+{{- if .Values.node.fargateSidecar.enabled }}
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: fargate-sidecar-metrics
+spec:
+  mode: sidecar
+  env:
+    - name: K8S_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+  config:
+    {{- include "observe.sidecar.applyFargateSidecarMetricsConfig" . | nindent 4 }}
+  initContainers:
+    - name: kube-cluster-info
+      image: observeinc/kube-cluster-info:v0.11.5
+      imagePullPolicy: Always
+      env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+{{- end }}

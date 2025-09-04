@@ -165,6 +165,7 @@ processors:
 {{- include "config.processors.batch" . | nindent 2 }}
 {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
+{{- include "config.processors.metricstransform.duplicate_k8s_cpu_metrics" . | nindent 2 }}
 
 {{- if .Values.agent.config.global.fleet.enabled }}
 {{- include "config.processors.resource_detection" . | nindent 2 }}
@@ -189,18 +190,6 @@ processors:
         action: insert
         value: kubeletstats_metrics
 
-  # convert new k8s metric names to the names our Kubernetes Explorer relies on
-  metricstransform/duplicate_k8s_cpu_metrics:
-    transforms:
-      - include: container.cpu.usage
-        action: insert
-        new_name: container.cpu.utilization
-      - include: k8s.pod.cpu.usage
-        action: insert
-        new_name: k8s.pod.cpu.utilization
-      - include: k8s.node.cpu.usage
-        action: insert
-        new_name: k8s.node.cpu.utilization
 
 # Create intermediate lists for pipeline arrays to then modify based on values.yaml
 {{- $logsExporters := (list "otlphttp/observe/base") -}}
