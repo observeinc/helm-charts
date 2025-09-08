@@ -18,6 +18,11 @@ node:
     metrics:
       outputFormat: otel
 
+gatewayDeployment:
+  enabled: true
+  traceSampling:
+    enabled: true
+
 cluster:
   namespaceOverride:
     value: "testing"
@@ -33,4 +38,6 @@ monitor:
 node-logs-metrics:
   namespaceOverride: "testing"
 prometheus-scraper:
+  namespaceOverride: "testing"
+gateway:
   namespaceOverride: "testing"

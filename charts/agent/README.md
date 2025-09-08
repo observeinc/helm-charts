@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.69.0](https://img.shields.io/badge/Version-0.69.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.8.1](https://img.shields.io/badge/AppVersion-2.8.1-informational?style=flat-square)
+![Version: 0.70.0](https://img.shields.io/badge/Version-0.70.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.8.1](https://img.shields.io/badge/AppVersion-2.8.1-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -46,6 +46,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | https://open-telemetry.github.io/opentelemetry-helm-charts | node-logs-metrics(opentelemetry-collector) | 0.130.2 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | monitor(opentelemetry-collector) | 0.130.2 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | forwarder(opentelemetry-collector) | 0.130.2 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | gateway(opentelemetry-collector) | 0.130.2 |
 
 ## Values
 
@@ -54,6 +55,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | agent.config.clusterEvents | string | `nil` | Additional OTel collector config for cluster-events deployment |
 | agent.config.clusterMetrics | string | `nil` | Additional OTel collector config for cluster-metrics deployment |
 | agent.config.forwarder | string | `nil` | Additional OTel collector config for forwarder daemonset |
+| agent.config.gateway | string | `nil` | Additional OTel collector config for gateway deployment |
 | agent.config.global.debug.enabled | bool | `false` |  |
 | agent.config.global.debug.verbosity | string | `"basic"` |  |
 | agent.config.global.exporters.retryOnFailure.enabled | bool | `true` |  |
@@ -295,6 +297,82 @@ This service is a *single-instance deployment*. It's critical that this service 
 | forwarder.serviceAccount.create | bool | `false` |  |
 | forwarder.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | forwarder.tolerations | list | `[]` |  |
+| gateway.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
+| gateway.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"DoesNotExist"` |  |
+| gateway.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].key | string | `"kubernetes.io/os"` |  |
+| gateway.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].operator | string | `"NotIn"` |  |
+| gateway.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].values[0] | string | `"windows"` |  |
+| gateway.clusterRole.create | bool | `false` |  |
+| gateway.clusterRole.name | string | `"observe-agent-cluster-role"` |  |
+| gateway.command.extraArgs[0] | string | `"start"` |  |
+| gateway.command.extraArgs[1] | string | `"--observe-config=/observe-agent-conf/observe-agent.yaml"` |  |
+| gateway.command.extraArgs[2] | string | `"--config=/conf/relay.yaml"` |  |
+| gateway.command.name | string | `"observe-agent"` |  |
+| gateway.configMap.create | bool | `false` |  |
+| gateway.configMap.existingName | string | `"gateway"` |  |
+| gateway.extraEnvsFrom | list | `[]` |  |
+| gateway.extraEnvs[0].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
+| gateway.extraEnvs[0].valueFrom.configMapKeyRef.key | string | `"name"` |  |
+| gateway.extraEnvs[0].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
+| gateway.extraEnvs[1].name | string | `"OBSERVE_CLUSTER_UID"` |  |
+| gateway.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"id"` |  |
+| gateway.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
+| gateway.extraEnvs[2].name | string | `"K8S_NODE_NAME"` |  |
+| gateway.extraEnvs[2].valueFrom.fieldRef.fieldPath | string | `"spec.nodeName"` |  |
+| gateway.extraEnvs[3].name | string | `"TOKEN"` |  |
+| gateway.extraEnvs[3].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
+| gateway.extraEnvs[3].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| gateway.extraEnvs[3].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| gateway.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
+| gateway.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
+| gateway.extraVolumes[0].configMap.defaultMode | int | `420` |  |
+| gateway.extraVolumes[0].configMap.items[0].key | string | `"relay"` |  |
+| gateway.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
+| gateway.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
+| gateway.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
+| gateway.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.8.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| gateway.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
+| gateway.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
+| gateway.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
+| gateway.initContainers[0].imagePullPolicy | string | `"Always"` |  |
+| gateway.initContainers[0].name | string | `"kube-cluster-info"` |  |
+| gateway.livenessProbe.httpGet.path | string | `"/status"` |  |
+| gateway.livenessProbe.httpGet.port | int | `13133` |  |
+| gateway.livenessProbe.initialDelaySeconds | int | `30` |  |
+| gateway.livenessProbe.periodSeconds | int | `5` |  |
+| gateway.mode | string | `"deployment"` |  |
+| gateway.nameOverride | string | `"gateway"` | --------------------------------------- # Different for each deployment/daemonset # |
+| gateway.namespaceOverride | string | `"observe"` |  |
+| gateway.networkPolicy.allowIngressFrom[0].podSelector.matchLabels."app.kubernetes.io/instance" | string | `"observe-agent"` |  |
+| gateway.networkPolicy.allowIngressFrom[0].podSelector.matchLabels."app.kubernetes.io/name" | string | `"forwarder"` |  |
+| gateway.networkPolicy.egressRules[0] | object | `{}` |  |
+| gateway.networkPolicy.enabled | bool | `true` |  |
+| gateway.podAnnotations.observe_monitor_path | string | `"/metrics"` |  |
+| gateway.podAnnotations.observe_monitor_port | string | `"8888"` |  |
+| gateway.podAnnotations.observe_monitor_purpose | string | `"observecollection"` |  |
+| gateway.podAnnotations.observe_monitor_scrape | string | `"true"` |  |
+| gateway.podAnnotations.observeinc_com_scrape | string | `"false"` |  |
+| gateway.ports.metrics.containerPort | int | `8888` |  |
+| gateway.ports.metrics.enabled | bool | `true` |  |
+| gateway.ports.metrics.protocol | string | `"TCP"` |  |
+| gateway.ports.metrics.servicePort | int | `8888` |  |
+| gateway.readinessProbe.httpGet.path | string | `"/status"` |  |
+| gateway.readinessProbe.httpGet.port | int | `13133` |  |
+| gateway.readinessProbe.initialDelaySeconds | int | `30` |  |
+| gateway.readinessProbe.periodSeconds | int | `5` |  |
+| gateway.replicaCount | int | `3` | The number of pods to use for the gateway deployment. |
+| gateway.resources.limits.memory | string | `"768Mi"` |  |
+| gateway.resources.requests.cpu | string | `"300m"` |  |
+| gateway.resources.requests.memory | string | `"768Mi"` |  |
+| gateway.service.enabled | bool | `true` |  |
+| gateway.service.type | string | `"ClusterIP"` |  |
+| gateway.serviceAccount.create | bool | `false` |  |
+| gateway.serviceAccount.name | string | `"observe-agent-service-account"` |  |
+| gateway.tolerations | list | `[]` |  |
+| gatewayDeployment.enabled | bool | `false` | Whether to enable the gateway deployment. The gateway is responsible for sampling and traces before sending them to Observe. |
+| gatewayDeployment.traceSampling.config | object | `{"policies":[{"name":"retain-all-errors","status_code":{"status_codes":["ERROR"]},"type":"status_code"},{"name":"sample-probabilistically-10-percent","probabilistic":{"sampling_percentage":10},"type":"probabilistic"}]}` | Full configuration for the tail sampling processor. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor |
+| gatewayDeployment.traceSampling.config.policies | list | `[{"name":"retain-all-errors","status_code":{"status_codes":["ERROR"]},"type":"status_code"},{"name":"sample-probabilistically-10-percent","probabilistic":{"sampling_percentage":10},"type":"probabilistic"}]` | List of sampling policies to apply. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor#a-practical-example |
+| gatewayDeployment.traceSampling.enabled | bool | `true` | Whether to enable trace sampling. Sampling will only occur if the gateway deployment is enabled. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor#tail-sampling-processor |
 | monitor.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
 | monitor.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"DoesNotExist"` |  |
 | monitor.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].key | string | `"kubernetes.io/os"` |  |

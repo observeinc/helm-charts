@@ -138,6 +138,25 @@ application:
     # -- (bool) Whether to enable generating RED metrics from spans. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview
     enabled: false
 
+gatewayDeployment:
+  # -- (bool) Whether to enable the gateway deployment. The gateway is responsible for sampling and traces before sending them to Observe.
+  enabled: false
+  traceSampling:
+    # -- (bool) Whether to enable trace sampling. Sampling will only occur if the gateway deployment is enabled. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor#tail-sampling-processor
+    enabled: true
+    # -- (object) Full configuration for the tail sampling processor. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor
+    config:
+      # -- (list) List of sampling policies to apply. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/tailsamplingprocessor#a-practical-example
+      policies:
+        # Send all spans with status_code error to Observe
+        - name: retain-all-errors
+          type: status_code
+          status_code: {status_codes: [ERROR]}
+        # Send 10% of all other spans to Observe
+        - name: sample-probabilistically-10-percent
+          type: probabilistic
+          probabilistic: {sampling_percentage: 10}
+
 agent:
   config:
     global:
@@ -210,6 +229,10 @@ agent:
     #       exporters:
     #         - otlphttp/extra
     #         - otlphttp/observe/forward/trace
+
+    # -- Additional OTel collector config for gateway deployment
+    gateway:
+    # Put any OTel config overrides here.
 
   selfMonitor:
     enabled: true
@@ -1061,6 +1084,153 @@ forwarder:
         secretKeyRef:
           name: agent-credentials
           key: TRACE_TOKEN
+          optional: true
+  extraEnvsFrom: []
+  extraVolumes:
+    - name: "observe-agent-deployment-config"
+      configMap:
+        name: "observe-agent"
+        items:
+          - key: "relay"
+            path: "observe-agent.yaml"
+        defaultMode: 420
+  extraVolumeMounts:
+    - name: observe-agent-deployment-config
+      mountPath: /observe-agent-conf
+  # ----------------------------------------- #
+
+gateway:
+  mode: deployment
+
+  # -- (int) The number of pods to use for the gateway deployment.
+  replicaCount: 3
+
+  # ----------------------------------------- #
+  # Different for each deployment/daemonset #
+  nameOverride: "gateway"
+  # !!! IMPORTANT !!! This needs to have same value as namespaceOverride in cluster above
+  namespaceOverride: "observe"
+
+  configMap:
+    create: false
+    existingName: "gateway"
+
+  resources:
+    requests:
+      cpu: 300m
+      memory: 768Mi
+    limits:
+      memory: 768Mi
+  # ----------------------------------------- #
+
+  # ----------------------------------------- #
+  # Same for each deployment/daemonset      #
+  image:
+    repository: observeinc/observe-agent
+    tag: 2.8.1
+    pullPolicy: IfNotPresent
+
+  command:
+    name: "observe-agent"
+    extraArgs: ["start", "--observe-config=/observe-agent-conf/observe-agent.yaml", "--config=/conf/relay.yaml"]
+
+  serviceAccount:
+    create: false
+    name: "observe-agent-service-account"
+  clusterRole:
+    create: false
+    name: "observe-agent-cluster-role"
+
+  livenessProbe:
+    httpGet:
+      port: 13133
+      path: /status
+    initialDelaySeconds: 30
+    periodSeconds: 5
+
+  readinessProbe:
+    httpGet:
+      port: 13133
+      path: /status
+    initialDelaySeconds: 30
+    periodSeconds: 5
+
+  service:
+    enabled: true
+    type: ClusterIP
+
+  networkPolicy:
+    enabled: true
+    egressRules: [{}]
+    allowIngressFrom:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: forwarder
+            app.kubernetes.io/instance: observe-agent
+
+  podAnnotations: {
+    # This stops optional prometheus scrape config from picking up these pods
+    observeinc_com_scrape: 'false',
+    observe_monitor_purpose: observecollection,
+    observe_monitor_scrape: 'true',
+    observe_monitor_path: '/metrics',
+    observe_monitor_port: '8888',
+  }
+
+  # Standard anti-affinity rules will exclude any node labeled with observeinc.com/unschedulable or using windows os
+  # See helm-charts/examples/agent/affinity/README.md for more information
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: observeinc.com/unschedulable
+                operator: DoesNotExist
+              - key: kubernetes.io/os
+                operator: NotIn
+                values: [windows]
+
+  tolerations: []
+
+  ports:
+    metrics:
+      # The metrics port is disabled by default. However you need to enable the port
+      # in order to use the ServiceMonitor (serviceMonitor.enabled) or PodMonitor (podMonitor.enabled).
+      enabled: true
+      containerPort: 8888
+      servicePort: 8888
+      protocol: TCP
+  # this init container provides the cluster uid (kube-system namespace) as config map
+  initContainers:
+    - name: kube-cluster-info
+      image: observeinc/kube-cluster-info:v0.11.5
+      imagePullPolicy: Always
+      env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+  # extract clusteruid from configmap create by init container
+  extraEnvs:
+    - name: OBSERVE_CLUSTER_NAME
+      valueFrom:
+        configMapKeyRef:
+          name: cluster-name
+          key: name
+    - name: OBSERVE_CLUSTER_UID
+      valueFrom:
+        configMapKeyRef:
+          name: cluster-info
+          key: id
+    - name: K8S_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+    - name: TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: agent-credentials
+          key: OBSERVE_TOKEN
           optional: true
   extraEnvsFrom: []
   extraVolumes:
