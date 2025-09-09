@@ -102,6 +102,16 @@ attributes/debug_source_pod_metrics:
       value: pod_metrics
 {{- end -}}
 
+{{- define "config.processors.attributes.cadvisor_metrics" -}}
+{{- if .Values.node.metrics.cadvisor.enabled }}
+attributes/debug_source_cadvisor_metrics:
+  actions:
+    - key: debug_source
+      action: insert
+      value: cadvisor_metrics
+{{- end -}}
+{{- end -}}
+
 {{- define "config.processors.attributes.drop_container_info" -}}
 resource/drop_container_info:
   attributes:

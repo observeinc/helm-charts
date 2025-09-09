@@ -39,3 +39,28 @@ metrics/spanmetrics:
     - attributes/debug_source_span_metrics
   exporters: [{{ join ", " $metricsSpanmetricsExporters }}]
 {{- end -}}
+
+{{- define "config.pipelines.prometheus_scrapers" -}}
+
+metrics/pod_metrics:
+  receivers: [prometheus/pod_metrics]
+  # Drop the service.name resource attribute (which is set to the prom scrape job name) before the k8sattributes processor
+  processors: [memory_limiter, resource/drop_service_name, k8sattributes, batch, resource/observe_common, attributes/debug_source_pod_metrics]
+  exporters:
+    - prometheusremotewrite/observe
+    {{- if eq .Values.agent.config.global.debug.enabled true }}
+    - debug/override
+    {{- end }}
+
+{{- if .Values.node.metrics.cadvisor.enabled }}
+metrics/cadvisor:
+  receivers: [prometheus/cadvisor]
+  processors: [memory_limiter, k8sattributes, batch, resource/observe_common, attributes/debug_source_cadvisor_metrics]
+  exporters:
+    - prometheusremotewrite/observe
+    {{- if eq .Values.agent.config.global.debug.enabled true }}
+    - debug/override
+    {{- end }}
+{{- end }}
+
+{{- end }}
