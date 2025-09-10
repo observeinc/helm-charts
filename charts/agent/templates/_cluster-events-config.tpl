@@ -183,7 +183,7 @@ processors:
           - set(attributes["observe_transform"]["facets"]["desiredReplicas"], body["spec"]["replicas"])
           # custom
           - set(attributes["observe_transform"]["facets"]["status"], "Healthy")
-          - set(attributes["observe_transform"]["facets"]["status"], "Unhealthy") where attributes["observe_transform"]["facets"]["readyReplicas"] != attributes["observe_transform"]["facets"]["desiredReplicas"]
+          - set(attributes["observe_transform"]["facets"]["status"], "Unhealthy") where attributes["observe_transform"]["facets"]["desiredReplicas"] != nil and attributes["observe_transform"]["facets"]["readyReplicas"] != attributes["observe_transform"]["facets"]["desiredReplicas"]
       # ReplicaSet
       - context: log
         conditions:
@@ -199,7 +199,7 @@ processors:
           - set(attributes["observe_transform"]["facets"]["readyReplicas"], body["status"]["readyReplicas"])
           - set(attributes["observe_transform"]["facets"]["readyReplicas"], 0) where attributes["observe_transform"]["facets"]["readyReplicas"] == nil
           - set(attributes["observe_transform"]["facets"]["status"], "Healthy")
-          - set(attributes["observe_transform"]["facets"]["status"], "Unhealthy") where attributes["observe_transform"]["facets"]["readyReplicas"] != attributes["observe_transform"]["facets"]["desiredReplicas"]
+          - set(attributes["observe_transform"]["facets"]["status"], "Unhealthy") where attributes["observe_transform"]["facets"]["desiredReplicas"] != nil and attributes["observe_transform"]["facets"]["readyReplicas"] != attributes["observe_transform"]["facets"]["desiredReplicas"]
       # Event
       - context: log
         conditions:
@@ -266,7 +266,7 @@ processors:
           - set(attributes["observe_transform"]["facets"]["numberUnavailable"], body["status"]["numberUnavailable"])
           - set(attributes["observe_transform"]["facets"]["numberMisscheduled"], body["status"]["numberMisscheduled"])
           - set(attributes["observe_transform"]["facets"]["status"], "Healthy")
-          - set(attributes["observe_transform"]["facets"]["status"], "Unhealthy") where attributes["observe_transform"]["facets"]["numberReady"] != attributes["observe_transform"]["facets"]["desiredNumberScheduled"]
+          - set(attributes["observe_transform"]["facets"]["status"], "Unhealthy") where attributes["observe_transform"]["facets"]["desiredNumberScheduled"] != nil and attributes["observe_transform"]["facets"]["numberReady"] != attributes["observe_transform"]["facets"]["desiredNumberScheduled"]
       # StatefulSet
       - context: log
         conditions:
@@ -284,7 +284,7 @@ processors:
           - set(attributes["observe_transform"]["facets"]["currentReplicas"], body["status"]["currentReplicas"])
           - set(attributes["observe_transform"]["facets"]["readyReplicas"], body["status"]["readyReplicas"])
           - set(attributes["observe_transform"]["facets"]["status"], "Healthy")
-          - set(attributes["observe_transform"]["facets"]["status"], "Unhealthy") where attributes["observe_transform"]["facets"]["readyReplicas"] != attributes["observe_transform"]["facets"]["desiredReplicas"]
+          - set(attributes["observe_transform"]["facets"]["status"], "Unhealthy") where attributes["observe_transform"]["facets"]["desiredReplicas"] != nil and attributes["observe_transform"]["facets"]["readyReplicas"] != attributes["observe_transform"]["facets"]["desiredReplicas"]
       - context: log
         conditions:
           - body["kind"] == "ConfigMap"
