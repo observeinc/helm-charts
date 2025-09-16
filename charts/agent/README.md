@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.74.2](https://img.shields.io/badge/Version-0.74.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.9.1](https://img.shields.io/badge/AppVersion-2.9.1-informational?style=flat-square)
+![Version: 0.75.0](https://img.shields.io/badge/Version-0.75.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.9.1](https://img.shields.io/badge/AppVersion-2.9.1-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -64,6 +64,8 @@ This service is a *single-instance deployment*. It's critical that this service 
 | agent.config.global.exporters.retryOnFailure.maxInterval | string | `"30s"` |  |
 | agent.config.global.exporters.sendingQueue.enabled | bool | `true` |  |
 | agent.config.global.exporters.timeout | string | `"10s"` |  |
+| agent.config.global.fleet.heartbeat.enabled | bool | `true` |  |
+| agent.config.global.fleet.heartbeat.interval | string | `"5m"` |  |
 | agent.config.global.overrides | string | `nil` | Additional OTel collector config for all agent deployments/daemonsets |
 | agent.config.global.processors.batch.sendBatchMaxSize | int | `4096` |  |
 | agent.config.global.processors.batch.sendBatchSize | int | `4096` |  |

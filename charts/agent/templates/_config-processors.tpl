@@ -84,6 +84,22 @@ resource/observe_common:
     {{ end }}
 {{- end -}}
 
+{{- define "config.processors.resource.agent_instance" -}}
+resource/agent_instance:
+    attributes:
+        - action: upsert
+          key: observe.agent.instance.id
+          value: test-agent-instance-id
+{{- end -}}
+
+{{- define "config.processors.resource.heartbeat" -}}
+resource/heartbeat:
+    attributes:
+        - action: insert
+          from_attribute: host.name
+          key: observe.agent.hostname
+{{- end -}}
+
 {{- define "config.processors.memory_limiter" -}}
 # https://github.com/open-telemetry/opentelemetry-collector/blob/main/processor/memorylimiterprocessor/README.md
 memory_limiter:

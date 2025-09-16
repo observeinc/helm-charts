@@ -204,6 +204,10 @@ agent:
         enabled: false
         # values basic, normal, detailed
         verbosity: basic
+      fleet:
+        heartbeat:
+          enabled: true
+          interval: 5m
       # -- Additional OTel collector config for all agent deployments/daemonsets
       overrides:
 

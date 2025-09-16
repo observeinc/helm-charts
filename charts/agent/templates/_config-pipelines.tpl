@@ -63,3 +63,17 @@ metrics/cadvisor:
 {{- end }}
 
 {{- end }}
+
+{{- define "config.pipelines.heartbeat" - }}
+logs/heartbeat:
+    exporters:
+        - otlphttp/observe/agentheartbeat
+    processors:
+        - resourcedetection
+        - resourcedetection/cloud
+        - k8sattributes
+        - resource/agent_instance
+        - resource/heartbeat
+    receivers:
+        - heartbeat
+{{- end }}
