@@ -4,6 +4,10 @@ exporters:
 {{- include "config.exporters.debug" . | nindent 2 }}
 {{- include "config.exporters.prometheusremotewrite" . | nindent 2 }}
 
+{{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+{{- include "config.exporters.otlphttp.observe.metrics.agentheartbeat" . | nindent 2 }}
+{{- end }}
+
 receivers:
   prometheus/collector:
         config:
@@ -47,6 +51,9 @@ receivers:
               action: replace
               target_label: kubernetes_pod_name
 
+{{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+{{- include "config.receivers.observe.heartbeat" . | nindent 2 }}
+{{- end }}
 
 processors:
 {{- include "config.processors.memory_limiter" . | nindent 2 }}
@@ -58,6 +65,11 @@ processors:
 {{- include "config.processors.attributes.drop_service_name" . | nindent 2 }}
 
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
+
+{{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+{{- include "config.processors.resource.agent_instance" . | nindent 2 }}
+{{- include "config.processors.resource.heartbeat" . | nindent 2 }}
+{{- end }}
 
   # attributes to append to objects
   attributes/debug_source_agent_monitor:
@@ -79,5 +91,9 @@ service:
         # Drop the service.name resource attribute (which is set to the prom scrape job name) before the k8sattributes processor
         processors: [memory_limiter, resource/drop_service_name, k8sattributes, batch, resource/observe_common, attributes/debug_source_agent_monitor]
         exporters: [{{ join ", " $metricsExporters }}]
+
+      {{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+      {{- include "config.pipelines.heartbeat" . | nindent 6 }}
+      {{- end }}
 
 {{- end }}

@@ -11,6 +11,10 @@ exporters:
 {{- include "config.exporters.otlphttp.observe.trace" . | nindent 2 }}
 {{- include "config.exporters.otlphttp.observe.metrics.otel" . | nindent 2 }}
 
+{{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+{{- include "config.exporters.otlphttp.observe.metrics.agentheartbeat" . | nindent 2 }}
+{{- end }}
+
 receivers:
   otlp/app-telemetry:
     protocols:
@@ -18,6 +22,10 @@ receivers:
         endpoint: ${env:MY_POD_IP}:4317
       http:
         endpoint: ${env:MY_POD_IP}:4318
+
+{{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+{{- include "config.receivers.observe.heartbeat" . | nindent 2 }}
+{{- end }}
 
 processors:
 
@@ -33,6 +41,11 @@ processors:
 
 {{- if .Values.application.REDMetrics.enabled }}
 {{- include "config.processors.RED_metrics" . | nindent 2 }}
+{{- end }}
+
+{{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+{{- include "config.processors.resource.agent_instance" . | nindent 2 }}
+{{- include "config.processors.resource.heartbeat" . | nindent 2 }}
 {{- end }}
 
   attributes/debug_source_gateway:
@@ -101,6 +114,10 @@ service:
       exporters: [{{ join ", " $metricsExporters }}]
     {{- if .Values.application.REDMetrics.enabled }}
     {{- include "config.pipelines.RED_metrics" . | nindent 4 }}
+    {{- end }}
+
+    {{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+    {{- include "config.pipelines.heartbeat" . | nindent 4 }}
     {{- end }}
 
 {{- end }}
