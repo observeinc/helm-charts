@@ -555,6 +555,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | node.containers.metrics.enabled | bool | `true` |  |
 | node.containers.metrics.interval | string | `"60s"` |  |
 | node.enabled | bool | `true` | Enables the node-logs-metrics agent daemonset for collection of node logs and metrics. The nodes on which metrics and logs are collected can be configured via `affinity` in the `node-logs-metrics` section below. This should be set to false to disable the node-log-metrics daemonset when running in a serverless environment (ex: EKS Fargate). |
+| node.fargateMode | bool | `false` | Enables collection of metrics from EKS Fargate pods. |
 | node.forwarder.enabled | bool | `true` |  |
 | node.forwarder.logs.enabled | bool | `true` |  |
 | node.forwarder.metrics.enabled | bool | `true` |  |

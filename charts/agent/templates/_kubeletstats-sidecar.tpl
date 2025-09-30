@@ -1,7 +1,5 @@
 {{- define "observe.sidecar.fargateSidecarMetrics.config" -}}
 
-{{- $kubeletstatsExporters := (list "otlphttp" "debug") -}}
-
 receivers:
   kubeletstats:
     collection_interval: {{.Values.node.containers.metrics.interval}}
@@ -12,7 +10,7 @@ receivers:
     k8s_api_config:
         auth_type: serviceAccount
     metric_groups:
-      - node 
+      - node
       - pod
       - container
     metrics:
@@ -57,17 +55,33 @@ receivers:
     extra_metadata_labels:
       - container.id
 
+processors:
+
+{{- include "config.processors.memory_limiter" . | nindent 2 }}
+{{- include "config.processors.batch" . | nindent 2 }}
+{{- include "config.processors.resource_detection.cloud" . | nindent 2 }}
+{{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
+{{- include "config.processors.resource.observe_common" . | nindent 2 }}
+{{- include "config.processors.deltatocumulative" . | nindent 2 }}
+{{- include "config.processors.attributes.add_empty_service_attributes" . | nindent 2 }}
+{{- include "config.processors.metricstransform.duplicate_k8s_cpu_metrics" . | nindent 2 }}
+{{- include "config.processors.attributes.sidecar_kubeletstats_metrics" . | nindent 2 }}
+
 exporters:
-  otlphttp:
-    endpoint: http://observe-agent-forwarder.observe.svc:4318
   debug:
     verbosity: detailed
+{{- include "config.exporters.prometheusremotewrite" . | nindent 2 }}
+
+{{ $kubeletstatsExporters := (list "debug" "prometheusremotewrite/observe") -}}
 
 service:
   pipelines:
     {{- if .Values.node.containers.metrics.enabled }}
       metrics/kubeletstats:
-        receivers: [kubeletstats] # should add processors back eventually
+        receivers: [kubeletstats]
+        processors: [memory_limiter, metricstransform/duplicate_k8s_cpu_metrics, k8sattributes, deltatocumulative/observe, batch, resourcedetection/cloud, resource/observe_common, attributes/debug_source_sidecar_kubeletstats_metrics]
         exporters: [{{ join ", " $kubeletstatsExporters }}]
-    {{- end -}}
+    {{- else }}
+      {{- fail "node.containers.metrics.enabled must be true for Fargate sidecar - otherwise no telemetry will be collected" }}
+    {{- end }}
 {{- end }}
