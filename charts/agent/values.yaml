@@ -47,9 +47,7 @@ node:
   # -- Enables the node-logs-metrics agent daemonset for collection of node logs and metrics.
   # The nodes on which metrics and logs are collected can be configured via `affinity` in the `node-logs-metrics` section below.
   # This should be set to false to disable the node-log-metrics daemonset when running in a serverless environment (ex: EKS Fargate).
-  enabled: false
-  fargateMode: false
-  # collects host level metrics from node
+  enabled: true
   metrics:
     enabled: true
     interval: 60s
@@ -101,7 +99,6 @@ node:
     # this resolves issues similar to https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/26481#issuecomment-1720797914 for `no such host` or `connection refused`.
     useNodeIp: false
   forwarder:
-    mode: deployment
     enabled: true
     traces:
       enabled: true
@@ -157,6 +154,22 @@ application:
       - peer.messaging.system
       - otel.status_description
       - observe.status_code
+
+nodeless:
+  # -- (bool) Enables nodeless mode. Nodeless mode is intended for environments where daemonsets are not supported.
+  enabled: false
+  # -- (string) The hosting platform for the nodeless mode. Valid values are "fargate".
+  hostingPlatform: ""
+  metrics:
+    enabled: false
+  # -- (object) A map of namespaces to lists of service accounts. If you provide service accounts here
+  # we will attach a cluster role and binding granting the service accounts permission to the relevant Kubernetes APIs
+  # needed to collect metrics. If empty, you will need to manually grant the service accounts the necessary permissions.
+  # Example:
+  #   serviceAccounts:
+  #     default: ["app1-sa", "app2-sa"]
+  #     fargate-ns: ["fargate-app-sa"]
+  serviceAccounts: {}
 
 gatewayDeployment:
   # -- (bool) Whether to enable the gateway deployment. The gateway is responsible for sampling and traces before sending them to Observe.
@@ -254,10 +267,6 @@ agent:
     #       exporters:
     #         - otlphttp/extra
     #         - otlphttp/observe/forward/trace
-    
-    # -- Additional OTel collector config for fargate-sidecar-metrics custom resource
-    fargateSidecarMetrics:
-    # Put any OTel config overrides here.
 
     # -- Additional OTel collector config for gateway deployment
     gateway:
@@ -1020,7 +1029,7 @@ monitor:
 forwarder:
   # -- The forwarder is run as a daemonset by default, but can be run as a deployment by setting mode to "deployment". Deployment mode
   # must be used when running in a serverless environment (ex: EKS Fargate) where daemonsets are not supported.
-  mode: deployment
+  mode: daemonset
 
   # -- The `replicaCount` is only used when `mode` is set to "deployment". It is ignored when `mode` is set to "daemonset".
   # In deployment mode, this sets the number of replicas (ie the number of forwarder pods to run).
@@ -1330,27 +1339,3 @@ gateway:
     - name: observe-agent-deployment-config
       mountPath: /observe-agent-conf
   # ----------------------------------------- #
-image:
-  repository: "otel/opentelemetry-collector-k8s"
-
-
-fargate-sidecar-injector:
-
-  # -- This is an otel operator that will inject a sidecar container into all pods in the cluster. This is only needed when running 
-  # in a serverless environment (ex: EKS Fargate) where daemonsets are not supported.
-
-  replicaCount: 1
-
-  # ----------------------------------------- #
-  # Different for each deployment/daemonset #
-  nameOverride: "fargate-sidecar-injector"
-  # !!! IMPORTANT !!! This needs to have same value as namespaceOverride in cluster above
-  namespaceOverride: "observe"
-  # for now, use defaults for the rest of the values
-  # ----------------------------------------- #
-  manager:
-    collectorImage:
-      repository: observeinc/observe-agent
-      tag: 2.8.1
-
-

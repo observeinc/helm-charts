@@ -2,7 +2,7 @@ apiVersion: v2
 name: agent
 description: Chart to install K8s collection stack based on Observe Agent
 type: application
-version: 0.74.4
+version: 0.75.0
 appVersion: "2.10.1"
 dependencies:
   - name: opentelemetry-collector
@@ -40,11 +40,6 @@ dependencies:
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     alias: gateway
     condition: gatewayDeployment.enabled
-  - name: opentelemetry-operator
-    version: 0.93.1
-    repository: https://open-telemetry.github.io/opentelemetry-helm-charts
-    alias: fargate-sidecar-injector
-    condition: node.fargateMode
 maintainers:
   - name: Observe
     email: support@observeinc.com

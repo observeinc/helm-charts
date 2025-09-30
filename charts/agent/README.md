@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.74.4](https://img.shields.io/badge/Version-0.74.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.10.1](https://img.shields.io/badge/AppVersion-2.10.1-informational?style=flat-square)
+![Version: 0.75.0](https://img.shields.io/badge/Version-0.75.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.10.1](https://img.shields.io/badge/AppVersion-2.10.1-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -29,6 +29,10 @@ This service is a *daemonset* which means it runs on every node in the cluster. 
 ## monitor
 
 This service is a *single-instance deployment*. It's critical that this service is only a single instance since otherwise it would produce duplicate data. It is responsible for monitoring the other containers of Observe Agent running by scraping the exposed Prometheus metrics of those agents. It's best practice to separate the monitoring of the agents from the agents themselves since if problems develop in those pipelines, we would need the agent telemetry to keep flowing in order to diagnose.
+
+## fargate-collector
+
+This service is an *OpenTelemetryCollector*, a custom resource that is managed by a OpenTelemetry Operator (must be installed separately) It is responsible for collecting metrics from nodes when running on AWS Fargate. It injects a sidecar into every pod with the appropriate annotation, and scrapes the API of the kubelet of that node for metrics. Daemonsets are not allowed on fargate, so this service is intended as a replacement for the usual approach for node metric collection with the `node-logs-metrics` daemonset.
 
 ## Maintainers
 
@@ -599,6 +603,10 @@ This service is a *single-instance deployment*. It's critical that this service 
 | node.metrics.fileSystem.excludeMountPoints | string | `"[\"/dev/*\",\"/proc/*\",\"/sys/*\",\"/run/k3s/containerd/*\",\"/var/lib/docker/*\",\"/var/lib/kubelet/*\",\"/snap/*\"]"` |  |
 | node.metrics.fileSystem.rootPath | string | `"/hostfs"` |  |
 | node.metrics.interval | string | `"60s"` |  |
+| nodeless.enabled | bool | `false` | Enables nodeless mode. Nodeless mode is intended for environments where daemonsets are not supported. |
+| nodeless.hostingPlatform | string | `""` | The hosting platform for the nodeless mode. Valid values are "fargate". |
+| nodeless.metrics.enabled | bool | `false` |  |
+| nodeless.serviceAccounts | object | `{}` | A map of namespaces to lists of service accounts. If you provide service accounts here we will attach a cluster role and binding granting the service accounts permission to the relevant Kubernetes APIs needed to collect metrics. If empty, you will need to manually grant the service accounts the necessary permissions. Example:   serviceAccounts:     default: ["app1-sa", "app2-sa"]     fargate-ns: ["fargate-app-sa"] |
 | observe.collectionEndpoint.value | string | `""` |  |
 | observe.entityToken.create | bool | `false` |  |
 | observe.entityToken.use | bool | `false` |  |
