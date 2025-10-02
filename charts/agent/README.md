@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.71.0](https://img.shields.io/badge/Version-0.71.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.8.1](https://img.shields.io/badge/AppVersion-2.8.1-informational?style=flat-square)
+![Version: 0.72.0](https://img.shields.io/badge/Version-0.72.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.8.1](https://img.shields.io/badge/AppVersion-2.8.1-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -76,6 +76,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | agent.selfMonitor.enabled | bool | `true` |  |
 | agent.selfMonitor.metrics.scrapeInterval | string | `"60s"` |  |
 | application.REDMetrics.enabled | bool | `false` | Whether to enable generating RED metrics from spans. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview |
+| application.REDMetrics.onlyGenerateForServiceEntrypointSpans | bool | `false` | If enabled, this will skip generating RED metrics for spans that are not service entrypoint spans (which are spans with kind Server, kind Consumer, or calls to DB or messaging system clients). If this and trace sampling are both enabled, it will not be possible to deduce accurate RED metrics for span types other than service entrypoint spans. |
 | application.REDMetrics.resourceDimensions | list | `["service.namespace","service.version","deployment.environment","k8s.pod.name","k8s.namespace.name"]` | List of resource attributes to include as dimensions for RED metrics. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview |
 | application.REDMetrics.spanDimensions | list | `["peer.db.name","peer.messaging.system","otel.status_description","observe.status_code"]` | List of span attributes to include as dimensions for RED metrics. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview |
 | application.prometheusScrape.enabled | bool | `false` |  |
