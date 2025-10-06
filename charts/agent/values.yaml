@@ -137,6 +137,19 @@ application:
   REDMetrics:
     # -- (bool) Whether to enable generating RED metrics from spans. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview
     enabled: false
+    # -- (list) List of resource attributes to include as dimensions for RED metrics. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview
+    resourceDimensions:
+      - service.namespace
+      - service.version
+      - deployment.environment
+      - k8s.pod.name
+      - k8s.namespace.name
+    # -- (list) List of span attributes to include as dimensions for RED metrics. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview
+    spanDimensions:
+      - peer.db.name
+      - peer.messaging.system
+      - otel.status_description
+      - observe.status_code
 
 gatewayDeployment:
   # -- (bool) Whether to enable the gateway deployment. The gateway is responsible for sampling and traces before sending them to Observe.

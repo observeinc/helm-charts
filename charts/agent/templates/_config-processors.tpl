@@ -166,8 +166,6 @@ transform/add_span_status_code:
 {{- end -}}
 
 {{- define "config.processors.RED_metrics" -}}
-{{/* Note: this must be kept in sync with the same variable in config.connectors.spanmetrics */}}
-{{- $spanmetricsResourceAttributes := (list "service.namespace" "service.version" "deployment.environment" "k8s.pod.name" "k8s.namespace.name") -}}
 
 attributes/debug_source_span_metrics:
   actions:
@@ -220,16 +218,17 @@ filter/drop_span_kinds_other_than_server_and_consumer_and_peer_client:
       - span.kind == SPAN_KIND_PRODUCER
 {{- end }}
 
+{{- $resourceDims := (prepend .Values.application.REDMetrics.resourceDimensions "service.name" | uniq) }}
+
 # The spanmetrics connector puts all dimensions as attributes on the datapoint, and copies the resource attributes from an arbitrary span's resource. This cleans that up as well as handling any other renaming.
 transform/fix_red_metrics_resource_attributes:
   error_mode: ignore
   metric_statements:
     # Drop all resource attributes that aren't dimensions in the spanmetrics connector.
-    {{/* The service.name is implicit in the spanmetrics connector, so we can't include it in spanmetricsResourceAttributes and need to list it here. */}}
-    - keep_matching_keys(resource.attributes, "^(service.name|{{ join "|" $spanmetricsResourceAttributes }})")
+    - keep_matching_keys(resource.attributes, "^({{ join "|" $resourceDims }})")
 
     # Drop all datapoint attributes that are resource attributes in the spans.
-    - delete_matching_keys(datapoint.attributes, "^(service.name|{{ join "|" $spanmetricsResourceAttributes }})")
+    - delete_matching_keys(datapoint.attributes, "^({{ join "|" $resourceDims }})")
 
     # Rename status.code to response_status to be consistent with Trace Explorer and disambiguate from status_code (with an underscore).
     - set(datapoint.attributes["otel.status_code"], "OK") where datapoint.attributes["status.code"] == "STATUS_CODE_OK"
