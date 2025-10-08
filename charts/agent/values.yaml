@@ -48,6 +48,7 @@ node:
   # The nodes on which metrics and logs are collected can be configured via `affinity` in the `node-logs-metrics` section below.
   # This should be set to false to disable the node-log-metrics daemonset when running in a serverless environment (ex: EKS Fargate).
   enabled: true
+  fargateMode: false
   # collects host level metrics from node
   metrics:
     enabled: true
