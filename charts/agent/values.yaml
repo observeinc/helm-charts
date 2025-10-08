@@ -137,6 +137,9 @@ application:
   REDMetrics:
     # -- (bool) Whether to enable generating RED metrics from spans. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview
     enabled: false
+    # -- (bool) If enabled, this will skip generating RED metrics for spans that are not service entrypoint spans (which are spans with kind Server, kind Consumer, or calls to DB or messaging system clients).
+    # If this and trace sampling are both enabled, it will not be possible to deduce accurate RED metrics for span types other than service entrypoint spans.
+    onlyGenerateForServiceEntrypointSpans: false
     # -- (list) List of resource attributes to include as dimensions for RED metrics. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview
     resourceDimensions:
       - service.namespace
