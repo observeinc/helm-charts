@@ -19,7 +19,7 @@ deltatocumulative/observe:
 
 {{- define "config.processors.cumulativetodelta" -}}
 cumulativetodelta/observe:
-  max_stale: 5m
+  max_staleness: 5m
 {{- end -}}
 
 {{- define "config.processors.attributes.k8sattributes" -}}
