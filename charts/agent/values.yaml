@@ -109,6 +109,8 @@ node:
       enabled: true
       # -- (string) The format of the outbound metrics from the forwarder to Observe. Valid values are "prometheus" and "otel"
       outputFormat: "prometheus"
+      # -- (bool) Converts cumulative metrics to delta metrics; all OTel metrics should be sent to Observe with temporality delta for the best experience.
+      convertCumulativeToDelta: false
     logs:
       enabled: true
 

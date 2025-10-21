@@ -61,6 +61,13 @@ processors:
   {{- include "config.processors.transform.add_span_status_code" . | nindent 2 }}
   {{- include "config.processors.attributes.add_empty_service_attributes" . | nindent 2 }}
 
+  {{- if .Values.node.forwarder.metrics.convertCumulativeToDelta }}
+    {{- if eq .Values.node.forwarder.metrics.outputFormat "prometheus" }}
+      {{- fail "Forwarder metric format 'prometheus' cannot be used with convertCumulativeToDelta; prometheus metrics must be cumulative." }}
+    {{- end }}
+    {{- include "config.processors.cumulativetodelta" . | nindent 2 }}
+  {{- end }}
+
   # attributes to append to objects
   attributes/debug_source_app_traces:
     actions:
@@ -111,13 +118,24 @@ processors:
 {{- $metricsProcessors := (list) -}}
 
 {{ if .Values.gatewayDeployment.enabled -}}
+  {{/* Separate handling when gateway is enabled, since we do minimal processing on the forwarder in that case */}}
   {{- $metricsProcessors = (list "memory_limiter" "k8sattributes/passthrough" "batch" "resourcedetection/cloud") }}
-{{- else if eq .Values.node.forwarder.metrics.outputFormat "prometheus" -}}
-  {{- $metricsProcessors = (list "memory_limiter" "k8sattributes" "deltatocumulative/observe" "batch" "resourcedetection/cloud" "resource/observe_common" "attributes/debug_source_app_metrics") }}
-{{- else if eq .Values.node.forwarder.metrics.outputFormat "otel" -}}
-  {{- $metricsProcessors = (list "memory_limiter" "k8sattributes" "batch" "resourcedetection/cloud" "resource/observe_common" "attributes/debug_source_app_metrics") }}
 {{- else }}
-{{- fail "Invalid output format for forwarder metrics, valid values are 'prometheus' and 'otel'." }}
+  {{- $metricsProcessors = (list "memory_limiter" "k8sattributes") }}
+
+  {{/* Handle metrics format related temporality processors */}}
+  {{- if eq .Values.node.forwarder.metrics.outputFormat "prometheus" -}}
+    {{- $metricsProcessors = concat $metricsProcessors (list "deltatocumulative/observe") }}
+  {{- else if ne .Values.node.forwarder.metrics.outputFormat "otel" -}}
+    {{- fail "Invalid output format for forwarder metrics, valid values are 'prometheus' and 'otel'." }}
+  {{- end }}
+
+  {{/* Handle other temporality processors */}}
+  {{- if .Values.node.forwarder.metrics.convertCumulativeToDelta }}
+    {{- $metricsProcessors = concat $metricsProcessors (list "cumulativetodelta/observe") }}
+  {{- end }}
+
+  {{- $metricsProcessors = concat $metricsProcessors (list "batch" "resourcedetection/cloud" "resource/observe_common" "attributes/debug_source_app_metrics") }}
 {{- end }}
 
 service:
