@@ -17,6 +17,11 @@ deltatocumulative/observe:
   max_stale: 5m
 {{- end -}}
 
+{{- define "config.processors.cumulativetodelta" -}}
+cumulativetodelta/observe:
+  max_stale: 5m
+{{- end -}}
+
 {{- define "config.processors.attributes.k8sattributes" -}}
 k8sattributes:
   extract:

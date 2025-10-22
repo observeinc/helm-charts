@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.73.0](https://img.shields.io/badge/Version-0.73.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.9.1](https://img.shields.io/badge/AppVersion-2.9.1-informational?style=flat-square)
+![Version: 0.74.0](https://img.shields.io/badge/Version-0.74.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.9.1](https://img.shields.io/badge/AppVersion-2.9.1-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -560,6 +560,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | node.enabled | bool | `true` | Enables the node-logs-metrics agent daemonset for collection of node logs and metrics. The nodes on which metrics and logs are collected can be configured via `affinity` in the `node-logs-metrics` section below. This should be set to false to disable the node-log-metrics daemonset when running in a serverless environment (ex: EKS Fargate). |
 | node.forwarder.enabled | bool | `true` |  |
 | node.forwarder.logs.enabled | bool | `true` |  |
+| node.forwarder.metrics.convertCumulativeToDelta | bool | `false` | Converts cumulative metrics to delta metrics; all OTel metrics should be sent to Observe with temporality delta for the best experience. |
 | node.forwarder.metrics.enabled | bool | `true` |  |
 | node.forwarder.metrics.outputFormat | string | `"prometheus"` | The format of the outbound metrics from the forwarder to Observe. Valid values are "prometheus" and "otel" |
 | node.forwarder.traces.enabled | bool | `true` |  |

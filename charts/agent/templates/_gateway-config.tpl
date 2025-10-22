@@ -32,7 +32,14 @@ processors:
 {{- include "config.processors.attributes.add_empty_service_attributes" . | nindent 2 }}
 
 {{- if .Values.application.REDMetrics.enabled }}
-{{- include "config.processors.RED_metrics" . | nindent 2 }}
+  {{- include "config.processors.RED_metrics" . | nindent 2 }}
+{{- end }}
+
+{{- if .Values.node.forwarder.metrics.convertCumulativeToDelta }}
+  {{- if eq .Values.node.forwarder.metrics.outputFormat "prometheus" }}
+    {{- fail "Forwarder metric format 'prometheus' cannot be used with convertCumulativeToDelta; prometheus metrics must be cumulative." }}
+  {{- end }}
+  {{- include "config.processors.cumulativetodelta" . | nindent 2 }}
 {{- end }}
 
   attributes/debug_source_gateway:
@@ -94,6 +101,9 @@ service:
         - k8sattributes
         {{- if eq .Values.node.forwarder.metrics.outputFormat "prometheus" }}
         - deltatocumulative/observe
+        {{- end }}
+        {{- if .Values.node.forwarder.metrics.convertCumulativeToDelta }}
+        - cumulativetodelta/observe
         {{- end }}
         - batch
         - resource/observe_common
