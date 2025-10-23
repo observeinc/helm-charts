@@ -17,6 +17,7 @@ node:
     enabled: true
     metrics:
       outputFormat: otel
+      convertCumulativeToDelta: true
 
 gatewayDeployment:
   enabled: true
