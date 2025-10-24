@@ -109,6 +109,8 @@ node:
       enabled: true
       # -- (string) The format of the outbound metrics from the forwarder to Observe. Valid values are "prometheus" and "otel"
       outputFormat: "prometheus"
+      # -- (bool) Converts cumulative metrics to delta metrics; all OTel metrics should be sent to Observe with temporality delta for the best experience.
+      convertCumulativeToDelta: false
     logs:
       enabled: true
 
@@ -137,6 +139,9 @@ application:
   REDMetrics:
     # -- (bool) Whether to enable generating RED metrics from spans. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview
     enabled: false
+    # -- (bool) If enabled, this will skip generating RED metrics for spans that are not service entrypoint spans (which are spans with kind Server, kind Consumer, or calls to DB or messaging system clients).
+    # If this and trace sampling are both enabled, it will not be possible to deduce accurate RED metrics for span types other than service entrypoint spans.
+    onlyGenerateForServiceEntrypointSpans: false
     # -- (list) List of resource attributes to include as dimensions for RED metrics. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview
     resourceDimensions:
       - service.namespace
@@ -279,7 +284,7 @@ cluster-events:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.8.1
+    tag: 2.9.1
     pullPolicy: IfNotPresent
 
   command:
@@ -411,7 +416,7 @@ cluster-metrics:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.8.1
+    tag: 2.9.1
     pullPolicy: IfNotPresent
 
   command:
@@ -542,7 +547,7 @@ prometheus-scraper:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.8.1
+    tag: 2.9.1
     pullPolicy: IfNotPresent
 
   command:
@@ -673,7 +678,7 @@ node-logs-metrics:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.8.1
+    tag: 2.9.1
     pullPolicy: IfNotPresent
 
   command:
@@ -855,7 +860,7 @@ monitor:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.8.1
+    tag: 2.9.1
     pullPolicy: IfNotPresent
 
   command:
@@ -992,7 +997,7 @@ forwarder:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.8.1
+    tag: 2.9.1
     pullPolicy: IfNotPresent
 
   command:
@@ -1140,7 +1145,7 @@ gateway:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.8.1
+    tag: 2.9.1
     pullPolicy: IfNotPresent
 
   command:

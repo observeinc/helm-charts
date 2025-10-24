@@ -2,41 +2,41 @@ apiVersion: v2
 name: agent
 description: Chart to install K8s collection stack based on Observe Agent
 type: application
-version: 0.71.0
-appVersion: "2.8.1"
+version: 0.74.1
+appVersion: "2.9.1"
 dependencies:
   - name: opentelemetry-collector
-    version: 0.130.2
+    version: 0.136.1
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     alias: cluster-events
     condition: cluster.events.enabled
   - name: opentelemetry-collector
-    version: 0.130.2
+    version: 0.136.1
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     alias: cluster-metrics
     condition: cluster.metrics.enabled
   - name: opentelemetry-collector
-    version: 0.130.2
+    version: 0.136.1
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     alias: prometheus-scraper
     condition: application.prometheusScrape.independentDeployment
   - name: opentelemetry-collector
-    version: 0.130.2
+    version: 0.136.1
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     alias: node-logs-metrics
     condition: node.enabled
   - name: opentelemetry-collector
-    version: 0.130.2
+    version: 0.136.1
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     alias: monitor
     condition: agent.selfMonitor.enabled
   - name: opentelemetry-collector
-    version: 0.130.2
+    version: 0.136.1
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     alias: forwarder
     condition: node.forwarder.enabled
   - name: opentelemetry-collector
-    version: 0.130.2
+    version: 0.136.1
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     alias: gateway
     condition: gatewayDeployment.enabled

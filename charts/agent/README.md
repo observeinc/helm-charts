@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.71.0](https://img.shields.io/badge/Version-0.71.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.8.1](https://img.shields.io/badge/AppVersion-2.8.1-informational?style=flat-square)
+![Version: 0.74.1](https://img.shields.io/badge/Version-0.74.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.9.1](https://img.shields.io/badge/AppVersion-2.9.1-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -40,13 +40,13 @@ This service is a *single-instance deployment*. It's critical that this service 
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://open-telemetry.github.io/opentelemetry-helm-charts | cluster-events(opentelemetry-collector) | 0.130.2 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | cluster-metrics(opentelemetry-collector) | 0.130.2 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | prometheus-scraper(opentelemetry-collector) | 0.130.2 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | node-logs-metrics(opentelemetry-collector) | 0.130.2 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | monitor(opentelemetry-collector) | 0.130.2 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | forwarder(opentelemetry-collector) | 0.130.2 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | gateway(opentelemetry-collector) | 0.130.2 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | cluster-events(opentelemetry-collector) | 0.136.1 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | cluster-metrics(opentelemetry-collector) | 0.136.1 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | prometheus-scraper(opentelemetry-collector) | 0.136.1 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | node-logs-metrics(opentelemetry-collector) | 0.136.1 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | monitor(opentelemetry-collector) | 0.136.1 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | forwarder(opentelemetry-collector) | 0.136.1 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | gateway(opentelemetry-collector) | 0.136.1 |
 
 ## Values
 
@@ -76,6 +76,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | agent.selfMonitor.enabled | bool | `true` |  |
 | agent.selfMonitor.metrics.scrapeInterval | string | `"60s"` |  |
 | application.REDMetrics.enabled | bool | `false` | Whether to enable generating RED metrics from spans. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview |
+| application.REDMetrics.onlyGenerateForServiceEntrypointSpans | bool | `false` | If enabled, this will skip generating RED metrics for spans that are not service entrypoint spans (which are spans with kind Server, kind Consumer, or calls to DB or messaging system clients). If this and trace sampling are both enabled, it will not be possible to deduce accurate RED metrics for span types other than service entrypoint spans. |
 | application.REDMetrics.resourceDimensions | list | `["service.namespace","service.version","deployment.environment","k8s.pod.name","k8s.namespace.name"]` | List of resource attributes to include as dimensions for RED metrics. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview |
 | application.REDMetrics.spanDimensions | list | `["peer.db.name","peer.messaging.system","otel.status_description","observe.status_code"]` | List of span attributes to include as dimensions for RED metrics. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview |
 | application.prometheusScrape.enabled | bool | `false` |  |
@@ -117,7 +118,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | cluster-events.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | cluster-events.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | cluster-events.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| cluster-events.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.8.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| cluster-events.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.9.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | cluster-events.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | cluster-events.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | cluster-events.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
@@ -183,7 +184,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | cluster-metrics.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | cluster-metrics.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | cluster-metrics.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| cluster-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.8.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| cluster-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.9.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | cluster-metrics.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | cluster-metrics.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | cluster-metrics.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
@@ -262,7 +263,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | forwarder.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | forwarder.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | forwarder.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| forwarder.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.8.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| forwarder.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.9.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | forwarder.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | forwarder.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | forwarder.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
@@ -332,7 +333,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | gateway.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | gateway.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | gateway.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| gateway.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.8.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| gateway.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.9.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | gateway.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | gateway.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | gateway.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
@@ -407,7 +408,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | monitor.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | monitor.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | monitor.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| monitor.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.8.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| monitor.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.9.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | monitor.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | monitor.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | monitor.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
@@ -502,7 +503,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | node-logs-metrics.extraVolumes[3].name | string | `"varlibotelcol"` |  |
 | node-logs-metrics.extraVolumes[4].hostPath.path | string | `"/"` |  |
 | node-logs-metrics.extraVolumes[4].name | string | `"hostfs"` |  |
-| node-logs-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.8.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| node-logs-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.9.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | node-logs-metrics.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | node-logs-metrics.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | node-logs-metrics.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
@@ -559,6 +560,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | node.enabled | bool | `true` | Enables the node-logs-metrics agent daemonset for collection of node logs and metrics. The nodes on which metrics and logs are collected can be configured via `affinity` in the `node-logs-metrics` section below. This should be set to false to disable the node-log-metrics daemonset when running in a serverless environment (ex: EKS Fargate). |
 | node.forwarder.enabled | bool | `true` |  |
 | node.forwarder.logs.enabled | bool | `true` |  |
+| node.forwarder.metrics.convertCumulativeToDelta | bool | `false` | Converts cumulative metrics to delta metrics; all OTel metrics should be sent to Observe with temporality delta for the best experience. |
 | node.forwarder.metrics.enabled | bool | `true` |  |
 | node.forwarder.metrics.outputFormat | string | `"prometheus"` | The format of the outbound metrics from the forwarder to Observe. Valid values are "prometheus" and "otel" |
 | node.forwarder.traces.enabled | bool | `true` |  |
@@ -609,7 +611,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | prometheus-scraper.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | prometheus-scraper.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | prometheus-scraper.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| prometheus-scraper.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.8.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| prometheus-scraper.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.9.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | prometheus-scraper.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | prometheus-scraper.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | prometheus-scraper.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
