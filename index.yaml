@@ -5123,6 +5123,23 @@ entries:
     version: 0.1.8
   logs:
   - apiVersion: v2
+    created: "2025-10-24T17:34:12.776386078Z"
+    dependencies:
+    - name: fluent-bit
+      repository: https://fluent.github.io/helm-charts
+      version: 0.54.0
+    - name: endpoint
+      repository: file://../endpoint
+      version: 0.1.13
+    deprecated: true
+    description: DEPRECATED Observe logs collection
+    digest: ddde507f042fad7fd49d2db79973912a8856658f564bbb72ada6a546bb421bac
+    name: logs
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/logs-0.3.1/logs-0.3.1.tgz
+    version: 0.3.1
+  - apiVersion: v2
     created: "2025-05-14T17:38:01.352702728Z"
     dependencies:
     - name: fluent-bit
@@ -6386,6 +6403,37 @@ entries:
     - https://github.com/observeinc/helm-charts/releases/download/proxy-0.1.0/proxy-0.1.0.tgz
     version: 0.1.0
   stack:
+  - apiVersion: v2
+    created: "2025-10-24T17:34:12.934015317Z"
+    dependencies:
+    - condition: logs.enabled
+      name: logs
+      repository: file://../logs
+      version: 0.3.1
+    - condition: metrics.enabled
+      name: metrics
+      repository: file://../metrics
+      version: 0.4.0
+    - condition: events.enabled
+      name: events
+      repository: file://../events
+      version: 0.5.0
+    - condition: proxy.enabled
+      name: proxy
+      repository: file://../proxy
+      version: 0.1.8
+    - condition: traces.enabled
+      name: traces
+      repository: file://../traces
+      version: 1.1.0
+    deprecated: true
+    description: DEPRECATED Observe Kubernetes agent stack
+    digest: a342b52bb581c7cadf834a1ef01a4ba97ee1c32185675fd7bccc60343d505d3c
+    name: stack
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/stack-1.5.1/stack-1.5.1.tgz
+    version: 1.5.1
   - apiVersion: v2
     created: "2025-06-04T15:25:06.036746839Z"
     dependencies:
@@ -9825,4 +9873,4 @@ entries:
     urls:
     - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.0/traces-0.1.0.tgz
     version: 0.1.0
-generated: "2025-10-23T18:09:28.141012725Z"
+generated: "2025-10-24T17:34:12.934604675Z"
