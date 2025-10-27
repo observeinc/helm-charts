@@ -62,6 +62,10 @@ processors:
   # Use passthrough mode to reduce forwarder compute and push the lookup to the gateway whenever it is enabled.
   k8sattributes/passthrough:
     passthrough: true
+  {{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+  # k8sattributes is needed for the heartbeat pipeline even when gateway is enabled
+  {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
+  {{- end }}
 {{- else }}
   {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
   {{- include "config.processors.resource.observe_common" . | nindent 2 }}
@@ -99,8 +103,10 @@ processors:
 {{- end }}
 
 {{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+{{- include "config.processors.resource_detection" . | nindent 2 }}
 {{- include "config.processors.resource.agent_instance" . | nindent 2 }}
 {{- include "config.processors.resource.heartbeat" . | nindent 2 }}
+{{- include "config.processors.transform.k8sheartbeat" . | nindent 2 }}
 {{- end }}
 
 {{- $traceExporters := (list) -}}

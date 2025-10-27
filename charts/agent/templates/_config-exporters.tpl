@@ -59,7 +59,7 @@ otlphttp/observe/forward/trace:
 otlphttp/observe/agentheartbeat:
     # These environment variables are provided by the observe-agent:
     # https://github.com/observeinc/observe-agent/blob/v2.0.1/internal/connections/confighandler.go#L91-L102
-    endpoint: "${env:OBSERVE_OTEL_ENDPOINT}"
+    logs_endpoint: "${env:OBSERVE_COLLECTOR_URL}/v1/kubernetes/v1/entity"
     headers:
         authorization: "${env:OBSERVE_AUTHORIZATION_HEADER}"
         x-observe-target-package: "Observe Agent"

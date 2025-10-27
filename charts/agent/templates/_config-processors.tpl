@@ -5,6 +5,13 @@ resourcedetection/cloud:
   override: false
 {{- end -}}
 
+{{- define "config.processors.resource_detection" -}}
+resourcedetection:
+  detectors: ["env", "system"]
+  timeout: 2s
+  override: false
+{{- end -}}
+
 {{- define "config.processors.batch" -}}
 batch:
   send_batch_size: {{ .Values.agent.config.global.processors.batch.sendBatchSize }}
@@ -98,6 +105,15 @@ resource/heartbeat:
         - action: insert
           from_attribute: host.name
           key: observe.agent.hostname
+{{- end -}}
+
+{{- define "config.processors.transform.k8sheartbeat" -}}
+transform/k8sheartbeat:
+  error_mode: ignore
+  log_statements:
+    - context: log
+      statements:
+        - set(attributes["observe_transform"]["identifiers"]["podName"], attributes["k8s.pod.name"])
 {{- end -}}
 
 {{- define "config.processors.memory_limiter" -}}

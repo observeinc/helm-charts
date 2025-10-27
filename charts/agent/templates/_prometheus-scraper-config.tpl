@@ -33,11 +33,16 @@ processors:
   {{- include "config.processors.attributes.pod_metrics" . | nindent 2 }}
   {{- include "config.processors.attributes.cadvisor_metrics" . | nindent 2 }}
   {{- include "config.processors.attributes.drop_service_name" . | nindent 2 }}
+{{- else if .Values.agent.config.global.fleet.heartbeat.enabled }}
+  # k8sattributes is needed for the heartbeat pipeline even when prometheusScrape is disabled
+  {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
 {{- end }}
 
 {{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+{{- include "config.processors.resource_detection" . | nindent 2 }}
 {{- include "config.processors.resource.agent_instance" . | nindent 2 }}
 {{- include "config.processors.resource.heartbeat" . | nindent 2 }}
+{{- include "config.processors.transform.k8sheartbeat" . | nindent 2 }}
 {{- end }}
 
 service:

@@ -146,4 +146,5 @@ heartbeat:
         url: "${env:OBSERVE_OTEL_ENDPOINT}"
     environment: kubernetes
     interval: {{ .Values.agent.config.global.fleet.heartbeat.interval }}
+    config_interval: {{ .Values.agent.config.global.fleet.heartbeat.configInterval }}
 {{- end }}
