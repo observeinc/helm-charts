@@ -207,6 +207,7 @@ agent:
         heartbeat:
           enabled: true
           interval: 5m
+          configInterval: 24h
       # -- Additional OTel collector config for all agent deployments/daemonsets
       overrides:
 
