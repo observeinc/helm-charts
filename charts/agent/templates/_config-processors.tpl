@@ -97,6 +97,9 @@ resource/agent_instance:
         - action: upsert
           key: observe.agent.instance.id
           value: test-agent-instance-id
+        - key: k8s.pod.uid
+          value: ${env:OTEL_K8S_POD_UID}
+          action: upsert
 {{- end -}}
 
 {{- define "config.processors.resource.heartbeat" -}}
@@ -113,7 +116,7 @@ transform/k8sheartbeat:
   log_statements:
     - context: log
       statements:
-        - set(attributes["observe_transform"]["identifiers"]["podName"], attributes["k8s.pod.name"])
+        - set(attributes["observe_transform"]["identifiers"]["podUid"], resource.attributes["k8s.pod.uid"])
 {{- end -}}
 
 {{- define "config.processors.memory_limiter" -}}

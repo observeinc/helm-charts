@@ -143,8 +143,8 @@ heartbeat:
     auth_check:
         headers:
             authorization: "${env:OBSERVE_AUTHORIZATION_HEADER}"
-        url: "${env:OBSERVE_OTEL_ENDPOINT}"
+        url: "${env:OBSERVE_COLLECTOR_URL}"
     environment: kubernetes
     interval: {{ .Values.agent.config.global.fleet.heartbeat.interval }}
-    config_interval: {{ .Values.agent.config.global.fleet.heartbeat.configInterval }}
+    config_interval: {{ .Values.agent.config.global.fleet.heartbeat.config_interval }}
 {{- end }}
