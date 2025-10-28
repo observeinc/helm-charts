@@ -366,6 +366,10 @@ cluster-events:
               fieldPath: metadata.namespace
   # extract clusteruid from configmap create by init container
   extraEnvs:
+    - name: OTEL_K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.uid
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:
@@ -498,6 +502,10 @@ cluster-metrics:
               fieldPath: metadata.namespace
   # extract clusteruid from configmap create by init container
   extraEnvs:
+    - name: OTEL_K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.uid
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:
@@ -629,6 +637,10 @@ prometheus-scraper:
               fieldPath: metadata.namespace
   # extract clusteruid from configmap create by init container
   extraEnvs:
+    - name: OTEL_K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.uid
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:
@@ -768,6 +780,10 @@ node-logs-metrics:
               fieldPath: metadata.namespace
   # extract clusteruid from configmap create by init container
   extraEnvs:
+    - name: OTEL_K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.uid
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:
@@ -942,6 +958,10 @@ monitor:
               fieldPath: metadata.namespace
   # extract clusteruid from configmap create by init container
   extraEnvs:
+    - name: OTEL_K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.uid
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:
@@ -1083,6 +1103,10 @@ forwarder:
               fieldPath: metadata.namespace
   # extract clusteruid from configmap create by init container
   extraEnvs:
+    - name: OTEL_K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.uid
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:
@@ -1236,6 +1260,10 @@ gateway:
               fieldPath: metadata.namespace
   # extract clusteruid from configmap create by init container
   extraEnvs:
+    - name: OTEL_K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.uid
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:

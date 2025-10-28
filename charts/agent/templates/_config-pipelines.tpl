@@ -65,14 +65,19 @@ metrics/cadvisor:
 {{- end }}
 
 {{- define "config.pipelines.heartbeat" -}}
+{{- $heartbeatExporters := (list "otlphttp/observe/agentheartbeat") -}}
+
+{{- if eq .Values.agent.config.global.debug.enabled true }}
+  {{- $heartbeatExporters = concat $heartbeatExporters ( list "debug/override" ) | uniq }}
+{{- end }}
+
 logs/heartbeat:
-    exporters:
-        - otlphttp/observe/agentheartbeat
+    exporters: [{{ join ", " $heartbeatExporters }}]
     processors:
         - resourcedetection
         - resourcedetection/cloud
-        - k8sattributes
         - resource/agent_instance
+        - k8sattributes
         - resource/heartbeat
         - transform/k8sheartbeat
     receivers:
