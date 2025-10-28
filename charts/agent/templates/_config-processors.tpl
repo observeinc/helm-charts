@@ -102,21 +102,16 @@ resource/agent_instance:
           action: upsert
 {{- end -}}
 
-{{- define "config.processors.resource.heartbeat" -}}
-resource/heartbeat:
-    attributes:
-        - action: insert
-          from_attribute: host.name
-          key: observe.agent.hostname
-{{- end -}}
-
 {{- define "config.processors.transform.k8sheartbeat" -}}
 transform/k8sheartbeat:
   error_mode: ignore
   log_statements:
     - context: log
       statements:
-        - set(attributes["observe_transform"]["identifiers"]["podUid"], resource.attributes["k8s.pod.uid"])
+        - set(attributes["observe_transform"]["identifiers"]["host.name"], resource.attributes["k8s.node.name"])
+        - set(attributes["observe_transform"]["identifiers"]["k8s.pod.uid"], resource.attributes["k8s.pod.uid"])
+        - set(attributes["observe_transform"]["identifiers"]["k8s.deployment.name"], resource.attributes["k8s.deployment.name"])
+        - set(attributes["observe_transform"]["identifiers"]["k8s.daemonset.name"], resource.attributes["k8s.daemonset.name"])
 {{- end -}}
 
 {{- define "config.processors.memory_limiter" -}}

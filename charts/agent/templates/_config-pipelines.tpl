@@ -78,7 +78,6 @@ logs/heartbeat:
         - resourcedetection/cloud
         - resource/agent_instance
         - k8sattributes
-        - resource/heartbeat
         - transform/k8sheartbeat
     receivers:
         - heartbeat
