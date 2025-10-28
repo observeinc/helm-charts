@@ -5,6 +5,13 @@ resourcedetection/cloud:
   override: false
 {{- end -}}
 
+{{- define "config.processors.resource_detection" -}}
+resourcedetection:
+  detectors: ["env", "system"]
+  timeout: 2s
+  override: false
+{{- end -}}
+
 {{- define "config.processors.batch" -}}
 batch:
   send_batch_size: {{ .Values.agent.config.global.processors.batch.sendBatchSize }}
@@ -82,6 +89,29 @@ resource/observe_common:
       action: upsert
       value: {{ .Values.cluster.deploymentEnvironment.name }}
     {{ end }}
+{{- end -}}
+
+{{- define "config.processors.resource.agent_instance" -}}
+resource/agent_instance:
+    attributes:
+        - action: upsert
+          key: observe.agent.instance.id
+          value: test-agent-instance-id
+        - key: k8s.pod.uid
+          value: ${env:OTEL_K8S_POD_UID}
+          action: upsert
+{{- end -}}
+
+{{- define "config.processors.transform.k8sheartbeat" -}}
+transform/k8sheartbeat:
+  error_mode: ignore
+  log_statements:
+    - context: log
+      statements:
+        - set(attributes["observe_transform"]["identifiers"]["host.name"], resource.attributes["k8s.node.name"])
+        - set(attributes["observe_transform"]["identifiers"]["k8s.pod.uid"], resource.attributes["k8s.pod.uid"])
+        - set(attributes["observe_transform"]["identifiers"]["k8s.deployment.name"], resource.attributes["k8s.deployment.name"])
+        - set(attributes["observe_transform"]["identifiers"]["k8s.daemonset.name"], resource.attributes["k8s.daemonset.name"])
 {{- end -}}
 
 {{- define "config.processors.memory_limiter" -}}
