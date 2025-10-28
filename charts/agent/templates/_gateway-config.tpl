@@ -53,7 +53,6 @@ processors:
 {{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
 {{- include "config.processors.resource_detection" . | nindent 2 }}
 {{- include "config.processors.resource.agent_instance" . | nindent 2 }}
-{{- include "config.processors.resource.heartbeat" . | nindent 2 }}
 {{- include "config.processors.transform.k8sheartbeat" . | nindent 2 }}
 {{- end }}
 
