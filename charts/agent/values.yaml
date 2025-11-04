@@ -194,6 +194,7 @@ agent:
           maxInterval: 30s
           # Maximum amount of time (including retries) spent trying to send a logs batch to a downstream consumer. Once this value is reached, the data is discarded. Retrying never stops if set to 0.
           maxElapsedTime: 5m
+        timeout: 10s
       service:
         telemetry:
           metricsLevel: normal
