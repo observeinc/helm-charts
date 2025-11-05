@@ -90,7 +90,15 @@ service:
       metrics:
         receivers: [prometheus/collector]
         # Drop the service.name resource attribute (which is set to the prom scrape job name) before the k8sattributes processor
-        processors: [memory_limiter, resource/drop_service_name, k8sattributes, batch, resource/observe_common, attributes/debug_source_agent_monitor]
+        processors:
+          - memory_limiter
+          - resource/drop_service_name
+          - k8sattributes
+          {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
+          - batch
+          {{- end }}
+          - resource/observe_common
+          - attributes/debug_source_agent_monitor
         exporters: [{{ join ", " $metricsExporters }}]
 
       {{- if .Values.agent.config.global.fleet.enabled }}

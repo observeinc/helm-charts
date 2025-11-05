@@ -153,7 +153,10 @@ processors:
     {{- $metricsProcessors = concat $metricsProcessors (list "cumulativetodelta/observe") }}
   {{- end }}
 
-  {{- $metricsProcessors = concat $metricsProcessors (list "batch" "resourcedetection/cloud" "resource/observe_common" "attributes/debug_source_app_metrics") }}
+  {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
+  {{- $metricsProcessors = concat $metricsProcessors (list "batch") }}
+  {{- end }}
+  {{- $metricsProcessors = concat $metricsProcessors (list "resourcedetection/cloud" "resource/observe_common" "attributes/debug_source_app_metrics") }}
 {{- end }}
 
 service:
@@ -172,7 +175,9 @@ service:
         - resource/add_empty_service_attributes
         - k8sattributes
         {{- end }}
+        {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
         - batch
+        {{- end }}
         - resourcedetection/cloud
         {{- if not .Values.gatewayDeployment.enabled }}
         - resource/observe_common
@@ -188,7 +193,9 @@ service:
         {{- else }}
         - k8sattributes
         {{- end }}
+        {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
         - batch
+        {{- end }}
         - resourcedetection/cloud
         {{- if not .Values.gatewayDeployment.enabled }}
         - resource/observe_common

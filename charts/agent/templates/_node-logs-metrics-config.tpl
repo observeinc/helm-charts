@@ -161,19 +161,44 @@ service:
       {{- if .Values.node.containers.logs.enabled }}
       logs:
         receivers: [filelog]
-        processors: [memory_limiter, k8sattributes, batch, resourcedetection/cloud, resource/observe_common, attributes/debug_source_pod_logs]
+        processors:
+          - memory_limiter
+          - k8sattributes
+          {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
+          - batch
+          {{- end }}
+          - resourcedetection/cloud
+          - resource/observe_common
+          - attributes/debug_source_pod_logs
         exporters: [{{ join ", " $logsExporters }}]
       {{- end -}}
       {{- if .Values.node.metrics.enabled }}
       metrics/hostmetrics:
         receivers: [hostmetrics]
-        processors: [memory_limiter, k8sattributes, batch, resourcedetection/cloud, resource/observe_common, attributes/debug_source_hostmetrics]
+        processors:
+          - memory_limiter
+          - k8sattributes
+          {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
+          - batch
+          {{- end }}
+          - resourcedetection/cloud
+          - resource/observe_common
+          - attributes/debug_source_hostmetrics
         exporters: [{{ join ", " $hostmetricsExporters }}]
       {{- end -}}
       {{- if .Values.node.containers.metrics.enabled }}
       metrics/kubeletstats:
         receivers: [kubeletstats]
-        processors: [memory_limiter, metricstransform/duplicate_k8s_cpu_metrics, k8sattributes, batch, resourcedetection/cloud, resource/observe_common, attributes/debug_source_kubeletstats_metrics]
+        processors:
+          - memory_limiter
+          - metricstransform/duplicate_k8s_cpu_metrics
+          - k8sattributes
+          {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
+          - batch
+          {{- end }}
+          - resourcedetection/cloud
+          - resource/observe_common
+          - attributes/debug_source_kubeletstats_metrics
         exporters: [{{ join ", " $kubeletstatsExporters }}]
       {{- end -}}
 

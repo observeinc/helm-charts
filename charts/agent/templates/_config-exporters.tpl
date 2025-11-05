@@ -8,6 +8,13 @@ otlphttp/observe/base:
     x-observe-target-package: "Kubernetes Explorer"
   sending_queue:
     enabled: {{ .Values.agent.config.global.exporters.sendingQueue.enabled }}
+    {{- if .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
+    batch:
+      flush_timeout: {{ .Values.agent.config.global.exporters.sendingQueue.batch.flushTimeout }}
+      sizer: {{ .Values.agent.config.global.exporters.sendingQueue.batch.sizer }}
+      min_size: {{ .Values.agent.config.global.exporters.sendingQueue.batch.minSize }}
+      max_size: {{ .Values.agent.config.global.exporters.sendingQueue.batch.maxSize }}
+    {{- end }}
   retry_on_failure:
     enabled: {{ .Values.agent.config.global.exporters.retryOnFailure.enabled }}
     initial_interval: {{ .Values.agent.config.global.exporters.retryOnFailure.initialInterval }}
@@ -27,6 +34,13 @@ otlphttp/observe/entity:
     x-observe-target-package: "Kubernetes Explorer"
   sending_queue:
     enabled: {{ .Values.agent.config.global.exporters.sendingQueue.enabled }}
+    {{- if .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
+    batch:
+      flush_timeout: {{ .Values.agent.config.global.exporters.sendingQueue.batch.flushTimeout }}
+      sizer: {{ .Values.agent.config.global.exporters.sendingQueue.batch.sizer }}
+      min_size: {{ .Values.agent.config.global.exporters.sendingQueue.batch.minSize }}
+      max_size: {{ .Values.agent.config.global.exporters.sendingQueue.batch.maxSize }}
+    {{- end }}
   retry_on_failure:
     enabled: {{ .Values.agent.config.global.exporters.retryOnFailure.enabled }}
     initial_interval: {{ .Values.agent.config.global.exporters.retryOnFailure.initialInterval }}
@@ -46,6 +60,13 @@ otlphttp/observe/forward/trace:
     x-observe-target-package: "Tracing"
   sending_queue:
     enabled: {{ .Values.agent.config.global.exporters.sendingQueue.enabled }}
+    {{- if .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
+    batch:
+      flush_timeout: {{ .Values.agent.config.global.exporters.sendingQueue.batch.flushTimeout }}
+      sizer: {{ .Values.agent.config.global.exporters.sendingQueue.batch.sizer }}
+      min_size: {{ .Values.agent.config.global.exporters.sendingQueue.batch.minSize }}
+      max_size: {{ .Values.agent.config.global.exporters.sendingQueue.batch.maxSize }}
+    {{- end }}
   retry_on_failure:
     enabled: {{ .Values.agent.config.global.exporters.retryOnFailure.enabled }}
     initial_interval: {{ .Values.agent.config.global.exporters.retryOnFailure.initialInterval }}
@@ -57,22 +78,29 @@ otlphttp/observe/forward/trace:
 
 {{- define "config.exporters.otlphttp.observe.metrics.agentheartbeat" -}}
 otlphttp/observe/agentheartbeat:
-    # These environment variables are provided by the observe-agent:
-    # https://github.com/observeinc/observe-agent/blob/v2.0.1/internal/connections/confighandler.go#L91-L102
-    logs_endpoint: "${env:OBSERVE_COLLECTOR_URL}/v1/kubernetes/v1/entity"
-    headers:
-        authorization: "${env:OBSERVE_AUTHORIZATION_HEADER}"
-        x-observe-target-package: "Observe Agent"
-        x-observe-context: {{ mustToJson (dict "version" "${env:OBSERVE_AGENT_VERSION}" "environment" "kubernetes" ) | toYaml }}
-        x-observe-enable-auth-error-reporting: "true"
-    sending_queue:
-      enabled: {{ .Values.agent.config.global.exporters.sendingQueue.enabled }}
-    retry_on_failure:
-      enabled: {{ .Values.agent.config.global.exporters.retryOnFailure.enabled }}
-      initial_interval: {{ .Values.agent.config.global.exporters.retryOnFailure.initialInterval }}
-      max_interval: {{ .Values.agent.config.global.exporters.retryOnFailure.maxInterval }}
-      max_elapsed_time: {{ .Values.agent.config.global.exporters.retryOnFailure.maxElapsedTime }}
-    compression: zstd
+  # These environment variables are provided by the observe-agent:
+  # https://github.com/observeinc/observe-agent/blob/v2.0.1/internal/connections/confighandler.go#L91-L102
+  logs_endpoint: "${env:OBSERVE_COLLECTOR_URL}/v1/kubernetes/v1/entity"
+  headers:
+      authorization: "${env:OBSERVE_AUTHORIZATION_HEADER}"
+      x-observe-target-package: "Observe Agent"
+      x-observe-context: {{ mustToJson (dict "version" "${env:OBSERVE_AGENT_VERSION}" "environment" "kubernetes" ) | toYaml }}
+      x-observe-enable-auth-error-reporting: "true"
+  sending_queue:
+    enabled: {{ .Values.agent.config.global.exporters.sendingQueue.enabled }}
+    {{- if .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
+    batch:
+      flush_timeout: {{ .Values.agent.config.global.exporters.sendingQueue.batch.flushTimeout }}
+      sizer: {{ .Values.agent.config.global.exporters.sendingQueue.batch.sizer }}
+      min_size: {{ .Values.agent.config.global.exporters.sendingQueue.batch.minSize }}
+      max_size: {{ .Values.agent.config.global.exporters.sendingQueue.batch.maxSize }}
+    {{- end }}
+  retry_on_failure:
+    enabled: {{ .Values.agent.config.global.exporters.retryOnFailure.enabled }}
+    initial_interval: {{ .Values.agent.config.global.exporters.retryOnFailure.initialInterval }}
+    max_interval: {{ .Values.agent.config.global.exporters.retryOnFailure.maxInterval }}
+    max_elapsed_time: {{ .Values.agent.config.global.exporters.retryOnFailure.maxElapsedTime }}
+  compression: zstd
 {{- end -}}
 
 {{- define "config.exporters.otlphttp.observe.metrics.otel" -}}
@@ -85,6 +113,13 @@ otlphttp/observe/otel_metrics:
     x-observe-target-package: "Metrics"
   sending_queue:
     enabled: {{ .Values.agent.config.global.exporters.sendingQueue.enabled }}
+    {{- if .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
+    batch:
+      flush_timeout: {{ .Values.agent.config.global.exporters.sendingQueue.batch.flushTimeout }}
+      sizer: {{ .Values.agent.config.global.exporters.sendingQueue.batch.sizer }}
+      min_size: {{ .Values.agent.config.global.exporters.sendingQueue.batch.minSize }}
+      max_size: {{ .Values.agent.config.global.exporters.sendingQueue.batch.maxSize }}
+    {{- end }}
   retry_on_failure:
     enabled: {{ .Values.agent.config.global.exporters.retryOnFailure.enabled }}
     initial_interval: {{ .Values.agent.config.global.exporters.retryOnFailure.initialInterval }}
