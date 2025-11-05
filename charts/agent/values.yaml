@@ -369,6 +369,10 @@ cluster-events:
       valueFrom:
         fieldRef:
           fieldPath: metadata.uid
+    - name: OTEL_K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:
@@ -505,6 +509,10 @@ cluster-metrics:
       valueFrom:
         fieldRef:
           fieldPath: metadata.uid
+    - name: OTEL_K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:
@@ -640,6 +648,10 @@ prometheus-scraper:
       valueFrom:
         fieldRef:
           fieldPath: metadata.uid
+    - name: OTEL_K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:
@@ -783,6 +795,10 @@ node-logs-metrics:
       valueFrom:
         fieldRef:
           fieldPath: metadata.uid
+    - name: OTEL_K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:
@@ -961,6 +977,10 @@ monitor:
       valueFrom:
         fieldRef:
           fieldPath: metadata.uid
+    - name: OTEL_K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:
@@ -1106,6 +1126,10 @@ forwarder:
       valueFrom:
         fieldRef:
           fieldPath: metadata.uid
+    - name: OTEL_K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:
@@ -1263,6 +1287,10 @@ gateway:
       valueFrom:
         fieldRef:
           fieldPath: metadata.uid
+    - name: OTEL_K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:

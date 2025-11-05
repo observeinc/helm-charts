@@ -97,6 +97,9 @@ resource/agent_instance:
         - key: k8s.pod.uid
           value: ${env:OTEL_K8S_POD_UID}
           action: upsert
+        - key: k8s.pod.name
+          value: ${env:OTEL_K8S_POD_NAME}
+          action: upsert
 {{- end -}}
 
 {{- define "config.processors.transform.k8sheartbeat" -}}
@@ -107,6 +110,7 @@ transform/k8sheartbeat:
       statements:
         - set(attributes["observe_transform"]["identifiers"]["host.name"], resource.attributes["k8s.node.name"])
         - set(attributes["observe_transform"]["identifiers"]["k8s.pod.uid"], resource.attributes["k8s.pod.uid"])
+        - set(attributes["observe_transform"]["identifiers"]["k8s.pod.name"], resource.attributes["k8s.pod.name"])
         - set(attributes["observe_transform"]["identifiers"]["k8s.deployment.name"], resource.attributes["k8s.deployment.name"])
         - set(attributes["observe_transform"]["identifiers"]["k8s.daemonset.name"], resource.attributes["k8s.daemonset.name"])
 {{- end -}}
