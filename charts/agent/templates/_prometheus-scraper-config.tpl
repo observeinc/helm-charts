@@ -8,7 +8,7 @@ exporters:
   nop:
 {{- end }}
 
-{{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+{{- if .Values.agent.config.global.fleet.enabled }}
 {{- include "config.exporters.otlphttp.observe.metrics.agentheartbeat" . | nindent 2 }}
 {{- end }}
 
@@ -20,7 +20,7 @@ receivers:
   nop:
 {{- end }}
 
-{{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+{{- if .Values.agent.config.global.fleet.enabled }}
 {{- include "config.receivers.observe.heartbeat" . | nindent 2 }}
 {{- end }}
 
@@ -33,12 +33,12 @@ processors:
   {{- include "config.processors.attributes.pod_metrics" . | nindent 2 }}
   {{- include "config.processors.attributes.cadvisor_metrics" . | nindent 2 }}
   {{- include "config.processors.attributes.drop_service_name" . | nindent 2 }}
-{{- else if .Values.agent.config.global.fleet.heartbeat.enabled }}
+{{- else if .Values.agent.config.global.fleet.enabled }}
   # k8sattributes is needed for the heartbeat pipeline even when prometheusScrape is disabled
   {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
 {{- end }}
 
-{{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+{{- if .Values.agent.config.global.fleet.enabled }}
 {{- include "config.processors.resource_detection" . | nindent 2 }}
 {{- include "config.processors.resource.agent_instance" . | nindent 2 }}
 {{- include "config.processors.transform.k8sheartbeat" . | nindent 2 }}
@@ -54,7 +54,7 @@ service:
       exporters: [nop]
     {{- end }}
 
-    {{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+    {{- if .Values.agent.config.global.fleet.enabled }}
     {{- include "config.pipelines.heartbeat" . | nindent 4 }}
     {{- end }}
 {{- end }}

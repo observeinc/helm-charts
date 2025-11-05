@@ -6,7 +6,7 @@ exporters:
 {{- include "config.exporters.debug" . | nindent 2 }}
 {{- include "config.exporters.prometheusremotewrite" . | nindent 2 }}
 
-{{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+{{- if .Values.agent.config.global.fleet.enabled }}
 {{- include "config.exporters.otlphttp.observe.metrics.agentheartbeat" . | nindent 2 }}
 {{- end }}
 
@@ -35,7 +35,7 @@ receivers:
 {{- include "config.receivers.prometheus.cadvisor" . | nindent 2 }}
 {{- end }}
 
-{{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+{{- if .Values.agent.config.global.fleet.enabled }}
 {{- include "config.receivers.observe.heartbeat" . | nindent 2 }}
 {{- end }}
 
@@ -52,7 +52,7 @@ processors:
 {{- include "config.processors.attributes.cadvisor_metrics" . | nindent 2 }}
 {{- end }}
 
-{{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+{{- if .Values.agent.config.global.fleet.enabled }}
 {{- include "config.processors.resource_detection" . | nindent 2 }}
 {{- include "config.processors.resource.agent_instance" . | nindent 2 }}
 {{- include "config.processors.transform.k8sheartbeat" . | nindent 2 }}
@@ -81,7 +81,7 @@ service:
     {{- include "config.pipelines.prometheus_scrapers" . | nindent 4 }}
     {{- end }}
 
-    {{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+    {{- if .Values.agent.config.global.fleet.enabled }}
     {{- include "config.pipelines.heartbeat" . | nindent 4 }}
     {{- end }}
 

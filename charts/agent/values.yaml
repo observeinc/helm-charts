@@ -205,10 +205,9 @@ agent:
         # values basic, normal, detailed
         verbosity: basic
       fleet:
-        heartbeat:
-          enabled: true
-          interval: 5m
-          configInterval: 24h
+        enabled: true
+        interval: 10m
+        configInterval: 24h
       # -- Additional OTel collector config for all agent deployments/daemonsets
       overrides:
 

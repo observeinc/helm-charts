@@ -145,6 +145,6 @@ heartbeat:
             authorization: "${env:OBSERVE_AUTHORIZATION_HEADER}"
         url: "${env:OBSERVE_COLLECTOR_URL}"
     environment: kubernetes
-    interval: {{ .Values.agent.config.global.fleet.heartbeat.interval }}
-    config_interval: {{ .Values.agent.config.global.fleet.heartbeat.config_interval }}
+    interval: {{ .Values.agent.config.global.fleet.interval }}
+    config_interval: {{ .Values.agent.config.global.fleet.configInterval }}
 {{- end }}

@@ -4,7 +4,7 @@ exporters:
 {{- include "config.exporters.debug" . | nindent 2 }}
 {{- include "config.exporters.otlphttp.observe.entity" . | nindent 2 }}
 
-{{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+{{- if .Values.agent.config.global.fleet.enabled }}
 {{- include "config.exporters.otlphttp.observe.metrics.agentheartbeat" . | nindent 2 }}
 {{- end }}
 
@@ -68,7 +68,7 @@ receivers:
       - {name: serviceaccounts, mode: pull, interval: 15m}
       - {name: serviceaccounts, mode: watch}
 
-{{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+{{- if .Values.agent.config.global.fleet.enabled }}
 {{- include "config.receivers.observe.heartbeat" . | nindent 2 }}
 {{- end }}
 
@@ -86,7 +86,7 @@ processors:
 
 {{- include "config.processors.attributes.observek8sattributes" . | nindent 2 }}
 
-{{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+{{- if .Values.agent.config.global.fleet.enabled }}
 {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
 {{- include "config.processors.resource_detection" . | nindent 2 }}
 {{- include "config.processors.resource_detection.cloud" . | nindent 2 }}
@@ -467,7 +467,7 @@ service:
         processors: [memory_limiter, batch, resource/observe_common, filter/cluster, transform/cluster]
         exporters: [{{ join ", " $logsClusterExporters }}]
 
-      {{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+      {{- if .Values.agent.config.global.fleet.enabled }}
       {{- include "config.pipelines.heartbeat" . | nindent 6 }}
       {{- end }}
 

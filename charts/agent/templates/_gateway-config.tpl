@@ -11,7 +11,7 @@ exporters:
 {{- include "config.exporters.otlphttp.observe.trace" . | nindent 2 }}
 {{- include "config.exporters.otlphttp.observe.metrics.otel" . | nindent 2 }}
 
-{{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+{{- if .Values.agent.config.global.fleet.enabled }}
 {{- include "config.exporters.otlphttp.observe.metrics.agentheartbeat" . | nindent 2 }}
 {{- end }}
 
@@ -23,7 +23,7 @@ receivers:
       http:
         endpoint: ${env:MY_POD_IP}:4318
 
-{{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+{{- if .Values.agent.config.global.fleet.enabled }}
 {{- include "config.receivers.observe.heartbeat" . | nindent 2 }}
 {{- end }}
 
@@ -50,7 +50,7 @@ processors:
   {{- include "config.processors.cumulativetodelta" . | nindent 2 }}
 {{- end }}
 
-{{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+{{- if .Values.agent.config.global.fleet.enabled }}
 {{- include "config.processors.resource_detection" . | nindent 2 }}
 {{- include "config.processors.resource.agent_instance" . | nindent 2 }}
 {{- include "config.processors.transform.k8sheartbeat" . | nindent 2 }}
@@ -127,7 +127,7 @@ service:
     {{- include "config.pipelines.RED_metrics" . | nindent 4 }}
     {{- end }}
 
-    {{- if .Values.agent.config.global.fleet.heartbeat.enabled }}
+    {{- if .Values.agent.config.global.fleet.enabled }}
     {{- include "config.pipelines.heartbeat" . | nindent 4 }}
     {{- end }}
 

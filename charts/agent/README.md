@@ -64,9 +64,9 @@ This service is a *single-instance deployment*. It's critical that this service 
 | agent.config.global.exporters.retryOnFailure.maxInterval | string | `"30s"` |  |
 | agent.config.global.exporters.sendingQueue.enabled | bool | `true` |  |
 | agent.config.global.exporters.timeout | string | `"10s"` |  |
-| agent.config.global.fleet.heartbeat.configInterval | string | `"24h"` |  |
-| agent.config.global.fleet.heartbeat.enabled | bool | `true` |  |
-| agent.config.global.fleet.heartbeat.interval | string | `"5m"` |  |
+| agent.config.global.fleet.configInterval | string | `"24h"` |  |
+| agent.config.global.fleet.enabled | bool | `true` |  |
+| agent.config.global.fleet.interval | string | `"10m"` |  |
 | agent.config.global.overrides | string | `nil` | Additional OTel collector config for all agent deployments/daemonsets |
 | agent.config.global.processors.batch.sendBatchMaxSize | int | `4096` |  |
 | agent.config.global.processors.batch.sendBatchSize | int | `4096` |  |
