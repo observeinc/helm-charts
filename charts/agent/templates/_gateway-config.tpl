@@ -82,7 +82,9 @@ service:
         {{- if .Values.gatewayDeployment.traceSampling.enabled }}
         - tail_sampling/observe
         {{- end }}
+        {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
         - batch
+        {{- end }}
         - resource/observe_common
       exporters: [{{ join ", " $traceExporters }}]
     logs/observe-forward:
@@ -90,7 +92,9 @@ service:
       processors:
         - memory_limiter
         - k8sattributes
+        {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
         - batch
+        {{- end }}
         - resource/observe_common
         - attributes/debug_source_gateway
       exporters: [{{ join ", " $logsExporters }}]
@@ -105,7 +109,9 @@ service:
         {{- if .Values.node.forwarder.metrics.convertCumulativeToDelta }}
         - cumulativetodelta/observe
         {{- end }}
+        {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
         - batch
+        {{- end }}
         - resource/observe_common
         - attributes/debug_source_gateway
       exporters: [{{ join ", " $metricsExporters }}]
