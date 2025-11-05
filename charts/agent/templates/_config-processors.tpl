@@ -94,9 +94,6 @@ resource/observe_common:
 {{- define "config.processors.resource.agent_instance" -}}
 resource/agent_instance:
     attributes:
-        - action: upsert
-          key: observe.agent.instance.id
-          value: test-agent-instance-id
         - key: k8s.pod.uid
           value: ${env:OTEL_K8S_POD_UID}
           action: upsert

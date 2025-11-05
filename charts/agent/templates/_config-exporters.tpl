@@ -63,6 +63,8 @@ otlphttp/observe/agentheartbeat:
     headers:
         authorization: "${env:OBSERVE_AUTHORIZATION_HEADER}"
         x-observe-target-package: "Observe Agent"
+        x-Observe-Context: {{ mustToJson (dict "version" "${env:OBSERVE_AGENT_VERSION}" "environment" "${env:OBSERVE_AGENT_ENVIRONMENT}" ) | toYaml }}
+        x-Observe-Enable-Auth-Error-Reporting: "true"
     sending_queue:
       enabled: {{ .Values.agent.config.global.exporters.sendingQueue.enabled }}
     retry_on_failure:
