@@ -285,7 +285,7 @@ cluster-events:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.9.1
+    tag: 2.10.0
     pullPolicy: IfNotPresent
 
   command:
@@ -417,7 +417,7 @@ cluster-metrics:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.9.1
+    tag: 2.10.0
     pullPolicy: IfNotPresent
 
   command:
@@ -548,7 +548,7 @@ prometheus-scraper:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.9.1
+    tag: 2.10.0
     pullPolicy: IfNotPresent
 
   command:
@@ -679,7 +679,7 @@ node-logs-metrics:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.9.1
+    tag: 2.10.0
     pullPolicy: IfNotPresent
 
   command:
@@ -861,7 +861,7 @@ monitor:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.9.1
+    tag: 2.10.0
     pullPolicy: IfNotPresent
 
   command:
@@ -998,7 +998,7 @@ forwarder:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.9.1
+    tag: 2.10.0
     pullPolicy: IfNotPresent
 
   command:
@@ -1146,7 +1146,7 @@ gateway:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.9.1
+    tag: 2.10.0
     pullPolicy: IfNotPresent
 
   command:
