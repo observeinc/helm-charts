@@ -73,7 +73,6 @@ logs/heartbeat:
       {{- end }}
     processors:
         - resourcedetection
-        - resourcedetection/cloud
         - resource/agent_instance
         - k8sattributes
         - transform/k8sheartbeat
