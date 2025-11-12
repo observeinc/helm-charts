@@ -55,6 +55,26 @@ otlphttp/observe/forward/trace:
   compression: zstd
 {{- end -}}
 
+{{- define "config.exporters.otlphttp.observe.metrics.agentheartbeat" -}}
+otlphttp/observe/agentheartbeat:
+    # These environment variables are provided by the observe-agent:
+    # https://github.com/observeinc/observe-agent/blob/v2.0.1/internal/connections/confighandler.go#L91-L102
+    logs_endpoint: "${env:OBSERVE_COLLECTOR_URL}/v1/kubernetes/v1/entity"
+    headers:
+        authorization: "${env:OBSERVE_AUTHORIZATION_HEADER}"
+        x-observe-target-package: "Observe Agent"
+        x-observe-context: {{ mustToJson (dict "version" "${env:OBSERVE_AGENT_VERSION}" "environment" "kubernetes" ) | toYaml }}
+        x-observe-enable-auth-error-reporting: "true"
+    sending_queue:
+      enabled: {{ .Values.agent.config.global.exporters.sendingQueue.enabled }}
+    retry_on_failure:
+      enabled: {{ .Values.agent.config.global.exporters.retryOnFailure.enabled }}
+      initial_interval: {{ .Values.agent.config.global.exporters.retryOnFailure.initialInterval }}
+      max_interval: {{ .Values.agent.config.global.exporters.retryOnFailure.maxInterval }}
+      max_elapsed_time: {{ .Values.agent.config.global.exporters.retryOnFailure.maxElapsedTime }}
+    compression: zstd
+{{- end -}}
+
 {{- define "config.exporters.otlphttp.observe.metrics.otel" -}}
 otlphttp/observe/otel_metrics:
   # These environment variables are provided by the observe-agent:

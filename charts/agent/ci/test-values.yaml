@@ -1,9 +1,9 @@
 observe:
   collectionEndpoint:
-    collectionEndpoint: "http://test-stack-collector.testing.svc.cluster.local:8080"
+    value: "http://test-stack-collector.testing.svc.cluster.local:8080"
   token:
     create: true
-    value: "fake-token"
+    value: "fake-ds:fake-token"
 
 application:
   prometheusScrape:
@@ -23,6 +23,14 @@ gatewayDeployment:
   enabled: true
   traceSampling:
     enabled: true
+
+agent:
+  config:
+    global:
+      fleet:
+        enabled: true
+        interval: 10s
+        configInterval: 10m
 
 cluster:
   namespaceOverride:

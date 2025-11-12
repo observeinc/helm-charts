@@ -204,6 +204,10 @@ agent:
         enabled: false
         # values basic, normal, detailed
         verbosity: basic
+      fleet:
+        enabled: true
+        interval: 10m
+        configInterval: 24h
       # -- Additional OTel collector config for all agent deployments/daemonsets
       overrides:
 
@@ -285,7 +289,7 @@ cluster-events:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.9.1
+    tag: 2.10.1
     pullPolicy: IfNotPresent
 
   command:
@@ -361,6 +365,14 @@ cluster-events:
               fieldPath: metadata.namespace
   # extract clusteruid from configmap create by init container
   extraEnvs:
+    - name: OTEL_K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.uid
+    - name: OTEL_K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:
@@ -417,7 +429,7 @@ cluster-metrics:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.9.1
+    tag: 2.10.1
     pullPolicy: IfNotPresent
 
   command:
@@ -493,6 +505,14 @@ cluster-metrics:
               fieldPath: metadata.namespace
   # extract clusteruid from configmap create by init container
   extraEnvs:
+    - name: OTEL_K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.uid
+    - name: OTEL_K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:
@@ -548,7 +568,7 @@ prometheus-scraper:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.9.1
+    tag: 2.10.1
     pullPolicy: IfNotPresent
 
   command:
@@ -624,6 +644,14 @@ prometheus-scraper:
               fieldPath: metadata.namespace
   # extract clusteruid from configmap create by init container
   extraEnvs:
+    - name: OTEL_K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.uid
+    - name: OTEL_K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:
@@ -679,7 +707,7 @@ node-logs-metrics:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.9.1
+    tag: 2.10.1
     pullPolicy: IfNotPresent
 
   command:
@@ -763,6 +791,14 @@ node-logs-metrics:
               fieldPath: metadata.namespace
   # extract clusteruid from configmap create by init container
   extraEnvs:
+    - name: OTEL_K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.uid
+    - name: OTEL_K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:
@@ -861,7 +897,7 @@ monitor:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.9.1
+    tag: 2.10.1
     pullPolicy: IfNotPresent
 
   command:
@@ -937,6 +973,14 @@ monitor:
               fieldPath: metadata.namespace
   # extract clusteruid from configmap create by init container
   extraEnvs:
+    - name: OTEL_K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.uid
+    - name: OTEL_K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:
@@ -998,7 +1042,7 @@ forwarder:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.9.1
+    tag: 2.10.1
     pullPolicy: IfNotPresent
 
   command:
@@ -1078,6 +1122,14 @@ forwarder:
               fieldPath: metadata.namespace
   # extract clusteruid from configmap create by init container
   extraEnvs:
+    - name: OTEL_K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.uid
+    - name: OTEL_K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:
@@ -1146,7 +1198,7 @@ gateway:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.9.1
+    tag: 2.10.1
     pullPolicy: IfNotPresent
 
   command:
@@ -1231,6 +1283,14 @@ gateway:
               fieldPath: metadata.namespace
   # extract clusteruid from configmap create by init container
   extraEnvs:
+    - name: OTEL_K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.uid
+    - name: OTEL_K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:

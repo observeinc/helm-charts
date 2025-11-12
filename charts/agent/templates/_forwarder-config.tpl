@@ -35,6 +35,10 @@ exporters:
   {{- include "config.exporters.prometheusremotewrite" . | nindent 2 }}
 {{- end }}
 
+{{- if .Values.agent.config.global.fleet.enabled }}
+{{- include "config.exporters.otlphttp.observe.metrics.agentheartbeat" . | nindent 2 }}
+{{- end }}
+
 receivers:
   otlp/app-telemetry:
     protocols:
@@ -42,6 +46,10 @@ receivers:
         endpoint: ${env:MY_POD_IP}:4317
       http:
         endpoint: ${env:MY_POD_IP}:4318
+
+{{- if .Values.agent.config.global.fleet.enabled }}
+{{- include "config.receivers.observe.heartbeat" . | nindent 2 }}
+{{- end }}
 
 processors:
 
@@ -54,6 +62,10 @@ processors:
   # Use passthrough mode to reduce forwarder compute and push the lookup to the gateway whenever it is enabled.
   k8sattributes/passthrough:
     passthrough: true
+  {{- if .Values.agent.config.global.fleet.enabled }}
+  # k8sattributes is needed for the heartbeat pipeline even when gateway is enabled
+  {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
+  {{- end }}
 {{- else }}
   {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
   {{- include "config.processors.resource.observe_common" . | nindent 2 }}
@@ -88,6 +100,12 @@ processors:
 
 {{- if $redMetrics }}
 {{- include "config.processors.RED_metrics" . | nindent 2 }}
+{{- end }}
+
+{{- if .Values.agent.config.global.fleet.enabled }}
+{{- include "config.processors.resource_detection" . | nindent 2 }}
+{{- include "config.processors.resource.agent_instance" . | nindent 2 }}
+{{- include "config.processors.transform.k8sheartbeat" . | nindent 2 }}
 {{- end }}
 
 {{- $traceExporters := (list) -}}
@@ -183,6 +201,10 @@ service:
       exporters: [{{ join ", " $metricsExporters }}]
     {{- if $redMetrics }}
     {{- include "config.pipelines.RED_metrics" . | nindent 4 }}
+    {{- end }}
+
+    {{- if .Values.agent.config.global.fleet.enabled }}
+    {{- include "config.pipelines.heartbeat" . | nindent 4 }}
     {{- end }}
 
 {{- end }}

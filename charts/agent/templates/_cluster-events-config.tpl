@@ -4,6 +4,10 @@ exporters:
 {{- include "config.exporters.debug" . | nindent 2 }}
 {{- include "config.exporters.otlphttp.observe.entity" . | nindent 2 }}
 
+{{- if .Values.agent.config.global.fleet.enabled }}
+{{- include "config.exporters.otlphttp.observe.metrics.agentheartbeat" . | nindent 2 }}
+{{- end }}
+
 receivers:
   # this is used to create a cluster resource by pulling namespaces and then dropping all but kube-system with filter processor
   k8sobjects/cluster:
@@ -64,6 +68,10 @@ receivers:
       - {name: serviceaccounts, mode: pull, interval: 15m}
       - {name: serviceaccounts, mode: watch}
 
+{{- if .Values.agent.config.global.fleet.enabled }}
+{{- include "config.receivers.observe.heartbeat" . | nindent 2 }}
+{{- end }}
+
 processors:
 {{- include "config.processors.memory_limiter" . | nindent 2 }}
 
@@ -77,6 +85,13 @@ processors:
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
 
 {{- include "config.processors.attributes.observek8sattributes" . | nindent 2 }}
+
+{{- if .Values.agent.config.global.fleet.enabled }}
+{{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
+{{- include "config.processors.resource_detection" . | nindent 2 }}
+{{- include "config.processors.resource.agent_instance" . | nindent 2 }}
+{{- include "config.processors.transform.k8sheartbeat" . | nindent 2 }}
+{{- end }}
 
   transform/unify:
     error_mode: ignore
@@ -450,5 +465,9 @@ service:
         receivers: [k8sobjects/cluster]
         processors: [memory_limiter, batch, resource/observe_common, filter/cluster, transform/cluster]
         exporters: [{{ join ", " $logsClusterExporters }}]
+
+      {{- if .Values.agent.config.global.fleet.enabled }}
+      {{- include "config.pipelines.heartbeat" . | nindent 6 }}
+      {{- end }}
 
 {{- end }}

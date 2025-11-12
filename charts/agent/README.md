@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.74.2](https://img.shields.io/badge/Version-0.74.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.9.1](https://img.shields.io/badge/AppVersion-2.9.1-informational?style=flat-square)
+![Version: 0.74.3](https://img.shields.io/badge/Version-0.74.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.10.1](https://img.shields.io/badge/AppVersion-2.10.1-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -64,6 +64,9 @@ This service is a *single-instance deployment*. It's critical that this service 
 | agent.config.global.exporters.retryOnFailure.maxInterval | string | `"30s"` |  |
 | agent.config.global.exporters.sendingQueue.enabled | bool | `true` |  |
 | agent.config.global.exporters.timeout | string | `"10s"` |  |
+| agent.config.global.fleet.configInterval | string | `"24h"` |  |
+| agent.config.global.fleet.enabled | bool | `true` |  |
+| agent.config.global.fleet.interval | string | `"10m"` |  |
 | agent.config.global.overrides | string | `nil` | Additional OTel collector config for all agent deployments/daemonsets |
 | agent.config.global.processors.batch.sendBatchMaxSize | int | `4096` |  |
 | agent.config.global.processors.batch.sendBatchSize | int | `4096` |  |
@@ -102,16 +105,20 @@ This service is a *single-instance deployment*. It's critical that this service 
 | cluster-events.configMap.create | bool | `false` |  |
 | cluster-events.configMap.existingName | string | `"cluster-events"` |  |
 | cluster-events.extraEnvsFrom | list | `[]` |  |
-| cluster-events.extraEnvs[0].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
-| cluster-events.extraEnvs[0].valueFrom.configMapKeyRef.key | string | `"name"` |  |
-| cluster-events.extraEnvs[0].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
-| cluster-events.extraEnvs[1].name | string | `"OBSERVE_CLUSTER_UID"` |  |
-| cluster-events.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"id"` |  |
-| cluster-events.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
-| cluster-events.extraEnvs[2].name | string | `"TOKEN"` |  |
-| cluster-events.extraEnvs[2].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
-| cluster-events.extraEnvs[2].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
-| cluster-events.extraEnvs[2].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| cluster-events.extraEnvs[0].name | string | `"OTEL_K8S_POD_UID"` |  |
+| cluster-events.extraEnvs[0].valueFrom.fieldRef.fieldPath | string | `"metadata.uid"` |  |
+| cluster-events.extraEnvs[1].name | string | `"OTEL_K8S_POD_NAME"` |  |
+| cluster-events.extraEnvs[1].valueFrom.fieldRef.fieldPath | string | `"metadata.name"` |  |
+| cluster-events.extraEnvs[2].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
+| cluster-events.extraEnvs[2].valueFrom.configMapKeyRef.key | string | `"name"` |  |
+| cluster-events.extraEnvs[2].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
+| cluster-events.extraEnvs[3].name | string | `"OBSERVE_CLUSTER_UID"` |  |
+| cluster-events.extraEnvs[3].valueFrom.configMapKeyRef.key | string | `"id"` |  |
+| cluster-events.extraEnvs[3].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
+| cluster-events.extraEnvs[4].name | string | `"TOKEN"` |  |
+| cluster-events.extraEnvs[4].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
+| cluster-events.extraEnvs[4].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| cluster-events.extraEnvs[4].valueFrom.secretKeyRef.optional | bool | `true` |  |
 | cluster-events.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | cluster-events.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | cluster-events.extraVolumes[0].configMap.defaultMode | int | `420` |  |
@@ -119,7 +126,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | cluster-events.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | cluster-events.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | cluster-events.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| cluster-events.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.9.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| cluster-events.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.10.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | cluster-events.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | cluster-events.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | cluster-events.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
@@ -168,16 +175,20 @@ This service is a *single-instance deployment*. It's critical that this service 
 | cluster-metrics.configMap.create | bool | `false` |  |
 | cluster-metrics.configMap.existingName | string | `"cluster-metrics"` |  |
 | cluster-metrics.extraEnvsFrom | list | `[]` |  |
-| cluster-metrics.extraEnvs[0].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
-| cluster-metrics.extraEnvs[0].valueFrom.configMapKeyRef.key | string | `"name"` |  |
-| cluster-metrics.extraEnvs[0].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
-| cluster-metrics.extraEnvs[1].name | string | `"OBSERVE_CLUSTER_UID"` |  |
-| cluster-metrics.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"id"` |  |
-| cluster-metrics.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
-| cluster-metrics.extraEnvs[2].name | string | `"TOKEN"` |  |
-| cluster-metrics.extraEnvs[2].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
-| cluster-metrics.extraEnvs[2].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
-| cluster-metrics.extraEnvs[2].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| cluster-metrics.extraEnvs[0].name | string | `"OTEL_K8S_POD_UID"` |  |
+| cluster-metrics.extraEnvs[0].valueFrom.fieldRef.fieldPath | string | `"metadata.uid"` |  |
+| cluster-metrics.extraEnvs[1].name | string | `"OTEL_K8S_POD_NAME"` |  |
+| cluster-metrics.extraEnvs[1].valueFrom.fieldRef.fieldPath | string | `"metadata.name"` |  |
+| cluster-metrics.extraEnvs[2].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
+| cluster-metrics.extraEnvs[2].valueFrom.configMapKeyRef.key | string | `"name"` |  |
+| cluster-metrics.extraEnvs[2].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
+| cluster-metrics.extraEnvs[3].name | string | `"OBSERVE_CLUSTER_UID"` |  |
+| cluster-metrics.extraEnvs[3].valueFrom.configMapKeyRef.key | string | `"id"` |  |
+| cluster-metrics.extraEnvs[3].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
+| cluster-metrics.extraEnvs[4].name | string | `"TOKEN"` |  |
+| cluster-metrics.extraEnvs[4].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
+| cluster-metrics.extraEnvs[4].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| cluster-metrics.extraEnvs[4].valueFrom.secretKeyRef.optional | bool | `true` |  |
 | cluster-metrics.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | cluster-metrics.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | cluster-metrics.extraVolumes[0].configMap.defaultMode | int | `420` |  |
@@ -185,7 +196,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | cluster-metrics.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | cluster-metrics.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | cluster-metrics.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| cluster-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.9.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| cluster-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.10.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | cluster-metrics.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | cluster-metrics.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | cluster-metrics.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
@@ -241,22 +252,26 @@ This service is a *single-instance deployment*. It's critical that this service 
 | forwarder.configMap.create | bool | `false` |  |
 | forwarder.configMap.existingName | string | `"forwarder"` |  |
 | forwarder.extraEnvsFrom | list | `[]` |  |
-| forwarder.extraEnvs[0].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
-| forwarder.extraEnvs[0].valueFrom.configMapKeyRef.key | string | `"name"` |  |
-| forwarder.extraEnvs[0].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
-| forwarder.extraEnvs[1].name | string | `"OBSERVE_CLUSTER_UID"` |  |
-| forwarder.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"id"` |  |
-| forwarder.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
-| forwarder.extraEnvs[2].name | string | `"K8S_NODE_NAME"` |  |
-| forwarder.extraEnvs[2].valueFrom.fieldRef.fieldPath | string | `"spec.nodeName"` |  |
-| forwarder.extraEnvs[3].name | string | `"TOKEN"` |  |
-| forwarder.extraEnvs[3].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
-| forwarder.extraEnvs[3].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
-| forwarder.extraEnvs[3].valueFrom.secretKeyRef.optional | bool | `true` |  |
-| forwarder.extraEnvs[4].name | string | `"TRACE_TOKEN"` |  |
-| forwarder.extraEnvs[4].valueFrom.secretKeyRef.key | string | `"TRACE_TOKEN"` |  |
-| forwarder.extraEnvs[4].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
-| forwarder.extraEnvs[4].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| forwarder.extraEnvs[0].name | string | `"OTEL_K8S_POD_UID"` |  |
+| forwarder.extraEnvs[0].valueFrom.fieldRef.fieldPath | string | `"metadata.uid"` |  |
+| forwarder.extraEnvs[1].name | string | `"OTEL_K8S_POD_NAME"` |  |
+| forwarder.extraEnvs[1].valueFrom.fieldRef.fieldPath | string | `"metadata.name"` |  |
+| forwarder.extraEnvs[2].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
+| forwarder.extraEnvs[2].valueFrom.configMapKeyRef.key | string | `"name"` |  |
+| forwarder.extraEnvs[2].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
+| forwarder.extraEnvs[3].name | string | `"OBSERVE_CLUSTER_UID"` |  |
+| forwarder.extraEnvs[3].valueFrom.configMapKeyRef.key | string | `"id"` |  |
+| forwarder.extraEnvs[3].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
+| forwarder.extraEnvs[4].name | string | `"K8S_NODE_NAME"` |  |
+| forwarder.extraEnvs[4].valueFrom.fieldRef.fieldPath | string | `"spec.nodeName"` |  |
+| forwarder.extraEnvs[5].name | string | `"TOKEN"` |  |
+| forwarder.extraEnvs[5].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
+| forwarder.extraEnvs[5].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| forwarder.extraEnvs[5].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| forwarder.extraEnvs[6].name | string | `"TRACE_TOKEN"` |  |
+| forwarder.extraEnvs[6].valueFrom.secretKeyRef.key | string | `"TRACE_TOKEN"` |  |
+| forwarder.extraEnvs[6].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| forwarder.extraEnvs[6].valueFrom.secretKeyRef.optional | bool | `true` |  |
 | forwarder.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | forwarder.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | forwarder.extraVolumes[0].configMap.defaultMode | int | `420` |  |
@@ -264,7 +279,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | forwarder.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | forwarder.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | forwarder.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| forwarder.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.9.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| forwarder.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.10.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | forwarder.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | forwarder.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | forwarder.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
@@ -315,18 +330,22 @@ This service is a *single-instance deployment*. It's critical that this service 
 | gateway.configMap.create | bool | `false` |  |
 | gateway.configMap.existingName | string | `"gateway"` |  |
 | gateway.extraEnvsFrom | list | `[]` |  |
-| gateway.extraEnvs[0].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
-| gateway.extraEnvs[0].valueFrom.configMapKeyRef.key | string | `"name"` |  |
-| gateway.extraEnvs[0].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
-| gateway.extraEnvs[1].name | string | `"OBSERVE_CLUSTER_UID"` |  |
-| gateway.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"id"` |  |
-| gateway.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
-| gateway.extraEnvs[2].name | string | `"K8S_NODE_NAME"` |  |
-| gateway.extraEnvs[2].valueFrom.fieldRef.fieldPath | string | `"spec.nodeName"` |  |
-| gateway.extraEnvs[3].name | string | `"TOKEN"` |  |
-| gateway.extraEnvs[3].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
-| gateway.extraEnvs[3].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
-| gateway.extraEnvs[3].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| gateway.extraEnvs[0].name | string | `"OTEL_K8S_POD_UID"` |  |
+| gateway.extraEnvs[0].valueFrom.fieldRef.fieldPath | string | `"metadata.uid"` |  |
+| gateway.extraEnvs[1].name | string | `"OTEL_K8S_POD_NAME"` |  |
+| gateway.extraEnvs[1].valueFrom.fieldRef.fieldPath | string | `"metadata.name"` |  |
+| gateway.extraEnvs[2].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
+| gateway.extraEnvs[2].valueFrom.configMapKeyRef.key | string | `"name"` |  |
+| gateway.extraEnvs[2].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
+| gateway.extraEnvs[3].name | string | `"OBSERVE_CLUSTER_UID"` |  |
+| gateway.extraEnvs[3].valueFrom.configMapKeyRef.key | string | `"id"` |  |
+| gateway.extraEnvs[3].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
+| gateway.extraEnvs[4].name | string | `"K8S_NODE_NAME"` |  |
+| gateway.extraEnvs[4].valueFrom.fieldRef.fieldPath | string | `"spec.nodeName"` |  |
+| gateway.extraEnvs[5].name | string | `"TOKEN"` |  |
+| gateway.extraEnvs[5].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
+| gateway.extraEnvs[5].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| gateway.extraEnvs[5].valueFrom.secretKeyRef.optional | bool | `true` |  |
 | gateway.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | gateway.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | gateway.extraVolumes[0].configMap.defaultMode | int | `420` |  |
@@ -334,7 +353,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | gateway.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | gateway.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | gateway.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| gateway.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.9.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| gateway.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.10.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | gateway.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | gateway.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | gateway.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
@@ -392,16 +411,20 @@ This service is a *single-instance deployment*. It's critical that this service 
 | monitor.configMap.create | bool | `false` |  |
 | monitor.configMap.existingName | string | `"monitor"` |  |
 | monitor.extraEnvsFrom | list | `[]` |  |
-| monitor.extraEnvs[0].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
-| monitor.extraEnvs[0].valueFrom.configMapKeyRef.key | string | `"name"` |  |
-| monitor.extraEnvs[0].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
-| monitor.extraEnvs[1].name | string | `"OBSERVE_CLUSTER_UID"` |  |
-| monitor.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"id"` |  |
-| monitor.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
-| monitor.extraEnvs[2].name | string | `"TOKEN"` |  |
-| monitor.extraEnvs[2].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
-| monitor.extraEnvs[2].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
-| monitor.extraEnvs[2].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| monitor.extraEnvs[0].name | string | `"OTEL_K8S_POD_UID"` |  |
+| monitor.extraEnvs[0].valueFrom.fieldRef.fieldPath | string | `"metadata.uid"` |  |
+| monitor.extraEnvs[1].name | string | `"OTEL_K8S_POD_NAME"` |  |
+| monitor.extraEnvs[1].valueFrom.fieldRef.fieldPath | string | `"metadata.name"` |  |
+| monitor.extraEnvs[2].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
+| monitor.extraEnvs[2].valueFrom.configMapKeyRef.key | string | `"name"` |  |
+| monitor.extraEnvs[2].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
+| monitor.extraEnvs[3].name | string | `"OBSERVE_CLUSTER_UID"` |  |
+| monitor.extraEnvs[3].valueFrom.configMapKeyRef.key | string | `"id"` |  |
+| monitor.extraEnvs[3].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
+| monitor.extraEnvs[4].name | string | `"TOKEN"` |  |
+| monitor.extraEnvs[4].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
+| monitor.extraEnvs[4].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| monitor.extraEnvs[4].valueFrom.secretKeyRef.optional | bool | `true` |  |
 | monitor.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | monitor.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | monitor.extraVolumes[0].configMap.defaultMode | int | `420` |  |
@@ -409,7 +432,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | monitor.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | monitor.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | monitor.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| monitor.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.9.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| monitor.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.10.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | monitor.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | monitor.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | monitor.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
@@ -458,24 +481,28 @@ This service is a *single-instance deployment*. It's critical that this service 
 | node-logs-metrics.configMap.create | bool | `false` |  |
 | node-logs-metrics.configMap.existingName | string | `"node-logs-metrics"` |  |
 | node-logs-metrics.extraEnvsFrom | list | `[]` |  |
-| node-logs-metrics.extraEnvs[0].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
-| node-logs-metrics.extraEnvs[0].valueFrom.configMapKeyRef.key | string | `"name"` |  |
-| node-logs-metrics.extraEnvs[0].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
-| node-logs-metrics.extraEnvs[1].name | string | `"OBSERVE_CLUSTER_UID"` |  |
-| node-logs-metrics.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"id"` |  |
-| node-logs-metrics.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
-| node-logs-metrics.extraEnvs[2].name | string | `"K8S_NODE_NAME"` |  |
-| node-logs-metrics.extraEnvs[2].valueFrom.fieldRef.fieldPath | string | `"spec.nodeName"` |  |
-| node-logs-metrics.extraEnvs[3].name | string | `"K8S_NODE_IP"` |  |
-| node-logs-metrics.extraEnvs[3].valueFrom.fieldRef.fieldPath | string | `"status.hostIP"` |  |
-| node-logs-metrics.extraEnvs[4].name | string | `"TOKEN"` |  |
-| node-logs-metrics.extraEnvs[4].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
-| node-logs-metrics.extraEnvs[4].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
-| node-logs-metrics.extraEnvs[4].valueFrom.secretKeyRef.optional | bool | `true` |  |
-| node-logs-metrics.extraEnvs[5].name | string | `"TRACES_TOKEN"` |  |
-| node-logs-metrics.extraEnvs[5].valueFrom.secretKeyRef.key | string | `"TRACES_TOKEN"` |  |
-| node-logs-metrics.extraEnvs[5].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
-| node-logs-metrics.extraEnvs[5].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| node-logs-metrics.extraEnvs[0].name | string | `"OTEL_K8S_POD_UID"` |  |
+| node-logs-metrics.extraEnvs[0].valueFrom.fieldRef.fieldPath | string | `"metadata.uid"` |  |
+| node-logs-metrics.extraEnvs[1].name | string | `"OTEL_K8S_POD_NAME"` |  |
+| node-logs-metrics.extraEnvs[1].valueFrom.fieldRef.fieldPath | string | `"metadata.name"` |  |
+| node-logs-metrics.extraEnvs[2].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
+| node-logs-metrics.extraEnvs[2].valueFrom.configMapKeyRef.key | string | `"name"` |  |
+| node-logs-metrics.extraEnvs[2].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
+| node-logs-metrics.extraEnvs[3].name | string | `"OBSERVE_CLUSTER_UID"` |  |
+| node-logs-metrics.extraEnvs[3].valueFrom.configMapKeyRef.key | string | `"id"` |  |
+| node-logs-metrics.extraEnvs[3].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
+| node-logs-metrics.extraEnvs[4].name | string | `"K8S_NODE_NAME"` |  |
+| node-logs-metrics.extraEnvs[4].valueFrom.fieldRef.fieldPath | string | `"spec.nodeName"` |  |
+| node-logs-metrics.extraEnvs[5].name | string | `"K8S_NODE_IP"` |  |
+| node-logs-metrics.extraEnvs[5].valueFrom.fieldRef.fieldPath | string | `"status.hostIP"` |  |
+| node-logs-metrics.extraEnvs[6].name | string | `"TOKEN"` |  |
+| node-logs-metrics.extraEnvs[6].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
+| node-logs-metrics.extraEnvs[6].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| node-logs-metrics.extraEnvs[6].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| node-logs-metrics.extraEnvs[7].name | string | `"TRACES_TOKEN"` |  |
+| node-logs-metrics.extraEnvs[7].valueFrom.secretKeyRef.key | string | `"TRACES_TOKEN"` |  |
+| node-logs-metrics.extraEnvs[7].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| node-logs-metrics.extraEnvs[7].valueFrom.secretKeyRef.optional | bool | `true` |  |
 | node-logs-metrics.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | node-logs-metrics.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | node-logs-metrics.extraVolumeMounts[1].mountPath | string | `"/var/log/pods"` |  |
@@ -504,7 +531,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | node-logs-metrics.extraVolumes[3].name | string | `"varlibotelcol"` |  |
 | node-logs-metrics.extraVolumes[4].hostPath.path | string | `"/"` |  |
 | node-logs-metrics.extraVolumes[4].name | string | `"hostfs"` |  |
-| node-logs-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.9.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| node-logs-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.10.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | node-logs-metrics.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | node-logs-metrics.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | node-logs-metrics.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
@@ -595,16 +622,20 @@ This service is a *single-instance deployment*. It's critical that this service 
 | prometheus-scraper.configMap.create | bool | `false` |  |
 | prometheus-scraper.configMap.existingName | string | `"prometheus-scraper"` |  |
 | prometheus-scraper.extraEnvsFrom | list | `[]` |  |
-| prometheus-scraper.extraEnvs[0].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
-| prometheus-scraper.extraEnvs[0].valueFrom.configMapKeyRef.key | string | `"name"` |  |
-| prometheus-scraper.extraEnvs[0].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
-| prometheus-scraper.extraEnvs[1].name | string | `"OBSERVE_CLUSTER_UID"` |  |
-| prometheus-scraper.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"id"` |  |
-| prometheus-scraper.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
-| prometheus-scraper.extraEnvs[2].name | string | `"TOKEN"` |  |
-| prometheus-scraper.extraEnvs[2].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
-| prometheus-scraper.extraEnvs[2].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
-| prometheus-scraper.extraEnvs[2].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| prometheus-scraper.extraEnvs[0].name | string | `"OTEL_K8S_POD_UID"` |  |
+| prometheus-scraper.extraEnvs[0].valueFrom.fieldRef.fieldPath | string | `"metadata.uid"` |  |
+| prometheus-scraper.extraEnvs[1].name | string | `"OTEL_K8S_POD_NAME"` |  |
+| prometheus-scraper.extraEnvs[1].valueFrom.fieldRef.fieldPath | string | `"metadata.name"` |  |
+| prometheus-scraper.extraEnvs[2].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
+| prometheus-scraper.extraEnvs[2].valueFrom.configMapKeyRef.key | string | `"name"` |  |
+| prometheus-scraper.extraEnvs[2].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
+| prometheus-scraper.extraEnvs[3].name | string | `"OBSERVE_CLUSTER_UID"` |  |
+| prometheus-scraper.extraEnvs[3].valueFrom.configMapKeyRef.key | string | `"id"` |  |
+| prometheus-scraper.extraEnvs[3].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
+| prometheus-scraper.extraEnvs[4].name | string | `"TOKEN"` |  |
+| prometheus-scraper.extraEnvs[4].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
+| prometheus-scraper.extraEnvs[4].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| prometheus-scraper.extraEnvs[4].valueFrom.secretKeyRef.optional | bool | `true` |  |
 | prometheus-scraper.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | prometheus-scraper.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | prometheus-scraper.extraVolumes[0].configMap.defaultMode | int | `420` |  |
@@ -612,7 +643,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | prometheus-scraper.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | prometheus-scraper.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | prometheus-scraper.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| prometheus-scraper.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.9.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| prometheus-scraper.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.10.1"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | prometheus-scraper.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | prometheus-scraper.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | prometheus-scraper.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |

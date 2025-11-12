@@ -27,6 +27,8 @@ forwarding:
 
 self_monitoring:
   enabled: false
+  fleet:
+    enabled: false
 
 host_monitoring:
   enabled: false

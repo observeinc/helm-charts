@@ -1,4 +1,5 @@
 {{ if .Values.cluster.metrics.enabled }}
+{{- include "observe-agent.validateOtelPodUid" (dict "componentName" "cluster-metrics" "extraEnvs" (index .Values "cluster-metrics" "extraEnvs") "fleetEnabled" .Values.agent.config.global.fleet.enabled) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:

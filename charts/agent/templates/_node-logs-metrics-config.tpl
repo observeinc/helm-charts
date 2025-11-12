@@ -22,6 +22,10 @@ exporters:
 {{ if or .Values.node.containers.metrics.enabled .Values.node.metrics.enabled -}}
 {{- include "config.exporters.prometheusremotewrite" . | nindent 2 }}
 {{ end }}
+
+{{- if .Values.agent.config.global.fleet.enabled }}
+{{- include "config.exporters.otlphttp.observe.metrics.agentheartbeat" . | nindent 2 }}
+{{- end }}
 receivers:
   {{- if .Values.node.metrics.enabled }}
   # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/hostmetricsreceiver
@@ -151,12 +155,22 @@ receivers:
     {{ end }}
   {{ end }}
 
+{{- if .Values.agent.config.global.fleet.enabled }}
+{{- include "config.receivers.observe.heartbeat" . | nindent 2 }}
+{{- end }}
+
 processors:
 {{- include "config.processors.memory_limiter" . | nindent 2 }}
 {{- include "config.processors.resource_detection.cloud" . | nindent 2 }}
 {{- include "config.processors.batch" . | nindent 2 }}
 {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
+
+{{- if .Values.agent.config.global.fleet.enabled }}
+{{- include "config.processors.resource_detection" . | nindent 2 }}
+{{- include "config.processors.resource.agent_instance" . | nindent 2 }}
+{{- include "config.processors.transform.k8sheartbeat" . | nindent 2 }}
+{{- end }}
 
   # attributes to append to objects
   attributes/debug_source_pod_logs:
@@ -219,5 +233,9 @@ service:
         processors: [memory_limiter, metricstransform/duplicate_k8s_cpu_metrics, k8sattributes, batch, resourcedetection/cloud, resource/observe_common, attributes/debug_source_kubeletstats_metrics]
         exporters: [{{ join ", " $kubeletstatsExporters }}]
       {{- end -}}
+
+      {{- if .Values.agent.config.global.fleet.enabled }}
+      {{- include "config.pipelines.heartbeat" . | nindent 6 }}
+      {{- end }}
 
 {{- end }}

@@ -1,4 +1,5 @@
 {{ if .Values.agent.selfMonitor.enabled }}
+{{- include "observe-agent.validateOtelPodUid" (dict "componentName" "monitor" "extraEnvs" (index .Values "monitor" "extraEnvs") "fleetEnabled" .Values.agent.config.global.fleet.enabled) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:

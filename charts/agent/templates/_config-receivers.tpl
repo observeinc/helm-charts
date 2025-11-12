@@ -137,3 +137,14 @@ prometheus/cadvisor:
             replacement: /api/v1/nodes/$$1/proxy/metrics/cadvisor
 {{ end }}
 {{ end }}
+
+{{- define "config.receivers.observe.heartbeat" -}}
+heartbeat:
+    auth_check:
+        headers:
+            authorization: "${env:OBSERVE_AUTHORIZATION_HEADER}"
+        url: "${env:OBSERVE_COLLECTOR_URL}"
+    environment: kubernetes
+    interval: {{ .Values.agent.config.global.fleet.interval }}
+    config_interval: {{ .Values.agent.config.global.fleet.configInterval }}
+{{- end }}
