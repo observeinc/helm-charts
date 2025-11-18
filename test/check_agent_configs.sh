@@ -32,30 +32,49 @@ any_failed=false
 confs=$(yq -e 'select(.kind == "ConfigMap").metadata.name' $1 | grep -Ev 'cluster-name|observe-agent|---')
 for conf in $confs; do
     echo "Checking $conf..."
-    yq -e "select(.kind == \"ConfigMap\" and .metadata.name == \"$conf\").data.relay" "$1" > "$tmp_dir/$conf.yaml"
+    fname="$tmp_dir/$conf.yaml"
+    yq -e "select(.kind == \"ConfigMap\" and .metadata.name == \"$conf\").data.relay" "$1" > "$fname"
+    if [ ! -f "$fname" ]; then
+        echo "File $fname not found!" 1>&2
+        any_failed=true
+        continue
+    fi
 
-    # Remove any eks cloud detector since it errors outside of kubernetes
-    yq -i '(.processors."resourcedetection/cloud".detectors // empty) = ["ec2"]' "$tmp_dir/$conf.yaml" 2>/dev/null || true
+    # TODO eventually we should migrate this script to running a job in kubernetes and doing full validation rather than hacking the config to get it to run on a host.
+    yq_commands=(
+      # Remove any eks cloud detector since it errors outside of kubernetes
+      '(.processors."resourcedetection/cloud".detectors) = ["ec2"]'
 
-    # Remove root_path from hostmetrics since it errors outside of linux
-    yq -i 'del(.receivers.hostmetrics.root_path)' "$tmp_dir/$conf.yaml" 2>/dev/null || true
+      # Remove root_path from hostmetrics since it errors outside of linux
+      'del(.receivers.hostmetrics.root_path)'
 
-    # Remove references to bearer_token_file for prom scraping since they may not be present
-    yq -i 'del(.receivers.prometheus.*.config.scrape_configs[].bearer_token_file)' "$tmp_dir/$conf.yaml" 2>/dev/null || true
+      # Remove references to bearer_token_file for prom scraping since they may not be present
+      'del(.receivers.prometheus*.config.scrape_configs[].bearer_token_file)'
 
-    # Remove kubeletstats since it errors outside of kubernetes :(
-    yq -i 'del(.receivers.kubeletstats*)' "$tmp_dir/$conf.yaml" 2>/dev/null || true
-    yq -i '(.service.pipelines.*.receivers[] | select(. == "kubeletstats*")) |= "nop"' "$tmp_dir/$conf.yaml" 2>/dev/null || true
+      # Remove kubeletstats since it errors outside of kubernetes
+      'del(.receivers.kubeletstats*)'
+      '(.service.pipelines.*.receivers[] | select(. == "kubeletstats*")) |= "nop"'
 
-    # Remove loadbalancing exporter since it errors outside of kubernetes :(
-    yq -i 'del(.exporters.loadbalancing*)' "$tmp_dir/$conf.yaml" 2>/dev/null || true
-    yq -i '(.service.pipelines.*.exporters[] | select(. == "loadbalancing*")) |= "nop"' "$tmp_dir/$conf.yaml" 2>/dev/null || true
+      # Remove loadbalancing exporter since it errors outside of kubernetes
+      'del(.exporters.loadbalancing*)'
+      '(.service.pipelines.*.exporters[] | select(. == "loadbalancing*")) |= "nop"'
+    )
+    for ((i = 0; i < ${#yq_commands[@]}; i++)); do
+      yq_cmd="${yq_commands[$i]}"
+      if ! yq -i "$yq_cmd" $fname; then
+        echo "failed to apply YQ modification: $yq_cmd" 1>&2
+        any_failed=true
+        break
+      fi
+    done
 
     # Set various env vars to match what's provided in our helm chart pod definitions.
     if ! env MY_POD_IP=0.0.0.0 \
         GOMEMLIMIT=409MiB \
         OBSERVE_CLUSTER_NAME=observe-agent-monitored-cluster \
         OBSERVE_CLUSTER_UID=abc123 \
+        OTEL_K8S_POD_UID=abc456 \
+        OTEL_K8S_POD_NAME=test-pod \
         K8S_NODE_NAME=test-node \
         KUBERNETES_SERVICE_HOST=0.0.0.0 \
         KUBERNETES_SERVICE_PORT=1234 \
