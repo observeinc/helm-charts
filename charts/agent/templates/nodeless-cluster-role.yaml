@@ -1,0 +1,56 @@
+{{- if .Values.nodeless.enabled }}
+{{- if .Values.nodeless.serviceAccounts }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: observe-agent-nodeless-cluster-role-{{ template "observe-agent.namespace" . }}
+  labels:
+    app.kubernetes.io/name: observe-agent-nodeless-cluster-role
+    app.kubernetes.io/instance: observe-agent
+rules:
+  - apiGroups: [""]
+    resources:
+      - nodes
+      - nodes/proxy
+      - namespaces
+      - pods
+      - configmaps
+    verbs: ["get", "list", "watch"]
+
+  - apiGroups: ["apps"]
+    resources:
+      - replicasets
+    verbs: ["get", "list", "watch"]
+---
+{{- range $namespace, $serviceAccounts := .Values.nodeless.serviceAccounts }}
+{{- if not (kindIs "slice" $serviceAccounts) }}
+{{- fail (printf "nodeless.serviceAccounts[%s] must be a list, but got: %v (type: %s)" $namespace $serviceAccounts (kindOf $serviceAccounts)) }}
+{{- end }}
+{{- if not $serviceAccounts }}
+{{- fail (printf "nodeless.serviceAccounts[%s] is empty. Please provide at least one service account or remove the namespace from the map." $namespace) }}
+{{- end }}
+{{- range $serviceAccounts }}
+{{- if not (kindIs "string" .) }}
+{{- fail (printf "nodeless.serviceAccounts[%s] contains a non-string value: %v. All service account names must be strings." $namespace .) }}
+{{- end }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: observe-agent-nodeless-cluster-role-binding-{{ $namespace }}-{{ . }}
+  labels:
+    app.kubernetes.io/name: observe-agent-nodeless-cluster-role-binding
+    app.kubernetes.io/instance: observe-agent
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: observe-agent-nodeless-cluster-role-{{ template "observe-agent.namespace" $ }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ . }}
+    namespace: {{ $namespace }}
+---
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

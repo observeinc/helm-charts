@@ -1,0 +1,40 @@
+{{- if .Values.nodeless.enabled }}
+{{- if eq .Values.nodeless.hostingPlatform "fargate" }}
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+metadata:
+  name: fargate-collector
+spec:
+  mode: sidecar
+  image: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:latest"
+  env:
+    - name: K8S_NODE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: spec.nodeName
+    - name: OBSERVE_CLUSTER_NAME
+      value: "{{ .Values.cluster.name }}"
+    - name: OBSERVE_CLUSTER_UID
+      valueFrom:
+        configMapKeyRef:
+          name: cluster-info
+          key: id
+    - name: OBSERVE_PROMETHEUS_ENDPOINT
+      value: "{{ .Values.observe.collectionEndpoint.value }}v1/prometheus"
+    - name: OBSERVE_AUTHORIZATION_HEADER
+      value: "Bearer {{ .Values.observe.token.value }}"
+  config:
+    {{- include "observe.sidecar.applyFargateSidecarConfig" . | nindent 4 }}
+  initContainers:
+    - name: kube-cluster-info
+      image: observeinc/kube-cluster-info:v0.11.5
+      imagePullPolicy: Always
+      env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+{{- else }}
+{{- fail "Invalid nodeless.hostingPlatform, valid values are 'fargate', provided value is %s" .Values.nodeless.hostingPlatform }}
+{{- end }}
+{{- end }}

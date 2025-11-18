@@ -148,6 +148,14 @@ attributes/debug_source_cadvisor_metrics:
 {{- end -}}
 {{- end -}}
 
+{{- define "config.processors.attributes.sidecar_kubeletstats_metrics" -}}
+attributes/debug_source_sidecar_kubeletstats_metrics:
+  actions:
+    - key: debug_source
+      action: insert
+      value: sidecar_kubeletstats_metrics
+{{- end -}}
+
 {{- define "config.processors.attributes.drop_container_info" -}}
 resource/drop_container_info:
   attributes:
@@ -160,6 +168,21 @@ resource/drop_service_name:
   attributes:
     - action: delete
       key: service.name
+{{- end -}}
+
+{{- define "config.processors.metricstransform.duplicate_k8s_cpu_metrics" -}}
+# convert new k8s metric names to the names our Kubernetes Explorer relies on
+metricstransform/duplicate_k8s_cpu_metrics:
+  transforms:
+    - include: container.cpu.usage
+      action: insert
+      new_name: container.cpu.utilization
+    - include: k8s.pod.cpu.usage
+      action: insert
+      new_name: k8s.pod.cpu.utilization
+    - include: k8s.node.cpu.usage
+      action: insert
+      new_name: k8s.node.cpu.utilization
 {{- end -}}
 
 {{- define "config.processors.filter.drop_long_spans" -}}

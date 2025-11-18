@@ -48,7 +48,6 @@ node:
   # The nodes on which metrics and logs are collected can be configured via `affinity` in the `node-logs-metrics` section below.
   # This should be set to false to disable the node-log-metrics daemonset when running in a serverless environment (ex: EKS Fargate).
   enabled: true
-  # collects host level metrics from node
   metrics:
     enabled: true
     interval: 60s
@@ -155,6 +154,22 @@ application:
       - peer.messaging.system
       - otel.status_description
       - observe.status_code
+
+nodeless:
+  # -- (bool) Enables nodeless mode. Nodeless mode is intended for environments where daemonsets are not supported.
+  enabled: false
+  # -- (string) The hosting platform for the nodeless mode. Valid values are "fargate".
+  hostingPlatform: ""
+  metrics:
+    enabled: false
+  # -- (object) A map of namespaces to lists of service accounts. If you provide service accounts here
+  # we will attach a cluster role and binding granting the service accounts permission to the relevant Kubernetes APIs
+  # needed to collect metrics. If empty, you will need to manually grant the service accounts the necessary permissions.
+  # Example:
+  #   serviceAccounts:
+  #     default: ["app1-sa", "app2-sa"]
+  #     fargate-ns: ["fargate-app-sa"]
+  serviceAccounts: {}
 
 gatewayDeployment:
   # -- (bool) Whether to enable the gateway deployment. The gateway is responsible for sampling and traces before sending them to Observe.

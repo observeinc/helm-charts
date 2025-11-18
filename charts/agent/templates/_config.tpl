@@ -12,6 +12,14 @@
 {{- toYaml $config | indent 2 }}
 {{- end }}
 
+{{- define "observe.sidecar.applyFargateSidecarConfig" -}}
+{{- $values := deepCopy .Values }}
+{{- $data := dict "Values" $values | mustMergeOverwrite (deepCopy .) }}
+{{- $config := mustMergeOverwrite ( include "observe.sidecar.FargateSidecar.config" $data |  fromYaml ) ($values.agent.config.FargateSidecar) ($values.agent.config.global.overrides) -}}
+{{- toYaml $config | indent 2 }}
+{{- end }}
+
+
 {{- define "observe.deployment.applyPrometheusScraperConfig" -}}
 {{- $values := deepCopy .Values }}
 {{- $data := dict "Values" $values | mustMergeOverwrite (deepCopy .) }}
