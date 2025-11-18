@@ -205,7 +205,7 @@ agent:
         # values basic, normal, detailed
         verbosity: basic
       fleet:
-        enabled: true
+        enabled: false
         interval: 10m
         configInterval: 24h
       # -- Additional OTel collector config for all agent deployments/daemonsets
