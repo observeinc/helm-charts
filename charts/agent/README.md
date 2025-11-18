@@ -65,7 +65,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 | agent.config.global.exporters.sendingQueue.enabled | bool | `true` |  |
 | agent.config.global.exporters.timeout | string | `"10s"` |  |
 | agent.config.global.fleet.configInterval | string | `"24h"` |  |
-| agent.config.global.fleet.enabled | bool | `true` |  |
+| agent.config.global.fleet.enabled | bool | `false` |  |
 | agent.config.global.fleet.interval | string | `"10m"` |  |
 | agent.config.global.overrides | string | `nil` | Additional OTel collector config for all agent deployments/daemonsets |
 | agent.config.global.processors.batch.sendBatchMaxSize | int | `4096` |  |
