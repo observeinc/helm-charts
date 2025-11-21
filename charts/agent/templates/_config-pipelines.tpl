@@ -34,7 +34,6 @@ metrics/spanmetrics:
     - transform/fix_red_metrics_resource_attributes
     - batch
     - resource/observe_common
-    - resourcedetection/cloud
     - attributes/debug_source_span_metrics
   exporters: [{{ join ", " $metricsSpanmetricsExporters }}]
 {{- end -}}
