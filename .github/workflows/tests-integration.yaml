@@ -91,7 +91,7 @@ jobs:
             terraform test -verbose -junit-xml=results-ns-${{ matrix.namespace }}+values-${{ matrix.values }}.xml
 
         - name: Upload Test Results
-          uses: actions/upload-artifact@v4
+          uses: actions/upload-artifact@v5
           if: success() || failure()
           with:
             name: results-ns-${{ matrix.namespace }}+values-${{ matrix.values }}
