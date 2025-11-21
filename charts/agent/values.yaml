@@ -198,6 +198,7 @@ agent:
           sendBatchSize: 4096
           sendBatchMaxSize: 4096
           timeout: 5s
+        k8sattributesNodeOnlyDaemonset: false
       exporters:
         sendingQueue:
           enabled: true

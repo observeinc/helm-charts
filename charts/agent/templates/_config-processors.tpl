@@ -31,6 +31,10 @@ cumulativetodelta/observe:
 
 {{- define "config.processors.attributes.k8sattributes" -}}
 k8sattributes:
+  {{ if (and (eq .filterToNode true) (eq .Values.agent.config.global.processors.k8sattributesNodeOnlyDaemonset true)) }}
+  filter:
+    node_from_env_var: K8S_NODE_NAME
+  {{ end }}
   extract:
     otel_annotations: true
     metadata:

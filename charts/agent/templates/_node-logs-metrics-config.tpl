@@ -117,7 +117,7 @@ processors:
 {{- include "config.processors.memory_limiter" . | nindent 2 }}
 {{- include "config.processors.resource_detection.cloud" . | nindent 2 }}
 {{- include "config.processors.batch" . | nindent 2 }}
-{{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
+{{- include "config.processors.attributes.k8sattributes" (merge . (dict "filterToNode" true)) | nindent 2 }}
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
 {{- include "config.processors.metricstransform.duplicate_k8s_cpu_metrics" . | nindent 2 }}
 
