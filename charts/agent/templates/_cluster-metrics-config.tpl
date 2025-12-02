@@ -75,7 +75,15 @@ service:
   pipelines:
     metrics:
       receivers: [k8s_cluster]
-      processors: [memory_limiter, k8sattributes, batch, resource/observe_common, resource/drop_container_info, attributes/debug_source_cluster_metrics]
+      processors:
+        - memory_limiter
+        - k8sattributes
+        {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
+        - batch
+        {{- end }}
+        - resource/observe_common
+        - resource/drop_container_info
+        - attributes/debug_source_cluster_metrics
       exporters: [{{ join ", " $metricsExporters }}]
     {{- if $podMetrics }}
     {{- include "config.pipelines.prometheus_scrapers" . | nindent 4 }}

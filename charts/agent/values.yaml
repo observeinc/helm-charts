@@ -202,6 +202,12 @@ agent:
       exporters:
         sendingQueue:
           enabled: true
+          batch:
+            enabled: false
+            flushTimeout: 5s
+            sizer: bytes
+            minSize: 0
+            maxSize: 41943040  # 40MiB
         retryOnFailure:
           enabled: true
           # Time to wait after the first failure before retrying.

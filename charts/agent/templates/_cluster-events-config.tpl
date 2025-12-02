@@ -459,11 +459,26 @@ service:
   pipelines:
       logs/objects:
         receivers: [k8sobjects/objects]
-        processors: [memory_limiter, batch, resource/observe_common, transform/unify, observek8sattributes, transform/object]
+        processors:
+          - memory_limiter
+          {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
+          - batch
+          {{- end }}
+          - resource/observe_common
+          - transform/unify
+          - observek8sattributes
+          - transform/object
         exporters: [{{ join ", " $objectsExporters }}]
       logs/cluster:
         receivers: [k8sobjects/cluster]
-        processors: [memory_limiter, batch, resource/observe_common, filter/cluster, transform/cluster]
+        processors:
+          - memory_limiter
+          {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
+          - batch
+          {{- end }}
+          - resource/observe_common
+          - filter/cluster
+          - transform/cluster
         exporters: [{{ join ", " $logsClusterExporters }}]
 
       {{- if .Values.agent.config.global.fleet.enabled }}
