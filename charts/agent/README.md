@@ -243,6 +243,8 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | cluster.deploymentEnvironment.name | string | `""` | deployment environment cluster runs in (e.g. testing, production, etc). populates to deployment.environment.name per https://opentelemetry.io/docs/specs/semconv/resource/deployment-environment/ |
 | cluster.events.enabled | bool | `true` |  |
 | cluster.events.pullInterval | string | `"20m"` |  |
+| cluster.metadata.waitForInitialPoll | bool | `false` | whether to wait for the initial metadata poll to complete before processing telemetry |
+| cluster.metadata.waitForInitialPollTimeout | string | `"10s"` | timeout for waiting for the initial metadata poll to complete |
 | cluster.metrics.enabled | bool | `true` |  |
 | cluster.metrics.interval | string | `"60s"` |  |
 | cluster.name | string | `"observe-agent-monitored-cluster"` | name given to your cluster. popuplates to k8s.cluster.name per https://opentelemetry.io/docs/specs/semconv/resource/k8s/#cluster |
