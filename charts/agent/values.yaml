@@ -26,6 +26,12 @@ cluster:
     # -- deployment environment cluster runs in (e.g. testing, production, etc).
     # populates to deployment.environment.name per https://opentelemetry.io/docs/specs/semconv/resource/deployment-environment/
     name: ""
+  # configure k8sattributes processor metadata collection behavior
+  metadata:
+    # -- whether to wait for the initial metadata poll to complete before processing telemetry
+    waitForInitialPoll: false
+    # -- timeout for waiting for the initial metadata poll to complete
+    waitForInitialPollTimeout: 10s
   # configure the collection of resources and events
   events:
     # how often to pull resources from cluster

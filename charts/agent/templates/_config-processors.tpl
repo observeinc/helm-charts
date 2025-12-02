@@ -35,6 +35,8 @@ k8sattributes:
   filter:
     node_from_env_var: K8S_NODE_NAME
   {{ end }}
+  wait_for_metadata: {{ .Values.cluster.metadata.waitForInitialPoll }}
+  wait_for_metadata_timeout: {{ .Values.cluster.metadata.waitForInitialPollTimeout }}
   extract:
     otel_annotations: true
     metadata:
