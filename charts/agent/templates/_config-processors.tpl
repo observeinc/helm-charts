@@ -97,6 +97,48 @@ resource/observe_common:
     {{ end }}
 {{- end -}}
 
+{{- define "config.processors.resource.fargate_resource_attributes" -}}
+resource/fargate_resource_attributes:
+  attributes:
+    - key: k8s.pod.uid
+      action: upsert
+      value: ${env:K8S_POD_ID}
+    - key: k8s.pod.ip
+      action: upsert
+      value: ${env:K8S_POD_IP}
+    {{ if eq .Values.nodeless.logs.containerNameFromFile false }}
+    - key: k8s.container.name
+      value: ${file:/applogs/app-container-name.txt}
+      action: upsert
+    {{ end }}
+{{- end -}}
+
+{{- define "config.processors.resource.fargate_add_log_file_path" -}}
+resource/fargate_add_log_file_path:
+  attributes:
+    - key: log.file.path
+      action: upsert
+      value: "/test/test_file_path.log"
+{{- end -}}
+
+{{- define "config.processors.groupbyattrs.log_file" -}}
+groupbyattrs/log_file:
+  keys:
+    - log.file.path
+{{- end -}}
+
+{{- define "config.processors.transform.add_resource_container_name" -}}
+transform/add_resource_container_name:
+  error_mode: ignore
+  log_statements:
+    - context: resource
+      statements:
+      # Extract filename from path (no path, no extension) using regex
+      - set(attributes["k8s.container.name"], attributes["log.file.path"])
+      - replace_pattern(attributes["k8s.container.name"], "^(?:.*/)?([^/]+)\\..*$", "$$1")
+{{- end -}}
+
+
 {{- define "config.processors.resource.agent_instance" -}}
 resource/agent_instance:
     attributes:
@@ -142,6 +184,14 @@ attributes/debug_source_pod_metrics:
     - key: debug_source
       action: insert
       value: pod_metrics
+{{- end -}}
+
+{{- define "config.processors.attributes.fargate_pod_logs" -}}
+  attributes/debug_source_fargate_pod_logs:
+    actions:
+      - key: debug_source
+        action: insert
+        value: fargate_pod_logs
 {{- end -}}
 
 {{- define "config.processors.attributes.cadvisor_metrics" -}}
