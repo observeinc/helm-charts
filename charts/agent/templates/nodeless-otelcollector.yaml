@@ -12,6 +12,14 @@ spec:
       valueFrom:
         fieldRef:
           fieldPath: spec.nodeName
+    - name: K8S_POD_ID
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.uid
+    - name: K8S_POD_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
     - name: OBSERVE_CLUSTER_NAME
       value: "{{ .Values.cluster.name }}"
     - name: OBSERVE_CLUSTER_UID
@@ -19,6 +27,8 @@ spec:
         configMapKeyRef:
           name: cluster-info
           key: id
+    - name: OBSERVE_OTEL_ENDPOINT
+      value: "{{ .Values.observe.collectionEndpoint.value }}v2/otel"
     - name: OBSERVE_PROMETHEUS_ENDPOINT
       value: "{{ .Values.observe.collectionEndpoint.value }}v1/prometheus"
     - name: OBSERVE_AUTHORIZATION_HEADER
@@ -34,6 +44,66 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+    {{- if and .Values.nodeless.logs.enabled (not .Values.nodeless.logs.containerNameFromFile) }}
+    - name: app-container-info
+      image: bitnami/kubectl:latest
+      command: ["/bin/sh", "-c"]
+      args:
+      - |
+        #!/bin/sh
+
+        # Sidecars to exclude (space-separated list)
+        SIDECARS="cleanup-sidecar otc-container"
+
+        # Get container names (space-separated), convert to newline-separated
+        CONTAINERS=$(kubectl get pod "$HOSTNAME" -n "$NAMESPACE" \
+          -o jsonpath='{.spec.containers[*].name}' | tr ' ' '\n')
+
+        APP_CONTAINER=""
+
+        for c in $CONTAINERS; do
+            SKIP="false"
+
+            # Check if this container is in the sidecar list
+            for sidecar in $SIDECARS; do
+                if [ "$c" = "$sidecar" ]; then
+                    SKIP="true"
+                    break
+                fi
+            done
+
+            if [ "$SKIP" = "false" ]; then
+                APP_CONTAINER="$c"
+                break
+            fi
+        done
+
+        echo "Detected app container: $APP_CONTAINER"
+        echo -n "$APP_CONTAINER" > /applogs/app-container-name.txt
+      env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+      volumeMounts:
+        - name: log-storage
+          mountPath: /applogs
+          readOnly: false
+    {{- end }}
+
+  {{- if and .Values.nodeless.logs.enabled }}
+  volumeMounts:
+    - name: log-storage
+      mountPath: /applogs
+      readOnly: false
+  {{- end }}
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 150m
+      memory: 256Mi
 {{- else }}
 {{- fail "Invalid nodeless.hostingPlatform, valid values are 'fargate', provided value is %s" .Values.nodeless.hostingPlatform }}
 {{- end }}

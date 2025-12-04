@@ -1,40 +1,89 @@
 {{- define "observe.sidecar.FargateSidecar.config" -}}
 
 receivers:
+{{- if .Values.nodeless.metrics.enabled }}
 {{- include "observe.kubeletstats.receiver" (dict "Values" .Values "endpoint" "https://kubernetes.default.svc/api/v1/nodes/${env:K8S_NODE_NAME}/proxy") | nindent 2 }}
+{{ end }}
+
+{{- if .Values.nodeless.logs.enabled }}
+  filelog:
+    poll_interval: 20ms
+    exclude: {{ .Values.nodeless.logs.exclude }}
+    include: {{ .Values.nodeless.logs.include }}
+    include_file_name: false
+    include_file_path: true
+    exclude_older_than: {{ .Values.node.containers.logs.lookbackPeriod }}
+    retry_on_failure:
+      enabled: {{ .Values.node.containers.logs.retryOnFailure.enabled }}
+      initial_interval: {{ .Values.node.containers.logs.retryOnFailure.initialInterval }}
+      max_interval: {{ .Values.node.containers.logs.retryOnFailure.maxInterval }}
+      max_elapsed_time: {{ .Values.node.containers.logs.retryOnFailure.maxElapsedTime }}
+    start_at: {{  .Values.nodeless.logs.startAt }}
+{{ end }}
 
 processors:
-
+# common processors
 {{- include "config.processors.memory_limiter" . | nindent 2 }}
 {{- include "config.processors.batch" . | nindent 2 }}
 {{- include "config.processors.resource_detection.cloud" . | nindent 2 }}
 {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
+
+# metrics specific processors
 {{- include "config.processors.deltatocumulative" . | nindent 2 }}
-{{- include "config.processors.attributes.add_empty_service_attributes" . | nindent 2 }}
 {{- include "config.processors.metricstransform.duplicate_k8s_cpu_metrics" . | nindent 2 }}
 {{- include "config.processors.attributes.sidecar_kubeletstats_metrics" . | nindent 2 }}
+
+# logs specific processors
+{{- include "config.processors.resource.fargate_resource_attributes" . | nindent 2 }}
+{{- include "config.processors.attributes.fargate_pod_logs" . | nindent 2 }}
+
+{{- if .Values.nodeless.logs.containerNameFromFile }}
+  {{- include "config.processors.resource.fargate_add_log_file_path" . | nindent 2 }}
+  {{- include "config.processors.groupbyattrs.log_file" . | nindent 2 }}
+  {{- include "config.processors.transform.add_resource_container_name" . | nindent 2 }}
+{{- end }}
+
+{{ $logsProcessors := (list "resource/fargate_resource_attributes"  "k8sattributes" "batch" "resourcedetection/cloud" "resource/observe_common" "attributes/debug_source_fargate_pod_logs") }}
+{{- if .Values.nodeless.logs.containerNameFromFile }}
+  {{- $logsProcessors = concat ( list "resource/fargate_add_log_file_path" "groupbyattrs/log_file" "transform/add_resource_container_name" ) $logsProcessors | uniq }}
+{{- end }}
+{{- $logsProcessors = concat ( list "memory_limiter" ) $logsProcessors | uniq }}
+
+# {{- include "config.processors.attributes.add_empty_service_attributes" . | nindent 2 }} # TODO check if we need this
+
 
 exporters:
 {{- include "config.exporters.debug" . | nindent 2 }}
 {{- include "config.exporters.prometheusremotewrite" . | nindent 2 }}
+{{- include "config.exporters.otlphttp.observe.base" . | nindent 2 }}
 
-{{ $kubeletstatsExporters := (list "prometheusremotewrite/observe") -}}
+{{- $kubeletstatsExporters := (list "prometheusremotewrite/observe") -}}
+{{- $logsExporters := (list "otlphttp/observe/base") -}}
 
-{{- if eq .Values.agent.config.global.debug.enabled true }}
+{{- if and .Values.nodeless.logs.enabled .Values.agent.config.global.debug.enabled }}
+  {{- $logsExporters = concat $logsExporters ( list "debug/override" ) | uniq }}
+{{- end }}
+
+{{- if and .Values.nodeless.metrics.enabled .Values.agent.config.global.debug.enabled }}
   {{- $kubeletstatsExporters = concat $kubeletstatsExporters ( list "debug/override" ) | uniq }}
 {{- end }}
 
-# in the future, we may add other pipelines, and the failure condition should change to
-# being that no telemetry collection was enabled
 service:
   pipelines:
     {{- if .Values.nodeless.metrics.enabled }}
-      metrics/kubeletstats:
-        receivers: [kubeletstats]
-        processors: [memory_limiter, metricstransform/duplicate_k8s_cpu_metrics, k8sattributes, deltatocumulative/observe, batch, resourcedetection/cloud, resource/observe_common, attributes/debug_source_sidecar_kubeletstats_metrics]
-        exporters: [{{ join ", " $kubeletstatsExporters }}]
-    {{- else }}
-      {{- fail "nodeless.metrics.enabled must be true for Fargate sidecar - otherwise no telemetry will be collected" }}
+    metrics/kubeletstats:
+      receivers: [kubeletstats]
+      processors: [memory_limiter, metricstransform/duplicate_k8s_cpu_metrics, k8sattributes, deltatocumulative/observe, batch, resourcedetection/cloud, resource/observe_common, attributes/debug_source_sidecar_kubeletstats_metrics]
+      exporters: [{{ join ", " $kubeletstatsExporters }}]
+    {{- end }}
+    {{- if .Values.nodeless.logs.enabled }}
+    logs/filelog:
+      receivers: [filelog]
+      processors: [{{ join ", " $logsProcessors }}]
+      exporters: [{{ join ", " $logsExporters }}]
+    {{- end }}
+    {{- if and (not .Values.nodeless.metrics.enabled) (not .Values.nodeless.logs.enabled) }}
+      {{- fail "nodeless.metrics.enabled or nodeless.logs.enabled must be true for Fargate sidecar, or no telemetry will be collected" }}
     {{- end }}
 {{- end }}
