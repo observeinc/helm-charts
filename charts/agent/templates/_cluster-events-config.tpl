@@ -67,6 +67,12 @@ receivers:
       - {name: clusterrolebindings, mode: watch}
       - {name: serviceaccounts, mode: pull, interval: 15m}
       - {name: serviceaccounts, mode: watch}
+      - {name: customresourcedefinitions, mode: pull, interval: 15m}
+      - {name: customresourcedefinitions, mode: watch}
+{{- range .Values.cluster.events.customResources }}
+      - {name: {{ . }}, mode: pull, interval: 15m}
+      - {name: {{ . }}, mode: watch}
+{{- end }}
 
 {{- if .Values.agent.config.global.fleet.enabled }}
 {{- include "config.receivers.observe.heartbeat" . | nindent 2 }}
