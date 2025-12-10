@@ -37,6 +37,9 @@ cluster:
     # how often to pull resources from cluster
     pullInterval: 20m
     enabled: true
+    # -- A list of custom resource definition names whose custom resources will be collected.
+    # Example: ["applications.argoproj.io", "cninodes.vpcresources.k8s.aws"]
+    customResources: []
   # cluster-level metrics and entity events (as metrics) from the Kubernetes API server. It uses the K8s API to listen for updates.
   metrics:
     enabled: true
