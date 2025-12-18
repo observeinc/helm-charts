@@ -6,7 +6,7 @@ metadata:
   name: fargate-collector
 spec:
   mode: sidecar
-  image: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:latest"
+  image: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.141.0"
   env:
     - name: K8S_NODE_NAME
       valueFrom:
