@@ -165,12 +165,47 @@ application:
       - observe.status_code
 
 nodeless:
-  # -- (bool) Enables nodeless mode. Nodeless mode is intended for environments where daemonsets are not supported.
+  # -- (bool) Enables nodeless mode. Nodeless mode is intended for environments where daemonsets are not supported. See https://docs.observeinc.com/docs/deploy-to-a-serverless-kubernetes-cluster for details on setup required.
   enabled: false
   # -- (string) The hosting platform for the nodeless mode. Valid values are "fargate".
   hostingPlatform: ""
   metrics:
+    # -- (bool) Enables metric collection in nodeless mode.
     enabled: false
+  logs:
+    # -- (bool) Enables log collection in nodeless mode.
+    enabled: false
+    # -- (bool) If true, the container name will be extracted from the log file path. If false, the container name will be the first (non-sidecar) container in the pod.
+    containerNameFromFile: false
+    # If true, the receiver will pause reading a file and attempt to resend the current batch of logs if it encounters an error from downstream components.
+    retryOnFailure:
+      enabled: true
+      # Time to wait after the first failure before retrying.
+      initialInterval: 1s
+      # Upper bound on retry backoff interval. Once this value is reached the delay between consecutive retries will remain constant at the specified value.
+      maxInterval: 30s
+      # Maximum amount of time (including retries) spent trying to send a logs batch to a downstream consumer. Once this value is reached, the data is discarded. Retrying never stops if set to 0.
+      maxElapsedTime: 5m
+    # A list of file glob patterns that match the file paths to be read. Need to put inside of '' to avoid helm stripping commas and quotes.
+    # Log rotation glob assumes rename of file follows this pattern *.log.*
+    include: '["/applogs/**/*.log", "/applogs/**/*.log.*"]'
+    # A list of file glob patterns to exclude from reading. This is applied against the paths matched by include. Need to put inside of '' to avoid helm stripping commas and quotes.
+    #  Log rotation exclude glob assumes files previously rotated and renamed are zipped after rotated file is created
+    exclude: '["**/*.gz", "**/*.tmp"]'
+    # -- Enable automatic detection of multiline logs that start with a timestamp. Cannot be combined with multiline config block.
+    # Examples of supported timestamp formats:
+    # `2025-03-28 13:45:30`,
+    # `2025-03-28T14:33:53.743350Z`,
+    # `Jul 15 15:16:01`,
+    # `2025/05/16 19:46:15`
+    autoMultilineDetection: false
+    # -- Multiline config block. Cannot be combined with automatic multiline detection.
+    # For more information see https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/filelogreceiver/README.md#multiline-configuration
+    multiline:
+    # time unit 1m, 1h
+    lookbackPeriod: 24h
+    # At startup, where to start reading logs from the file. Options are beginning or end.
+    startAt: end
   # -- (object) A map of namespaces to lists of service accounts. If you provide service accounts here
   # we will attach a cluster role and binding granting the service accounts permission to the relevant Kubernetes APIs
   # needed to collect metrics. If empty, you will need to manually grant the service accounts the necessary permissions.

@@ -12,6 +12,14 @@ spec:
       valueFrom:
         fieldRef:
           fieldPath: spec.nodeName
+    - name: OTEL_K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.uid
+    - name: OTEL_K8S_POD_IP
+      valueFrom:
+        fieldRef:
+          fieldPath: status.podIP
     - name: OBSERVE_CLUSTER_NAME
       value: "{{ .Values.cluster.name }}"
     - name: OBSERVE_CLUSTER_UID
@@ -19,6 +27,8 @@ spec:
         configMapKeyRef:
           name: cluster-info
           key: id
+    - name: OBSERVE_OTEL_ENDPOINT
+      value: "{{ .Values.observe.collectionEndpoint.value }}v2/otel"
     - name: OBSERVE_PROMETHEUS_ENDPOINT
       value: "{{ .Values.observe.collectionEndpoint.value }}v1/prometheus"
     - name: OBSERVE_AUTHORIZATION_HEADER
@@ -34,6 +44,88 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+    {{- if .Values.nodeless.logs.enabled }}
+    - name: logging-sidecar
+      restartPolicy: Always
+      image: alpine/k8s:1.28.3
+      resources:
+        requests:
+          memory: 100Mi
+          cpu: 100m
+        limits:
+          memory: 100Mi
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          apk add --no-cache logrotate curl
+
+          {{- if not .Values.nodeless.logs.containerNameFromFile }}
+          # Get the first container name
+          APP_CONTAINER=$(kubectl get pod "$POD_NAME" -n "$POD_NAMESPACE" \
+            -o jsonpath='{.spec.containers[0].name}')
+
+          echo "Detected app container: $APP_CONTAINER"
+          echo -n "$APP_CONTAINER" > /applogs/app-container-name.txt
+          {{- end }}
+
+          # Create logrotate config inline
+          # size and rotation should keep total memory usage < 5Mi per container
+          # compression helps keep the size down
+          # delaycompress, copytruncate to prevent concurrency issues with applications writing to the log file
+          # missingok to suppress errors in case application has not written to the log file yet
+          # notifempty to prevent logrotate from creating a new file if the log file is empty
+          # su root root to grant logrotate permission to rotate the log file
+          cat > /etc/logrotate.conf << 'EOF'
+          /applogs/*.log {
+              size 1M
+              rotate 5
+              compress
+              delaycompress
+              missingok
+              notifempty
+              copytruncate
+              dateext
+              su root root
+              dateformat -%Y%m%d-%H%M%S
+          }
+          EOF
+
+          # Run logrotate
+          while true; do
+            logrotate -v /etc/logrotate.conf
+            sleep 60
+          done
+      env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+      volumeMounts:
+        - name: log-storage
+          mountPath: /applogs
+          readOnly: false
+    {{- end }}
+
+  {{- if .Values.nodeless.logs.enabled }}
+  volumeMounts:
+    - name: log-storage
+      mountPath: /applogs
+      readOnly: false
+  {{- end }}
+  resources:
+    limits:
+      memory: 256Mi
+    requests:
+      cpu: 150m
+      memory: 256Mi
 {{- else }}
 {{- fail "Invalid nodeless.hostingPlatform, valid values are 'fargate', provided value is %s" .Values.nodeless.hostingPlatform }}
 {{- end }}

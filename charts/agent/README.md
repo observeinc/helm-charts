@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.79.1](https://img.shields.io/badge/Version-0.79.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.11.0](https://img.shields.io/badge/AppVersion-2.11.0-informational?style=flat-square)
+![Version: 0.80.0](https://img.shields.io/badge/Version-0.80.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.12.0](https://img.shields.io/badge/AppVersion-2.12.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -32,7 +32,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 
 ## fargate-collector
 
-This service is an *OpenTelemetryCollector*, a custom resource that is managed by a OpenTelemetry Operator (must be installed separately) It is responsible for collecting metrics from nodes when running on AWS Fargate. It injects a sidecar into every pod with the appropriate annotation, and scrapes the API of the kubelet of that node for metrics. Daemonsets are not allowed on fargate, so this service is intended as a replacement for the usual approach for node metric collection with the `node-logs-metrics` daemonset.
+This service is an *OpenTelemetryCollector*, a custom resource that is managed by a OpenTelemetry Operator (must be installed separately) It is responsible for collecting logs and metrics from nodes when running on AWS Fargate. It injects a sidecar into every pod with the appropriate annotation, and scrapes the API of the kubelet of that node for metrics. Daemonsets are not allowed on fargate, so this service is intended as a replacement for the usual approach for node metric collection with the `node-logs-metrics` daemonset.
 
 ## Maintainers
 
@@ -612,9 +612,21 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | node.metrics.fileSystem.excludeMountPoints | string | `"[\"/dev/*\",\"/proc/*\",\"/sys/*\",\"/run/k3s/containerd/*\",\"/var/lib/docker/*\",\"/var/lib/kubelet/*\",\"/snap/*\"]"` |  |
 | node.metrics.fileSystem.rootPath | string | `"/hostfs"` |  |
 | node.metrics.interval | string | `"60s"` |  |
-| nodeless.enabled | bool | `false` | Enables nodeless mode. Nodeless mode is intended for environments where daemonsets are not supported. |
+| nodeless.enabled | bool | `false` | Enables nodeless mode. Nodeless mode is intended for environments where daemonsets are not supported. See https://docs.observeinc.com/docs/deploy-to-a-serverless-kubernetes-cluster for details on setup required. |
 | nodeless.hostingPlatform | string | `""` | The hosting platform for the nodeless mode. Valid values are "fargate". |
-| nodeless.metrics.enabled | bool | `false` |  |
+| nodeless.logs.autoMultilineDetection | bool | `false` | Enable automatic detection of multiline logs that start with a timestamp. Cannot be combined with multiline config block. Examples of supported timestamp formats: `2025-03-28 13:45:30`, `2025-03-28T14:33:53.743350Z`, `Jul 15 15:16:01`, `2025/05/16 19:46:15` |
+| nodeless.logs.containerNameFromFile | bool | `false` | If true, the container name will be extracted from the log file path. If false, the container name will be the first (non-sidecar) container in the pod. |
+| nodeless.logs.enabled | bool | `false` | Enables log collection in nodeless mode. |
+| nodeless.logs.exclude | string | `"[\"**/*.gz\", \"**/*.tmp\"]"` |  |
+| nodeless.logs.include | string | `"[\"/applogs/**/*.log\", \"/applogs/**/*.log.*\"]"` |  |
+| nodeless.logs.lookbackPeriod | string | `"24h"` |  |
+| nodeless.logs.multiline | string | `nil` | Multiline config block. Cannot be combined with automatic multiline detection. For more information see https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/filelogreceiver/README.md#multiline-configuration |
+| nodeless.logs.retryOnFailure.enabled | bool | `true` |  |
+| nodeless.logs.retryOnFailure.initialInterval | string | `"1s"` |  |
+| nodeless.logs.retryOnFailure.maxElapsedTime | string | `"5m"` |  |
+| nodeless.logs.retryOnFailure.maxInterval | string | `"30s"` |  |
+| nodeless.logs.startAt | string | `"end"` |  |
+| nodeless.metrics.enabled | bool | `false` | Enables metric collection in nodeless mode. |
 | nodeless.serviceAccounts | object | `{}` | A map of namespaces to lists of service accounts. If you provide service accounts here we will attach a cluster role and binding granting the service accounts permission to the relevant Kubernetes APIs needed to collect metrics. If empty, you will need to manually grant the service accounts the necessary permissions. Example:   serviceAccounts:     default: ["app1-sa", "app2-sa"]     fargate-ns: ["fargate-app-sa"] |
 | observe.collectionEndpoint.value | string | `""` |  |
 | observe.entityToken.create | bool | `false` |  |

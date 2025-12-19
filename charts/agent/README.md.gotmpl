@@ -33,7 +33,7 @@ This service is a *single-instance deployment*. It's critical that this service 
 
 ## fargate-collector
 
-This service is an *OpenTelemetryCollector*, a custom resource that is managed by a OpenTelemetry Operator (must be installed separately) It is responsible for collecting metrics from nodes when running on AWS Fargate. It injects a sidecar into every pod with the appropriate annotation, and scrapes the API of the kubelet of that node for metrics. Daemonsets are not allowed on fargate, so this service is intended as a replacement for the usual approach for node metric collection with the `node-logs-metrics` daemonset.
+This service is an *OpenTelemetryCollector*, a custom resource that is managed by a OpenTelemetry Operator (must be installed separately) It is responsible for collecting logs and metrics from nodes when running on AWS Fargate. It injects a sidecar into every pod with the appropriate annotation, and scrapes the API of the kubelet of that node for metrics. Daemonsets are not allowed on fargate, so this service is intended as a replacement for the usual approach for node metric collection with the `node-logs-metrics` daemonset.
 
 {{ template "chart.homepageLine" . }}
 
