@@ -14,7 +14,6 @@ processors:
   - resource/fargate_resource_attributes
   - k8sattributes
   - batch
-  - resourcedetection/cloud
   - resource/observe_common
   - attributes/debug_source_fargate_pod_logs
 {{- end }}
