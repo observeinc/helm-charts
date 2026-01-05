@@ -127,6 +127,6 @@ spec:
       cpu: 150m
       memory: 256Mi
 {{- else }}
-{{- fail "Invalid nodeless.hostingPlatform, valid values are 'fargate', provided value is %s" .Values.nodeless.hostingPlatform }}
+{{- fail (printf "Invalid nodeless.hostingPlatform, valid values are 'fargate', provided value is %s" .Values.nodeless.hostingPlatform) }}
 {{- end }}
 {{- end }}
