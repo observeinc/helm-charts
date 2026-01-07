@@ -10,6 +10,7 @@ processors:
   {{- if .Values.nodeless.logs.containerNameFromFile }}
   - groupbyattrs/log_file
   - transform/add_resource_container_name
+  - transform/extract_iostream
   {{- end }}
   - resource/fargate_resource_attributes
   - k8sattributes
@@ -77,6 +78,7 @@ processors:
 {{- if .Values.nodeless.logs.containerNameFromFile }}
   {{- include "config.processors.groupbyattrs.log_file" . | nindent 2 }}
   {{- include "config.processors.transform.add_resource_container_name" . | nindent 2 }}
+  {{- include "config.processors.transform.extract_iostream" . | nindent 2 }}
 {{- end }}
 
 exporters:
