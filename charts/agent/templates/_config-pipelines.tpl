@@ -91,6 +91,7 @@ logs/heartbeat:
         - resourcedetection
         - resource/agent_instance
         - k8sattributes
+        - resource/observe_common
         - transform/k8sheartbeat
     receivers:
         - heartbeat

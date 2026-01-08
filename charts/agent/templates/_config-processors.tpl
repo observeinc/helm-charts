@@ -153,6 +153,10 @@ transform/k8sheartbeat:
         - set(attributes["observe_transform"]["identifiers"]["k8s.pod.name"], resource.attributes["k8s.pod.name"])
         - set(attributes["observe_transform"]["identifiers"]["k8s.deployment.name"], resource.attributes["k8s.deployment.name"])
         - set(attributes["observe_transform"]["identifiers"]["k8s.daemonset.name"], resource.attributes["k8s.daemonset.name"])
+        - set(attributes["observe_transform"]["identifiers"]["deployment.environment.name"], resource.attributes["deployment.environment.name"])
+        - set(attributes["observe_transform"]["identifiers"]["k8s.cluster.uid"], resource.attributes["k8s.cluster.uid"])
+        - set(attributes["observe_transform"]["identifiers"]["k8s.cluster.name"], resource.attributes["k8s.cluster.name"])
+        - set(attributes["observe_transform"]["identifiers"]["k8s.namespace.name"], resource.attributes["k8s.namespace.name"])
 {{- end -}}
 
 {{- define "config.processors.memory_limiter" -}}
