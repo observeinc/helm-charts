@@ -69,7 +69,7 @@ node:
     logs:
       enabled: true
       # log lines above this size will be truncated
-      maxLogSize: 512kb
+      maxLogSize: 1024kb
       # If true, the receiver will pause reading a file and attempt to resend the current batch of logs if it encounters an error from downstream components.
       retryOnFailure:
         enabled: true
@@ -81,7 +81,7 @@ node:
         maxElapsedTime: 5m
       # A list of file glob patterns that match the file paths to be read. Need to put inside of '' to avoid helm stripping commas and quotes.
       # Log rotation glob assumes rename of file follows this pattern *.log.*
-      include: '["/var/log/pods/*/*/*.log", "/var/log/pods/*/*/*.log.*", "/var/log/kube-apiserver-audit.log"]'
+      include: '["/var/log/pods/*/*/*.log", "/var/log/pods/*/*/*.log.*"]'
       # A list of file glob patterns to exclude from reading. This is applied against the paths matched by include. Need to put inside of '' to avoid helm stripping commas and quotes.
       #  Log rotation exclude glob assumes files previously rotated and renamed are zipped after rotated file is created
       exclude: '["**/*.gz", "**/*.tmp"]'

@@ -15,7 +15,7 @@ node:
     logs:
       enabled: true
       # log lines above this size will be truncated
-      maxLogSize: 512kb
+      maxLogSize: 1024kb
       # If true, the receiver will pause reading a file and attempt to resend the current batch of logs if it encounters an error from downstream components.
       retryOnFailure:
         enabled: true

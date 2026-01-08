@@ -85,6 +85,7 @@ receivers:
     include: {{ .Values.node.containers.logs.include }}
     include_file_name: false
     include_file_path: true
+    max_log_size: {{ .Values.node.containers.logs.maxLogSize }}
     exclude_older_than: {{ .Values.node.containers.logs.lookbackPeriod }}
     operators:
     - id: container-parser
