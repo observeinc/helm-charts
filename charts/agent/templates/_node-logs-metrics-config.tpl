@@ -88,7 +88,7 @@ receivers:
     exclude_older_than: {{ .Values.node.containers.logs.lookbackPeriod }}
     operators:
     - id: container-parser
-      max_log_size: 102400
+      max_log_size: {{ .Values.node.containers.logs.maxLogSize }}
       type: container
     {{- if .Values.node.containers.logs.autoMultilineDetection }}
     - id: multiline-recombine
