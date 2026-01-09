@@ -130,6 +130,20 @@ transform/add_resource_container_name:
       - replace_pattern(attributes["k8s.container.name"], "^(?:.*/)?([^/]+)\\..*$", "$$1")
 {{- end -}}
 
+{{- define "config.processors.transform.extract_iostream" -}}
+transform/extract_iostream:
+  error_mode: ignore
+  log_statements:
+    - context: log
+      statements:
+      # Extract the immediate parent folder from log.file.path (resource attribute)
+      # e.g., /var/log/pods/ns_pod_uid/container/stdout/0.log -> stdout
+      - set(cache["parent_folder"], resource.attributes["log.file.path"])
+      - replace_pattern(cache["parent_folder"], "^.*/([^/]+)/[^/]+$$", "$$1")
+      # Set log.iostream as a log attribute only if the parent folder is stdout or stderr
+      - set(attributes["log.iostream"], cache["parent_folder"]) where cache["parent_folder"] == "stdout" or cache["parent_folder"] == "stderr"
+{{- end -}}
+
 
 {{- define "config.processors.resource.agent_instance" -}}
 resource/agent_instance:

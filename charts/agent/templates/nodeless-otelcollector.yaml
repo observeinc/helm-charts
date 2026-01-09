@@ -68,6 +68,9 @@ spec:
           echo -n "$APP_CONTAINER" > /applogs/app-container-name.txt
           {{- end }}
 
+          # Create stdout/stderr directories for log streaming
+          mkdir -p /applogs/stdout /applogs/stderr
+
           # Create logrotate config inline
           # size and rotation should keep total memory usage < 5Mi per container
           # compression helps keep the size down
@@ -77,6 +80,32 @@ spec:
           # su root root to grant logrotate permission to rotate the log file
           cat > /etc/logrotate.conf << 'EOF'
           /applogs/*.log {
+              size 1M
+              rotate 5
+              compress
+              delaycompress
+              missingok
+              notifempty
+              copytruncate
+              dateext
+              su root root
+              dateformat -%Y%m%d-%H%M%S
+          }
+
+          /applogs/stdout/*.log {
+              size 1M
+              rotate 5
+              compress
+              delaycompress
+              missingok
+              notifempty
+              copytruncate
+              dateext
+              su root root
+              dateformat -%Y%m%d-%H%M%S
+          }
+
+          /applogs/stderr/*.log {
               size 1M
               rotate 5
               compress
