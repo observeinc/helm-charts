@@ -57,6 +57,7 @@ processors:
 {{- include "config.processors.batch" . | nindent 2 }}
 {{- include "config.processors.resource_detection.cloud" . | nindent 2 }}
 {{- include "config.processors.filter.drop_long_spans" . | nindent 2 }}
+{{- include "config.processors.resource.observe_common" . | nindent 2 }}
 
 {{- if .Values.gatewayDeployment.enabled }}
   # Use passthrough mode to reduce forwarder compute and push the lookup to the gateway whenever it is enabled.
@@ -68,7 +69,6 @@ processors:
   {{- end }}
 {{- else }}
   {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
-  {{- include "config.processors.resource.observe_common" . | nindent 2 }}
   {{- include "config.processors.deltatocumulative" . | nindent 2 }}
   {{- include "config.processors.transform.add_span_status_code" . | nindent 2 }}
   {{- include "config.processors.attributes.add_empty_service_attributes" . | nindent 2 }}
