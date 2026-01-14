@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.81.1](https://img.shields.io/badge/Version-0.81.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.12.0](https://img.shields.io/badge/AppVersion-2.12.0-informational?style=flat-square)
+![Version: 0.81.2](https://img.shields.io/badge/Version-0.81.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.12.0](https://img.shields.io/badge/AppVersion-2.12.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -587,9 +587,9 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | node.containers.logs.autoMultilineDetection | bool | `false` | Enable automatic detection of multiline logs that start with a timestamp. Cannot be combined with multiline config block. Examples of supported timestamp formats: `2025-03-28 13:45:30`, `2025-03-28T14:33:53.743350Z`, `Jul 15 15:16:01`, `2025/05/16 19:46:15` |
 | node.containers.logs.enabled | bool | `true` |  |
 | node.containers.logs.exclude | string | `"[\"**/*.gz\", \"**/*.tmp\"]"` |  |
-| node.containers.logs.include | string | `"[\"/var/log/pods/*/*/*.log\", \"/var/log/pods/*/*/*.log.*\", \"/var/log/kube-apiserver-audit.log\"]"` |  |
+| node.containers.logs.include | string | `"[\"/var/log/pods/*/*/*.log\", \"/var/log/pods/*/*/*.log.*\"]"` |  |
 | node.containers.logs.lookbackPeriod | string | `"24h"` |  |
-| node.containers.logs.maxLogSize | string | `"512kb"` |  |
+| node.containers.logs.maxLogSize | string | `"1024kb"` |  |
 | node.containers.logs.multiline | string | `nil` | Multiline config block. Cannot be combined with automatic multiline detection. For more information see https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/filelogreceiver/README.md#multiline-configuration |
 | node.containers.logs.retryOnFailure.enabled | bool | `true` |  |
 | node.containers.logs.retryOnFailure.initialInterval | string | `"1s"` |  |
