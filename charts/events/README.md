@@ -2,7 +2,7 @@
 
 > **:exclamation: This Helm Chart is deprecated!**
 
-![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.11.5](https://img.shields.io/badge/AppVersion-v0.11.5-informational?style=flat-square)
+![Version: 0.6.0](https://img.shields.io/badge/Version-0.6.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v0.11.6](https://img.shields.io/badge/AppVersion-v0.11.6-informational?style=flat-square)
 
 DEPRECATED Observe kubernetes event collection
 

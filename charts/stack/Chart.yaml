@@ -2,7 +2,7 @@ apiVersion: v2
 name: stack
 description: DEPRECATED Observe Kubernetes agent stack
 type: application
-version: 1.5.1
+version: 1.5.2
 deprecated: true
 dependencies:
   - name: logs
@@ -14,7 +14,7 @@ dependencies:
     repository: file://../metrics
     condition: metrics.enabled
   - name: events
-    version: 0.5.0
+    version: 0.6.0
     repository: file://../events
     condition: events.enabled
   - name: proxy

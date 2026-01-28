@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.82.0](https://img.shields.io/badge/Version-0.82.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.12.0](https://img.shields.io/badge/AppVersion-2.12.0-informational?style=flat-square)
+![Version: 0.82.1](https://img.shields.io/badge/Version-0.82.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.12.0](https://img.shields.io/badge/AppVersion-2.12.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -139,7 +139,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | cluster-events.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.12.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | cluster-events.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | cluster-events.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
-| cluster-events.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
+| cluster-events.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.6"` |  |
 | cluster-events.initContainers[0].imagePullPolicy | string | `"Always"` |  |
 | cluster-events.initContainers[0].name | string | `"kube-cluster-info"` |  |
 | cluster-events.livenessProbe.httpGet.path | string | `"/status"` |  |
@@ -209,7 +209,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | cluster-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.12.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | cluster-metrics.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | cluster-metrics.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
-| cluster-metrics.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
+| cluster-metrics.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.6"` |  |
 | cluster-metrics.initContainers[0].imagePullPolicy | string | `"Always"` |  |
 | cluster-metrics.initContainers[0].name | string | `"kube-cluster-info"` |  |
 | cluster-metrics.livenessProbe.httpGet.path | string | `"/status"` |  |
@@ -295,7 +295,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | forwarder.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.12.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | forwarder.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | forwarder.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
-| forwarder.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
+| forwarder.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.6"` |  |
 | forwarder.initContainers[0].imagePullPolicy | string | `"Always"` |  |
 | forwarder.initContainers[0].name | string | `"kube-cluster-info"` |  |
 | forwarder.livenessProbe.httpGet.path | string | `"/status"` |  |
@@ -369,7 +369,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | gateway.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.12.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | gateway.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | gateway.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
-| gateway.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
+| gateway.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.6"` |  |
 | gateway.initContainers[0].imagePullPolicy | string | `"Always"` |  |
 | gateway.initContainers[0].name | string | `"kube-cluster-info"` |  |
 | gateway.livenessProbe.httpGet.path | string | `"/status"` |  |
@@ -448,7 +448,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | monitor.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.12.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | monitor.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | monitor.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
-| monitor.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
+| monitor.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.6"` |  |
 | monitor.initContainers[0].imagePullPolicy | string | `"Always"` |  |
 | monitor.initContainers[0].name | string | `"kube-cluster-info"` |  |
 | monitor.livenessProbe.httpGet.path | string | `"/status"` |  |
@@ -547,7 +547,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | node-logs-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.12.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | node-logs-metrics.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | node-logs-metrics.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
-| node-logs-metrics.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
+| node-logs-metrics.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.6"` |  |
 | node-logs-metrics.initContainers[0].imagePullPolicy | string | `"Always"` |  |
 | node-logs-metrics.initContainers[0].name | string | `"kube-cluster-info"` |  |
 | node-logs-metrics.livenessProbe.httpGet.path | string | `"/status"` |  |
@@ -675,7 +675,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | prometheus-scraper.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.12.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | prometheus-scraper.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | prometheus-scraper.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
-| prometheus-scraper.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.5"` |  |
+| prometheus-scraper.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.6"` |  |
 | prometheus-scraper.initContainers[0].imagePullPolicy | string | `"Always"` |  |
 | prometheus-scraper.initContainers[0].name | string | `"kube-cluster-info"` |  |
 | prometheus-scraper.livenessProbe.httpGet.path | string | `"/status"` |  |
