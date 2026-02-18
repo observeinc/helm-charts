@@ -20,6 +20,8 @@ receivers:
     protocols:
       grpc:
         endpoint: ${env:MY_POD_IP}:4317
+        # Set the max receive size to match Observe ingest for consistency.
+        max_recv_msg_size_mib: 50
       http:
         endpoint: ${env:MY_POD_IP}:4318
 
