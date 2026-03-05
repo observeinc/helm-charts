@@ -1,6 +1,13 @@
 {{- define "config.processors.resource_detection.cloud" -}}
 resourcedetection/cloud:
-  detectors: ["eks", "gcp", "ecs", "ec2", "azure"]
+  detectors:
+    {{- if not .Values.nodeless.enabled }}
+    - eks
+    {{- end }}
+    - gcp
+    - ecs
+    - ec2
+    - azure
   timeout: 2s
   override: false
 {{- end -}}
