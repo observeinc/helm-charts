@@ -291,6 +291,8 @@ transform/shape_spans_for_red_metrics:
     # peer.db.name = coalesce(peer.db.name, db.system.name, db.system)
     - set(span.attributes["peer.db.name"], span.attributes["db.system.name"]) where span.attributes["peer.db.name"] == nil and span.attributes["db.system.name"] != nil
     - set(span.attributes["peer.db.name"], span.attributes["db.system"]) where span.attributes["peer.db.name"] == nil and span.attributes["db.system"] != nil
+    # peer.messaging.system = coalesce(peer.messaging.system, messaging.system)
+    - set(span.attributes["peer.messaging.system"], span.attributes["messaging.system"]) where span.attributes["peer.messaging.system"] == nil and span.attributes["messaging.system"] != nil
     # deployment.environment = coalesce(deployment.environment, deployment.environment.name)
     - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]) where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"] != nil
     # Needed because `spanmetrics` connector can only operate on attributes or resource attributes.
