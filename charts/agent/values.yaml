@@ -1196,6 +1196,14 @@ forwarder:
       valueFrom:
         fieldRef:
           fieldPath: metadata.name
+    - name: OTEL_K8S_NAMESPACE_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.namespace
+    - name: OTEL_K8S_DEPLOYMENT_ENVIRONMENT_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.annotations['resource.opentelemetry.io/deployment.environment.name']
     - name: OBSERVE_CLUSTER_NAME
       valueFrom:
         configMapKeyRef:
