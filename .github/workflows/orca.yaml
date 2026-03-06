@@ -48,3 +48,4 @@ jobs:
           path:
              # scanning the entire repository
             "."
+          exclude_paths: "charts/*/examples"

@@ -1,0 +1,77 @@
+# Example values for deploying the Observe Agent on AWS EKS Fargate.
+# See: https://docs.observeinc.com/docs/deploy-to-a-serverless-kubernetes-cluster
+observe:
+  token:
+    create: true
+
+application:
+  prometheusScrape:
+    enabled: true
+    independentDeployment: true
+  REDMetrics:
+    enabled: true
+
+agent:
+  config:
+    global:
+      exporters:
+        sendingQueue:
+          batch:
+            enabled: true
+      processors:
+        k8sattributesNodeOnlyDaemonset: true
+      fleet:
+        enabled: true
+
+node:
+  # Daemonsets are not supported in serverless Kubernetes (EKS Fargate).
+  enabled: false
+  forwarder:
+    enabled: true
+    traces:
+      maxSpanDuration: 1h
+    metrics:
+      outputFormat: otel
+      convertCumulativeToDelta: true
+  metrics:
+    cadvisor:
+      enabled: true
+  kubeletstats:
+    metric_groups:
+      - node
+      - pod
+      - container
+      - volume
+
+# Collect pod metrics and logs via OTel operator sidecars on Fargate.
+# Requires the opentelemetry-operator Helm chart to be installed.
+nodeless:
+  enabled: true
+  hostingPlatform: fargate
+  logs:
+    enabled: true
+    containerNameFromFile: false
+    retryOnFailure:
+      enabled: true
+      initialInterval: 1s
+      maxInterval: 30s
+      maxElapsedTime: 5m
+    include: '["/applogs/**/*.log", "/applogs/**/*.log.*"]'
+    exclude: '["**/*.gz", "**/*.tmp"]'
+    multiline:
+    lookbackPeriod: 24h
+    startAt: end
+    autoMultilineDetection: false
+  serviceAccounts:
+    dev: ["devServiceAccount1", "devServiceAccount2"]
+    production: ["productionServiceAccount1", "productionServiceAccount2"]
+
+gatewayDeployment:
+  enabled: true
+  traceSampling:
+    enabled: true
+
+forwarder:
+  # Switch forwarder from daemonset to deployment for Fargate.
+  mode: deployment
+  replicaCount: 2
