@@ -1,0 +1,4 @@
+global:
+  excluded_paths:
+    - "charts/*/examples/**"
+    - "examples/**"
