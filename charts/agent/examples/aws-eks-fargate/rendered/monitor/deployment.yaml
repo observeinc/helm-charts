@@ -1,0 +1,172 @@
+---
+# Source: agent/charts/monitor/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-monitor
+  namespace: observe
+  labels:
+    helm.sh/chart: monitor-0.143.0
+    app.kubernetes.io/name: monitor
+    app.kubernetes.io/instance: example
+    app.kubernetes.io/version: "0.143.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/part-of: opentelemetry-collector
+    app.kubernetes.io/component: standalone-collector
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: monitor
+      app.kubernetes.io/instance: example
+      component: standalone-collector
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum/config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+        observe_monitor_path: /metrics
+        observe_monitor_port: "8888"
+        observe_monitor_purpose: observecollection
+        observe_monitor_scrape: "false"
+        observeinc_com_scrape: "false"
+      labels:
+        app.kubernetes.io/name: monitor
+        app.kubernetes.io/instance: example
+        component: standalone-collector
+
+    spec:
+
+      serviceAccountName: observe-agent-service-account
+      automountServiceAccountToken: true
+      securityContext:
+        {}
+      containers:
+        - name: monitor
+          command:
+            - /observe-agent
+          args:
+            - --config=/conf/relay.yaml
+            - start
+            - --observe-config=/observe-agent-conf/observe-agent.yaml
+            - --config=/conf/relay.yaml
+            - --feature-gates=+exporter.prometheusremotewritexporter.EnableMultipleWorkers
+          securityContext:
+            {}
+          image: "observeinc/observe-agent:2.14.0"
+          imagePullPolicy: IfNotPresent
+          ports:
+
+            - name: jaeger-compact
+              containerPort: 6831
+              protocol: UDP
+            - name: jaeger-grpc
+              containerPort: 14250
+              protocol: TCP
+            - name: jaeger-thrift
+              containerPort: 14268
+              protocol: TCP
+            - name: metrics
+              containerPort: 8888
+              protocol: TCP
+            - name: otlp
+              containerPort: 4317
+              protocol: TCP
+            - name: otlp-http
+              containerPort: 4318
+              protocol: TCP
+            - name: zipkin
+              containerPort: 9411
+              protocol: TCP
+          env:
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+            - name: GOMEMLIMIT
+              value: "204MiB"
+            - name: OTEL_K8S_POD_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: OTEL_K8S_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OBSERVE_CLUSTER_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: name
+                  name: cluster-name
+            - name: OBSERVE_CLUSTER_UID
+              valueFrom:
+                configMapKeyRef:
+                  key: id
+                  name: cluster-info
+            - name: TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: OBSERVE_TOKEN
+                  name: agent-credentials
+                  optional: true
+          livenessProbe:
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            httpGet:
+              path: /status
+              port: 13133
+          readinessProbe:
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            httpGet:
+              path: /status
+              port: 13133
+          resources:
+            limits:
+              memory: 256Mi
+            requests:
+              cpu: 150m
+              memory: 256Mi
+          volumeMounts:
+            - mountPath: /conf
+              name: monitor-configmap
+            - mountPath: /observe-agent-conf
+              name: observe-agent-deployment-config
+      initContainers:
+        - env:
+          - name: NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          image: observeinc/kube-cluster-info:v0.11.6
+          imagePullPolicy: Always
+          name: kube-cluster-info
+      volumes:
+        - name: monitor-configmap
+          configMap:
+            name: monitor
+            items:
+              - key: relay
+                path: relay.yaml
+        - configMap:
+            defaultMode: 420
+            items:
+            - key: relay
+              path: observe-agent.yaml
+            name: observe-agent
+          name: observe-agent-deployment-config
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: observeinc.com/unschedulable
+                operator: DoesNotExist
+              - key: kubernetes.io/os
+                operator: NotIn
+                values:
+                - windows
+      hostNetwork: false
