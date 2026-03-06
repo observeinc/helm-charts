@@ -36,6 +36,9 @@ metrics/spanmetrics:
     - batch
     {{- end }}
     - resource/observe_common
+    {{- if .Values.cluster.customResourceAttributes }}
+    - resource/custom_attributes
+    {{- end }}
     - attributes/debug_source_span_metrics
   exporters: [{{ join ", " $metricsSpanmetricsExporters }}]
 {{- end -}}
@@ -53,6 +56,9 @@ metrics/pod_metrics:
     - batch
     {{- end }}
     - resource/observe_common
+    {{- if .Values.cluster.customResourceAttributes }}
+    - resource/custom_attributes
+    {{- end }}
     - attributes/debug_source_pod_metrics
   exporters:
     - prometheusremotewrite/observe
@@ -70,6 +76,9 @@ metrics/cadvisor:
     - batch
     {{- end }}
     - resource/observe_common
+    {{- if .Values.cluster.customResourceAttributes }}
+    - resource/custom_attributes
+    {{- end }}
     - attributes/debug_source_cadvisor_metrics
   exporters:
     - prometheusremotewrite/observe
@@ -92,6 +101,9 @@ logs/heartbeat:
         - resource/agent_instance
         - k8sattributes
         - resource/observe_common
+        {{- if .Values.cluster.customResourceAttributes }}
+        - resource/custom_attributes
+        {{- end }}
         - transform/k8sheartbeat
     receivers:
         - heartbeat

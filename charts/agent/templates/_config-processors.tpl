@@ -97,6 +97,18 @@ resource/observe_common:
     {{ end }}
 {{- end -}}
 
+{{- define "config.processors.resource.custom_attributes" -}}
+{{- if .Values.cluster.customResourceAttributes }}
+resource/custom_attributes:
+  attributes:
+    {{- range $key, $value := .Values.cluster.customResourceAttributes }}
+    - key: {{ $key }}
+      action: upsert
+      value: "{{ $value }}"
+    {{- end }}
+{{- end -}}
+{{- end -}}
+
 {{- define "config.processors.resource.fargate_resource_attributes" -}}
 resource/fargate_resource_attributes:
   attributes:

@@ -89,6 +89,7 @@ processors:
     timeout: {{ .Values.agent.config.global.processors.batch.timeout }}
 
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
+{{- include "config.processors.resource.custom_attributes" . | nindent 2 }}
 
 {{- include "config.processors.attributes.observek8sattributes" . | nindent 2 }}
 
@@ -471,6 +472,9 @@ service:
           - batch
           {{- end }}
           - resource/observe_common
+          {{- if .Values.cluster.customResourceAttributes }}
+          - resource/custom_attributes
+          {{- end }}
           - transform/unify
           - observek8sattributes
           - transform/object
@@ -483,6 +487,9 @@ service:
           - batch
           {{- end }}
           - resource/observe_common
+          {{- if .Values.cluster.customResourceAttributes }}
+          - resource/custom_attributes
+          {{- end }}
           - filter/cluster
           - transform/cluster
         exporters: [{{ join ", " $logsClusterExporters }}]

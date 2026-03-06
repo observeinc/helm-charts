@@ -65,6 +65,7 @@ processors:
 {{- include "config.processors.attributes.drop_service_name" . | nindent 2 }}
 
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
+{{- include "config.processors.resource.custom_attributes" . | nindent 2 }}
 
 {{- if .Values.agent.config.global.fleet.enabled }}
 {{- include "config.processors.resource_detection" . | nindent 2 }}
@@ -98,6 +99,9 @@ service:
           - batch
           {{- end }}
           - resource/observe_common
+          {{- if .Values.cluster.customResourceAttributes }}
+          - resource/custom_attributes
+          {{- end }}
           - attributes/debug_source_agent_monitor
         exporters: [{{ join ", " $metricsExporters }}]
 

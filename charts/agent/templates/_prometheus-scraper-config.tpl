@@ -30,6 +30,7 @@ processors:
   {{- include "config.processors.batch" . | nindent 2 }}
   {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
   {{- include "config.processors.resource.observe_common" . | nindent 2 }}
+  {{- include "config.processors.resource.custom_attributes" . | nindent 2 }}
   {{- include "config.processors.attributes.pod_metrics" . | nindent 2 }}
   {{- include "config.processors.attributes.cadvisor_metrics" . | nindent 2 }}
   {{- include "config.processors.attributes.drop_service_name" . | nindent 2 }}

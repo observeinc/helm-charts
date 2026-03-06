@@ -120,6 +120,7 @@ processors:
 {{- include "config.processors.batch" . | nindent 2 }}
 {{- include "config.processors.attributes.k8sattributes" (merge . (dict "filterToNode" true)) | nindent 2 }}
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
+{{- include "config.processors.resource.custom_attributes" . | nindent 2 }}
 {{- include "config.processors.metricstransform.duplicate_k8s_cpu_metrics" . | nindent 2 }}
 
 {{- if .Values.agent.config.global.fleet.enabled }}
@@ -170,6 +171,9 @@ service:
           {{- end }}
           - resourcedetection/cloud
           - resource/observe_common
+          {{- if .Values.cluster.customResourceAttributes }}
+          - resource/custom_attributes
+          {{- end }}
           - attributes/debug_source_pod_logs
         exporters: [{{ join ", " $logsExporters }}]
       {{- end -}}
@@ -184,6 +188,9 @@ service:
           {{- end }}
           - resourcedetection/cloud
           - resource/observe_common
+          {{- if .Values.cluster.customResourceAttributes }}
+          - resource/custom_attributes
+          {{- end }}
           - attributes/debug_source_hostmetrics
         exporters: [{{ join ", " $hostmetricsExporters }}]
       {{- end -}}
@@ -199,6 +206,9 @@ service:
           {{- end }}
           - resourcedetection/cloud
           - resource/observe_common
+          {{- if .Values.cluster.customResourceAttributes }}
+          - resource/custom_attributes
+          {{- end }}
           - attributes/debug_source_kubeletstats_metrics
         exporters: [{{ join ", " $kubeletstatsExporters }}]
       {{- end -}}

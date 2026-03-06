@@ -58,6 +58,7 @@ processors:
 {{- include "config.processors.resource_detection.cloud" . | nindent 2 }}
 {{- include "config.processors.filter.drop_long_spans" . | nindent 2 }}
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
+{{- include "config.processors.resource.custom_attributes" . | nindent 2 }}
 
 {{- if .Values.gatewayDeployment.enabled }}
   # Use passthrough mode to reduce forwarder compute and push the lookup to the gateway whenever it is enabled.
@@ -157,6 +158,9 @@ processors:
   {{- $metricsProcessors = concat $metricsProcessors (list "batch") }}
   {{- end }}
   {{- $metricsProcessors = concat $metricsProcessors (list "resourcedetection/cloud" "resource/observe_common" "attributes/debug_source_app_metrics") }}
+  {{- if .Values.cluster.customResourceAttributes }}
+  {{- $metricsProcessors = concat $metricsProcessors (list "resource/custom_attributes") }}
+  {{- end }}
 {{- end }}
 
 service:
@@ -181,6 +185,9 @@ service:
         - resourcedetection/cloud
         {{- if not .Values.gatewayDeployment.enabled }}
         - resource/observe_common
+        {{- if .Values.cluster.customResourceAttributes }}
+        - resource/custom_attributes
+        {{- end }}
         - attributes/debug_source_app_traces
         {{- end }}
       exporters: [{{ join ", " $traceExporters }}]
@@ -199,6 +206,9 @@ service:
         - resourcedetection/cloud
         {{- if not .Values.gatewayDeployment.enabled }}
         - resource/observe_common
+        {{- if .Values.cluster.customResourceAttributes }}
+        - resource/custom_attributes
+        {{- end }}
         - attributes/debug_source_app_logs
         {{- end }}
       exporters: [{{ join ", " $logsExporters }}]

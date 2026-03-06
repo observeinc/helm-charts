@@ -26,6 +26,8 @@ cluster:
     # -- deployment environment cluster runs in (e.g. testing, production, etc).
     # populates to deployment.environment.name per https://opentelemetry.io/docs/specs/semconv/resource/deployment-environment/
     name: ""
+  # -- A map of custom resource attributes to be applied to all agent pipelines.
+  customResourceAttributes: {}
   # configure k8sattributes processor metadata collection behavior
   metadata:
     # -- whether to wait for the initial metadata poll to complete before processing telemetry

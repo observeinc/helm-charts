@@ -46,6 +46,7 @@ processors:
 {{- include "config.processors.attributes.drop_container_info" . | nindent 2 }}
 {{- include "config.processors.attributes.drop_service_name" . | nindent 2 }}
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
+{{- include "config.processors.resource.custom_attributes" . | nindent 2 }}
 
 {{- if $podMetrics }}
 {{- include "config.processors.attributes.pod_metrics" . | nindent 2 }}
@@ -82,6 +83,9 @@ service:
         - batch
         {{- end }}
         - resource/observe_common
+        {{- if .Values.cluster.customResourceAttributes }}
+        - resource/custom_attributes
+        {{- end }}
         - resource/drop_container_info
         - attributes/debug_source_cluster_metrics
       exporters: [{{ join ", " $metricsExporters }}]
