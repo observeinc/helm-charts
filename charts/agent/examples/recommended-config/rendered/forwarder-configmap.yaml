@@ -1,0 +1,209 @@
+---
+# Source: agent/templates/forwarder-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: forwarder
+  namespace: observe
+data:
+  relay: |
+      exporters:
+        debug/override:
+          sampling_initial: 2
+          sampling_thereafter: 1
+          verbosity: basic
+        loadbalancing/observe-gateway:
+          protocol:
+            otlp:
+              compression: snappy
+              tls:
+                insecure: true
+          resolver:
+            k8s:
+              service: example-gateway.observe
+          routing_key: traceID
+        otlp/gateway-service:
+          compression: snappy
+          endpoint: example-gateway.observe.svc.cluster.local:4317
+          tls:
+            insecure: true
+        otlphttp/observe/agentheartbeat:
+          compression: zstd
+          headers:
+            authorization: ${env:OBSERVE_AUTHORIZATION_HEADER}
+            x-observe-context: '{"environment":"kubernetes","version":"${env:OBSERVE_AGENT_VERSION}"}'
+            x-observe-enable-auth-error-reporting: "true"
+            x-observe-target-package: Observe Agent
+          logs_endpoint: ${env:OBSERVE_COLLECTOR_URL}/v1/kubernetes/v1/entity
+          retry_on_failure:
+            enabled: true
+            initial_interval: 1s
+            max_elapsed_time: 5m
+            max_interval: 30s
+          sending_queue:
+            batch:
+              flush_timeout: 5s
+              max_size: 41943040
+              min_size: 0
+              sizer: bytes
+            enabled: true
+      processors:
+        batch:
+          send_batch_max_size: 4096
+          send_batch_size: 4096
+          timeout: 5s
+        filter/drop_long_spans:
+          error_mode: ignore
+          traces:
+            span:
+            - (span.end_time - span.start_time) > Duration("1h")
+        k8sattributes:
+          extract:
+            labels:
+            - from: pod
+              key_regex: (app\.kubernetes\.io/.+)
+              tag_name: $1
+            metadata:
+            - k8s.namespace.name
+            - k8s.deployment.name
+            - k8s.replicaset.name
+            - k8s.statefulset.name
+            - k8s.daemonset.name
+            - k8s.cronjob.name
+            - k8s.job.name
+            - k8s.node.name
+            - k8s.node.uid
+            - k8s.pod.name
+            - k8s.pod.uid
+            - k8s.cluster.uid
+            - k8s.container.name
+            - container.id
+            - service.namespace
+            - service.name
+            - service.version
+            - service.instance.id
+            otel_annotations: true
+          passthrough: false
+          pod_association:
+          - sources:
+            - from: resource_attribute
+              name: k8s.pod.ip
+          - sources:
+            - from: resource_attribute
+              name: k8s.pod.uid
+          - sources:
+            - from: connection
+          wait_for_metadata: false
+          wait_for_metadata_timeout: 10s
+        k8sattributes/passthrough:
+          passthrough: true
+        memory_limiter:
+          check_interval: 5s
+          limit_percentage: 80
+          spike_limit_percentage: 15
+        resource/agent_instance:
+          attributes:
+          - action: upsert
+            key: k8s.pod.uid
+            value: ${env:OTEL_K8S_POD_UID}
+          - action: upsert
+            key: k8s.pod.name
+            value: ${env:OTEL_K8S_POD_NAME}
+        resource/observe_common:
+          attributes:
+          - action: upsert
+            key: k8s.cluster.name
+            value: ${env:OBSERVE_CLUSTER_NAME}
+          - action: upsert
+            key: k8s.cluster.uid
+            value: ${env:OBSERVE_CLUSTER_UID}
+        resourcedetection:
+          detectors:
+          - env
+          - system
+          override: false
+          timeout: 2s
+        resourcedetection/cloud:
+          detectors:
+          - eks
+          - gcp
+          - ecs
+          - ec2
+          - azure
+          override: false
+          timeout: 2s
+        transform/k8sheartbeat:
+          error_mode: ignore
+          log_statements:
+          - context: log
+            statements:
+            - set(attributes["observe_transform"]["identifiers"]["host.name"], resource.attributes["k8s.node.name"])
+            - set(attributes["observe_transform"]["identifiers"]["k8s.pod.uid"], resource.attributes["k8s.pod.uid"])
+            - set(attributes["observe_transform"]["identifiers"]["k8s.pod.name"], resource.attributes["k8s.pod.name"])
+            - set(attributes["observe_transform"]["identifiers"]["k8s.deployment.name"],
+              resource.attributes["k8s.deployment.name"])
+            - set(attributes["observe_transform"]["identifiers"]["k8s.daemonset.name"],
+              resource.attributes["k8s.daemonset.name"])
+            - set(attributes["observe_transform"]["identifiers"]["deployment.environment.name"],
+              resource.attributes["deployment.environment.name"])
+            - set(attributes["observe_transform"]["identifiers"]["k8s.cluster.uid"], resource.attributes["k8s.cluster.uid"])
+            - set(attributes["observe_transform"]["identifiers"]["k8s.cluster.name"], resource.attributes["k8s.cluster.name"])
+            - set(attributes["observe_transform"]["identifiers"]["k8s.namespace.name"],
+              resource.attributes["k8s.namespace.name"])
+      receivers:
+        heartbeat:
+          auth_check:
+            headers:
+              authorization: ${env:OBSERVE_AUTHORIZATION_HEADER}
+            url: ${env:OBSERVE_COLLECTOR_URL}
+          config_interval: 24h
+          environment: kubernetes
+          interval: 10m
+        otlp/app-telemetry:
+          protocols:
+            grpc:
+              endpoint: ${env:MY_POD_IP}:4317
+            http:
+              endpoint: ${env:MY_POD_IP}:4318
+      service:
+        pipelines:
+          logs/heartbeat:
+            exporters:
+            - otlphttp/observe/agentheartbeat
+            processors:
+            - resourcedetection
+            - resource/agent_instance
+            - k8sattributes
+            - resource/observe_common
+            - transform/k8sheartbeat
+            receivers:
+            - heartbeat
+          logs/observe-forward:
+            exporters:
+            - otlp/gateway-service
+            processors:
+            - memory_limiter
+            - k8sattributes/passthrough
+            - resourcedetection/cloud
+            receivers:
+            - otlp/app-telemetry
+          metrics/observe-forward:
+            exporters:
+            - otlp/gateway-service
+            processors:
+            - memory_limiter
+            - k8sattributes/passthrough
+            - batch
+            - resourcedetection/cloud
+            receivers:
+            - otlp/app-telemetry
+          traces/observe-forward:
+            exporters:
+            - loadbalancing/observe-gateway
+            processors:
+            - filter/drop_long_spans
+            - memory_limiter
+            - k8sattributes/passthrough
+            - resourcedetection/cloud
+            receivers:
+            - otlp/app-telemetry

@@ -1,0 +1,91 @@
+---
+# Source: agent/templates/nodeless-cluster-role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: observe-agent-nodeless-cluster-role-observe
+  labels:
+    app.kubernetes.io/name: observe-agent-nodeless-cluster-role
+    app.kubernetes.io/instance: observe-agent
+rules:
+  - apiGroups: [""]
+    resources:
+      - nodes
+      - nodes/proxy
+      - namespaces
+      - pods
+      - configmaps
+    verbs: ["get", "list", "watch", "create"]
+
+  - apiGroups: ["apps"]
+    resources:
+      - replicasets
+    verbs: ["get", "list", "watch"]
+---
+# Source: agent/templates/nodeless-cluster-role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: observe-agent-nodeless-cluster-role-binding-dev-devServiceAccount1
+  labels:
+    app.kubernetes.io/name: observe-agent-nodeless-cluster-role-binding
+    app.kubernetes.io/instance: observe-agent
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: observe-agent-nodeless-cluster-role-observe
+subjects:
+  - kind: ServiceAccount
+    name: devServiceAccount1
+    namespace: dev
+---
+# Source: agent/templates/nodeless-cluster-role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: observe-agent-nodeless-cluster-role-binding-dev-devServiceAccount2
+  labels:
+    app.kubernetes.io/name: observe-agent-nodeless-cluster-role-binding
+    app.kubernetes.io/instance: observe-agent
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: observe-agent-nodeless-cluster-role-observe
+subjects:
+  - kind: ServiceAccount
+    name: devServiceAccount2
+    namespace: dev
+---
+# Source: agent/templates/nodeless-cluster-role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: observe-agent-nodeless-cluster-role-binding-production-productionServiceAccount1
+  labels:
+    app.kubernetes.io/name: observe-agent-nodeless-cluster-role-binding
+    app.kubernetes.io/instance: observe-agent
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: observe-agent-nodeless-cluster-role-observe
+subjects:
+  - kind: ServiceAccount
+    name: productionServiceAccount1
+    namespace: production
+---
+# Source: agent/templates/nodeless-cluster-role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: observe-agent-nodeless-cluster-role-binding-production-productionServiceAccount2
+  labels:
+    app.kubernetes.io/name: observe-agent-nodeless-cluster-role-binding
+    app.kubernetes.io/instance: observe-agent
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: observe-agent-nodeless-cluster-role-observe
+subjects:
+  - kind: ServiceAccount
+    name: productionServiceAccount2
+    namespace: production

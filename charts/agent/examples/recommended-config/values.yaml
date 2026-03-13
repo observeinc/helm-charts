@@ -1,0 +1,46 @@
+# Base / recommended values for testing the agent
+observe:
+  token:
+    create: true
+
+application:
+  prometheusScrape:
+    enabled: true
+    independentDeployment: true
+  REDMetrics:
+    enabled: true
+
+agent:
+  config:
+    global:
+      exporters:
+        sendingQueue:
+          batch:
+            enabled: true
+      processors:
+        k8sattributesNodeOnlyDaemonset: true
+      fleet:
+        enabled: true
+
+node:
+  forwarder:
+    enabled: true
+    traces:
+      maxSpanDuration: 1h
+    metrics:
+      outputFormat: otel
+      convertCumulativeToDelta: true
+  metrics:
+    cadvisor:
+      enabled: true
+  kubeletstats:
+    metric_groups:
+      - node
+      - pod
+      - container
+      - volume
+
+gatewayDeployment:
+  enabled: true
+  traceSampling:
+    enabled: true
