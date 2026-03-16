@@ -1,0 +1,659 @@
+---
+# Source: agent/templates/cluster-events-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-events
+  namespace: observe
+data:
+  relay: |
+      exporters:
+        debug/override:
+          sampling_initial: 2
+          sampling_thereafter: 1
+          verbosity: basic
+        otlphttp/observe/agentheartbeat:
+          compression: zstd
+          headers:
+            authorization: ${env:OBSERVE_AUTHORIZATION_HEADER}
+            x-observe-context: '{"environment":"kubernetes","version":"${env:OBSERVE_AGENT_VERSION}"}'
+            x-observe-enable-auth-error-reporting: "true"
+            x-observe-target-package: Observe Agent
+          logs_endpoint: ${env:OBSERVE_COLLECTOR_URL}/v1/kubernetes/v1/entity
+          retry_on_failure:
+            enabled: true
+            initial_interval: 1s
+            max_elapsed_time: 5m
+            max_interval: 30s
+          sending_queue:
+            batch:
+              flush_timeout: 5s
+              max_size: 41943040
+              min_size: 0
+              sizer: bytes
+            enabled: true
+        otlphttp/observe/entity:
+          compression: zstd
+          headers:
+            authorization: ${env:OBSERVE_AUTHORIZATION_HEADER}
+            x-observe-target-package: Kubernetes Explorer
+          logs_endpoint: ${env:OBSERVE_COLLECTOR_URL}/v1/kubernetes/v1/entity
+          retry_on_failure:
+            enabled: true
+            initial_interval: 1s
+            max_elapsed_time: 5m
+            max_interval: 30s
+          sending_queue:
+            batch:
+              flush_timeout: 5s
+              max_size: 41943040
+              min_size: 0
+              sizer: bytes
+            enabled: true
+          timeout: 10s
+      processors:
+        batch:
+          send_batch_max_size: 1024
+          send_batch_size: 1024
+          timeout: 5s
+        filter/cluster:
+          error_mode: ignore
+          logs:
+            log_record:
+            - body["metadata"]["name"] != "kube-system" and body["object"]["metadata"]["name"]
+              != "kube-system"
+        k8sattributes:
+          extract:
+            labels:
+            - from: pod
+              key_regex: (app\.kubernetes\.io/.+)
+              tag_name: $1
+            metadata:
+            - k8s.namespace.name
+            - k8s.deployment.name
+            - k8s.replicaset.name
+            - k8s.statefulset.name
+            - k8s.daemonset.name
+            - k8s.cronjob.name
+            - k8s.job.name
+            - k8s.node.name
+            - k8s.node.uid
+            - k8s.pod.name
+            - k8s.pod.uid
+            - k8s.cluster.uid
+            - k8s.container.name
+            - container.id
+            - service.namespace
+            - service.name
+            - service.version
+            - service.instance.id
+            otel_annotations: true
+          passthrough: false
+          pod_association:
+          - sources:
+            - from: resource_attribute
+              name: k8s.pod.ip
+          - sources:
+            - from: resource_attribute
+              name: k8s.pod.uid
+          - sources:
+            - from: connection
+          wait_for_metadata: false
+          wait_for_metadata_timeout: 10s
+        memory_limiter:
+          check_interval: 5s
+          limit_percentage: 80
+          spike_limit_percentage: 15
+        observek8sattributes: null
+        resource/agent_instance:
+          attributes:
+          - action: upsert
+            key: k8s.pod.uid
+            value: ${env:OTEL_K8S_POD_UID}
+          - action: upsert
+            key: k8s.pod.name
+            value: ${env:OTEL_K8S_POD_NAME}
+        resource/observe_common:
+          attributes:
+          - action: upsert
+            key: k8s.cluster.name
+            value: ${env:OBSERVE_CLUSTER_NAME}
+          - action: upsert
+            key: k8s.cluster.uid
+            value: ${env:OBSERVE_CLUSTER_UID}
+        resourcedetection:
+          detectors:
+          - env
+          - system
+          override: false
+          timeout: 2s
+        transform/cluster:
+          error_mode: ignore
+          log_statements:
+          - context: log
+            statements:
+            - set(attributes["observe_filter"], "objects_pull_watch")
+            - set(attributes["observe_transform"]["control"]["isDelete"], true) where body["object"]
+              != nil and body["type"] == "DELETED"
+            - set(attributes["observe_transform"]["control"]["debug_source"], "watch") where
+              body["object"] != nil and body["type"] != nil
+            - set(attributes["observe_transform"]["control"]["debug_source"], "pull") where
+              body["object"] == nil or body["type"] == nil
+            - set(body, body["object"]) where body["object"] != nil and body["type"] !=
+              nil
+            - set(attributes["observe_transform"]["valid_from"], observed_time_unix_nano)
+            - set(attributes["observe_transform"]["valid_to"], Int(observed_time_unix_nano)
+              + 5400000000000)
+            - set(attributes["observe_transform"]["kind"], "Cluster")
+            - set(attributes["observe_transform"]["control"]["isDelete"], false) where attributes["observe_transform"]["control"]["isDelete"]
+              == nil
+            - set(attributes["observe_transform"]["control"]["version"], body["metadata"]["resourceVersion"])
+            - set(attributes["observe_transform"]["identifiers"]["clusterName"], resource.attributes["k8s.cluster.name"])
+            - set(attributes["observe_transform"]["identifiers"]["clusterUid"], resource.attributes["k8s.cluster.uid"])
+            - set(attributes["observe_transform"]["identifiers"]["uid"], resource.attributes["k8s.cluster.uid"])
+            - set(attributes["observe_transform"]["identifiers"]["kind"], "Cluster")
+            - set(attributes["observe_transform"]["identifiers"]["name"], resource.attributes["k8s.cluster.name"])
+            - set(attributes["observe_transform"]["facets"]["creationTimestamp"], body["metadata"]["creationTimestamp"])
+            - set(attributes["observe_transform"]["facets"]["labels"], body["metadata"]["labels"])
+            - set(attributes["observe_transform"]["facets"]["annotations"], body["metadata"]["annotations"])
+            - set(body, "")
+        transform/k8sheartbeat:
+          error_mode: ignore
+          log_statements:
+          - context: log
+            statements:
+            - set(attributes["observe_transform"]["identifiers"]["host.name"], resource.attributes["k8s.node.name"])
+            - set(attributes["observe_transform"]["identifiers"]["k8s.pod.uid"], resource.attributes["k8s.pod.uid"])
+            - set(attributes["observe_transform"]["identifiers"]["k8s.pod.name"], resource.attributes["k8s.pod.name"])
+            - set(attributes["observe_transform"]["identifiers"]["k8s.deployment.name"],
+              resource.attributes["k8s.deployment.name"])
+            - set(attributes["observe_transform"]["identifiers"]["k8s.daemonset.name"],
+              resource.attributes["k8s.daemonset.name"])
+            - set(attributes["observe_transform"]["identifiers"]["deployment.environment.name"],
+              resource.attributes["deployment.environment.name"])
+            - set(attributes["observe_transform"]["identifiers"]["k8s.cluster.uid"], resource.attributes["k8s.cluster.uid"])
+            - set(attributes["observe_transform"]["identifiers"]["k8s.cluster.name"], resource.attributes["k8s.cluster.name"])
+            - set(attributes["observe_transform"]["identifiers"]["k8s.namespace.name"],
+              resource.attributes["k8s.namespace.name"])
+        transform/object:
+          error_mode: ignore
+          log_statements:
+          - context: log
+            statements:
+            - set(attributes["observe_filter"], "objects_pull_watch")
+            - set(attributes["observe_transform"]["valid_from"], observed_time_unix_nano)
+            - set(attributes["observe_transform"]["valid_to"], Int(observed_time_unix_nano)
+              + 5400000000000)
+            - set(attributes["observe_transform"]["kind"], body["kind"])
+            - set(attributes["observe_transform"]["control"]["isDelete"], false) where attributes["observe_transform"]["control"]["isDelete"]
+              == nil
+            - set(attributes["observe_transform"]["control"]["version"], body["metadata"]["resourceVersion"])
+            - set(attributes["observe_transform"]["control"]["agentVersion"], "2.14.0")
+            - set(attributes["observe_transform"]["identifiers"]["clusterName"], resource.attributes["k8s.cluster.name"])
+            - set(attributes["observe_transform"]["identifiers"]["clusterUid"], resource.attributes["k8s.cluster.uid"])
+            - set(attributes["observe_transform"]["identifiers"]["kind"], body["kind"])
+            - set(attributes["observe_transform"]["identifiers"]["name"], body["metadata"]["name"])
+            - set(attributes["observe_transform"]["identifiers"]["namespaceName"], body["metadata"]["namespace"])
+            - set(attributes["observe_transform"]["identifiers"]["uid"], body["metadata"]["uid"])
+            - set(attributes["observe_transform"]["facets"]["creationTimestamp"], body["metadata"]["creationTimestamp"])
+            - set(attributes["observe_transform"]["facets"]["deletionTimestamp"], body["metadata"]["deletionTimestamp"])
+            - set(attributes["observe_transform"]["facets"]["ownerRefKind"], body["metadata"]["ownerReferences"][0]["kind"])
+            - set(attributes["observe_transform"]["facets"]["ownerRefName"], body["metadata"]["ownerReferences"][0]["name"])
+            - set(attributes["observe_transform"]["facets"]["labels"], body["metadata"]["labels"])
+            - set(attributes["observe_transform"]["facets"]["annotations"], body["metadata"]["annotations"])
+            - set(attributes["observe_transform"]["facets"]["replicaSetName"], body["metadata"]["ownerReferences"][0]["name"])
+              where body["metadata"]["ownerReferences"][0]["kind"] == "ReplicaSet"
+            - set(attributes["observe_transform"]["facets"]["daemonSetName"], body["metadata"]["ownerReferences"][0]["name"])
+              where body["metadata"]["ownerReferences"][0]["kind"] == "DaemonSet"
+            - set(attributes["observe_transform"]["facets"]["jobName"], body["metadata"]["ownerReferences"][0]["name"])
+              where body["metadata"]["ownerReferences"][0]["kind"] == "Job"
+            - set(attributes["observe_transform"]["facets"]["cronJobName"], attributes["observe_transform"]["facets"]["jobName"])
+              where IsMatch(attributes["observe_transform"]["facets"]["jobName"], ".*-\\d{8}$")
+            - replace_pattern(attributes["observe_transform"]["facets"]["cronJobName"],
+              "-\\d{8}$$", "")
+            - set(attributes["observe_transform"]["facets"]["statefulSetName"], body["metadata"]["ownerReferences"][0]["name"])
+              where body["metadata"]["ownerReferences"][0]["kind"] == "StatefulSet"
+            - set(attributes["observe_transform"]["facets"]["deploymentName"], body["metadata"]["ownerReferences"][0]["name"])
+              where body["metadata"]["ownerReferences"][0]["kind"] == "ReplicaSet"
+            - replace_pattern(attributes["observe_transform"]["facets"]["deploymentName"],
+              "^(.*)-[0-9a-f]+$$", "$$1")
+            - set(attributes["observe_transform"]["facets"]["deploymentName"], body["metadata"]["ownerReferences"][0]["name"])
+              where body["metadata"]["ownerReferences"][0]["kind"] == "Deployment"
+          - conditions:
+            - body["kind"] == "Pod"
+            context: log
+            statements:
+            - set(attributes["observe_transform"]["identifiers"]["podName"], body["metadata"]["name"])
+            - set(attributes["observe_transform"]["identifiers"]["podUid"], body["metadata"]["uid"])
+            - set(attributes["observe_transform"]["facets"]["phase"], body["status"]["phase"])
+            - set(attributes["observe_transform"]["facets"]["podIP"], body["status"]["podIP"])
+            - set(attributes["observe_transform"]["facets"]["qosClass"], body["status"]["qosClass"])
+            - set(attributes["observe_transform"]["facets"]["startTime"], body["status"]["startTime"])
+            - set(attributes["observe_transform"]["facets"]["readinessGates"], body["object"]["spec"]["readinessGates"])
+            - set(attributes["observe_transform"]["facets"]["nodeName"], body["spec"]["nodeName"])
+          - conditions:
+            - body["kind"] == "Namespace"
+            context: log
+            statements:
+            - set(attributes["observe_transform"]["facets"]["status"], body["status"]["phase"])
+            - set(attributes["observe_transform"]["identifiers"]["namespaceName"], body["metadata"]["name"])
+            - set(attributes["observe_transform"]["identifiers"]["namespaceUid"], body["metadata"]["uid"])
+          - conditions:
+            - body["kind"] == "Node"
+            context: log
+            statements:
+            - set(attributes["observe_transform"]["identifiers"]["nodeName"], body["metadata"]["name"])
+            - set(attributes["observe_transform"]["identifiers"]["nodeUid"], body["metadata"]["uid"])
+            - set(attributes["observe_transform"]["facets"]["kernelVersion"], body["status"]["nodeInfo"]["kernelVersion"])
+            - set(attributes["observe_transform"]["facets"]["kubeProxyVersion"], body["status"]["nodeInfo"]["kubeProxyVersion"])
+            - set(attributes["observe_transform"]["facets"]["kubeletVersion"], body["status"]["nodeInfo"]["kubeletVersion"])
+            - set(attributes["observe_transform"]["facets"]["osImage"], body["status"]["nodeInfo"]["osImage"])
+            - set(attributes["observe_transform"]["facets"]["taints"], body["spec"]["taints"])
+          - conditions:
+            - body["kind"] == "Deployment"
+            context: log
+            statements:
+            - set(attributes["observe_transform"]["identifiers"]["deploymentName"], body["metadata"]["name"])
+            - set(attributes["observe_transform"]["identifiers"]["deploymentUid"], body["metadata"]["uid"])
+            - set(attributes["observe_transform"]["facets"]["updatedReplicas"], body["status"]["updatedReplicas"])
+            - set(attributes["observe_transform"]["facets"]["availableReplicas"], body["status"]["availableReplicas"])
+            - set(attributes["observe_transform"]["facets"]["readyReplicas"], body["status"]["readyReplicas"])
+            - set(attributes["observe_transform"]["facets"]["readyReplicas"], 0) where attributes["observe_transform"]["facets"]["readyReplicas"]
+              == nil
+            - set(attributes["observe_transform"]["facets"]["unavailableReplicas"], body["status"]["unavailableReplicas"])
+            - set(attributes["observe_transform"]["facets"]["selector"], body["spec"]["selector"]["matchLabels"])
+            - set(attributes["observe_transform"]["facets"]["desiredReplicas"], body["spec"]["replicas"])
+            - set(attributes["observe_transform"]["facets"]["status"], "Healthy")
+            - set(attributes["observe_transform"]["facets"]["status"], "Unhealthy") where
+              attributes["observe_transform"]["facets"]["desiredReplicas"] != nil and attributes["observe_transform"]["facets"]["readyReplicas"]
+              != attributes["observe_transform"]["facets"]["desiredReplicas"]
+          - conditions:
+            - body["kind"] == "ReplicaSet"
+            context: log
+            statements:
+            - set(attributes["observe_transform"]["identifiers"]["replicaSetName"], body["metadata"]["name"])
+            - set(attributes["observe_transform"]["identifiers"]["replicaSetUid"], body["metadata"]["uid"])
+            - set(attributes["observe_transform"]["facets"]["desiredReplicas"], body["spec"]["replicas"])
+            - set(attributes["observe_transform"]["facets"]["currentReplicas"], body["status"]["replicas"])
+            - set(attributes["observe_transform"]["facets"]["availableReplicas"], body["status"]["availableReplicas"])
+            - set(attributes["observe_transform"]["facets"]["readyReplicas"], body["status"]["readyReplicas"])
+            - set(attributes["observe_transform"]["facets"]["readyReplicas"], 0) where attributes["observe_transform"]["facets"]["readyReplicas"]
+              == nil
+            - set(attributes["observe_transform"]["facets"]["status"], "Healthy")
+            - set(attributes["observe_transform"]["facets"]["status"], "Unhealthy") where
+              attributes["observe_transform"]["facets"]["desiredReplicas"] != nil and attributes["observe_transform"]["facets"]["readyReplicas"]
+              != attributes["observe_transform"]["facets"]["desiredReplicas"]
+          - conditions:
+            - body["kind"] == "Event"
+            context: log
+            statements:
+            - set(attributes["observe_transform"]["identifiers"]["involvedObjectKind"],
+              body["involvedObject"]["kind"])
+            - set(attributes["observe_transform"]["identifiers"]["involvedObjectName"],
+              body["involvedObject"]["name"])
+            - set(attributes["observe_transform"]["identifiers"]["involvedObjectUid"], body["involvedObject"]["uid"])
+            - set(attributes["observe_transform"]["facets"]["firstTimestamp"], body["firstTimestamp"])
+            - set(attributes["observe_transform"]["facets"]["lastTimestamp"], body["lastTimestamp"])
+            - set(attributes["observe_transform"]["facets"]["message"], body["message"])
+            - set(attributes["observe_transform"]["facets"]["reason"], body["reason"])
+            - set(attributes["observe_transform"]["facets"]["count"], body["count"])
+            - set(attributes["observe_transform"]["facets"]["type"], body["type"])
+            - set(attributes["observe_transform"]["facets"]["sourceComponent"], body["source"]["component"])
+          - conditions:
+            - body["kind"] == "Job"
+            context: log
+            statements:
+            - set(attributes["observe_transform"]["identifiers"]["jobName"], body["metadata"]["name"])
+            - set(attributes["observe_transform"]["identifiers"]["jobUid"], body["metadata"]["uid"])
+            - set(attributes["observe_transform"]["facets"]["cronJobName"], body["metadata"]["ownerReferences"][0]["name"])
+              where body["metadata"]["ownerReferences"][0]["kind"] == "CronJob"
+            - set(attributes["observe_transform"]["facets"]["cronJobUid"], body["metadata"]["ownerReferences"][0]["uid"])
+              where body["metadata"]["ownerReferences"][0]["kind"] == "CronJob"
+            - set(attributes["observe_transform"]["facets"]["completions"], body["spec"]["completions"])
+            - set(attributes["observe_transform"]["facets"]["parallelism"], body["spec"]["parallelism"])
+            - set(attributes["observe_transform"]["facets"]["activeDeadlineSeconds"], body["spec"]["activeDeadlineSeconds"])
+            - set(attributes["observe_transform"]["facets"]["backoffLimit"], body["spec"]["backoffLimit"])
+            - set(attributes["observe_transform"]["facets"]["startTime"], body["status"]["startTime"])
+            - set(attributes["observe_transform"]["facets"]["activePods"], body["status"]["active"])
+            - set(attributes["observe_transform"]["facets"]["failedPods"], body["status"]["falied"])
+            - set(attributes["observe_transform"]["facets"]["succeededPods"], body["status"]["succeeded"])
+            - set(attributes["observe_transform"]["facets"]["readyPods"], body["status"]["ready"])
+          - conditions:
+            - body["kind"] == "CronJob"
+            context: log
+            statements:
+            - set(attributes["observe_transform"]["identifiers"]["cronJobName"], body["metadata"]["name"])
+            - set(attributes["observe_transform"]["identifiers"]["cronJobUid"], body["metadata"]["uid"])
+            - set(attributes["observe_transform"]["facets"]["schedule"], body["spec"]["schedule"])
+            - set(attributes["observe_transform"]["facets"]["suspend"], "Active") where
+              body["spec"]["suspend"] == false
+            - set(attributes["observe_transform"]["facets"]["suspend"], "Suspend") where
+              body["spec"]["suspend"] == true
+          - conditions:
+            - body["kind"] == "DaemonSet"
+            context: log
+            statements:
+            - set(attributes["observe_transform"]["identifiers"]["daemonSetName"], body["metadata"]["name"])
+            - set(attributes["observe_transform"]["identifiers"]["daemonSetUid"], body["metadata"]["uid"])
+            - set(attributes["observe_transform"]["facets"]["updateStrategy"], body["spec"]["updateStrategy"]["type"])
+            - set(attributes["observe_transform"]["facets"]["maxUnavailable"], body["spec"]["updateStrategy"]["rollingUpdate"]["maxUnavailable"])
+            - set(attributes["observe_transform"]["facets"]["maxSurge"], body["spec"]["updateStrategy"]["rollingUpdate"]["maxSurge"])
+            - set(attributes["observe_transform"]["facets"]["numberReady"], body["status"]["numberReady"])
+            - set(attributes["observe_transform"]["facets"]["desiredNumberScheduled"], body["status"]["desiredNumberScheduled"])
+            - set(attributes["observe_transform"]["facets"]["currentNumberScheduled"], body["status"]["currentNumberScheduled"])
+            - set(attributes["observe_transform"]["facets"]["updatedNumberScheduled"], body["status"]["updatedNumberScheduled"])
+            - set(attributes["observe_transform"]["facets"]["numberAvailable"], body["status"]["numberAvailable"])
+            - set(attributes["observe_transform"]["facets"]["numberUnavailable"], body["status"]["numberUnavailable"])
+            - set(attributes["observe_transform"]["facets"]["numberMisscheduled"], body["status"]["numberMisscheduled"])
+            - set(attributes["observe_transform"]["facets"]["status"], "Healthy")
+            - set(attributes["observe_transform"]["facets"]["status"], "Unhealthy") where
+              attributes["observe_transform"]["facets"]["desiredNumberScheduled"] != nil
+              and attributes["observe_transform"]["facets"]["numberReady"] != attributes["observe_transform"]["facets"]["desiredNumberScheduled"]
+          - conditions:
+            - body["kind"] == "StatefulSet"
+            context: log
+            statements:
+            - set(attributes["observe_transform"]["identifiers"]["statefulSetName"], body["metadata"]["name"])
+            - set(attributes["observe_transform"]["identifiers"]["statefulSetUid"], body["metadata"]["uid"])
+            - set(attributes["observe_transform"]["facets"]["serviceName"], body["spec"]["serviceName"])
+            - set(attributes["observe_transform"]["facets"]["podManagementPolicy"], body["spec"]["podManagementPolicy"])
+            - set(attributes["observe_transform"]["facets"]["desiredReplicas"], body["spec"]["replicas"])
+            - set(attributes["observe_transform"]["facets"]["updateStrategy"], body["spec"]["updateStrategy"]["type"])
+            - set(attributes["observe_transform"]["facets"]["partition"], body["spec"]["updateStrategy"]["rollingUpdate"]["partition"])
+            - set(attributes["observe_transform"]["facets"]["currentReplicas"], body["status"]["currentReplicas"])
+            - set(attributes["observe_transform"]["facets"]["readyReplicas"], body["status"]["readyReplicas"])
+            - set(attributes["observe_transform"]["facets"]["status"], "Healthy")
+            - set(attributes["observe_transform"]["facets"]["status"], "Unhealthy") where
+              attributes["observe_transform"]["facets"]["desiredReplicas"] != nil and attributes["observe_transform"]["facets"]["readyReplicas"]
+              != attributes["observe_transform"]["facets"]["desiredReplicas"]
+          - conditions:
+            - body["kind"] == "ConfigMap"
+            context: log
+            statements:
+            - set(attributes["observe_transform"]["identifiers"]["configMapName"], body["metadata"]["name"])
+            - set(attributes["observe_transform"]["identifiers"]["configMapUid"], body["metadata"]["uid"])
+            - set(attributes["observe_transform"]["facets"]["immutable"], body["immutable"])
+          - conditions:
+            - body["kind"] == "Secret"
+            context: log
+            statements:
+            - set(attributes["observe_transform"]["identifiers"]["secretName"], body["metadata"]["name"])
+            - set(attributes["observe_transform"]["identifiers"]["secretUid"], body["metadata"]["uid"])
+            - set(attributes["observe_transform"]["facets"]["immutable"], body["immutable"])
+            - set(attributes["observe_transform"]["facets"]["data"], body["data"])
+            - set(attributes["observe_transform"]["facets"]["type"], body["type"])
+          - conditions:
+            - body["kind"] == "PersistentVolume"
+            context: log
+            statements:
+            - set(attributes["observe_transform"]["identifiers"]["persistentVolumeName"],
+              body["metadata"]["name"])
+            - set(attributes["observe_transform"]["identifiers"]["persistentVolumeUid"],
+              body["metadata"]["uid"])
+            - set(attributes["observe_transform"]["facets"]["capacity"], body["spec"]["capacity"]["storage"])
+            - set(attributes["observe_transform"]["facets"]["reclaimPolicy"], body["spec"]["persistentVolumeReclaimPolicy"])
+            - set(attributes["observe_transform"]["facets"]["class"], body["spec"]["storageClassName"])
+            - set(attributes["observe_transform"]["facets"]["accessModes"], body["spec"]["accessModes"])
+            - set(attributes["observe_transform"]["facets"]["volumeMode"], body["spec"]["volumeMode"])
+            - set(attributes["observe_transform"]["facets"]["phase"], body["status"]["phase"])
+          - conditions:
+            - body["kind"] == "PersistentVolumeClaim"
+            context: log
+            statements:
+            - set(attributes["observe_transform"]["identifiers"]["persistentVolumeClaimName"],
+              body["metadata"]["name"])
+            - set(attributes["observe_transform"]["identifiers"]["persistentVolumeClaimUid"],
+              body["metadata"]["uid"])
+            - set(attributes["observe_transform"]["facets"]["capacityRequests"], body["spec"]["resources"]["requests"]["storage"])
+            - set(attributes["observe_transform"]["facets"]["capacityLimits"], body["spec"]["resources"]["limits"]["storage"])
+            - set(attributes["observe_transform"]["facets"]["class"], body["spec"]["storageClassName"])
+            - set(attributes["observe_transform"]["facets"]["volumeName"], body["spec"]["volumeName"])
+            - set(attributes["observe_transform"]["facets"]["desiredAccessModes"], body["spec"]["accessModes"])
+            - set(attributes["observe_transform"]["facets"]["volumeMode"], body["spec"]["volumeMode"])
+            - set(attributes["observe_transform"]["facets"]["capacity"], body["status"]["capacity"]["storage"])
+            - set(attributes["observe_transform"]["facets"]["phase"], body["status"]["phase"])
+            - set(attributes["observe_transform"]["facets"]["currentAccessModes"], body["spec"]["accessModes"])
+          - conditions:
+            - body["kind"] == "Service"
+            context: log
+            statements:
+            - set(attributes["observe_transform"]["identifiers"]["serviceName"], body["metadata"]["name"])
+            - set(attributes["observe_transform"]["identifiers"]["serviceUid"], body["metadata"]["uid"])
+            - set(attributes["observe_transform"]["facets"]["serviceType"], body["spec"]["type"])
+            - set(attributes["observe_transform"]["facets"]["clusterIP"], body["spec"]["clusterIP"])
+            - set(attributes["observe_transform"]["facets"]["externalIPs"], body["spec"]["externalIPs"])
+            - set(attributes["observe_transform"]["facets"]["sessionAffinity"], body["spec"]["sessionAffinity"])
+            - set(attributes["observe_transform"]["facets"]["externalName"], body["spec"]["externalName"])
+            - set(attributes["observe_transform"]["facets"]["externalTrafficPolicy"], body["spec"]["externalTrafficPolicy"])
+            - set(attributes["observe_transform"]["facets"]["ipFamilies"], "IPv4,IPv6")
+              where Len(body["spec"]["ipFamilies"]) == 2
+            - set(attributes["observe_transform"]["facets"]["ipFamilies"], body["spec"]["ipFamilies"][0])
+              where Len(body["spec"]["ipFamilies"]) == 1
+          - conditions:
+            - body["kind"] == "Ingress"
+            context: log
+            statements:
+            - set(attributes["observe_transform"]["identifiers"]["ingressName"], body["metadata"]["name"])
+            - set(attributes["observe_transform"]["identifiers"]["ingressUid"], body["metadata"]["uid"])
+            - set(attributes["observe_transform"]["facets"]["class"], body["spec"]["ingressClassName"])
+            - set(attributes["observe_transform"]["facets"]["class"], body["metadata"]["annotations"]["kubernetes.io/ingress.class"])
+              where attributes["observe_transform"]["facets"]["class"] == nil
+          - conditions:
+            - body["kind"] == "RoleBinding"
+            context: log
+            statements:
+            - set(attributes["observe_transform"]["identifiers"]["roleBindingName"], body["metadata"]["name"])
+            - set(attributes["observe_transform"]["identifiers"]["roleBindingUid"], body["metadata"]["uid"])
+            - set(attributes["observe_transform"]["facets"]["subjects"], body["subjects"])
+            - set(attributes["observe_transform"]["facets"]["role"], body["roleRef"]["name"])
+          - conditions:
+            - body["kind"] == "Role"
+            context: log
+            statements:
+            - set(attributes["observe_transform"]["identifiers"]["roleName"], body["metadata"]["name"])
+            - set(attributes["observe_transform"]["identifiers"]["roleUid"], body["metadata"]["uid"])
+            - set(attributes["observe_transform"]["facets"]["rules"], body["rules"])
+            - set(attributes["observe_transform"]["facets"]["role"], body["roleRef"]["name"])
+          - conditions:
+            - body["kind"] == "ClusterRoleBinding"
+            context: log
+            statements:
+            - set(attributes["observe_transform"]["identifiers"]["clusterRoleBindingName"],
+              body["metadata"]["name"])
+            - set(attributes["observe_transform"]["identifiers"]["clusterRoleBindingUid"],
+              body["metadata"]["uid"])
+            - set(attributes["observe_transform"]["facets"]["subjects"], body["subjects"])
+            - set(attributes["observe_transform"]["facets"]["role"], body["roleRef"]["name"])
+          - conditions:
+            - body["kind"] == "ServiceAccount"
+            context: log
+            statements:
+            - set(attributes["observe_transform"]["identifiers"]["serviceAccountName"],
+              body["metadata"]["name"])
+            - set(attributes["observe_transform"]["identifiers"]["serviceAccountUid"], body["metadata"]["uid"])
+            - set(attributes["observe_transform"]["facets"]["automountToken"], body["automountServiceAccountToken"])
+        transform/unify:
+          error_mode: ignore
+          log_statements:
+          - context: log
+            statements:
+            - set(attributes["observe_transform"]["control"]["isDelete"], true) where body["object"]
+              != nil and body["type"] == "DELETED"
+            - set(attributes["observe_transform"]["control"]["debug_source"], "watch") where
+              body["object"] != nil and body["type"] != nil
+            - set(attributes["observe_transform"]["control"]["debug_source"], "pull") where
+              body["object"] == nil or body["type"] == nil
+            - set(body, body["object"]) where body["object"] != nil and body["type"] !=
+              nil
+      receivers:
+        heartbeat:
+          auth_check:
+            headers:
+              authorization: ${env:OBSERVE_AUTHORIZATION_HEADER}
+            url: ${env:OBSERVE_COLLECTOR_URL}
+          config_interval: 24h
+          environment: kubernetes
+          interval: 10m
+        k8sobjects/cluster:
+          auth_type: serviceAccount
+          objects:
+          - interval: 20m
+            mode: pull
+            name: namespaces
+        k8sobjects/objects:
+          auth_type: serviceAccount
+          objects:
+          - interval: 15m
+            mode: pull
+            name: events
+          - mode: watch
+            name: events
+          - interval: 15m
+            mode: pull
+            name: pods
+          - mode: watch
+            name: pods
+          - interval: 15m
+            mode: pull
+            name: namespaces
+          - mode: watch
+            name: namespaces
+          - interval: 15m
+            mode: pull
+            name: nodes
+          - mode: watch
+            name: nodes
+          - interval: 15m
+            mode: pull
+            name: deployments
+          - mode: watch
+            name: deployments
+          - interval: 15m
+            mode: pull
+            name: replicasets
+          - mode: watch
+            name: replicasets
+          - interval: 15m
+            mode: pull
+            name: configmaps
+          - mode: watch
+            name: configmaps
+          - interval: 15m
+            mode: pull
+            name: endpoints
+          - mode: watch
+            name: endpoints
+          - interval: 15m
+            mode: pull
+            name: jobs
+          - mode: watch
+            name: jobs
+          - interval: 15m
+            mode: pull
+            name: cronjobs
+          - mode: watch
+            name: cronjobs
+          - interval: 15m
+            mode: pull
+            name: daemonsets
+          - mode: watch
+            name: daemonsets
+          - interval: 15m
+            mode: pull
+            name: statefulsets
+          - mode: watch
+            name: statefulsets
+          - interval: 15m
+            mode: pull
+            name: services
+          - mode: watch
+            name: services
+          - interval: 15m
+            mode: pull
+            name: ingresses
+          - mode: watch
+            name: ingresses
+          - interval: 15m
+            mode: pull
+            name: secrets
+          - mode: watch
+            name: secrets
+          - interval: 15m
+            mode: pull
+            name: persistentvolumeclaims
+          - mode: watch
+            name: persistentvolumeclaims
+          - interval: 15m
+            mode: pull
+            name: persistentvolumes
+          - mode: watch
+            name: persistentvolumes
+          - interval: 15m
+            mode: pull
+            name: storageclasses
+          - mode: watch
+            name: storageclasses
+          - interval: 15m
+            mode: pull
+            name: roles
+          - mode: watch
+            name: roles
+          - interval: 15m
+            mode: pull
+            name: rolebindings
+          - mode: watch
+            name: rolebindings
+          - interval: 15m
+            mode: pull
+            name: clusterroles
+          - mode: watch
+            name: clusterroles
+          - interval: 15m
+            mode: pull
+            name: clusterrolebindings
+          - mode: watch
+            name: clusterrolebindings
+          - interval: 15m
+            mode: pull
+            name: serviceaccounts
+          - mode: watch
+            name: serviceaccounts
+          - interval: 15m
+            mode: pull
+            name: customresourcedefinitions
+          - mode: watch
+            name: customresourcedefinitions
+      service:
+        pipelines:
+          logs/cluster:
+            exporters:
+            - otlphttp/observe/entity
+            processors:
+            - memory_limiter
+            - resource/observe_common
+            - filter/cluster
+            - transform/cluster
+            receivers:
+            - k8sobjects/cluster
+          logs/heartbeat:
+            exporters:
+            - otlphttp/observe/agentheartbeat
+            processors:
+            - resourcedetection
+            - resource/agent_instance
+            - k8sattributes
+            - resource/observe_common
+            - transform/k8sheartbeat
+            receivers:
+            - heartbeat
+          logs/objects:
+            exporters:
+            - otlphttp/observe/entity
+            processors:
+            - memory_limiter
+            - resource/observe_common
+            - transform/unify
+            - observek8sattributes
+            - transform/object
+            receivers:
+            - k8sobjects/objects

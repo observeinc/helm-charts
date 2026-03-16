@@ -1,0 +1,44 @@
+---
+# Source: agent/charts/gateway/templates/networkpolicy.yaml
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: example-gateway
+  namespace: observe
+  labels:
+    helm.sh/chart: gateway-0.143.0
+    app.kubernetes.io/name: gateway
+    app.kubernetes.io/instance: example
+    app.kubernetes.io/version: "0.143.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/part-of: opentelemetry-collector
+    app.kubernetes.io/component: standalone-collector
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: gateway
+      app.kubernetes.io/instance: example
+      component: standalone-collector
+  ingress:
+    - ports:
+        - port: 6831
+          protocol: UDP
+        - port: 14250
+          protocol: TCP
+        - port: 14268
+          protocol: TCP
+        - port: 8888
+          protocol: TCP
+        - port: 4317
+          protocol: TCP
+        - port: 4318
+          protocol: TCP
+        - port: 9411
+          protocol: TCP
+      from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: observe-agent
+              app.kubernetes.io/name: forwarder
+  egress:
+    - {}
