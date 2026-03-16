@@ -30,6 +30,7 @@ jobs:
           path:
             # scanning the entire repository
             "."
+          exclude_paths: "examples,charts/*/examples"
 
       - name: Run Orca FS Scan
         if: always()
@@ -48,3 +49,4 @@ jobs:
           path:
              # scanning the entire repository
             "."
+          exclude_paths: "examples,charts/*/examples"
