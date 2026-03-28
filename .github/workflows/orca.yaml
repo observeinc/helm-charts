@@ -18,7 +18,7 @@ jobs:
     steps:
       # Checkout your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           # Important for pull request diff-awareness report
           fetch-depth: 0
