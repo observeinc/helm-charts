@@ -20,10 +20,10 @@ exporters:
     resolver:
       # use k8s service resolver, if collector runs in kubernetes environment
       k8s:
-        service: {{ include "otelcol-service-name" (merge . (dict "collector" .Values.gateway)) }}.{{ .Values.gateway.namespaceOverride }}
+        service: {{ include "opentelemetry-operator.fullname" (deepCopy . | merge (dict "collector" .Values.gateway)) }}.{{ .Values.gateway.namespaceOverride }}
 
   otlp/gateway-service:
-    endpoint: {{ include "otelcol-service-name" (merge . (dict "collector" .Values.gateway)) }}.{{ .Values.gateway.namespaceOverride }}.svc.cluster.local:4317
+    endpoint: {{ include "opentelemetry-operator.fullname" (deepCopy . | merge (dict "collector" .Values.gateway)) }}.{{ .Values.gateway.namespaceOverride }}.svc.cluster.local:4317
     tls:
       insecure: true
     compression: snappy
@@ -63,10 +63,6 @@ processors:
   # Use passthrough mode to reduce forwarder compute and push the lookup to the gateway whenever it is enabled.
   k8sattributes/passthrough:
     passthrough: true
-  {{- if .Values.agent.config.global.fleet.enabled }}
-  # k8sattributes is needed for the heartbeat pipeline even when gateway is enabled
-  {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
-  {{- end }}
 {{- else }}
   {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
   {{- include "config.processors.deltatocumulative" . | nindent 2 }}
@@ -104,7 +100,8 @@ processors:
 
 {{- if .Values.agent.config.global.fleet.enabled }}
 {{- include "config.processors.resource_detection" . | nindent 2 }}
-{{- include "config.processors.resource.agent_instance" . | nindent 2 }}
+{{- $forwarderName := (include "opentelemetry-operator.fullname" (deepCopy . | merge (dict "collector" .Values.forwarder))) -}}
+{{- include "config.processors.resource.agent_instance" (deepCopy . | merge (dict .Values.forwarder.mode $forwarderName "addAllAttrs" true)) | nindent 2 }}
 {{- include "config.processors.transform.k8sheartbeat" . | nindent 2 }}
 {{- end }}
 
@@ -211,7 +208,7 @@ service:
     {{- end }}
 
     {{- if .Values.agent.config.global.fleet.enabled }}
-    {{- include "config.pipelines.heartbeat" . | nindent 4 }}
+    {{- include "config.pipelines.heartbeat" (deepCopy . | merge (dict "skipK8sattributesProcessor" true)) | nindent 4 }}
     {{- end }}
 
 {{- end }}
