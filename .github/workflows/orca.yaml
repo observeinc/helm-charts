@@ -39,6 +39,7 @@ jobs:
           api_token: ${{ secrets.ORCA_SECURITY_API_TOKEN }}
           project_key: ${{ env.PROJECT_KEY }}
           path: "."
+          exclude_paths: "examples,charts/*/examples"
 
       - name: Run Orca IaC Scan
         if: always()
