@@ -61,7 +61,7 @@ jobs:
             echo "TF_VAR_helm_chart_agent_test_values_file=$(echo ${{matrix.values}})" >> $GITHUB_ENV
             echo "TF_VAR_helm_chart_agent_test_namespace=$(echo ${{matrix.namespace}})" >> $GITHUB_ENV
 
-        - uses: azure/setup-kubectl@v4
+        - uses: azure/setup-kubectl@v5
           with:
             version: latest
 
