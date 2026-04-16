@@ -147,6 +147,33 @@ resource/agent_instance:
         - key: k8s.pod.name
           value: ${env:OTEL_K8S_POD_NAME}
           action: upsert
+    {{- if .addAllAttrs }}
+        - key: k8s.namespace.name
+          value: ${env:OTEL_K8S_NAMESPACE_NAME}
+          action: insert
+          default_value: ""
+        - key: k8s.node.name
+          value: ${env:K8S_NODE_NAME}
+          action: insert
+          default_value: ""
+        {{- if .deployment }}
+        - key: k8s.deployment.name
+          value: {{ .deployment }}
+          action: upsert
+        {{- end }}
+        {{- if .daemonset }}
+        - key: k8s.daemonset.name
+          value: {{ .daemonset }}
+          action: upsert
+        {{- end }}
+        {{- if (not .Values.cluster.deploymentEnvironment.name) }}
+        # Only rely on the downward annotation API if `resource/observe_common` will not be able to handle this field.
+        - key: deployment.environment.name
+          value: ${env:OTEL_K8S_DEPLOYMENT_ENVIRONMENT_NAME:-}
+          action: insert
+          default_value: ""
+        {{- end }}
+    {{- end }}
 {{- end -}}
 
 {{- define "config.processors.transform.k8sheartbeat" -}}
