@@ -3,7 +3,7 @@
 {{- $redMetrics := (and .Values.application.REDMetrics.enabled (not .Values.gatewayDeployment.enabled)) }}
 {{- if $redMetrics }}
 connectors:
-{{- include "config.connectors.spanmetrics" . | nindent 2 }}
+{{- include "config.connectors.RED_metrics" . | nindent 2 }}
 {{- end }}
 
 exporters:
@@ -72,7 +72,7 @@ processors:
   {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
   {{- include "config.processors.deltatocumulative" . | nindent 2 }}
   {{- include "config.processors.transform.add_span_status_code" . | nindent 2 }}
-  {{- include "config.processors.attributes.add_empty_service_attributes" . | nindent 2 }}
+  {{- include "config.processors.transform.add_empty_service_attributes" . | nindent 2 }}
 
   {{- if .Values.node.forwarder.metrics.convertCumulativeToDelta }}
     {{- if eq .Values.node.forwarder.metrics.outputFormat "prometheus" }}
@@ -176,9 +176,9 @@ service:
         {{- if .Values.gatewayDeployment.enabled }}
         - k8sattributes/passthrough
         {{- else }}
-        - transform/add_span_status_code
-        - resource/add_empty_service_attributes
         - k8sattributes
+        - transform/add_span_status_code
+        - transform/add_empty_service_attributes
         {{- end }}
         {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
         - batch

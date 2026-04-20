@@ -1,27 +1,26 @@
 ---
-# Source: agent/charts/forwarder/templates/deployment.yaml
+# Source: agent/charts/node-logs-metrics/templates/daemonset.yaml
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
-  name: example-forwarder
+  name: example-node-logs-metrics-agent
   namespace: observe
   labels:
-    helm.sh/chart: forwarder-0.155.0
-    app.kubernetes.io/name: forwarder
+    helm.sh/chart: node-logs-metrics-0.155.0
+    app.kubernetes.io/name: node-logs-metrics
     app.kubernetes.io/instance: example
     app.kubernetes.io/version: "0.151.0"
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: opentelemetry-collector
-    app.kubernetes.io/component: standalone-collector
+    app.kubernetes.io/component: agent-collector
 spec:
-  replicas: 2
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app.kubernetes.io/name: forwarder
+      app.kubernetes.io/name: node-logs-metrics
       app.kubernetes.io/instance: example
-      component: standalone-collector
-  strategy:
+      component: agent-collector
+  updateStrategy:
     type: RollingUpdate
   template:
     metadata:
@@ -33,9 +32,9 @@ spec:
         observe_monitor_scrape: "true"
         observeinc_com_scrape: "false"
       labels:
-        app.kubernetes.io/name: forwarder
+        app.kubernetes.io/name: node-logs-metrics
         app.kubernetes.io/instance: example
-        component: standalone-collector
+        component: agent-collector
 
     spec:
 
@@ -44,7 +43,7 @@ spec:
       securityContext:
         {}
       containers:
-        - name: forwarder
+        - name: node-logs-metrics
           command:
             - /observe-agent
           args:
@@ -52,33 +51,16 @@ spec:
             - start
             - --observe-config=/observe-agent-conf/observe-agent.yaml
             - --config=/conf/relay.yaml
-            - --feature-gates=+connector.spanmetrics.includeCollectorInstanceID
+            - --feature-gates=+exporter.prometheusremotewritexporter.EnableMultipleWorkers
           securityContext:
-            {}
+            runAsGroup: 0
+            runAsUser: 0
           image: "observeinc/observe-agent:2.16.0"
           imagePullPolicy: IfNotPresent
           ports:
 
-            - name: jaeger-compact
-              containerPort: 6831
-              protocol: UDP
-            - name: jaeger-grpc
-              containerPort: 14250
-              protocol: TCP
-            - name: jaeger-thrift
-              containerPort: 14268
-              protocol: TCP
             - name: metrics
               containerPort: 8888
-              protocol: TCP
-            - name: otlp
-              containerPort: 4317
-              protocol: TCP
-            - name: otlp-http
-              containerPort: 4318
-              protocol: TCP
-            - name: zipkin
-              containerPort: 9411
               protocol: TCP
           env:
             - name: MY_POD_IP
@@ -129,16 +111,20 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
+            - name: K8S_NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
             - name: TOKEN
               valueFrom:
                 secretKeyRef:
                   key: OBSERVE_TOKEN
                   name: agent-credentials
                   optional: true
-            - name: TRACE_TOKEN
+            - name: TRACES_TOKEN
               valueFrom:
                 secretKeyRef:
-                  key: TRACE_TOKEN
+                  key: TRACES_TOKEN
                   name: agent-credentials
                   optional: true
           livenessProbe:
@@ -157,13 +143,25 @@ spec:
             limits:
               memory: 512Mi
             requests:
-              cpu: 300m
+              cpu: 250m
               memory: 512Mi
           volumeMounts:
             - mountPath: /conf
-              name: forwarder-configmap
+              name: node-logs-metrics-configmap
             - mountPath: /observe-agent-conf
               name: observe-agent-deployment-config
+            - mountPath: /var/log/pods
+              name: varlogpods
+              readOnly: true
+            - mountPath: /var/lib/docker/containers
+              name: varlibdockercontainers
+              readOnly: true
+            - mountPath: /var/lib/otelcol
+              name: varlibotelcol
+            - mountPath: /hostfs
+              mountPropagation: HostToContainer
+              name: hostfs
+              readOnly: true
       initContainers:
         - env:
           - name: NAMESPACE
@@ -175,9 +173,9 @@ spec:
           name: kube-cluster-info
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: forwarder-configmap
+        - name: node-logs-metrics-configmap
           configMap:
-            name: forwarder
+            name: node-logs-metrics
             items:
               - key: relay
                 path: relay.yaml
@@ -188,6 +186,19 @@ spec:
               path: observe-agent.yaml
             name: observe-agent
           name: observe-agent-deployment-config
+        - hostPath:
+            path: /var/log/pods
+          name: varlogpods
+        - hostPath:
+            path: /var/lib/docker/containers
+          name: varlibdockercontainers
+        - hostPath:
+            path: /var/lib/otelcol
+            type: DirectoryOrCreate
+          name: varlibotelcol
+        - hostPath:
+            path: /
+          name: hostfs
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

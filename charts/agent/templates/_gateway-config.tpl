@@ -2,7 +2,7 @@
 
 {{- if .Values.application.REDMetrics.enabled }}
 connectors:
-{{- include "config.connectors.spanmetrics" . | nindent 2 }}
+{{- include "config.connectors.RED_metrics" . | nindent 2 }}
 {{- end }}
 
 exporters:
@@ -40,7 +40,7 @@ processors:
 {{- include "config.processors.transform.deployment_environment_compatibility" . | nindent 2 }}
 {{- include "config.processors.filter.drop_long_spans" . | nindent 2 }}
 {{- include "config.processors.transform.add_span_status_code" . | nindent 2 }}
-{{- include "config.processors.attributes.add_empty_service_attributes" . | nindent 2 }}
+{{- include "config.processors.transform.add_empty_service_attributes" . | nindent 2 }}
 
 {{- if .Values.application.REDMetrics.enabled }}
   {{- include "config.processors.RED_metrics" . | nindent 2 }}
@@ -94,7 +94,7 @@ service:
         - memory_limiter
         - k8sattributes
         - transform/add_span_status_code
-        - resource/add_empty_service_attributes
+        - transform/add_empty_service_attributes
         - attributes/debug_source_gateway
         {{- if .Values.gatewayDeployment.traceSampling.enabled }}
         - tail_sampling/observe
