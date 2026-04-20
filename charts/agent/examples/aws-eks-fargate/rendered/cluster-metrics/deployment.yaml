@@ -55,7 +55,7 @@ spec:
             - --feature-gates=+exporter.prometheusremotewritexporter.EnableMultipleWorkers
           securityContext:
             {}
-          image: "observeinc/observe-agent:2.14.0"
+          image: "observeinc/observe-agent:2.15.0"
           imagePullPolicy: IfNotPresent
           ports:
 

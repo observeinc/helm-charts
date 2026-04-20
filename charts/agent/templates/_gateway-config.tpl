@@ -3,6 +3,10 @@
 {{- if .Values.application.REDMetrics.enabled }}
 connectors:
 {{- include "config.connectors.spanmetrics" . | nindent 2 }}
+{{- include "config.connectors.spanmetrics.summary" . | nindent 2 }}
+{{- if not .Values.application.REDMetrics.onlyGenerateForAPMSpans }}
+{{- include "config.connectors.routing.red_metrics_internal" . | nindent 2 }}
+{{- end }}
 {{- end }}
 
 exporters:
@@ -93,7 +97,7 @@ service:
         - memory_limiter
         - k8sattributes
         - transform/add_span_status_code
-        - resource/add_empty_service_attributes
+        - transform/add_empty_service_attributes
         - attributes/debug_source_gateway
         {{- if .Values.gatewayDeployment.traceSampling.enabled }}
         - tail_sampling/observe
@@ -133,6 +137,7 @@ service:
       exporters: [{{ join ", " $metricsExporters }}]
     {{- if .Values.application.REDMetrics.enabled }}
     {{- include "config.pipelines.RED_metrics" . | nindent 4 }}
+    {{- include "config.pipelines.RED_metrics_summary" . | nindent 4 }}
     {{- end }}
 
     {{- if .Values.agent.config.global.fleet.enabled }}

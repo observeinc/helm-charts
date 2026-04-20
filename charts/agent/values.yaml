@@ -147,14 +147,14 @@ application:
   REDMetrics:
     # -- (bool) Whether to enable generating RED metrics from spans. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview
     enabled: false
-    # -- (bool) If enabled, this will skip generating RED metrics for spans that are not service entrypoint spans (which are spans with kind Server, kind Consumer, or calls to DB or messaging system clients).
-    # If this and trace sampling are both enabled, it will not be possible to deduce accurate RED metrics for span types other than service entrypoint spans.
-    onlyGenerateForServiceEntrypointSpans: false
+    # -- (bool) If enabled, this will skip generating RED metrics for spans that are not considered to be top level in APM (which are spans with kind Server, kind Consumer, or calls to DB or messaging system clients).
+    # If this is set to false, metrics generated for non APM spans will be suffixed with `.internal`. If this flag and trace sampling are both enabled, it will not be possible to deduce accurate RED metrics for non-APM spans.
+    onlyGenerateForAPMSpans: true
     # -- (list) List of resource attributes to include as dimensions for RED metrics. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview
     resourceDimensions:
       - service.namespace
       - service.version
-      - deployment.environment
+      - deployment.environment.name
       - k8s.pod.name
       - k8s.namespace.name
     # -- (list) List of span attributes to include as dimensions for RED metrics. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview
@@ -163,6 +163,16 @@ application:
       - peer.messaging.system
       - otel.status_description
       - observe.status_code
+    summaryMetrics:
+      # -- (list) List of resource attributes to include as dimensions for summary RED metrics. Summary metrics have fewer dimensions than the full RED metrics and are named with a .summary suffix.
+      # Altering these dimensions will negatively impact query performence in APM.
+      resourceDimensions:
+        - service.namespace
+        - deployment.environment.name
+      # -- (list) List of span attributes to include as dimensions for summary RED metrics. Altering these dimensions will negatively impact query performence in APM.
+      spanDimensions:
+        - peer.db.name
+        - peer.messaging.system
 
 nodeless:
   # -- (bool) Enables nodeless mode. Nodeless mode is intended for environments where daemonsets are not supported. See https://docs.observeinc.com/docs/deploy-to-a-serverless-kubernetes-cluster for details on setup required.
