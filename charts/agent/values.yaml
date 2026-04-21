@@ -327,6 +327,8 @@ agent:
     enabled: true
     metrics:
       scrapeInterval: 60s
+      # -- Regex used to drop internal prometheus metrics.
+      metricDropRegex: "otelcol_k8s_pod_association.*"
 
 
 ################################################

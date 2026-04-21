@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.86.1](https://img.shields.io/badge/Version-0.86.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.15.0](https://img.shields.io/badge/AppVersion-2.15.0-informational?style=flat-square)
+![Version: 0.86.2](https://img.shields.io/badge/Version-0.86.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.15.0](https://img.shields.io/badge/AppVersion-2.15.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -88,6 +88,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | agent.config.nodeLogsMetrics | string | `nil` | Additional OTel collector config for node-logs-metrics daemonset |
 | agent.config.prometheusScraper | string | `nil` | Additional OTel collector config for prometheus-scraper deployment |
 | agent.selfMonitor.enabled | bool | `true` |  |
+| agent.selfMonitor.metrics.metricDropRegex | string | `"otelcol_k8s_pod_association.*"` | Regex used to drop internal prometheus metrics. |
 | agent.selfMonitor.metrics.scrapeInterval | string | `"60s"` |  |
 | application.REDMetrics.enabled | bool | `false` | Whether to enable generating RED metrics from spans. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview |
 | application.REDMetrics.onlyGenerateForServiceEntrypointSpans | bool | `false` | If enabled, this will skip generating RED metrics for spans that are not service entrypoint spans (which are spans with kind Server, kind Consumer, or calls to DB or messaging system clients). If this and trace sampling are both enabled, it will not be possible to deduce accurate RED metrics for span types other than service entrypoint spans. |
