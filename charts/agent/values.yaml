@@ -144,6 +144,8 @@ application:
     metricDropRegex: ""
     # metrics to keep
     metricKeepRegex: (.*)
+    # -- (bool) Enable extra scrape metrics
+    extraScrapeMetrics: false
   REDMetrics:
     # -- (bool) Whether to enable generating RED metrics from spans. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview
     enabled: false

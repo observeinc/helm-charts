@@ -1,6 +1,8 @@
 {{- define "config.receivers.prometheus.pod_metrics" -}}
 prometheus/pod_metrics:
   config:
+    global:
+      extra_scrape_metrics: {{.Values.application.prometheusScrape.extraScrapeMetrics}}
     scrape_configs:
     - job_name: pod-metrics
       scrape_interval: {{.Values.application.prometheusScrape.interval}}
@@ -117,6 +119,8 @@ prometheus/pod_metrics:
 {{- if .Values.node.metrics.cadvisor.enabled }}
 prometheus/cadvisor:
   config:
+    global:
+      extra_scrape_metrics: {{.Values.application.prometheusScrape.extraScrapeMetrics}}
     scrape_configs:
       - job_name: 'kubernetes-nodes-cadvisor'
         scheme: https
