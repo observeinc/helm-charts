@@ -10,19 +10,24 @@ exporters:
 
 receivers:
   prometheus/collector:
-        config:
-          scrape_configs:
-          - job_name: opentelemetry-collector-self
-            scrape_interval: {{ .Values.agent.selfMonitor.metrics.scrapeInterval }}
-            static_configs:
-            - targets:
-              - ${env:MY_POD_IP}:8888
-          - job_name: opentelemetry-collector-other
-            scrape_interval: {{ .Values.agent.selfMonitor.metrics.scrapeInterval }}
-            honor_labels: true
-            kubernetes_sd_configs:
+    config:
+      scrape_configs:
+        - job_name: opentelemetry-collector-self
+          scrape_interval: {{ .Values.agent.selfMonitor.metrics.scrapeInterval }}
+          static_configs:
+          - targets:
+            - ${env:MY_POD_IP}:8888
+          metric_relabel_configs:
+            - action: drop
+              regex: {{.Values.agent.selfMonitor.metrics.metricDropRegex}}
+              source_labels:
+                - __name__
+        - job_name: opentelemetry-collector-other
+          scrape_interval: {{ .Values.agent.selfMonitor.metrics.scrapeInterval }}
+          honor_labels: true
+          kubernetes_sd_configs:
             - role: pod
-            relabel_configs:
+          relabel_configs:
             # select only those pods that has "observe_monitor_purpose: observecollection" annotation
             - source_labels: [__meta_kubernetes_pod_annotation_observe_monitor_purpose]
               action: keep
@@ -50,6 +55,11 @@ receivers:
             - source_labels: [__meta_kubernetes_pod_name]
               action: replace
               target_label: kubernetes_pod_name
+          metric_relabel_configs:
+            - action: drop
+              regex: {{.Values.agent.selfMonitor.metrics.metricDropRegex}}
+              source_labels:
+                - __name__
 
 {{- if .Values.agent.config.global.fleet.enabled }}
 {{- include "config.receivers.observe.heartbeat" . | nindent 2 }}
