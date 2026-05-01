@@ -46,6 +46,10 @@ build-deps: add-repos
 		echo ; \
 	done
 
+.PHONY: verify-agent-prometheus-ta
+verify-agent-prometheus-ta:
+	test/verify_agent_prometheus_ta_template.sh
+
 .PHONY: test
 test: build-deps build-test-images
 	test/test.sh agent stack traces

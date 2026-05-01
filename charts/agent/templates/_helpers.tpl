@@ -5,6 +5,21 @@
     "observe"
   {{- end -}}
 {{- end -}}
+
+{{/* Kubernetes namespace string without extra quoting (for DNS names, env values, etc.). */}}
+{{- define "observe-agent.k8sNamespace" -}}
+{{- if .Values.cluster.namespaceOverride.value -}}
+{{- .Values.cluster.namespaceOverride.value -}}
+{{- else -}}
+observe
+{{- end -}}
+{{- end -}}
+
+{{/* DNS-safe service name for a standalone Target Allocator (TA-only sharding).
+     Usage: include "observe-agent.prometheusTargetAllocator.serviceName" (dict "root" . "suffix" "pod-metrics") */}}
+{{- define "observe-agent.prometheusTargetAllocator.serviceName" -}}
+{{- printf "%s-prometheus-ta-%s" .root.Release.Name .suffix | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
 {{- define "config.local_host" -}}
 ${env:MY_POD_IP}
 {{- end -}}

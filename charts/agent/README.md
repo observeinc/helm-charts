@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.86.1](https://img.shields.io/badge/Version-0.86.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.15.0](https://img.shields.io/badge/AppVersion-2.15.0-informational?style=flat-square)
+![Version: 0.87.0](https://img.shields.io/badge/Version-0.87.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.15.0](https://img.shields.io/badge/AppVersion-2.15.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -21,6 +21,8 @@ This service is a *single-instance deployment*. It's critical that this service 
 ## prometheus-scraper
 
 This service is a *single-instance deployment*. It's critical that this service is only a single instance since otherwise it would produce duplicate data. It is responsible for scraping pods for Prometheus metrics is configured and runs.
+
+When **`application.prometheusScrape.targetAllocator.enabled`** is `true` (requires **`application.prometheusScrape.independentDeployment`**), the chart also deploys an OpenTelemetry **Target Allocator** and configures the `prometheus/pod_metrics` receiver to shard targets across **`prometheus-scraper.replicaCount`** observe-agent pods. Set **`prometheus-scraper.replicaCount`** to at least `2` for meaningful sharding. The OpenTelemetry Operator is not required for this path. Pair the **`targetAllocator.image`** tag with your observe-agent / OTel collector version per OpenTelemetry release notes.
 
 ## forwarder
 
@@ -101,6 +103,13 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | application.prometheusScrape.namespaceDropRegex | string | `"(.*istio.*|.*ingress.*|kube-system)"` |  |
 | application.prometheusScrape.namespaceKeepRegex | string | `"(.*)"` |  |
 | application.prometheusScrape.portKeepRegex | string | `".*metrics"` |  |
+| application.prometheusScrape.targetAllocator.enabled | bool | `false` |  |
+| application.prometheusScrape.targetAllocator.image.repository | string | `"ghcr.io/open-telemetry/opentelemetry-operator/target-allocator"` |  |
+| application.prometheusScrape.targetAllocator.image.tag | string | `"0.150.0"` |  |
+| application.prometheusScrape.targetAllocator.interval | string | `"30s"` |  |
+| application.prometheusScrape.targetAllocator.resources.limits.memory | string | `"256Mi"` |  |
+| application.prometheusScrape.targetAllocator.resources.requests.cpu | string | `"50m"` |  |
+| application.prometheusScrape.targetAllocator.resources.requests.memory | string | `"128Mi"` |  |
 | cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
 | cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"DoesNotExist"` |  |
 | cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].key | string | `"kubernetes.io/os"` |  |
@@ -703,6 +712,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | prometheus-scraper.resources.limits.memory | string | `"512Mi"` |  |
 | prometheus-scraper.resources.requests.cpu | string | `"250m"` |  |
 | prometheus-scraper.resources.requests.memory | string | `"512Mi"` |  |
+| prometheus-scraper.securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | prometheus-scraper.serviceAccount.create | bool | `false` |  |
 | prometheus-scraper.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | prometheus-scraper.tolerations | list | `[]` |  |

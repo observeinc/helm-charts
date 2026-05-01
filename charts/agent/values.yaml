@@ -144,6 +144,22 @@ application:
     metricDropRegex: ""
     # metrics to keep
     metricKeepRegex: (.*)
+    # Target Allocator (TA-only) shards pod_metrics across multiple prometheus-scraper replicas.
+    # Requires application.prometheusScrape.independentDeployment=true. OpenTelemetry Operator is not required.
+    # Set prometheus-scraper.replicaCount >= 2 for meaningful sharding.
+    targetAllocator:
+      enabled: false
+      # How often each collector syncs scrape jobs from the Target Allocator (Prometheus receiver target_allocator.interval).
+      interval: 30s
+      image:
+        repository: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator
+        tag: "0.150.0"
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          memory: 256Mi
   REDMetrics:
     # -- (bool) Whether to enable generating RED metrics from spans. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview
     enabled: false
@@ -628,6 +644,10 @@ prometheus-scraper:
       memory: 512Mi
     limits:
       memory: 512Mi
+
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
   # ----------------------------------------- #
 
   # ----------------------------------------- #
