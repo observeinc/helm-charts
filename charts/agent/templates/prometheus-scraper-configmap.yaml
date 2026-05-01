@@ -1,3 +1,6 @@
+{{- if and (not .Values.node.metrics.cadvisor.separate_pipeline) (not .Values.application.prometheusScrape.independentDeployment) -}}
+{{- fail "node.metrics.cadvisor.separate_pipeline=false requires application.prometheusScrape.independentDeployment=true" -}}
+{{- end -}}
 {{ if .Values.application.prometheusScrape.independentDeployment }}
 {{- include "observe-agent.validateOtelPodUid" (dict "componentName" "prometheus-scraper" "extraEnvs" (index .Values "prometheus-scraper" "extraEnvs") "fleetEnabled" .Values.agent.config.global.fleet.enabled) -}}
 apiVersion: v1

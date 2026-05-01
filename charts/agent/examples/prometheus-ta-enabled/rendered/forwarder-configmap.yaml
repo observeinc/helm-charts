@@ -1,0 +1,237 @@
+---
+# Source: agent/templates/forwarder-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: forwarder
+  namespace: observe
+data:
+  relay: |
+      exporters:
+        debug/override:
+          sampling_initial: 2
+          sampling_thereafter: 1
+          verbosity: basic
+        otlphttp/observe/base:
+          compression: zstd
+          endpoint: ${env:OBSERVE_OTEL_ENDPOINT}
+          headers:
+            authorization: ${env:OBSERVE_AUTHORIZATION_HEADER}
+            x-observe-target-package: Kubernetes Explorer
+          retry_on_failure:
+            enabled: true
+            initial_interval: 1s
+            max_elapsed_time: 5m
+            max_interval: 30s
+          sending_queue:
+            enabled: true
+          timeout: 10s
+        otlphttp/observe/forward/trace:
+          compression: zstd
+          endpoint: ${env:OBSERVE_OTEL_ENDPOINT}
+          headers:
+            authorization: Bearer ${env:TRACE_TOKEN}
+            x-observe-target-package: Tracing
+          retry_on_failure:
+            enabled: true
+            initial_interval: 1s
+            max_elapsed_time: 5m
+            max_interval: 30s
+          sending_queue:
+            enabled: true
+          timeout: 10s
+        otlphttp/observe/otel_metrics:
+          compression: zstd
+          endpoint: ${env:OBSERVE_OTEL_ENDPOINT}
+          headers:
+            authorization: ${env:OBSERVE_AUTHORIZATION_HEADER}
+            x-observe-target-package: Metrics
+          retry_on_failure:
+            enabled: true
+            initial_interval: 1s
+            max_elapsed_time: 5m
+            max_interval: 30s
+          sending_queue:
+            enabled: true
+          timeout: 10s
+        prometheusremotewrite/observe:
+          endpoint: ${env:OBSERVE_PROMETHEUS_ENDPOINT}
+          headers:
+            authorization: ${env:OBSERVE_AUTHORIZATION_HEADER}
+            x-observe-target-package: Kubernetes Explorer
+          max_batch_request_parallelism: 5
+          remote_write_queue:
+            num_consumers: 5
+          resource_to_telemetry_conversion:
+            enabled: true
+          retry_on_failure:
+            enabled: true
+            initial_interval: 1s
+            max_elapsed_time: 5m
+            max_interval: 30s
+          send_metadata: true
+          timeout: 10s
+      processors:
+        attributes/debug_source_app_logs:
+          actions:
+          - action: insert
+            key: debug_source
+            value: app_logs
+        attributes/debug_source_app_metrics:
+          actions:
+          - action: insert
+            key: debug_source
+            value: app_metrics
+        attributes/debug_source_app_traces:
+          actions:
+          - action: insert
+            key: debug_source
+            value: app_traces
+        batch:
+          send_batch_max_size: 4096
+          send_batch_size: 4096
+          timeout: 5s
+        deltatocumulative/observe:
+          max_stale: 5m
+        filter/drop_long_spans:
+          error_mode: ignore
+          traces:
+            span:
+            - (span.end_time - span.start_time) > Duration("1h")
+        k8sattributes:
+          extract:
+            labels:
+            - from: pod
+              key_regex: (app\.kubernetes\.io/.+)
+              tag_name: $1
+            metadata:
+            - k8s.namespace.name
+            - k8s.deployment.name
+            - k8s.replicaset.name
+            - k8s.statefulset.name
+            - k8s.daemonset.name
+            - k8s.cronjob.name
+            - k8s.job.name
+            - k8s.node.name
+            - k8s.node.uid
+            - k8s.pod.name
+            - k8s.pod.uid
+            - k8s.cluster.uid
+            - k8s.container.name
+            - container.id
+            - service.namespace
+            - service.name
+            - service.version
+            - service.instance.id
+            otel_annotations: true
+          passthrough: false
+          pod_association:
+          - sources:
+            - from: resource_attribute
+              name: k8s.pod.ip
+          - sources:
+            - from: resource_attribute
+              name: k8s.pod.uid
+          - sources:
+            - from: connection
+          wait_for_metadata: false
+          wait_for_metadata_timeout: 10s
+        memory_limiter:
+          check_interval: 5s
+          limit_percentage: 80
+          spike_limit_percentage: 15
+        resource/add_empty_service_attributes:
+          attributes:
+          - action: insert
+            key: service.name
+            value: ""
+          - action: insert
+            key: service.namespace
+            value: ""
+          - action: insert
+            key: deployment.environment
+            value: ""
+        resource/observe_common:
+          attributes:
+          - action: upsert
+            key: k8s.cluster.name
+            value: ${env:OBSERVE_CLUSTER_NAME}
+          - action: upsert
+            key: k8s.cluster.uid
+            value: ${env:OBSERVE_CLUSTER_UID}
+        resourcedetection/cloud:
+          detectors:
+          - eks
+          - gcp
+          - ecs
+          - ec2
+          - azure
+          override: false
+          timeout: 2s
+        transform/add_span_status_code:
+          error_mode: ignore
+          trace_statements:
+          - set(span.attributes["observe.status_code"], Int(span.attributes["rpc.grpc.status_code"]))
+            where span.attributes["observe.status_code"] == nil and span.attributes["rpc.grpc.status_code"]
+            != nil
+          - set(span.attributes["observe.status_code"], Int(span.attributes["grpc.status_code"]))
+            where span.attributes["observe.status_code"] == nil and span.attributes["grpc.status_code"]
+            != nil
+          - set(span.attributes["observe.status_code"], Int(span.attributes["rpc.status_code"]))
+            where span.attributes["observe.status_code"] == nil and span.attributes["rpc.status_code"]
+            != nil
+          - set(span.attributes["observe.status_code"], Int(span.attributes["http.status_code"]))
+            where span.attributes["observe.status_code"] == nil and span.attributes["http.status_code"]
+            != nil
+          - set(span.attributes["observe.status_code"], Int(span.attributes["http.response.status_code"]))
+            where span.attributes["observe.status_code"] == nil and span.attributes["http.response.status_code"]
+            != nil
+      receivers:
+        otlp/app-telemetry:
+          protocols:
+            grpc:
+              endpoint: ${env:MY_POD_IP}:4317
+            http:
+              endpoint: ${env:MY_POD_IP}:4318
+      service:
+        pipelines:
+          logs/observe-forward:
+            exporters:
+            - otlphttp/observe/base
+            processors:
+            - memory_limiter
+            - k8sattributes
+            - batch
+            - resourcedetection/cloud
+            - resource/observe_common
+            - attributes/debug_source_app_logs
+            receivers:
+            - otlp/app-telemetry
+          metrics/observe-forward:
+            exporters:
+            - prometheusremotewrite/observe
+            processors:
+            - memory_limiter
+            - k8sattributes
+            - deltatocumulative/observe
+            - batch
+            - resourcedetection/cloud
+            - resource/observe_common
+            - attributes/debug_source_app_metrics
+            receivers:
+            - otlp/app-telemetry
+          traces/observe-forward:
+            exporters:
+            - otlphttp/observe/forward/trace
+            processors:
+            - filter/drop_long_spans
+            - memory_limiter
+            - transform/add_span_status_code
+            - resource/add_empty_service_attributes
+            - k8sattributes
+            - batch
+            - resourcedetection/cloud
+            - resource/observe_common
+            - attributes/debug_source_app_traces
+            receivers:
+            - otlp/app-telemetry

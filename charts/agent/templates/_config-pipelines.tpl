@@ -41,6 +41,31 @@ metrics/spanmetrics:
 {{- end -}}
 
 {{- define "config.pipelines.prometheus_scrapers" -}}
+{{- $merged := and .Values.application.prometheusScrape.independentDeployment (not .Values.node.metrics.cadvisor.separate_pipeline) }}
+{{- if $merged }}
+
+{{- /* Merged-pipeline path: pod-metrics and cadvisor scrape jobs share a
+       single receiver AND a single downstream pipeline. debug_source is set
+       per-datapoint by transform/set_debug_source based on the datapoint's
+       resource.service.name, eliminating the fan-out cost of routing through
+       two parallel pipelines. */}}
+metrics/k8s_metrics:
+  receivers: [prometheus/k8s_metrics]
+  processors:
+    - memory_limiter
+    - transform/set_debug_source
+    - k8sattributes
+    {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
+    - batch
+    {{- end }}
+    - resource/observe_common
+  exporters:
+    - prometheusremotewrite/observe
+    {{- if eq .Values.agent.config.global.debug.enabled true }}
+    - debug/override
+    {{- end }}
+
+{{- else }}
 
 metrics/pod_metrics:
   receivers: [prometheus/pod_metrics]
@@ -79,6 +104,8 @@ metrics/cadvisor:
     {{- if eq .Values.agent.config.global.debug.enabled true }}
     - debug/override
     {{- end }}
+{{- end }}
+
 {{- end }}
 
 {{- end }}

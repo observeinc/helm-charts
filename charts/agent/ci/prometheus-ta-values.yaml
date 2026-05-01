@@ -1,0 +1,30 @@
+observe:
+  collectionEndpoint:
+    value: "http://test-stack-collector.testing.svc.cluster.local:8080"
+  token:
+    create: true
+    value: "fake-ds:fake-token"
+
+application:
+  prometheusScrape:
+    enabled: true
+    independentDeployment: true
+
+node:
+  metrics:
+    cadvisor:
+      enabled: true
+      separate_pipeline: false
+
+cluster:
+  namespaceOverride:
+    value: "testing"
+
+cluster-events:
+  namespaceOverride: "testing"
+cluster-metrics:
+  namespaceOverride: "testing"
+node-logs-metrics:
+  namespaceOverride: "testing"
+prometheus-scraper:
+  namespaceOverride: "testing"
