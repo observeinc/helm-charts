@@ -1,0 +1,18 @@
+# Example: enable the merged prometheus/k8s_metrics receiver for pod-metrics + cadvisor.
+# In this PR the flag only merges the two receivers into one and splits them back via
+# filter processors. Target Allocator infrastructure itself lands in a follow-up PR.
+observe:
+  token:
+    create: true
+
+application:
+  prometheusScrape:
+    enabled: true
+    independentDeployment: true
+    targetAllocator:
+      enabled: true
+
+node:
+  metrics:
+    cadvisor:
+      enabled: true

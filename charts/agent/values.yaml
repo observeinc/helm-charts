@@ -144,6 +144,11 @@ application:
     metricDropRegex: ""
     # metrics to keep
     metricKeepRegex: (.*)
+    # Merge pod-metrics and cadvisor into a single receiver with filter processors to split pipelines.
+    # Requires application.prometheusScrape.independentDeployment=true.
+    # Sharding across replicas via Target Allocator will be introduced in a follow-up PR.
+    targetAllocator:
+      enabled: false
   REDMetrics:
     # -- (bool) Whether to enable generating RED metrics from spans. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview
     enabled: false

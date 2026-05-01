@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.86.1](https://img.shields.io/badge/Version-0.86.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.15.0](https://img.shields.io/badge/AppVersion-2.15.0-informational?style=flat-square)
+![Version: 0.87.0](https://img.shields.io/badge/Version-0.87.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.15.0](https://img.shields.io/badge/AppVersion-2.15.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -101,6 +101,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | application.prometheusScrape.namespaceDropRegex | string | `"(.*istio.*|.*ingress.*|kube-system)"` |  |
 | application.prometheusScrape.namespaceKeepRegex | string | `"(.*)"` |  |
 | application.prometheusScrape.portKeepRegex | string | `".*metrics"` |  |
+| application.prometheusScrape.targetAllocator.enabled | bool | `false` |  |
 | cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
 | cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"DoesNotExist"` |  |
 | cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].key | string | `"kubernetes.io/os"` |  |
