@@ -1,0 +1,154 @@
+---
+# Source: agent/templates/agent-monitor-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: monitor
+  namespace: observe
+data:
+  relay: |
+      exporters:
+        debug/override:
+          sampling_initial: 2
+          sampling_thereafter: 1
+          verbosity: basic
+        prometheusremotewrite/observe:
+          endpoint: ${env:OBSERVE_PROMETHEUS_ENDPOINT}
+          headers:
+            authorization: ${env:OBSERVE_AUTHORIZATION_HEADER}
+            x-observe-target-package: Kubernetes Explorer
+          max_batch_request_parallelism: 5
+          remote_write_queue:
+            num_consumers: 5
+          resource_to_telemetry_conversion:
+            enabled: true
+          retry_on_failure:
+            enabled: true
+            initial_interval: 1s
+            max_elapsed_time: 5m
+            max_interval: 30s
+          send_metadata: true
+          timeout: 10s
+      processors:
+        attributes/debug_source_agent_monitor:
+          actions:
+          - action: insert
+            key: debug_source
+            value: agent_monitor
+        batch:
+          send_batch_max_size: 4096
+          send_batch_size: 4096
+          timeout: 5s
+        k8sattributes:
+          extract:
+            labels:
+            - from: pod
+              key_regex: (app\.kubernetes\.io/.+)
+              tag_name: $1
+            metadata:
+            - k8s.namespace.name
+            - k8s.deployment.name
+            - k8s.replicaset.name
+            - k8s.statefulset.name
+            - k8s.daemonset.name
+            - k8s.cronjob.name
+            - k8s.job.name
+            - k8s.node.name
+            - k8s.node.uid
+            - k8s.pod.name
+            - k8s.pod.uid
+            - k8s.cluster.uid
+            - k8s.container.name
+            - container.id
+            - service.namespace
+            - service.name
+            - service.version
+            - service.instance.id
+            otel_annotations: true
+          passthrough: false
+          pod_association:
+          - sources:
+            - from: resource_attribute
+              name: k8s.pod.ip
+          - sources:
+            - from: resource_attribute
+              name: k8s.pod.uid
+          - sources:
+            - from: connection
+          wait_for_metadata: false
+          wait_for_metadata_timeout: 10s
+        memory_limiter:
+          check_interval: 5s
+          limit_percentage: 80
+          spike_limit_percentage: 15
+        resource/drop_service_name:
+          attributes:
+          - action: delete
+            key: service.name
+        resource/observe_common:
+          attributes:
+          - action: upsert
+            key: k8s.cluster.name
+            value: ${env:OBSERVE_CLUSTER_NAME}
+          - action: upsert
+            key: k8s.cluster.uid
+            value: ${env:OBSERVE_CLUSTER_UID}
+      receivers:
+        prometheus/collector:
+          config:
+            scrape_configs:
+            - job_name: opentelemetry-collector-self
+              scrape_interval: 60s
+              static_configs:
+              - targets:
+                - ${env:MY_POD_IP}:8888
+            - honor_labels: true
+              job_name: opentelemetry-collector-other
+              kubernetes_sd_configs:
+              - role: pod
+              relabel_configs:
+              - action: keep
+                regex: observecollection
+                source_labels:
+                - __meta_kubernetes_pod_annotation_observe_monitor_purpose
+              - action: keep
+                regex: true
+                source_labels:
+                - __meta_kubernetes_pod_annotation_observe_monitor_scrape
+              - action: replace
+                regex: (.+)
+                source_labels:
+                - __meta_kubernetes_pod_annotation_observe_monitor_path
+                target_label: __metrics_path__
+              - action: replace
+                regex: ([^:]+)(?::\d+)?;(\d+)
+                replacement: $$1:$$2
+                source_labels:
+                - __address__
+                - __meta_kubernetes_pod_annotation_observe_monitor_port
+                target_label: __address__
+              - action: labelmap
+                regex: __meta_kubernetes_pod_label_(.+)
+              - action: replace
+                source_labels:
+                - __meta_kubernetes_namespace
+                target_label: kubernetes_namespace
+              - action: replace
+                source_labels:
+                - __meta_kubernetes_pod_name
+                target_label: kubernetes_pod_name
+              scrape_interval: 60s
+      service:
+        pipelines:
+          metrics:
+            exporters:
+            - prometheusremotewrite/observe
+            processors:
+            - memory_limiter
+            - resource/drop_service_name
+            - k8sattributes
+            - batch
+            - resource/observe_common
+            - attributes/debug_source_agent_monitor
+            receivers:
+            - prometheus/collector

@@ -1,0 +1,30 @@
+# Example: Prometheus Target Allocator sharding enabled for pod-metrics and cadvisor.
+# Requires application.prometheusScrape.independentDeployment=true.
+# Set prometheus-scraper.replicaCount >= 2 for meaningful sharding.
+observe:
+  token:
+    create: true
+
+application:
+  prometheusScrape:
+    enabled: true
+    independentDeployment: true
+    targetAllocator:
+      enabled: true
+
+node:
+  metrics:
+    cadvisor:
+      enabled: true
+
+prometheus-scraper:
+  replicaCount: 2
+  extraEnvs:
+    - name: OTEL_K8S_POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
+    - name: OTEL_K8S_POD_UID
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.uid
