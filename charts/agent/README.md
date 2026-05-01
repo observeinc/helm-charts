@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.86.1](https://img.shields.io/badge/Version-0.86.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.15.0](https://img.shields.io/badge/AppVersion-2.15.0-informational?style=flat-square)
+![Version: 0.87.0](https://img.shields.io/badge/Version-0.87.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.15.0](https://img.shields.io/badge/AppVersion-2.15.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -608,6 +608,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | node.forwarder.traces.maxSpanDuration | string | `"1h"` | The max span duration to be considered by the agent, or "none" for no limit. Any span over this limit will be dropped. Durations must be a number with a valid time unit: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/pkg/ottl/ottlfuncs/README.md#duration |
 | node.kubeletstats.useNodeIp | bool | `false` |  |
 | node.metrics.cadvisor.enabled | bool | `false` |  |
+| node.metrics.cadvisor.separate_pipeline | bool | `true` |  |
 | node.metrics.enabled | bool | `true` |  |
 | node.metrics.fileSystem.excludeMountPoints | string | `"[\"/dev/*\",\"/proc/*\",\"/sys/*\",\"/run/k3s/containerd/*\",\"/var/lib/docker/*\",\"/var/lib/kubelet/*\",\"/snap/*\"]"` |  |
 | node.metrics.fileSystem.rootPath | string | `"/hostfs"` |  |
