@@ -1,4 +1,5 @@
 {{- define "observe.deployment.prometheusScraper.config" -}}
+{{- $ta := and .Values.application.prometheusScrape.independentDeployment .Values.application.prometheusScrape.targetAllocator.enabled }}
 
 exporters:
 {{- if eq .Values.application.prometheusScrape.enabled true }}
@@ -14,8 +15,12 @@ exporters:
 
 receivers:
 {{- if eq .Values.application.prometheusScrape.enabled true }}
+  {{- if $ta }}
+  {{- include "config.receivers.prometheus.k8s_metrics" . | nindent 2 }}
+  {{- else }}
   {{- include "config.receivers.prometheus.pod_metrics" . | nindent 2 }}
   {{- include "config.receivers.prometheus.cadvisor" . | nindent 2 }}
+  {{- end }}
 {{- else }}
   nop:
 {{- end }}
@@ -33,6 +38,10 @@ processors:
   {{- include "config.processors.attributes.pod_metrics" . | nindent 2 }}
   {{- include "config.processors.attributes.cadvisor_metrics" . | nindent 2 }}
   {{- include "config.processors.attributes.drop_service_name" . | nindent 2 }}
+  {{- if $ta }}
+  {{- include "config.processors.filter.pod_metrics" . | nindent 2 }}
+  {{- include "config.processors.filter.cadvisor" . | nindent 2 }}
+  {{- end }}
 {{- else if .Values.agent.config.global.fleet.enabled }}
   # k8sattributes is needed for the heartbeat pipeline even when prometheusScrape is disabled
   {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}

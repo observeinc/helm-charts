@@ -244,6 +244,29 @@ metricstransform/duplicate_k8s_cpu_metrics:
       new_name: k8s.node.cpu.utilization
 {{- end -}}
 
+{{/*
+  Filter processors for the TA single-receiver path. The prometheus receiver sets
+  service.name to the scrape job name, so these split the shared stream into the
+  correct per-job pipeline without any cross-contamination.
+*/}}
+{{- define "config.processors.filter.pod_metrics" -}}
+filter/pod_metrics:
+  error_mode: drop
+  metrics:
+    metric:
+      - resource.attributes["service.name"] != "pod-metrics"
+{{- end -}}
+
+{{- define "config.processors.filter.cadvisor" -}}
+{{- if .Values.node.metrics.cadvisor.enabled }}
+filter/cadvisor:
+  error_mode: drop
+  metrics:
+    metric:
+      - resource.attributes["service.name"] != "kubernetes-nodes-cadvisor"
+{{- end -}}
+{{- end -}}
+
 {{- define "config.processors.filter.drop_long_spans" -}}
 {{- if eq .Values.node.forwarder.traces.maxSpanDuration "none" }}
 {{- else if (regexMatch "^[0-9]+(ns|us|ms|s|m|h)$" .Values.node.forwarder.traces.maxSpanDuration) }}

@@ -41,6 +41,47 @@ metrics/spanmetrics:
 {{- end -}}
 
 {{- define "config.pipelines.prometheus_scrapers" -}}
+{{- $ta := and .Values.application.prometheusScrape.independentDeployment .Values.application.prometheusScrape.targetAllocator.enabled }}
+{{- if $ta }}
+
+metrics/pod_metrics:
+  receivers: [prometheus/k8s_metrics]
+  processors:
+    - memory_limiter
+    - filter/pod_metrics
+    - resource/drop_service_name
+    - k8sattributes
+    {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
+    - batch
+    {{- end }}
+    - resource/observe_common
+    - attributes/debug_source_pod_metrics
+  exporters:
+    - prometheusremotewrite/observe
+    {{- if eq .Values.agent.config.global.debug.enabled true }}
+    - debug/override
+    {{- end }}
+
+{{- if .Values.node.metrics.cadvisor.enabled }}
+metrics/cadvisor:
+  receivers: [prometheus/k8s_metrics]
+  processors:
+    - memory_limiter
+    - filter/cadvisor
+    - k8sattributes
+    {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
+    - batch
+    {{- end }}
+    - resource/observe_common
+    - attributes/debug_source_cadvisor_metrics
+  exporters:
+    - prometheusremotewrite/observe
+    {{- if eq .Values.agent.config.global.debug.enabled true }}
+    - debug/override
+    {{- end }}
+{{- end }}
+
+{{- else }}
 
 metrics/pod_metrics:
   receivers: [prometheus/pod_metrics]
@@ -76,6 +117,8 @@ metrics/cadvisor:
     {{- if eq .Values.agent.config.global.debug.enabled true }}
     - debug/override
     {{- end }}
+{{- end }}
+
 {{- end }}
 
 {{- end }}

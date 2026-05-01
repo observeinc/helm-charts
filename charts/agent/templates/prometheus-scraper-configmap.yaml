@@ -1,4 +1,7 @@
 {{ if .Values.application.prometheusScrape.independentDeployment }}
+{{- if and .Values.application.prometheusScrape.targetAllocator.enabled (not .Values.application.prometheusScrape.independentDeployment) }}
+{{- fail "application.prometheusScrape.targetAllocator.enabled requires application.prometheusScrape.independentDeployment=true" }}
+{{- end }}
 {{- include "observe-agent.validateOtelPodUid" (dict "componentName" "prometheus-scraper" "extraEnvs" (index .Values "prometheus-scraper" "extraEnvs") "fleetEnabled" .Values.agent.config.global.fleet.enabled) -}}
 apiVersion: v1
 kind: ConfigMap

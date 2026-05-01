@@ -5,6 +5,8 @@
     "observe"
   {{- end -}}
 {{- end -}}
+
+
 {{- define "config.local_host" -}}
 ${env:MY_POD_IP}
 {{- end -}}
