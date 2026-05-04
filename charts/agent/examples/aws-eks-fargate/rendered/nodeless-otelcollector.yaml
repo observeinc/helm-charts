@@ -170,7 +170,6 @@ spec:
             value: ${env:OBSERVE_CLUSTER_UID}
         resourcedetection/cloud:
           detectors:
-          - eks
           - gcp
           - ecs
           - ec2

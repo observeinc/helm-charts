@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.86.1](https://img.shields.io/badge/Version-0.86.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.15.0](https://img.shields.io/badge/AppVersion-2.15.0-informational?style=flat-square)
+![Version: 0.87.0](https://img.shields.io/badge/Version-0.87.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.15.0](https://img.shields.io/badge/AppVersion-2.15.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -90,9 +90,11 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | agent.selfMonitor.enabled | bool | `true` |  |
 | agent.selfMonitor.metrics.scrapeInterval | string | `"60s"` |  |
 | application.REDMetrics.enabled | bool | `false` | Whether to enable generating RED metrics from spans. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview |
-| application.REDMetrics.onlyGenerateForServiceEntrypointSpans | bool | `false` | If enabled, this will skip generating RED metrics for spans that are not service entrypoint spans (which are spans with kind Server, kind Consumer, or calls to DB or messaging system clients). If this and trace sampling are both enabled, it will not be possible to deduce accurate RED metrics for span types other than service entrypoint spans. |
-| application.REDMetrics.resourceDimensions | list | `["service.namespace","service.version","deployment.environment","k8s.pod.name","k8s.namespace.name"]` | List of resource attributes to include as dimensions for RED metrics. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview |
+| application.REDMetrics.onlyGenerateForAPMSpans | bool | `true` | If enabled, this will skip generating RED metrics for spans that are not considered to be top level in APM (which are spans with kind Server, kind Consumer, or calls to DB or messaging system clients). If this is set to false, metrics generated for non APM spans will be suffixed with `.internal`. If this flag and trace sampling are both enabled, it will not be possible to deduce accurate RED metrics for non-APM spans. |
+| application.REDMetrics.resourceDimensions | list | `["service.namespace","service.version","deployment.environment.name","k8s.pod.name","k8s.namespace.name"]` | List of resource attributes to include as dimensions for RED metrics. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview |
 | application.REDMetrics.spanDimensions | list | `["peer.db.name","peer.messaging.system","otel.status_description","observe.status_code"]` | List of span attributes to include as dimensions for RED metrics. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview |
+| application.REDMetrics.summaryMetrics.resourceDimensions | list | `["service.namespace","deployment.environment.name"]` | List of resource attributes to include as dimensions for summary RED metrics. Summary metrics have fewer dimensions than the full RED metrics and are named with a .summary suffix. Altering these dimensions will negatively impact query performence in APM. |
+| application.REDMetrics.summaryMetrics.spanDimensions | list | `["peer.db.name","peer.messaging.system"]` | List of span attributes to include as dimensions for summary RED metrics. Altering these dimensions will negatively impact query performence in APM. |
 | application.prometheusScrape.enabled | bool | `false` |  |
 | application.prometheusScrape.independentDeployment | bool | `false` |  |
 | application.prometheusScrape.interval | string | `"60s"` |  |

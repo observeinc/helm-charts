@@ -13,13 +13,23 @@ data:
           dimensions:
           - name: service.namespace
           - name: service.version
-          - name: deployment.environment
+          - name: deployment.environment.name
           - name: k8s.pod.name
           - name: k8s.namespace.name
           - name: peer.db.name
           - name: peer.messaging.system
           - name: otel.status_description
           - name: observe.status_code
+          histogram:
+            exponential:
+              max_size: 100
+        spanmetrics/summary:
+          aggregation_temporality: AGGREGATION_TEMPORALITY_DELTA
+          dimensions:
+          - name: service.namespace
+          - name: deployment.environment.name
+          - name: peer.db.name
+          - name: peer.messaging.system
           histogram:
             exponential:
               max_size: 100
@@ -129,6 +139,17 @@ data:
           traces:
             span:
             - (span.end_time - span.start_time) > Duration("1h")
+        filter/drop_span_kinds_other_than_server_and_consumer_and_peer_client:
+          error_mode: ignore
+          traces:
+            span:
+            - span.kind == SPAN_KIND_CLIENT and span.attributes["peer.db.name"] == nil and
+              span.attributes["db.system.name"] == nil and span.attributes["db.system"]
+              == nil
+            - span.kind == SPAN_KIND_PRODUCER and span.attributes["peer.messaging.system"]
+              == nil and span.attributes["messaging.system"] == nil
+            - span.kind == SPAN_KIND_UNSPECIFIED
+            - span.kind == SPAN_KIND_INTERNAL
         groupbyattrs/peers:
           keys:
           - peer.db.name
@@ -175,17 +196,14 @@ data:
           check_interval: 5s
           limit_percentage: 80
           spike_limit_percentage: 15
-        resource/add_empty_service_attributes:
-          attributes:
-          - action: insert
-            key: service.name
-            value: ""
-          - action: insert
-            key: service.namespace
-            value: ""
-          - action: insert
-            key: deployment.environment
-            value: ""
+        metricstransform/rename_summary_metrics:
+          transforms:
+          - action: update
+            include: traces.span.metrics.calls
+            new_name: traces.span.metrics.calls.summary
+          - action: update
+            include: traces.span.metrics.duration
+            new_name: traces.span.metrics.duration.summary
         resource/agent_instance:
           attributes:
           - action: upsert
@@ -210,7 +228,6 @@ data:
           timeout: 2s
         resourcedetection/cloud:
           detectors:
-          - eks
           - gcp
           - ecs
           - ec2
@@ -228,6 +245,23 @@ data:
             probabilistic:
               sampling_percentage: 10
             type: probabilistic
+        transform/add_empty_service_attributes:
+          error_mode: ignore
+          trace_statements:
+          - set(resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"])
+            where resource.attributes["deployment.environment.name"] == nil and resource.attributes["deployment.environment"]
+            != nil
+          - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"])
+            where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"]
+            != nil
+          - set(resource.attributes["service.name"], "") where resource.attributes["service.name"]
+            == nil
+          - set(resource.attributes["service.namespace"], "") where resource.attributes["service.namespace"]
+            == nil
+          - set(resource.attributes["deployment.environment.name"], "") where resource.attributes["deployment.environment.name"]
+            == nil
+          - set(resource.attributes["deployment.environment"], "") where resource.attributes["deployment.environment"]
+            == nil
         transform/add_span_status_code:
           error_mode: ignore
           trace_statements:
@@ -256,8 +290,18 @@ data:
         transform/fix_red_metrics_resource_attributes:
           error_mode: ignore
           metric_statements:
-          - keep_matching_keys(resource.attributes, "^(service.name|service.namespace|service.version|deployment.environment|k8s.pod.name|k8s.namespace.name)")
-          - delete_matching_keys(datapoint.attributes, "^(service.name|service.namespace|service.version|deployment.environment|k8s.pod.name|k8s.namespace.name)")
+          - keep_matching_keys(resource.attributes, "^(service.name|service.namespace|service.version|deployment.environment.name|k8s.pod.name|k8s.namespace.name)")
+          - delete_matching_keys(datapoint.attributes, "^(service.name|service.namespace|service.version|deployment.environment.name|k8s.pod.name|k8s.namespace.name)")
+          - set(datapoint.attributes["otel.status_code"], "OK") where datapoint.attributes["status.code"]
+            == "STATUS_CODE_OK"
+          - set(datapoint.attributes["otel.status_code"], "ERROR") where datapoint.attributes["status.code"]
+            == "STATUS_CODE_ERROR"
+          - delete_key(datapoint.attributes, "status.code")
+        transform/fix_red_metrics_resource_attributes/summary:
+          error_mode: ignore
+          metric_statements:
+          - keep_matching_keys(resource.attributes, "^(service.name|service.namespace|deployment.environment.name)")
+          - delete_matching_keys(datapoint.attributes, "^(service.name|service.namespace|deployment.environment.name)")
           - set(datapoint.attributes["otel.status_code"], "OK") where datapoint.attributes["status.code"]
             == "STATUS_CODE_OK"
           - set(datapoint.attributes["otel.status_code"], "ERROR") where datapoint.attributes["status.code"]
@@ -296,9 +340,6 @@ data:
             == nil and span.attributes["db.system"] != nil
           - set(span.attributes["peer.messaging.system"], span.attributes["messaging.system"])
             where span.attributes["peer.messaging.system"] == nil and span.attributes["messaging.system"]
-            != nil
-          - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"])
-            where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"]
             != nil
           - set(span.attributes["otel.status_description"], span.status.message) where span.status.message
             != ""
@@ -365,6 +406,19 @@ data:
             - attributes/debug_source_span_metrics
             receivers:
             - spanmetrics
+          metrics/spanmetrics/summary:
+            exporters:
+            - otlphttp/observe/otel_metrics
+            processors:
+            - memory_limiter
+            - groupbyattrs/peers
+            - transform/fix_peer_attributes
+            - transform/remove_service_name_for_peer_metrics
+            - transform/fix_red_metrics_resource_attributes/summary
+            - metricstransform/rename_summary_metrics
+            - resource/observe_common
+            receivers:
+            - spanmetrics/summary
           traces/observe-forward:
             exporters:
             - otlphttp/observe/forward/trace
@@ -372,7 +426,7 @@ data:
             - memory_limiter
             - k8sattributes
             - transform/add_span_status_code
-            - resource/add_empty_service_attributes
+            - transform/add_empty_service_attributes
             - attributes/debug_source_gateway
             - tail_sampling/observe
             - resource/observe_common
@@ -384,9 +438,22 @@ data:
             processors:
             - memory_limiter
             - filter/drop_long_spans
+            - filter/drop_span_kinds_other_than_server_and_consumer_and_peer_client
+            - k8sattributes
             - transform/shape_spans_for_red_metrics
             - transform/add_span_status_code
-            - resource/add_empty_service_attributes
+            - transform/add_empty_service_attributes
+            receivers:
+            - otlp/app-telemetry
+          traces/spanmetrics/summary:
+            exporters:
+            - spanmetrics/summary
+            processors:
+            - memory_limiter
+            - filter/drop_long_spans
+            - filter/drop_span_kinds_other_than_server_and_consumer_and_peer_client
             - k8sattributes
+            - transform/shape_spans_for_red_metrics
+            - transform/add_empty_service_attributes
             receivers:
             - otlp/app-telemetry
