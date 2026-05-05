@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.89.0](https://img.shields.io/badge/Version-0.89.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.16.0](https://img.shields.io/badge/AppVersion-2.16.0-informational?style=flat-square)
+![Version: 0.87.0](https://img.shields.io/badge/Version-0.87.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.15.0](https://img.shields.io/badge/AppVersion-2.15.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -44,13 +44,14 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://open-telemetry.github.io/opentelemetry-helm-charts | cluster-events(opentelemetry-collector) | 0.155.0 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | cluster-metrics(opentelemetry-collector) | 0.155.0 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | prometheus-scraper(opentelemetry-collector) | 0.155.0 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | node-logs-metrics(opentelemetry-collector) | 0.155.0 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | monitor(opentelemetry-collector) | 0.155.0 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | forwarder(opentelemetry-collector) | 0.155.0 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | gateway(opentelemetry-collector) | 0.155.0 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | cluster-events(opentelemetry-collector) | 0.143.0 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | cluster-metrics(opentelemetry-collector) | 0.143.0 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | prometheus-scraper(opentelemetry-collector) | 0.143.0 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | node-logs-metrics(opentelemetry-collector) | 0.143.0 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | monitor(opentelemetry-collector) | 0.143.0 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | forwarder(opentelemetry-collector) | 0.143.0 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | gateway(opentelemetry-collector) | 0.143.0 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | prometheus-ta(opentelemetry-target-allocator) | 0.128.0 |
 
 ## Values
 
@@ -62,7 +63,6 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | agent.config.gateway | string | `nil` | Additional OTel collector config for gateway deployment |
 | agent.config.global.debug.enabled | bool | `false` |  |
 | agent.config.global.debug.verbosity | string | `"basic"` |  |
-| agent.config.global.exporters.emitPrometheusTargetInfoMetrics | bool | `false` |  |
 | agent.config.global.exporters.retryOnFailure.enabled | bool | `true` |  |
 | agent.config.global.exporters.retryOnFailure.initialInterval | string | `"1s"` |  |
 | agent.config.global.exporters.retryOnFailure.maxElapsedTime | string | `"5m"` |  |
@@ -102,6 +102,8 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | application.prometheusScrape.namespaceDropRegex | string | `"(.*istio.*|.*ingress.*|kube-system)"` |  |
 | application.prometheusScrape.namespaceKeepRegex | string | `"(.*)"` |  |
 | application.prometheusScrape.portKeepRegex | string | `".*metrics"` |  |
+| application.prometheusScrape.targetAllocator.enabled | bool | `false` | Deploy the upstream opentelemetry-target-allocator subchart and shard Prometheus scrape targets across scraper replicas via consistent hashing. Required when running multiple prometheus-scraper replicas; otherwise each replica scrapes every target and produces duplicate samples. Requires application.prometheusScrape.independentDeployment=true and node.metrics.cadvisor.separate_pipeline=false. |
+| application.prometheusScrape.targetAllocator.interval | string | `"30s"` | How often each scraper polls the Target Allocator for its assigned scrape targets. Lower values reduce the time window during which short-lived targets (e.g. Kubernetes Jobs) can be missed, at the cost of more frequent HTTP requests to the Target Allocator. Set to 1s if accurate capture of jobs that exist for under a minute matters. |
 | cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
 | cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"DoesNotExist"` |  |
 | cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].key | string | `"kubernetes.io/os"` |  |
@@ -118,16 +120,18 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | cluster-events.extraEnvsFrom | list | `[]` |  |
 | cluster-events.extraEnvs[0].name | string | `"OTEL_K8S_POD_UID"` |  |
 | cluster-events.extraEnvs[0].valueFrom.fieldRef.fieldPath | string | `"metadata.uid"` |  |
-| cluster-events.extraEnvs[1].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
-| cluster-events.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"name"` |  |
-| cluster-events.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
-| cluster-events.extraEnvs[2].name | string | `"OBSERVE_CLUSTER_UID"` |  |
-| cluster-events.extraEnvs[2].valueFrom.configMapKeyRef.key | string | `"id"` |  |
-| cluster-events.extraEnvs[2].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
-| cluster-events.extraEnvs[3].name | string | `"TOKEN"` |  |
-| cluster-events.extraEnvs[3].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
-| cluster-events.extraEnvs[3].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
-| cluster-events.extraEnvs[3].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| cluster-events.extraEnvs[1].name | string | `"OTEL_K8S_POD_NAME"` |  |
+| cluster-events.extraEnvs[1].valueFrom.fieldRef.fieldPath | string | `"metadata.name"` |  |
+| cluster-events.extraEnvs[2].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
+| cluster-events.extraEnvs[2].valueFrom.configMapKeyRef.key | string | `"name"` |  |
+| cluster-events.extraEnvs[2].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
+| cluster-events.extraEnvs[3].name | string | `"OBSERVE_CLUSTER_UID"` |  |
+| cluster-events.extraEnvs[3].valueFrom.configMapKeyRef.key | string | `"id"` |  |
+| cluster-events.extraEnvs[3].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
+| cluster-events.extraEnvs[4].name | string | `"TOKEN"` |  |
+| cluster-events.extraEnvs[4].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
+| cluster-events.extraEnvs[4].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| cluster-events.extraEnvs[4].valueFrom.secretKeyRef.optional | bool | `true` |  |
 | cluster-events.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | cluster-events.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | cluster-events.extraVolumes[0].configMap.defaultMode | int | `420` |  |
@@ -135,7 +139,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | cluster-events.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | cluster-events.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | cluster-events.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| cluster-events.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.16.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| cluster-events.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.15.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | cluster-events.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | cluster-events.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | cluster-events.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.6"` |  |
@@ -186,16 +190,18 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | cluster-metrics.extraEnvsFrom | list | `[]` |  |
 | cluster-metrics.extraEnvs[0].name | string | `"OTEL_K8S_POD_UID"` |  |
 | cluster-metrics.extraEnvs[0].valueFrom.fieldRef.fieldPath | string | `"metadata.uid"` |  |
-| cluster-metrics.extraEnvs[1].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
-| cluster-metrics.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"name"` |  |
-| cluster-metrics.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
-| cluster-metrics.extraEnvs[2].name | string | `"OBSERVE_CLUSTER_UID"` |  |
-| cluster-metrics.extraEnvs[2].valueFrom.configMapKeyRef.key | string | `"id"` |  |
-| cluster-metrics.extraEnvs[2].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
-| cluster-metrics.extraEnvs[3].name | string | `"TOKEN"` |  |
-| cluster-metrics.extraEnvs[3].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
-| cluster-metrics.extraEnvs[3].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
-| cluster-metrics.extraEnvs[3].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| cluster-metrics.extraEnvs[1].name | string | `"OTEL_K8S_POD_NAME"` |  |
+| cluster-metrics.extraEnvs[1].valueFrom.fieldRef.fieldPath | string | `"metadata.name"` |  |
+| cluster-metrics.extraEnvs[2].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
+| cluster-metrics.extraEnvs[2].valueFrom.configMapKeyRef.key | string | `"name"` |  |
+| cluster-metrics.extraEnvs[2].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
+| cluster-metrics.extraEnvs[3].name | string | `"OBSERVE_CLUSTER_UID"` |  |
+| cluster-metrics.extraEnvs[3].valueFrom.configMapKeyRef.key | string | `"id"` |  |
+| cluster-metrics.extraEnvs[3].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
+| cluster-metrics.extraEnvs[4].name | string | `"TOKEN"` |  |
+| cluster-metrics.extraEnvs[4].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
+| cluster-metrics.extraEnvs[4].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| cluster-metrics.extraEnvs[4].valueFrom.secretKeyRef.optional | bool | `true` |  |
 | cluster-metrics.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | cluster-metrics.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | cluster-metrics.extraVolumes[0].configMap.defaultMode | int | `420` |  |
@@ -203,7 +209,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | cluster-metrics.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | cluster-metrics.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | cluster-metrics.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| cluster-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.16.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| cluster-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.15.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | cluster-metrics.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | cluster-metrics.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | cluster-metrics.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.6"` |  |
@@ -264,22 +270,24 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | forwarder.extraEnvsFrom | list | `[]` |  |
 | forwarder.extraEnvs[0].name | string | `"OTEL_K8S_POD_UID"` |  |
 | forwarder.extraEnvs[0].valueFrom.fieldRef.fieldPath | string | `"metadata.uid"` |  |
-| forwarder.extraEnvs[1].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
-| forwarder.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"name"` |  |
-| forwarder.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
-| forwarder.extraEnvs[2].name | string | `"OBSERVE_CLUSTER_UID"` |  |
-| forwarder.extraEnvs[2].valueFrom.configMapKeyRef.key | string | `"id"` |  |
-| forwarder.extraEnvs[2].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
-| forwarder.extraEnvs[3].name | string | `"K8S_NODE_NAME"` |  |
-| forwarder.extraEnvs[3].valueFrom.fieldRef.fieldPath | string | `"spec.nodeName"` |  |
-| forwarder.extraEnvs[4].name | string | `"TOKEN"` |  |
-| forwarder.extraEnvs[4].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
-| forwarder.extraEnvs[4].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
-| forwarder.extraEnvs[4].valueFrom.secretKeyRef.optional | bool | `true` |  |
-| forwarder.extraEnvs[5].name | string | `"TRACE_TOKEN"` |  |
-| forwarder.extraEnvs[5].valueFrom.secretKeyRef.key | string | `"TRACE_TOKEN"` |  |
+| forwarder.extraEnvs[1].name | string | `"OTEL_K8S_POD_NAME"` |  |
+| forwarder.extraEnvs[1].valueFrom.fieldRef.fieldPath | string | `"metadata.name"` |  |
+| forwarder.extraEnvs[2].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
+| forwarder.extraEnvs[2].valueFrom.configMapKeyRef.key | string | `"name"` |  |
+| forwarder.extraEnvs[2].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
+| forwarder.extraEnvs[3].name | string | `"OBSERVE_CLUSTER_UID"` |  |
+| forwarder.extraEnvs[3].valueFrom.configMapKeyRef.key | string | `"id"` |  |
+| forwarder.extraEnvs[3].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
+| forwarder.extraEnvs[4].name | string | `"K8S_NODE_NAME"` |  |
+| forwarder.extraEnvs[4].valueFrom.fieldRef.fieldPath | string | `"spec.nodeName"` |  |
+| forwarder.extraEnvs[5].name | string | `"TOKEN"` |  |
+| forwarder.extraEnvs[5].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
 | forwarder.extraEnvs[5].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
 | forwarder.extraEnvs[5].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| forwarder.extraEnvs[6].name | string | `"TRACE_TOKEN"` |  |
+| forwarder.extraEnvs[6].valueFrom.secretKeyRef.key | string | `"TRACE_TOKEN"` |  |
+| forwarder.extraEnvs[6].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| forwarder.extraEnvs[6].valueFrom.secretKeyRef.optional | bool | `true` |  |
 | forwarder.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | forwarder.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | forwarder.extraVolumes[0].configMap.defaultMode | int | `420` |  |
@@ -287,7 +295,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | forwarder.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | forwarder.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | forwarder.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| forwarder.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.16.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| forwarder.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.15.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | forwarder.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | forwarder.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | forwarder.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.6"` |  |
@@ -340,18 +348,20 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | gateway.extraEnvsFrom | list | `[]` |  |
 | gateway.extraEnvs[0].name | string | `"OTEL_K8S_POD_UID"` |  |
 | gateway.extraEnvs[0].valueFrom.fieldRef.fieldPath | string | `"metadata.uid"` |  |
-| gateway.extraEnvs[1].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
-| gateway.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"name"` |  |
-| gateway.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
-| gateway.extraEnvs[2].name | string | `"OBSERVE_CLUSTER_UID"` |  |
-| gateway.extraEnvs[2].valueFrom.configMapKeyRef.key | string | `"id"` |  |
-| gateway.extraEnvs[2].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
-| gateway.extraEnvs[3].name | string | `"K8S_NODE_NAME"` |  |
-| gateway.extraEnvs[3].valueFrom.fieldRef.fieldPath | string | `"spec.nodeName"` |  |
-| gateway.extraEnvs[4].name | string | `"TOKEN"` |  |
-| gateway.extraEnvs[4].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
-| gateway.extraEnvs[4].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
-| gateway.extraEnvs[4].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| gateway.extraEnvs[1].name | string | `"OTEL_K8S_POD_NAME"` |  |
+| gateway.extraEnvs[1].valueFrom.fieldRef.fieldPath | string | `"metadata.name"` |  |
+| gateway.extraEnvs[2].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
+| gateway.extraEnvs[2].valueFrom.configMapKeyRef.key | string | `"name"` |  |
+| gateway.extraEnvs[2].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
+| gateway.extraEnvs[3].name | string | `"OBSERVE_CLUSTER_UID"` |  |
+| gateway.extraEnvs[3].valueFrom.configMapKeyRef.key | string | `"id"` |  |
+| gateway.extraEnvs[3].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
+| gateway.extraEnvs[4].name | string | `"K8S_NODE_NAME"` |  |
+| gateway.extraEnvs[4].valueFrom.fieldRef.fieldPath | string | `"spec.nodeName"` |  |
+| gateway.extraEnvs[5].name | string | `"TOKEN"` |  |
+| gateway.extraEnvs[5].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
+| gateway.extraEnvs[5].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| gateway.extraEnvs[5].valueFrom.secretKeyRef.optional | bool | `true` |  |
 | gateway.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | gateway.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | gateway.extraVolumes[0].configMap.defaultMode | int | `420` |  |
@@ -359,7 +369,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | gateway.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | gateway.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | gateway.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| gateway.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.16.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| gateway.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.15.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | gateway.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | gateway.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | gateway.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.6"` |  |
@@ -419,16 +429,18 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | monitor.extraEnvsFrom | list | `[]` |  |
 | monitor.extraEnvs[0].name | string | `"OTEL_K8S_POD_UID"` |  |
 | monitor.extraEnvs[0].valueFrom.fieldRef.fieldPath | string | `"metadata.uid"` |  |
-| monitor.extraEnvs[1].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
-| monitor.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"name"` |  |
-| monitor.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
-| monitor.extraEnvs[2].name | string | `"OBSERVE_CLUSTER_UID"` |  |
-| monitor.extraEnvs[2].valueFrom.configMapKeyRef.key | string | `"id"` |  |
-| monitor.extraEnvs[2].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
-| monitor.extraEnvs[3].name | string | `"TOKEN"` |  |
-| monitor.extraEnvs[3].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
-| monitor.extraEnvs[3].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
-| monitor.extraEnvs[3].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| monitor.extraEnvs[1].name | string | `"OTEL_K8S_POD_NAME"` |  |
+| monitor.extraEnvs[1].valueFrom.fieldRef.fieldPath | string | `"metadata.name"` |  |
+| monitor.extraEnvs[2].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
+| monitor.extraEnvs[2].valueFrom.configMapKeyRef.key | string | `"name"` |  |
+| monitor.extraEnvs[2].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
+| monitor.extraEnvs[3].name | string | `"OBSERVE_CLUSTER_UID"` |  |
+| monitor.extraEnvs[3].valueFrom.configMapKeyRef.key | string | `"id"` |  |
+| monitor.extraEnvs[3].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
+| monitor.extraEnvs[4].name | string | `"TOKEN"` |  |
+| monitor.extraEnvs[4].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
+| monitor.extraEnvs[4].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| monitor.extraEnvs[4].valueFrom.secretKeyRef.optional | bool | `true` |  |
 | monitor.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | monitor.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | monitor.extraVolumes[0].configMap.defaultMode | int | `420` |  |
@@ -436,7 +448,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | monitor.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | monitor.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | monitor.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| monitor.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.16.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| monitor.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.15.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | monitor.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | monitor.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | monitor.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.6"` |  |
@@ -487,24 +499,26 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | node-logs-metrics.extraEnvsFrom | list | `[]` |  |
 | node-logs-metrics.extraEnvs[0].name | string | `"OTEL_K8S_POD_UID"` |  |
 | node-logs-metrics.extraEnvs[0].valueFrom.fieldRef.fieldPath | string | `"metadata.uid"` |  |
-| node-logs-metrics.extraEnvs[1].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
-| node-logs-metrics.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"name"` |  |
-| node-logs-metrics.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
-| node-logs-metrics.extraEnvs[2].name | string | `"OBSERVE_CLUSTER_UID"` |  |
-| node-logs-metrics.extraEnvs[2].valueFrom.configMapKeyRef.key | string | `"id"` |  |
-| node-logs-metrics.extraEnvs[2].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
-| node-logs-metrics.extraEnvs[3].name | string | `"K8S_NODE_NAME"` |  |
-| node-logs-metrics.extraEnvs[3].valueFrom.fieldRef.fieldPath | string | `"spec.nodeName"` |  |
-| node-logs-metrics.extraEnvs[4].name | string | `"K8S_NODE_IP"` |  |
-| node-logs-metrics.extraEnvs[4].valueFrom.fieldRef.fieldPath | string | `"status.hostIP"` |  |
-| node-logs-metrics.extraEnvs[5].name | string | `"TOKEN"` |  |
-| node-logs-metrics.extraEnvs[5].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
-| node-logs-metrics.extraEnvs[5].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
-| node-logs-metrics.extraEnvs[5].valueFrom.secretKeyRef.optional | bool | `true` |  |
-| node-logs-metrics.extraEnvs[6].name | string | `"TRACES_TOKEN"` |  |
-| node-logs-metrics.extraEnvs[6].valueFrom.secretKeyRef.key | string | `"TRACES_TOKEN"` |  |
+| node-logs-metrics.extraEnvs[1].name | string | `"OTEL_K8S_POD_NAME"` |  |
+| node-logs-metrics.extraEnvs[1].valueFrom.fieldRef.fieldPath | string | `"metadata.name"` |  |
+| node-logs-metrics.extraEnvs[2].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
+| node-logs-metrics.extraEnvs[2].valueFrom.configMapKeyRef.key | string | `"name"` |  |
+| node-logs-metrics.extraEnvs[2].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
+| node-logs-metrics.extraEnvs[3].name | string | `"OBSERVE_CLUSTER_UID"` |  |
+| node-logs-metrics.extraEnvs[3].valueFrom.configMapKeyRef.key | string | `"id"` |  |
+| node-logs-metrics.extraEnvs[3].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
+| node-logs-metrics.extraEnvs[4].name | string | `"K8S_NODE_NAME"` |  |
+| node-logs-metrics.extraEnvs[4].valueFrom.fieldRef.fieldPath | string | `"spec.nodeName"` |  |
+| node-logs-metrics.extraEnvs[5].name | string | `"K8S_NODE_IP"` |  |
+| node-logs-metrics.extraEnvs[5].valueFrom.fieldRef.fieldPath | string | `"status.hostIP"` |  |
+| node-logs-metrics.extraEnvs[6].name | string | `"TOKEN"` |  |
+| node-logs-metrics.extraEnvs[6].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
 | node-logs-metrics.extraEnvs[6].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
 | node-logs-metrics.extraEnvs[6].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| node-logs-metrics.extraEnvs[7].name | string | `"TRACES_TOKEN"` |  |
+| node-logs-metrics.extraEnvs[7].valueFrom.secretKeyRef.key | string | `"TRACES_TOKEN"` |  |
+| node-logs-metrics.extraEnvs[7].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| node-logs-metrics.extraEnvs[7].valueFrom.secretKeyRef.optional | bool | `true` |  |
 | node-logs-metrics.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | node-logs-metrics.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | node-logs-metrics.extraVolumeMounts[1].mountPath | string | `"/var/log/pods"` |  |
@@ -533,7 +547,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | node-logs-metrics.extraVolumes[3].name | string | `"varlibotelcol"` |  |
 | node-logs-metrics.extraVolumes[4].hostPath.path | string | `"/"` |  |
 | node-logs-metrics.extraVolumes[4].name | string | `"hostfs"` |  |
-| node-logs-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.16.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| node-logs-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.15.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | node-logs-metrics.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | node-logs-metrics.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | node-logs-metrics.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.6"` |  |
@@ -597,7 +611,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | node.forwarder.traces.maxSpanDuration | string | `"1h"` | The max span duration to be considered by the agent, or "none" for no limit. Any span over this limit will be dropped. Durations must be a number with a valid time unit: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/pkg/ottl/ottlfuncs/README.md#duration |
 | node.kubeletstats.useNodeIp | bool | `false` |  |
 | node.metrics.cadvisor.enabled | bool | `false` |  |
-| node.metrics.cadvisor.separate_pipeline | bool | `true` | Merge cadvisor and pod-metrics scrape jobs into a single OpenTelemetry receiver and pipeline. Defaults to true (legacy two-pipeline behavior). Applies in both the cluster-metrics deployment and the dedicated prometheus-scraper deployment (when application.prometheusScrape.independentDeployment=true). |
+| node.metrics.cadvisor.separate_pipeline | bool | `true` | Merge cadvisor and pod-metrics scrape jobs into a single OpenTelemetry receiver and pipeline. Defaults to true (legacy two-pipeline behavior). Applies in both the cluster-metrics deployment and the dedicated prometheus-scraper deployment (when application.prometheusScrape.independentDeployment=true). Required to be false when application.prometheusScrape.targetAllocator.enabled=true. |
 | node.metrics.enabled | bool | `true` |  |
 | node.metrics.fileSystem.excludeMountPoints | string | `"[\"/dev/*\",\"/proc/*\",\"/sys/*\",\"/run/k3s/containerd/*\",\"/var/lib/docker/*\",\"/var/lib/kubelet/*\",\"/snap/*\"]"` |  |
 | node.metrics.fileSystem.rootPath | string | `"/hostfs"` |  |
@@ -643,16 +657,18 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | prometheus-scraper.extraEnvsFrom | list | `[]` |  |
 | prometheus-scraper.extraEnvs[0].name | string | `"OTEL_K8S_POD_UID"` |  |
 | prometheus-scraper.extraEnvs[0].valueFrom.fieldRef.fieldPath | string | `"metadata.uid"` |  |
-| prometheus-scraper.extraEnvs[1].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
-| prometheus-scraper.extraEnvs[1].valueFrom.configMapKeyRef.key | string | `"name"` |  |
-| prometheus-scraper.extraEnvs[1].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
-| prometheus-scraper.extraEnvs[2].name | string | `"OBSERVE_CLUSTER_UID"` |  |
-| prometheus-scraper.extraEnvs[2].valueFrom.configMapKeyRef.key | string | `"id"` |  |
-| prometheus-scraper.extraEnvs[2].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
-| prometheus-scraper.extraEnvs[3].name | string | `"TOKEN"` |  |
-| prometheus-scraper.extraEnvs[3].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
-| prometheus-scraper.extraEnvs[3].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
-| prometheus-scraper.extraEnvs[3].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| prometheus-scraper.extraEnvs[1].name | string | `"OTEL_K8S_POD_NAME"` |  |
+| prometheus-scraper.extraEnvs[1].valueFrom.fieldRef.fieldPath | string | `"metadata.name"` |  |
+| prometheus-scraper.extraEnvs[2].name | string | `"OBSERVE_CLUSTER_NAME"` |  |
+| prometheus-scraper.extraEnvs[2].valueFrom.configMapKeyRef.key | string | `"name"` |  |
+| prometheus-scraper.extraEnvs[2].valueFrom.configMapKeyRef.name | string | `"cluster-name"` |  |
+| prometheus-scraper.extraEnvs[3].name | string | `"OBSERVE_CLUSTER_UID"` |  |
+| prometheus-scraper.extraEnvs[3].valueFrom.configMapKeyRef.key | string | `"id"` |  |
+| prometheus-scraper.extraEnvs[3].valueFrom.configMapKeyRef.name | string | `"cluster-info"` |  |
+| prometheus-scraper.extraEnvs[4].name | string | `"TOKEN"` |  |
+| prometheus-scraper.extraEnvs[4].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
+| prometheus-scraper.extraEnvs[4].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| prometheus-scraper.extraEnvs[4].valueFrom.secretKeyRef.optional | bool | `true` |  |
 | prometheus-scraper.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | prometheus-scraper.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | prometheus-scraper.extraVolumes[0].configMap.defaultMode | int | `420` |  |
@@ -660,7 +676,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | prometheus-scraper.extraVolumes[0].configMap.items[0].path | string | `"observe-agent.yaml"` |  |
 | prometheus-scraper.extraVolumes[0].configMap.name | string | `"observe-agent"` |  |
 | prometheus-scraper.extraVolumes[0].name | string | `"observe-agent-deployment-config"` |  |
-| prometheus-scraper.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.16.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
+| prometheus-scraper.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.15.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | prometheus-scraper.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | prometheus-scraper.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
 | prometheus-scraper.initContainers[0].image | string | `"observeinc/kube-cluster-info:v0.11.6"` |  |
@@ -688,12 +704,19 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | prometheus-scraper.readinessProbe.httpGet.port | int | `13133` |  |
 | prometheus-scraper.readinessProbe.initialDelaySeconds | int | `30` |  |
 | prometheus-scraper.readinessProbe.periodSeconds | int | `5` |  |
+| prometheus-scraper.replicaCount | int | `1` | Number of prometheus-scraper pods. Only honored when application.prometheusScrape.independentDeployment=true. Bumping this above 1 requires application.prometheusScrape.targetAllocator.enabled=true so the Target Allocator can shard scrape targets across replicas; without it every replica scrapes every target and produces duplicate metrics (the chart fails the render in that case). |
 | prometheus-scraper.resources.limits.memory | string | `"512Mi"` |  |
 | prometheus-scraper.resources.requests.cpu | string | `"250m"` |  |
 | prometheus-scraper.resources.requests.memory | string | `"512Mi"` |  |
 | prometheus-scraper.serviceAccount.create | bool | `false` |  |
 | prometheus-scraper.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | prometheus-scraper.tolerations | list | `[]` |  |
+| prometheus-ta.configMap.create | bool | `false` |  |
+| prometheus-ta.configMap.existingName | string | `"prometheus-ta"` |  |
+| prometheus-ta.namespaceOverride | string | `"observe"` |  |
+| prometheus-ta.targetAllocator.resources.limits.memory | string | `"256Mi"` |  |
+| prometheus-ta.targetAllocator.resources.requests.cpu | string | `"50m"` |  |
+| prometheus-ta.targetAllocator.resources.requests.memory | string | `"256Mi"` |  |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

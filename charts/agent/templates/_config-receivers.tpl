@@ -104,28 +104,28 @@
     target_label: kubernetes_pod_name
 
   metric_relabel_configs:
+    {{- if .Values.application.prometheusScrape.metricDropRegex }}
+    # Only emit the drop rule when there's something to drop. An empty
+    # metricDropRegex would render as `regex: null`, which the TA path
+    # round-trips through Regexp.MarshalYAML (lossy: "" → null) and
+    # re-unmarshals via Config.UnmarshalYAML's DefaultRelabelConfig
+    # seed, ending up as (.*) — silently dropping every user metric.
     - action: drop
       regex: {{ .Values.application.prometheusScrape.metricDropRegex }}
       source_labels:
         - __name__
+    {{- end }}
     - action: keep
       regex: {{ .Values.application.prometheusScrape.metricKeepRegex }}
       source_labels:
         - __name__
 {{- end -}}
 
-{{- define "config.receivers.prometheus.pod_metrics" -}}
-prometheus/pod_metrics:
-  config:
-    scrape_configs:
-{{ include "observe.prometheus.pod_metrics.scrape_job" . | nindent 4 }}
-{{- end -}}
-
 {{/*
   Prometheus scrape_configs entry for cadvisor (Kubernetes node SD via the API-server proxy).
-  Shared across the standalone prometheus/cadvisor receiver and the merged
-  prometheus/k8s_metrics receiver. Defines the backreference as $1; OTel collector
-  receivers must apply `replace "$1" "$$1"` to escape it through OTel's config-expansion.
+  Used by the parent-rendered TA ConfigMap. Uses $1 (not $$1) — the TA reads this YAML
+  directly, no OTel collector config-expansion happens, so Prometheus SD receives the
+  literal $1 backreference.
 */}}
 {{- define "observe.prometheus.cadvisor.scrape_job" -}}
 - job_name: 'kubernetes-nodes-cadvisor'
@@ -145,6 +145,13 @@ prometheus/pod_metrics:
       replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
 {{- end -}}
 
+{{- define "config.receivers.prometheus.pod_metrics" -}}
+prometheus/pod_metrics:
+  config:
+    scrape_configs:
+{{ include "observe.prometheus.pod_metrics.scrape_job" . | nindent 4 }}
+{{- end -}}
+
 {{- define "config.receivers.prometheus.cadvisor" -}}
 {{- if .Values.node.metrics.cadvisor.enabled }}
 prometheus/cadvisor:
@@ -155,18 +162,25 @@ prometheus/cadvisor:
 {{ end }}
 
 {{/*
-  Merged receiver for the TA-enabled path. Combines pod-metrics and cadvisor jobs into
-  a single receiver so that one Target Allocator (introduced in a follow-up PR) can serve
-  both jobs. Filter processors in the pipelines split the stream by service.name.
-  NOTE: uses $$1 (OTel expands $$ → $) unlike the standalone cadvisor receiver.
+  Merged receiver for the TA-enabled path. Polls the upstream Target Allocator
+  (deployed via the opentelemetry-target-allocator subchart) for both pod-metrics
+  and cadvisor jobs. Filter processors in the pipelines split the stream by service.name.
+  Each scraper pod identifies itself to TA via collector_id (= pod name) for sharding.
 */}}
 {{- define "config.receivers.prometheus.k8s_metrics" -}}
 prometheus/k8s_metrics:
+{{- if .Values.application.prometheusScrape.targetAllocator.enabled }}
+  target_allocator:
+    endpoint: http://{{ .Release.Name }}-prometheus-ta-ta.{{ template "observe-agent.namespace" . }}.svc.cluster.local
+    interval: {{ .Values.application.prometheusScrape.targetAllocator.interval }}
+    collector_id: ${env:OTEL_K8S_POD_NAME}
+{{- else }}
   config:
     scrape_configs:
 {{ include "observe.prometheus.pod_metrics.scrape_job" . | nindent 4 }}
 {{- if .Values.node.metrics.cadvisor.enabled }}
 {{ include "observe.prometheus.cadvisor.scrape_job" . | replace "$1" "$$1" | nindent 4 }}
+{{- end }}
 {{- end }}
 {{- end -}}
 

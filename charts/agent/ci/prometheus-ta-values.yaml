@@ -9,6 +9,8 @@ application:
   prometheusScrape:
     enabled: true
     independentDeployment: true
+    targetAllocator:
+      enabled: true
 
 node:
   metrics:
@@ -27,4 +29,6 @@ cluster-metrics:
 node-logs-metrics:
   namespaceOverride: "testing"
 prometheus-scraper:
+  namespaceOverride: "testing"
+prometheus-ta:
   namespaceOverride: "testing"

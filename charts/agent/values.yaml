@@ -70,6 +70,7 @@ node:
       # Applies in both the cluster-metrics deployment and the dedicated
       # prometheus-scraper deployment (when
       # application.prometheusScrape.independentDeployment=true).
+      # Required to be false when application.prometheusScrape.targetAllocator.enabled=true.
       separate_pipeline: true
   containers:
     logs:
@@ -150,6 +151,20 @@ application:
     metricDropRegex: ""
     # metrics to keep
     metricKeepRegex: (.*)
+    targetAllocator:
+      # -- Deploy the upstream opentelemetry-target-allocator subchart and shard
+      # Prometheus scrape targets across scraper replicas via consistent hashing.
+      # Required when running multiple prometheus-scraper replicas; otherwise
+      # each replica scrapes every target and produces duplicate samples.
+      # Requires application.prometheusScrape.independentDeployment=true and
+      # node.metrics.cadvisor.separate_pipeline=false.
+      enabled: false
+      # -- How often each scraper polls the Target Allocator for its assigned
+      # scrape targets. Lower values reduce the time window during which
+      # short-lived targets (e.g. Kubernetes Jobs) can be missed, at the cost
+      # of more frequent HTTP requests to the Target Allocator. Set to 1s if
+      # accurate capture of jobs that exist for under a minute matters.
+      interval: 30s
   REDMetrics:
     # -- (bool) Whether to enable generating RED metrics from spans. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview
     enabled: false
@@ -609,8 +624,38 @@ cluster-metrics:
   # ----------------------------------------- #
 
 ################################################
+# Target Allocator subchart (opentelemetry-target-allocator).
+# Only deployed when application.prometheusScrape.targetAllocator.enabled=true.
+# When enabled, the prometheus-scraper's prometheus/k8s_metrics receiver fetches
+# scrape configs and target assignments from this TA via its HTTP API.
+#
+# The TA's targetallocator.yaml ConfigMap is rendered by THIS chart (templates/
+# prometheus-ta-configmap.yaml) using the same scrape-job partials as the
+# non-TA path. The subchart mounts that ConfigMap by name (existingName).
+prometheus-ta:
+  # !!! IMPORTANT !!! This needs to have same value as namespaceOverride in cluster above
+  namespaceOverride: "observe"
+  configMap:
+    create: false
+    existingName: "prometheus-ta"
+  targetAllocator:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 256Mi
+      limits:
+        memory: 256Mi
+
+################################################
 prometheus-scraper:
   mode: deployment
+  # -- Number of prometheus-scraper pods. Only honored when
+  # application.prometheusScrape.independentDeployment=true. Bumping this
+  # above 1 requires application.prometheusScrape.targetAllocator.enabled=true
+  # so the Target Allocator can shard scrape targets across replicas; without
+  # it every replica scrapes every target and produces duplicate metrics
+  # (the chart fails the render in that case).
+  replicaCount: 1
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
   nameOverride: "prometheus-scraper"
