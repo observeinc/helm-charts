@@ -114,6 +114,30 @@
         - __name__
 {{- end -}}
 
+{{/*
+  Prometheus scrape_configs entry for cadvisor (Kubernetes node SD via the API-server proxy).
+  Used by the parent-rendered TA ConfigMap. Uses $1 (not $$1) — the TA reads this YAML
+  directly, no OTel collector config-expansion happens, so Prometheus SD receives the
+  literal $1 backreference.
+*/}}
+{{- define "observe.prometheus.cadvisor.scrape_job" -}}
+- job_name: 'kubernetes-nodes-cadvisor'
+  scheme: https
+  tls_config:
+    ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    insecure_skip_verify: true
+  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  kubernetes_sd_configs:
+    - role: node
+  relabel_configs:
+    - target_label: __address__
+      replacement: kubernetes.default.svc:443
+    - source_labels: [__meta_kubernetes_node_name]
+      regex: (.+)
+      target_label: __metrics_path__
+      replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
+{{- end -}}
+
 {{- define "config.receivers.prometheus.pod_metrics" -}}
 prometheus/pod_metrics:
   config:
@@ -147,33 +171,17 @@ prometheus/cadvisor:
 {{ end }}
 
 {{/*
-  Merged receiver for the TA-enabled path. Combines pod-metrics and cadvisor jobs into
-  a single receiver so that one Target Allocator (introduced in a follow-up PR) can serve
-  both jobs. Filter processors in the pipelines split the stream by service.name.
-  NOTE: uses $$1 (OTel expands $$ → $) unlike the standalone cadvisor receiver.
+  Merged receiver for the TA-enabled path. Polls the upstream Target Allocator
+  (deployed via the opentelemetry-target-allocator subchart) for both pod-metrics
+  and cadvisor jobs. Filter processors in the pipelines split the stream by service.name.
+  Each scraper pod identifies itself to TA via collector_id (= pod name) for sharding.
 */}}
 {{- define "config.receivers.prometheus.k8s_metrics" -}}
 prometheus/k8s_metrics:
-  config:
-    scrape_configs:
-{{ include "observe.prometheus.pod_metrics.scrape_job" . | nindent 4 }}
-{{- if .Values.node.metrics.cadvisor.enabled }}
-    - job_name: 'kubernetes-nodes-cadvisor'
-      scheme: https
-      tls_config:
-        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        insecure_skip_verify: true
-      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-      kubernetes_sd_configs:
-        - role: node
-      relabel_configs:
-        - target_label: __address__
-          replacement: kubernetes.default.svc:443
-        - source_labels: [__meta_kubernetes_node_name]
-          regex: (.+)
-          target_label: __metrics_path__
-          replacement: /api/v1/nodes/$$1/proxy/metrics/cadvisor
-{{- end }}
+  target_allocator:
+    endpoint: http://{{ .Release.Name }}-prometheus-ta-ta.{{ .Release.Namespace }}.svc.cluster.local
+    interval: 30s
+    collector_id: ${env:OTEL_K8S_POD_NAME}
 {{- end -}}
 
 {{- define "config.receivers.observe.heartbeat" -}}

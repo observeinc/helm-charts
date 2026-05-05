@@ -1,0 +1,22 @@
+{{- if and .Values.application.prometheusScrape.independentDeployment .Values.application.prometheusScrape.targetAllocator.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-ta
+  namespace: {{ .Release.Namespace }}
+data:
+  targetallocator.yaml: |
+    allocation_strategy: consistent-hashing
+    filter_strategy: relabel-config
+    prometheus_cr:
+      enabled: false
+    collector_selector:
+      matchlabels:
+        app.kubernetes.io/name: prometheus-scraper
+    config:
+      scrape_configs:
+{{ include "observe.prometheus.pod_metrics.scrape_job" . | nindent 8 }}
+{{- if .Values.node.metrics.cadvisor.enabled }}
+{{ include "observe.prometheus.cadvisor.scrape_job" . | nindent 8 }}
+{{- end }}
+{{- end }}

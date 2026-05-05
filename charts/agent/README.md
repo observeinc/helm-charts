@@ -51,6 +51,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | https://open-telemetry.github.io/opentelemetry-helm-charts | monitor(opentelemetry-collector) | 0.143.0 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | forwarder(opentelemetry-collector) | 0.143.0 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | gateway(opentelemetry-collector) | 0.143.0 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | prometheus-ta(opentelemetry-target-allocator) | 0.127.2 |
 
 ## Values
 
@@ -707,3 +708,10 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | prometheus-scraper.serviceAccount.create | bool | `false` |  |
 | prometheus-scraper.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | prometheus-scraper.tolerations | list | `[]` |  |
+| prometheus-ta.configMap.create | bool | `false` |  |
+| prometheus-ta.configMap.existingName | string | `"prometheus-ta"` |  |
+| prometheus-ta.replicaCount | int | `1` |  |
+| prometheus-ta.targetAllocator.image.tag | string | `"0.150.0"` |  |
+| prometheus-ta.targetAllocator.resources.limits.memory | string | `"256Mi"` |  |
+| prometheus-ta.targetAllocator.resources.requests.cpu | string | `"50m"` |  |
+| prometheus-ta.targetAllocator.resources.requests.memory | string | `"128Mi"` |  |

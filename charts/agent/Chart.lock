@@ -8,6 +8,9 @@ dependencies:
 - name: opentelemetry-collector
   repository: https://open-telemetry.github.io/opentelemetry-helm-charts
   version: 0.143.0
+- name: opentelemetry-target-allocator
+  repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+  version: 0.127.2
 - name: opentelemetry-collector
   repository: https://open-telemetry.github.io/opentelemetry-helm-charts
   version: 0.143.0
@@ -20,5 +23,5 @@ dependencies:
 - name: opentelemetry-collector
   repository: https://open-telemetry.github.io/opentelemetry-helm-charts
   version: 0.143.0
-digest: sha256:52184a96f6b61deb5d64a72df555e6b2b6a0cfab82cd0f2aff09074e4ef4c418
-generated: "2026-01-20T16:33:43.393951-05:00"
+digest: sha256:4c9c0692c53055a5e879df474b3958f92ccea860a4f5214c21b1b17dc1b82492
+generated: "2026-05-05T18:09:11.69163921Z"

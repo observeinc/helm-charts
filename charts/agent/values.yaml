@@ -615,6 +615,30 @@ cluster-metrics:
   # ----------------------------------------- #
 
 ################################################
+# Target Allocator subchart (opentelemetry-target-allocator).
+# Only deployed when application.prometheusScrape.targetAllocator.enabled=true.
+# When enabled, the prometheus-scraper's prometheus/k8s_metrics receiver fetches
+# scrape configs and target assignments from this TA via its HTTP API.
+#
+# The TA's targetallocator.yaml ConfigMap is rendered by THIS chart (templates/
+# prometheus-ta-configmap.yaml) using the same scrape-job partials as the
+# non-TA path. The subchart mounts that ConfigMap by name (existingName).
+prometheus-ta:
+  replicaCount: 1
+  configMap:
+    create: false
+    existingName: "prometheus-ta"
+  targetAllocator:
+    image:
+      tag: "0.150.0"
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        memory: 256Mi
+
+################################################
 prometheus-scraper:
   mode: deployment
   # ----------------------------------------- #
