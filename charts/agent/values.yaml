@@ -651,6 +651,29 @@ prometheus-scraper:
     create: false
     existingName: "prometheus-scraper"
 
+  # Horizontal Pod Autoscaling for the prometheus-scraper.
+  # Only meaningful when application.prometheusScrape.targetAllocator.enabled=true,
+  # because without TA every replica scrapes every target (so scaling up just
+  # multiplies the metrics). The chart fails install if autoscaling.enabled=true
+  # without targetAllocator.enabled=true.
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 10
+    # CPU is a coarse proxy for scrape load; consider tuning or adding a
+    # custom metric (e.g. otelcol_processor_incoming_items_total rate) via
+    # additionalMetrics if you need tighter control.
+    targetCPUUtilizationPercentage: 70
+    # Optional: also scale on memory (memory is often the binding constraint
+    # for high-cardinality scrape targets). Uncomment to enable.
+    # targetMemoryUtilizationPercentage: 75
+    # Optional: cooldown windows to prevent thrashing during rapid scale events.
+    # behavior:
+    #   scaleDown:
+    #     stabilizationWindowSeconds: 300
+    #   scaleUp:
+    #     stabilizationWindowSeconds: 60
+
   resources:
     requests:
       cpu: 250m

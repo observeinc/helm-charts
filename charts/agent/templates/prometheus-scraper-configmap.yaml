@@ -2,6 +2,9 @@
 {{- if and .Values.application.prometheusScrape.targetAllocator.enabled (not .Values.application.prometheusScrape.independentDeployment) }}
 {{- fail "application.prometheusScrape.targetAllocator.enabled requires application.prometheusScrape.independentDeployment=true" }}
 {{- end }}
+{{- if and (index .Values "prometheus-scraper" "autoscaling" "enabled") (not .Values.application.prometheusScrape.targetAllocator.enabled) }}
+{{- fail "prometheus-scraper.autoscaling.enabled requires application.prometheusScrape.targetAllocator.enabled=true (without TA, every replica scrapes every target — scaling up just duplicates metrics)" }}
+{{- end }}
 {{- include "observe-agent.validateOtelPodUid" (dict "componentName" "prometheus-scraper" "extraEnvs" (index .Values "prometheus-scraper" "extraEnvs") "fleetEnabled" .Values.agent.config.global.fleet.enabled) -}}
 apiVersion: v1
 kind: ConfigMap

@@ -643,6 +643,10 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | prometheus-scraper.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].key | string | `"kubernetes.io/os"` |  |
 | prometheus-scraper.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].operator | string | `"NotIn"` |  |
 | prometheus-scraper.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].values[0] | string | `"windows"` |  |
+| prometheus-scraper.autoscaling.enabled | bool | `false` |  |
+| prometheus-scraper.autoscaling.maxReplicas | int | `10` |  |
+| prometheus-scraper.autoscaling.minReplicas | int | `2` |  |
+| prometheus-scraper.autoscaling.targetCPUUtilizationPercentage | int | `70` |  |
 | prometheus-scraper.clusterRole.create | bool | `false` |  |
 | prometheus-scraper.clusterRole.name | string | `"observe-agent-cluster-role"` |  |
 | prometheus-scraper.command.extraArgs[0] | string | `"start"` |  |
