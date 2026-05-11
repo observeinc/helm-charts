@@ -74,6 +74,8 @@ spec:
             max_elapsed_time: 5m
             max_interval: 30s
           send_metadata: true
+          target_info:
+            enabled: false
           timeout: 10s
       extensions:
         file_storage/fargate:
@@ -170,7 +172,6 @@ spec:
             value: ${env:OBSERVE_CLUSTER_UID}
         resourcedetection/cloud:
           detectors:
-          - eks
           - gcp
           - ecs
           - ec2

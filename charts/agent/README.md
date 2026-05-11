@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.86.1](https://img.shields.io/badge/Version-0.86.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.15.0](https://img.shields.io/badge/AppVersion-2.15.0-informational?style=flat-square)
+![Version: 0.87.0](https://img.shields.io/badge/Version-0.87.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.15.0](https://img.shields.io/badge/AppVersion-2.15.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -62,6 +62,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | agent.config.gateway | string | `nil` | Additional OTel collector config for gateway deployment |
 | agent.config.global.debug.enabled | bool | `false` |  |
 | agent.config.global.debug.verbosity | string | `"basic"` |  |
+| agent.config.global.exporters.emitPrometheusTargetInfoMetrics | bool | `false` |  |
 | agent.config.global.exporters.retryOnFailure.enabled | bool | `true` |  |
 | agent.config.global.exporters.retryOnFailure.initialInterval | string | `"1s"` |  |
 | agent.config.global.exporters.retryOnFailure.maxElapsedTime | string | `"5m"` |  |

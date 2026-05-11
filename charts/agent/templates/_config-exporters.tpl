@@ -143,6 +143,8 @@ prometheusremotewrite/observe:
   resource_to_telemetry_conversion:
     enabled: true # Convert resource attributes to metric labels
   send_metadata: true
+  target_info:
+    enabled: {{ .Values.agent.config.global.exporters.emitPrometheusTargetInfoMetrics }}
   retry_on_failure:
     enabled: {{ .Values.agent.config.global.exporters.retryOnFailure.enabled }}
     initial_interval: {{ .Values.agent.config.global.exporters.retryOnFailure.initialInterval }}

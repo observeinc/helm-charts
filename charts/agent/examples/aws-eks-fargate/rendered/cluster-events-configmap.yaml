@@ -188,7 +188,7 @@ data:
             - set(attributes["observe_transform"]["control"]["isDelete"], false) where attributes["observe_transform"]["control"]["isDelete"]
               == nil
             - set(attributes["observe_transform"]["control"]["version"], body["metadata"]["resourceVersion"])
-            - set(attributes["observe_transform"]["control"]["agentVersion"], "2.14.0")
+            - set(attributes["observe_transform"]["control"]["agentVersion"], "2.15.0")
             - set(attributes["observe_transform"]["identifiers"]["clusterName"], resource.attributes["k8s.cluster.name"])
             - set(attributes["observe_transform"]["identifiers"]["clusterUid"], resource.attributes["k8s.cluster.uid"])
             - set(attributes["observe_transform"]["identifiers"]["kind"], body["kind"])

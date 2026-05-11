@@ -4,3 +4,10 @@ global:
     - "./examples/**"
     - "./integration/scripts/benchmark/**"
     - "./charts/stack/templates/tests/**"
+
+iac:
+  excluded_paths:
+    - "**/examples/**"
+    - "./examples/**"
+    - "./integration/scripts/benchmark/**"
+    - "./charts/stack/templates/tests/**"
