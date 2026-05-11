@@ -73,7 +73,7 @@ jobs:
         - run: pip install -r scripts/requirements.txt
 
         - name: Setup Terraform
-          uses: hashicorp/setup-terraform@v3
+          uses: hashicorp/setup-terraform@v4
           with: #Use alpha version which has experimental Junit feature.
             terraform_version: "1.10.0-alpha20240918"
 
