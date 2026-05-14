@@ -1,5 +1,5 @@
 {{- define "observe.deployment.prometheusScraper.config" -}}
-{{- $merged := and .Values.application.prometheusScrape.independentDeployment (not .Values.node.metrics.cadvisor.separate_pipeline) }}
+{{- $merged := not .Values.node.metrics.cadvisor.separate_pipeline }}
 
 exporters:
 {{- if eq .Values.application.prometheusScrape.enabled true }}

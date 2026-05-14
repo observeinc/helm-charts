@@ -65,10 +65,11 @@ node:
       excludeMountPoints: '["/dev/*","/proc/*","/sys/*","/run/k3s/containerd/*","/var/lib/docker/*","/var/lib/kubelet/*","/snap/*"]'
     cadvisor:
       enabled: false
-      # Merge cadvisor and pod-metrics into a single OpenTelemetry pipeline.
-      # Defaults to true (legacy two-pipeline behavior). Set to false to use
-      # the merged-pipeline path with transform/set_debug_source for routing.
-      # Requires application.prometheusScrape.independentDeployment=true.
+      # -- Merge cadvisor and pod-metrics scrape jobs into a single OpenTelemetry
+      # receiver and pipeline. Defaults to true (legacy two-pipeline behavior).
+      # Applies in both the cluster-metrics deployment and the dedicated
+      # prometheus-scraper deployment (when
+      # application.prometheusScrape.independentDeployment=true).
       separate_pipeline: true
   containers:
     logs:
