@@ -41,7 +41,7 @@ metrics/spanmetrics:
 {{- end -}}
 
 {{- define "config.pipelines.prometheus_scrapers" -}}
-{{- $merged := and .Values.application.prometheusScrape.independentDeployment (not .Values.node.metrics.cadvisor.separate_pipeline) }}
+{{- $merged := not .Values.node.metrics.cadvisor.separate_pipeline }}
 {{- if $merged }}
 
 {{- /* Merged-pipeline path: pod-metrics and cadvisor scrape jobs share a
