@@ -29,6 +29,9 @@ jobs:
       - name: Lint charts
         run: make lint
 
+      - name: Verify agent Prometheus Target Allocator rendering
+        run: make verify-agent-prometheus-ta
+
   test-charts:
     runs-on: ubuntu-latest
     steps:

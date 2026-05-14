@@ -23,6 +23,8 @@ This service is a *single-instance deployment*. It's critical that this service 
 
 This service is a *single-instance deployment*. It's critical that this service is only a single instance since otherwise it would produce duplicate data. It is responsible for scraping pods for Prometheus metrics is configured and runs.
 
+When **`application.prometheusScrape.targetAllocator.enabled`** is `true` (requires **`application.prometheusScrape.independentDeployment`**), the chart also deploys an OpenTelemetry **Target Allocator** and configures the `prometheus/pod_metrics` receiver to shard targets across **`prometheus-scraper.replicaCount`** observe-agent pods. Set **`prometheus-scraper.replicaCount`** to at least `2` for meaningful sharding. The OpenTelemetry Operator is not required for this path. Pair the **`targetAllocator.image`** tag with your observe-agent / OTel collector version per OpenTelemetry release notes.
+
 ## forwarder
 
 This service is a *daemonset* which means it runs on every node in the cluster. It is responsible for receiving telemetry from the other services, specifically via an OTLP receiver and forwarding it to Observe. It can be used as the target for various instrumentation SDK's and clients as well. See [here](https://docs.observeinc.com/en/latest/content/observe-agent/ConfigureApplicationInstrumentation.html) for more details.

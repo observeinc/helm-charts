@@ -1,0 +1,60 @@
+# Same as test-values.yaml but enables Target Allocator sharding for pod_metrics.
+# chart-testing runs `helm template` with each ci/*-values.yaml independently.
+observe:
+  collectionEndpoint:
+    value: "http://test-stack-collector.testing.svc.cluster.local:8080"
+  token:
+    create: true
+    value: "fake-ds:fake-token"
+
+application:
+  prometheusScrape:
+    enabled: true
+    independentDeployment: true
+    targetAllocator:
+      enabled: true
+  REDMetrics:
+    enabled: true
+
+node:
+  forwarder:
+    enabled: true
+    metrics:
+      outputFormat: otel
+      convertCumulativeToDelta: true
+  metrics:
+    cadvisor:
+      enabled: true
+
+gatewayDeployment:
+  enabled: true
+  traceSampling:
+    enabled: true
+
+agent:
+  config:
+    global:
+      fleet:
+        enabled: true
+        interval: 10s
+        configInterval: 10m
+
+cluster:
+  namespaceOverride:
+    value: "testing"
+
+cluster-events:
+  namespaceOverride: "testing"
+cluster-metrics:
+  namespaceOverride: "testing"
+forwarder:
+  namespaceOverride: "testing"
+monitor:
+  namespaceOverride: "testing"
+node-logs-metrics:
+  namespaceOverride: "testing"
+prometheus-scraper:
+  namespaceOverride: "testing"
+  replicaCount: 2
+gateway:
+  namespaceOverride: "testing"
