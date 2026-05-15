@@ -90,7 +90,9 @@ logs/heartbeat:
     processors:
         - resourcedetection
         - resource/agent_instance
+        {{- if not .skipK8sattributesProcessor }}
         - k8sattributes
+        {{- end }}
         - resource/observe_common
         - transform/k8sheartbeat
     receivers:

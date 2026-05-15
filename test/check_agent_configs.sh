@@ -75,6 +75,8 @@ for conf in $confs; do
         OBSERVE_CLUSTER_UID=abc123 \
         OTEL_K8S_POD_UID=abc456 \
         OTEL_K8S_POD_NAME=test-pod \
+        OTEL_K8S_NAMESPACE_NAME=test-namespace \
+        OTEL_K8S_DEPLOYMENT_ENVIRONMENT_NAME=test-deployment-environment \
         K8S_NODE_NAME=test-node \
         KUBERNETES_SERVICE_HOST=0.0.0.0 \
         KUBERNETES_SERVICE_PORT=1234 \
