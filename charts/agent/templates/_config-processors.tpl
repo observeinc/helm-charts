@@ -1,13 +1,14 @@
 {{- define "config.processors.resource_detection.cloud" -}}
+{{- $detectors := .Values.agent.config.global.processors.cloudResourceDetection.detectors -}}
 resourcedetection/cloud:
   detectors:
-    {{- if not .Values.nodeless.enabled }}
-    - eks
+    {{- range $detectors }}
+    - {{ . }}
     {{- end }}
-    - gcp
-    - ecs
-    - ec2
-    - azure
+  {{- if has "eks" $detectors }}
+  eks:
+    node_from_env_var: K8S_NODE_NAME
+  {{- end }}
   timeout: 2s
   override: false
 {{- end -}}
