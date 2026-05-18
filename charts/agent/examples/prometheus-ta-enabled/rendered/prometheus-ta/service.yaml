@@ -1,0 +1,17 @@
+---
+# Source: agent/charts/prometheus-ta/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: observe
+  name: example-prometheus-ta-ta
+spec:
+  selector:
+    app.kubernetes.io/name: prometheus-ta
+    app.kubernetes.io/instance: example
+  ports:
+    - name: http-port
+      protocol: TCP
+      port: 80
+      targetPort: http-port
+

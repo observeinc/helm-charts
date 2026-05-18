@@ -29,7 +29,7 @@ fi
 
 any_failed=false
 
-confs=$(yq -e 'select(.kind == "ConfigMap").metadata.name' $1 | grep -Ev 'cluster-name|observe-agent|---')
+confs=$(yq -e 'select(.kind == "ConfigMap" and .data.relay).metadata.name' $1 | grep -Ev 'cluster-name|observe-agent|---')
 for conf in $confs; do
     echo "Checking $conf..."
     fname="$tmp_dir/$conf.yaml"
