@@ -130,4 +130,4 @@ generate-examples:
 			done; \
 		done; \
 	done; \
-	find charts/*/examples -type f -name '*.yaml' -exec perl -pi -e 's/\s+$$/\n/' {} +
+	find charts/*/examples -type f -name '*.yaml' -exec perl -0777 -i -pe 's/[ \t]+$$//mg; s/\s+\z/\n/' {} +

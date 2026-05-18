@@ -259,17 +259,22 @@ filter/drop_long_spans:
 {{- end -}}
 
 {{- define "config.processors.attributes.add_empty_service_attributes" -}}
-resource/add_empty_service_attributes:
-    attributes:
-        - action: insert
-          key: service.name
-          value: ""
-        - action: insert
-          key: service.namespace
-          value: ""
-        - action: insert
-          key: deployment.environment
-          value: ""
+# Normalizes deployment environment (coalescing from the deprecated `deployment.environment`
+# onto `deployment.environment.name` and vice versa) and defaults the service / environment resource
+# attributes so they can be referenced as spanmetrics dimensions and in Observe even when the instrumentation
+# did not supply them.
+transform/add_empty_service_attributes:
+  error_mode: ignore
+  trace_statements:
+    # deployment.environment.name = coalesce(deployment.environment.name, deployment.environment)
+    - set(resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"]) where resource.attributes["deployment.environment.name"] == nil and resource.attributes["deployment.environment"] != nil
+    # deployment.environment = coalesce(deployment.environment, deployment.environment.name)
+    - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]) where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"] != nil
+    # Default any still-missing attributes to an empty string.
+    - set(resource.attributes["service.name"], "") where resource.attributes["service.name"] == nil
+    - set(resource.attributes["service.namespace"], "") where resource.attributes["service.namespace"] == nil
+    - set(resource.attributes["deployment.environment.name"], "") where resource.attributes["deployment.environment.name"] == nil
+    - set(resource.attributes["deployment.environment"], "") where resource.attributes["deployment.environment"] == nil
 {{- end -}}
 
 {{- define "config.processors.transform.add_span_status_code" -}}
@@ -300,8 +305,6 @@ transform/shape_spans_for_red_metrics:
     - set(span.attributes["peer.db.name"], span.attributes["db.system"]) where span.attributes["peer.db.name"] == nil and span.attributes["db.system"] != nil
     # peer.messaging.system = coalesce(peer.messaging.system, messaging.system)
     - set(span.attributes["peer.messaging.system"], span.attributes["messaging.system"]) where span.attributes["peer.messaging.system"] == nil and span.attributes["messaging.system"] != nil
-    # deployment.environment = coalesce(deployment.environment, deployment.environment.name)
-    - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]) where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"] != nil
     # Needed because `spanmetrics` connector can only operate on attributes or resource attributes.
     - set(span.attributes["otel.status_description"], span.status.message) where span.status.message != ""
 
@@ -312,12 +315,33 @@ groupbyattrs/peers:
     - peer.db.name
     - peer.messaging.system
 
-# This puts moves the peer attributes from the resource back to the datapoint after we have regrouped the metrics.
-transform/fix_peer_attributes:
+# This updates the `service.name` to be equal to `peer.db.name` or `peer.messaging.system` (in that order) when present. It also moves the peer attributes back
+# to the span attributes since we have now regrouped the data.
+#
+# Uses explicit `context:` blocks so resource-scoped statements run ONCE per resource
+# (not per-span). Without explicit contexts, all statements would execute in
+# per-span iteration order, and the `delete_key(resource.attributes, ...)`
+# steps would wipe `peer.*` from the resource during span 1's processing,
+# leaving spans 2..N unable to copy `peer.*` back onto their own attributes.
+transform/handle_peer_attributes:
   error_mode: ignore
-  metric_statements:
-    - set(datapoint.attributes["peer.db.name"], resource.attributes["peer.db.name"]) where resource.attributes["peer.db.name"] != nil
-    - set(datapoint.attributes["peer.messaging.system"], resource.attributes["peer.messaging.system"]) where resource.attributes["peer.messaging.system"] != nil
+  trace_statements:
+    - context: resource
+      statements:
+        # service.name = peer.db.name if peer.db.name != nil
+        - set(attributes["service.name"], attributes["peer.db.name"]) where attributes["peer.db.name"] != nil
+        # service.name = peer.messaging.system if peer.messaging.system != nil and peer.db.name == nil
+        - set(attributes["service.name"], attributes["peer.messaging.system"]) where attributes["peer.messaging.system"] != nil and attributes["peer.db.name"] == nil
+    - context: span
+      statements:
+        # Move peer.* back onto each span's own attributes (resource still intact here)
+        - set(attributes["peer.db.name"], resource.attributes["peer.db.name"]) where resource.attributes["peer.db.name"] != nil
+        - set(attributes["peer.messaging.system"], resource.attributes["peer.messaging.system"]) where resource.attributes["peer.messaging.system"] != nil
+    - context: resource
+      statements:
+        # Delete peer.* from the resource AFTER all spans have copied them locally
+        - delete_key(attributes, "peer.db.name")
+        - delete_key(attributes, "peer.messaging.system")
 
 # This removes service.name for generated RED metrics associated with peer systems.
 transform/remove_service_name_for_peer_metrics:
@@ -325,18 +349,17 @@ transform/remove_service_name_for_peer_metrics:
   metric_statements:
     - delete_key(resource.attributes, "service.name") where datapoint.attributes["peer.db.name"] != nil or datapoint.attributes["peer.messaging.system"] != nil
 
-{{- if .Values.application.REDMetrics.onlyGenerateForServiceEntrypointSpans }}
 # This drops spans (and thus RED metric data) for span kinds that are not relevant to the Observe APM offering. If you use RED metrics outside of APM,
 # then we recommend disabling this filter and generating RED metrics for all span kinds.
-filter/drop_span_kinds_other_than_server_and_consumer_and_peer_client:
+filter/drop_non_apm_spans:
   error_mode: ignore
   traces:
     span:
-      - span.kind == SPAN_KIND_CLIENT and span.attributes["peer.messaging.system"] == nil and span.attributes["peer.db.name"] == nil and span.attributes["db.system.name"] == nil and span.attributes["db.system"] == nil
+      # We are keeping: all SERVER spans, all CONSUMER spans, CLIENT spans with a peer db, and PRODUCER spans with a peer messaging system.
+      - span.kind == SPAN_KIND_CLIENT and span.attributes["peer.db.name"] == nil and span.attributes["db.system.name"] == nil and span.attributes["db.system"] == nil
+      - span.kind == SPAN_KIND_PRODUCER and span.attributes["peer.messaging.system"] == nil and span.attributes["messaging.system"] == nil
       - span.kind == SPAN_KIND_UNSPECIFIED
       - span.kind == SPAN_KIND_INTERNAL
-      - span.kind == SPAN_KIND_PRODUCER
-{{- end }}
 
 {{- $resourceDims := (prepend .Values.application.REDMetrics.resourceDimensions "service.name" | uniq) }}
 
@@ -350,8 +373,46 @@ transform/fix_red_metrics_resource_attributes:
     # Drop all datapoint attributes that are resource attributes in the spans.
     - delete_matching_keys(datapoint.attributes, "^({{ join "|" $resourceDims }})")
 
-    # Rename status.code to response_status to be consistent with Trace Explorer and disambiguate from status_code (with an underscore).
+    # Rename status.code to otel.status_code for updated semantic conventions (not needed when feature gate spanmetrics.statusCodeConvention.useOtelPrefix is enabled).
     - set(datapoint.attributes["otel.status_code"], "OK") where datapoint.attributes["status.code"] == "STATUS_CODE_OK"
     - set(datapoint.attributes["otel.status_code"], "ERROR") where datapoint.attributes["status.code"] == "STATUS_CODE_ERROR"
     - delete_key(datapoint.attributes, "status.code")
+
+{{- $summaryResourceDims := (prepend .Values.application.REDMetrics.summaryMetrics.resourceDimensions "service.name" | uniq) }}
+transform/fix_red_metrics_resource_attributes/summary:
+  error_mode: ignore
+  metric_statements:
+    # Drop all resource attributes that aren't dimensions in the spanmetrics connector.
+    - keep_matching_keys(resource.attributes, "^({{ join "|" $summaryResourceDims }})")
+
+    # Drop all datapoint attributes that are resource attributes on the spans.
+    - delete_matching_keys(datapoint.attributes, "^({{ join "|" $summaryResourceDims }})")
+
+    # Rename status.code to otel.status_code for updated semantic conventions (not needed when feature gate spanmetrics.statusCodeConvention.useOtelPrefix is enabled).
+    - set(datapoint.attributes["otel.status_code"], "OK") where datapoint.attributes["status.code"] == "STATUS_CODE_OK"
+    - set(datapoint.attributes["otel.status_code"], "ERROR") where datapoint.attributes["status.code"] == "STATUS_CODE_ERROR"
+    - delete_key(datapoint.attributes, "status.code")
+
+metricstransform/rename_summary_metrics:
+  transforms:
+    - include: traces.span.metrics.calls
+      action: update
+      new_name: traces.span.metrics.calls.summary
+    - include: traces.span.metrics.duration
+      action: update
+      new_name: traces.span.metrics.duration.summary
+
+{{- if not .Values.application.REDMetrics.onlyGenerateForAPMSpans }}
+# Renames RED metrics from non-entrypoint (would-have-been-dropped) spans with an ".internal"
+# suffix. This processor lives on the metrics/spanmetrics/internal pipeline, downstream of
+# routing/red_metrics_internal, so every datapoint it sees is already known to be "internal".
+metricstransform/rename_internal_metrics:
+  transforms:
+    - include: traces.span.metrics.calls
+      action: update
+      new_name: traces.span.metrics.calls.internal
+    - include: traces.span.metrics.duration
+      action: update
+      new_name: traces.span.metrics.duration.internal
+{{- end }}
 {{- end -}}
