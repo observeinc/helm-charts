@@ -51,7 +51,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | https://open-telemetry.github.io/opentelemetry-helm-charts | monitor(opentelemetry-collector) | 0.143.0 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | forwarder(opentelemetry-collector) | 0.143.0 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | gateway(opentelemetry-collector) | 0.143.0 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | prometheus-ta(opentelemetry-target-allocator) | 0.128.0 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | prometheus-ta(opentelemetry-target-allocator) | 0.128.1 |
 
 ## Values
 

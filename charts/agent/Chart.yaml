@@ -21,7 +21,7 @@ dependencies:
     alias: prometheus-scraper
     condition: application.prometheusScrape.independentDeployment
   - name: opentelemetry-target-allocator
-    version: 0.128.0
+    version: 0.128.1
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     alias: prometheus-ta
     condition: application.prometheusScrape.targetAllocator.enabled
