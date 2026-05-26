@@ -13,8 +13,6 @@ jobs:
 
       - name: Install Helm
         uses: azure/setup-helm@v5
-        with:
-          version: v3.12.1
 
       - uses: actions/setup-python@v5
         with:
@@ -29,18 +27,42 @@ jobs:
       - name: Lint charts
         run: make lint
 
-  test-charts:
+  test-charts-matrix:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        helm-major: [3, 4]
+    name: test-charts (helm v${{ matrix.helm-major }})
     steps:
       - name: Checkout
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
+      - name: Resolve Helm version
+        id: helm-version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -o pipefail
+          version=$(curl -fsSL \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/helm/helm/releases?per_page=100" | \
+            grep -oP '"tag_name":\s*"v${{ matrix.helm-major }}\.\d+\.\d+"' | \
+            head -1 | grep -oP 'v\d+\.\d+\.\d+')
+          if [ -z "$version" ]; then
+            echo "Failed to resolve latest helm v${{ matrix.helm-major }}.x release" >&2
+            exit 1
+          fi
+          echo "Resolved helm version: $version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
       - name: Install Helm
         uses: azure/setup-helm@v5
         with:
-          version: v3.12.1
+          version: ${{ steps.helm-version.outputs.version }}
 
       - name: Install kind
         uses: helm/kind-action@v1.14.0
@@ -49,3 +71,12 @@ jobs:
 
       - name: Test charts
         run: make test GOBUILD=false
+
+  test-charts:
+    runs-on: ubuntu-latest
+    needs: test-charts-matrix
+    if: always()
+    steps:
+      - name: Aggregate matrix results
+        run: |
+          [ "${{ needs.test-charts-matrix.result }}" = "success" ] || exit 1
