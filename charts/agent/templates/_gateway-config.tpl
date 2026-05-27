@@ -37,6 +37,7 @@ processors:
 {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
 {{- include "config.processors.deltatocumulative" . | nindent 2 }}
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
+{{- include "config.processors.transform.deployment_environment_compatibility" . | nindent 2 }}
 {{- include "config.processors.filter.drop_long_spans" . | nindent 2 }}
 {{- include "config.processors.transform.add_span_status_code" . | nindent 2 }}
 {{- include "config.processors.attributes.add_empty_service_attributes" . | nindent 2 }}
@@ -102,6 +103,9 @@ service:
         - batch
         {{- end }}
         - resource/observe_common
+        {{- if not .Values.cluster.deploymentEnvironment.name }}
+        - transform/deployment_environment_compatability
+        {{- end }}
       exporters: [{{ join ", " $traceExporters }}]
     logs/observe-forward:
       receivers: [otlp/app-telemetry]
@@ -112,6 +116,9 @@ service:
         - batch
         {{- end }}
         - resource/observe_common
+        {{- if not .Values.cluster.deploymentEnvironment.name }}
+        - transform/deployment_environment_compatability
+        {{- end }}
         - attributes/debug_source_gateway
       exporters: [{{ join ", " $logsExporters }}]
     metrics/observe-forward:
@@ -129,6 +136,9 @@ service:
         - batch
         {{- end }}
         - resource/observe_common
+        {{- if not .Values.cluster.deploymentEnvironment.name }}
+        - transform/deployment_environment_compatability
+        {{- end }}
         - attributes/debug_source_gateway
       exporters: [{{ join ", " $metricsExporters }}]
     {{- if .Values.application.REDMetrics.enabled }}

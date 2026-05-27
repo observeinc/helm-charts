@@ -101,6 +101,9 @@ resource/observe_common:
     - key: deployment.environment.name
       action: upsert
       value: {{ .Values.cluster.deploymentEnvironment.name }}
+    - key: deployment.environment
+      action: upsert
+      value: {{ .Values.cluster.deploymentEnvironment.name }}
     {{ end }}
 {{- end -}}
 
@@ -270,6 +273,28 @@ resource/add_empty_service_attributes:
         - action: insert
           key: deployment.environment
           value: ""
+{{- end -}}
+
+{{- define "config.processors.transform.deployment_environment_compatibility" -}}
+{{- if not .Values.cluster.deploymentEnvironment.name }}
+transform/deployment_environment_compatability:
+  error_mode: ignore
+  trace_statements:
+    # deployment.environment.name = coalesce(deployment.environment.name, deployment.environment)
+    - set(resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"]) where resource.attributes["deployment.environment.name"] == nil and resource.attributes["deployment.environment"] != nil
+    # deployment.environment = coalesce(deployment.environment, deployment.environment.name)
+    - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]) where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"] != nil
+  log_statements:
+    # deployment.environment.name = coalesce(deployment.environment.name, deployment.environment)
+    - set(resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"]) where resource.attributes["deployment.environment.name"] == nil and resource.attributes["deployment.environment"] != nil
+    # deployment.environment = coalesce(deployment.environment, deployment.environment.name)
+    - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]) where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"] != nil
+  metric_statements:
+    # deployment.environment.name = coalesce(deployment.environment.name, deployment.environment)
+    - set(resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"]) where resource.attributes["deployment.environment.name"] == nil and resource.attributes["deployment.environment"] != nil
+    # deployment.environment = coalesce(deployment.environment, deployment.environment.name)
+    - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]) where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"] != nil
+{{- end }}
 {{- end -}}
 
 {{- define "config.processors.transform.add_span_status_code" -}}

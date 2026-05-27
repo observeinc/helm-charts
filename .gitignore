@@ -21,3 +21,6 @@ __pycache__
 
 local*
 integration/source
+
+# tooling
+.snowflake/cortex/plans
