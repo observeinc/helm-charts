@@ -211,17 +211,14 @@ attributes/debug_source_cadvisor_metrics:
 {{- end -}}
 
 {{/*
-  For the merged-pipeline TA path, do two cadvisor-keyed resource-attribute
-  edits in one OTTL pass:
-    1. Stamp `debug_source` per scrape job (replaces the legacy two-pipeline
-       attributes/debug_source_* processors). Same key-off as elsewhere:
-       service.name == cadvisor's job name (rewrite-immune because cadvisor
-       doesn't emit a target_info series).
-    2. Drop `service.name` for non-cadvisor (i.e. pod-scraped) jobs so that
-       k8sattributes can re-populate it from pod labels. Cadvisor metrics
-       have no pod_association source, so leaving service.name intact lets
-       it survive end-to-end as "kubernetes-nodes-cadvisor" — matching the
-       legacy cadvisor pipeline (which never ran drop_service_name).
+  Merged-pipeline replacement for the legacy attributes/debug_source_* +
+  drop_service_name pair. One OTTL pass:
+    1. Stamp debug_source by service.name (rewrite-safe — cadvisor emits
+       no target_info series, so service.name isn't overwritten).
+    2. Drop service.name on non-cadvisor jobs so k8sattributes re-populates
+       it from pod labels. Cadvisor has no pod_association source, so its
+       service.name survives as "kubernetes-nodes-cadvisor" (matching the
+       legacy cadvisor pipeline, which never ran drop_service_name).
 */}}
 {{- define "config.processors.transform.set_debug_source" -}}
 transform/set_debug_source:

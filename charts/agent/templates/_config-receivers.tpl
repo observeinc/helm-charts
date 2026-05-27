@@ -1,6 +1,6 @@
 {{/*
-  Prometheus scrape_configs entry for pod-metrics (Kubernetes pod SD + relabel).
-  Shared between the non-TA receiver (prometheus/pod_metrics) and the merged receiver (prometheus/k8s_metrics).
+  Pod-metrics scrape job. Shared by the collector's prometheus receivers
+  (split and merged paths) and the TA ConfigMap.
 */}}
 {{- define "observe.prometheus.pod_metrics.scrape_job" -}}
 - job_name: pod-metrics
@@ -105,11 +105,10 @@
 
   metric_relabel_configs:
     {{- if .Values.application.prometheusScrape.metricDropRegex }}
-    # Only emit the drop rule when there's something to drop. An empty
-    # metricDropRegex would render as `regex: null`, which the TA path
-    # round-trips through Regexp.MarshalYAML (lossy: "" → null) and
-    # re-unmarshals via Config.UnmarshalYAML's DefaultRelabelConfig
-    # seed, ending up as (.*) — silently dropping every user metric.
+    # Only emit when there's something to drop. An empty metricDropRegex
+    # round-trips through TA's Regexp.MarshalYAML as `regex: null` and
+    # re-unmarshals via DefaultRelabelConfig as (.*), silently dropping
+    # every user metric.
     - action: drop
       regex: {{ .Values.application.prometheusScrape.metricDropRegex }}
       source_labels:
@@ -122,10 +121,8 @@
 {{- end -}}
 
 {{/*
-  Prometheus scrape_configs entry for cadvisor (Kubernetes node SD via the API-server proxy).
-  Used by the parent-rendered TA ConfigMap. Uses $1 (not $$1) — the TA reads this YAML
-  directly, no OTel collector config-expansion happens, so Prometheus SD receives the
-  literal $1 backreference.
+  Cadvisor scrape job. `$1` is a Prometheus backreference to the regex
+  capture group above (the node name).
 */}}
 {{- define "observe.prometheus.cadvisor.scrape_job" -}}
 - job_name: 'kubernetes-nodes-cadvisor'
@@ -162,10 +159,9 @@ prometheus/cadvisor:
 {{ end }}
 
 {{/*
-  Merged receiver for the TA-enabled path. Polls the upstream Target Allocator
-  (deployed via the opentelemetry-target-allocator subchart) for both pod-metrics
-  and cadvisor jobs. Filter processors in the pipelines split the stream by service.name.
-  Each scraper pod identifies itself to TA via collector_id (= pod name) for sharding.
+  Merged pod-metrics + cadvisor receiver. Polls TA when enabled (sharded
+  by collector_id = pod name), otherwise inlines the scrape configs.
+  Downstream filters split the stream by service.name.
 */}}
 {{- define "config.receivers.prometheus.k8s_metrics" -}}
 prometheus/k8s_metrics:

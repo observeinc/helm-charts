@@ -65,12 +65,9 @@ node:
       excludeMountPoints: '["/dev/*","/proc/*","/sys/*","/run/k3s/containerd/*","/var/lib/docker/*","/var/lib/kubelet/*","/snap/*"]'
     cadvisor:
       enabled: false
-      # -- Merge cadvisor and pod-metrics scrape jobs into a single OpenTelemetry
-      # receiver and pipeline. Defaults to true (legacy two-pipeline behavior).
-      # Applies in both the cluster-metrics deployment and the dedicated
-      # prometheus-scraper deployment (when
-      # application.prometheusScrape.independentDeployment=true).
-      # Required to be false when application.prometheusScrape.targetAllocator.enabled=true.
+      # -- Keep cadvisor and pod-metrics in separate OTel receivers/pipelines
+      # (legacy behavior). Set false to share one receiver + pipeline; required
+      # to be false when application.prometheusScrape.targetAllocator.enabled=true.
       separate_pipeline: true
   containers:
     logs:
@@ -152,18 +149,15 @@ application:
     # metrics to keep
     metricKeepRegex: (.*)
     targetAllocator:
-      # -- Deploy the upstream opentelemetry-target-allocator subchart and shard
-      # Prometheus scrape targets across scraper replicas via consistent hashing.
-      # Required when running multiple prometheus-scraper replicas; otherwise
-      # each replica scrapes every target and produces duplicate samples.
-      # Requires application.prometheusScrape.independentDeployment=true and
-      # node.metrics.cadvisor.separate_pipeline=false.
+      # -- Deploy the opentelemetry-target-allocator subchart so multiple
+      # scraper replicas can shard targets (consistent hashing). Required for
+      # replicaCount > 1; without it, every replica scrapes every target and
+      # produces duplicate samples. Requires independentDeployment=true and
+      # cadvisor.separate_pipeline=false.
       enabled: false
-      # -- How often each scraper polls the Target Allocator for its assigned
-      # scrape targets. Lower values reduce the time window during which
-      # short-lived targets (e.g. Kubernetes Jobs) can be missed, at the cost
-      # of more frequent HTTP requests to the Target Allocator. Set to 1s if
-      # accurate capture of jobs that exist for under a minute matters.
+      # -- How often each scraper polls TA for assigned targets. Lower values
+      # catch short-lived targets (Kubernetes Jobs) sooner, at the cost of
+      # more requests. Use 1s if accurate capture of sub-minute Jobs matters.
       interval: 30s
   REDMetrics:
     # -- (bool) Whether to enable generating RED metrics from spans. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview
@@ -625,13 +619,9 @@ cluster-metrics:
 
 ################################################
 # Target Allocator subchart (opentelemetry-target-allocator).
-# Only deployed when application.prometheusScrape.targetAllocator.enabled=true.
-# When enabled, the prometheus-scraper's prometheus/k8s_metrics receiver fetches
-# scrape configs and target assignments from this TA via its HTTP API.
-#
-# The TA's targetallocator.yaml ConfigMap is rendered by THIS chart (templates/
-# prometheus-ta-configmap.yaml) using the same scrape-job partials as the
-# non-TA path. The subchart mounts that ConfigMap by name (existingName).
+# The TA's targetallocator.yaml ConfigMap is rendered by THIS chart
+# (templates/prometheus-ta-configmap.yaml) using the same scrape-job partials
+# as the non-TA path; the subchart mounts it by name (existingName).
 prometheus-ta:
   # !!! IMPORTANT !!! This needs to have same value as namespaceOverride in cluster above
   namespaceOverride: "observe"
@@ -649,12 +639,10 @@ prometheus-ta:
 ################################################
 prometheus-scraper:
   mode: deployment
-  # -- Number of prometheus-scraper pods. Only honored when
-  # application.prometheusScrape.independentDeployment=true. Bumping this
-  # above 1 requires application.prometheusScrape.targetAllocator.enabled=true
-  # so the Target Allocator can shard scrape targets across replicas; without
-  # it every replica scrapes every target and produces duplicate metrics
-  # (the chart fails the render in that case).
+  # -- Number of prometheus-scraper pods. Honored only when
+  # independentDeployment=true. Above 1 requires targetAllocator.enabled=true;
+  # the chart fails to render otherwise (multiple replicas without TA each
+  # scrape every target and emit duplicates).
   replicaCount: 1
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
