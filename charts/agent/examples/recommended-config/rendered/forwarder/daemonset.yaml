@@ -119,10 +119,6 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.uid
-            - name: OTEL_K8S_POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
             - name: OBSERVE_CLUSTER_NAME
               valueFrom:
                 configMapKeyRef:
