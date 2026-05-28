@@ -58,6 +58,7 @@ processors:
 {{- include "config.processors.resource_detection.cloud" . | nindent 2 }}
 {{- include "config.processors.filter.drop_long_spans" . | nindent 2 }}
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
+{{- include "config.processors.transform.deployment_environment_compatibility" . | nindent 2 }}
 
 {{- if .Values.gatewayDeployment.enabled }}
   # Use passthrough mode to reduce forwarder compute and push the lookup to the gateway whenever it is enabled.
@@ -156,7 +157,11 @@ processors:
   {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
   {{- $metricsProcessors = concat $metricsProcessors (list "batch") }}
   {{- end }}
-  {{- $metricsProcessors = concat $metricsProcessors (list "resourcedetection/cloud" "resource/observe_common" "attributes/debug_source_app_metrics") }}
+  {{- $metricsProcessors = concat $metricsProcessors (list "resourcedetection/cloud" "resource/observe_common") }}
+  {{- if not .Values.cluster.deploymentEnvironment.name }}
+    {{- $metricsProcessors = concat $metricsProcessors (list "transform/deployment_environment_compatability") }}
+  {{- end }}
+  {{- $metricsProcessors = concat $metricsProcessors (list "attributes/debug_source_app_metrics") }}
 {{- end }}
 
 service:
@@ -181,6 +186,9 @@ service:
         - resourcedetection/cloud
         {{- if not .Values.gatewayDeployment.enabled }}
         - resource/observe_common
+        {{- if not .Values.cluster.deploymentEnvironment.name }}
+        - transform/deployment_environment_compatability
+        {{- end }}
         - attributes/debug_source_app_traces
         {{- end }}
       exporters: [{{ join ", " $traceExporters }}]
@@ -199,6 +207,9 @@ service:
         - resourcedetection/cloud
         {{- if not .Values.gatewayDeployment.enabled }}
         - resource/observe_common
+        {{- if not .Values.cluster.deploymentEnvironment.name }}
+        - transform/deployment_environment_compatability
+        {{- end }}
         - attributes/debug_source_app_logs
         {{- end }}
       exporters: [{{ join ", " $logsExporters }}]

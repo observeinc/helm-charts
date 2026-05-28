@@ -53,6 +53,9 @@ metrics/pod_metrics:
     - batch
     {{- end }}
     - resource/observe_common
+    {{- if not .Values.cluster.deploymentEnvironment.name }}
+    - transform/deployment_environment_compatability
+    {{- end }}
     - attributes/debug_source_pod_metrics
   exporters:
     - prometheusremotewrite/observe

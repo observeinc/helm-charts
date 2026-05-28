@@ -48,6 +48,7 @@ processors:
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
 
 {{- if $podMetrics }}
+{{- include "config.processors.transform.deployment_environment_compatibility" . | nindent 2 }}
 {{- include "config.processors.attributes.pod_metrics" . | nindent 2 }}
 {{- include "config.processors.attributes.cadvisor_metrics" . | nindent 2 }}
 {{- end }}

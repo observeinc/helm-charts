@@ -134,6 +134,29 @@ data:
           - system
           override: false
           timeout: 2s
+        transform/deployment_environment_compatability:
+          error_mode: ignore
+          log_statements:
+          - set(resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"])
+            where resource.attributes["deployment.environment.name"] == nil and resource.attributes["deployment.environment"]
+            != nil
+          - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"])
+            where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"]
+            != nil
+          metric_statements:
+          - set(resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"])
+            where resource.attributes["deployment.environment.name"] == nil and resource.attributes["deployment.environment"]
+            != nil
+          - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"])
+            where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"]
+            != nil
+          trace_statements:
+          - set(resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"])
+            where resource.attributes["deployment.environment.name"] == nil and resource.attributes["deployment.environment"]
+            != nil
+          - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"])
+            where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"]
+            != nil
         transform/k8sheartbeat:
           error_mode: ignore
           log_statements:
@@ -296,6 +319,7 @@ data:
             - resource/drop_service_name
             - k8sattributes
             - resource/observe_common
+            - transform/deployment_environment_compatability
             - attributes/debug_source_pod_metrics
             receivers:
             - prometheus/pod_metrics
