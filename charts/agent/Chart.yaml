@@ -20,6 +20,9 @@ dependencies:
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     alias: prometheus-scraper
     condition: application.prometheusScrape.independentDeployment
+  # The OTel project releases this chart and opentelemetry-collector above
+  # together, so their appVersions usually match. Patch versions can ship
+  # independently for TA-specific fixes.
   - name: opentelemetry-target-allocator
     version: 0.128.1
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
