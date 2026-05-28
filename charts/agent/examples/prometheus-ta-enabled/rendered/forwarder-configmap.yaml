@@ -70,6 +70,8 @@ data:
             max_elapsed_time: 5m
             max_interval: 30s
           send_metadata: true
+          target_info:
+            enabled: false
           timeout: 10s
       processors:
         attributes/debug_source_app_logs:
@@ -186,6 +188,29 @@ data:
           - set(span.attributes["observe.status_code"], Int(span.attributes["http.response.status_code"]))
             where span.attributes["observe.status_code"] == nil and span.attributes["http.response.status_code"]
             != nil
+        transform/deployment_environment_compatability:
+          error_mode: ignore
+          log_statements:
+          - set(resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"])
+            where resource.attributes["deployment.environment.name"] == nil and resource.attributes["deployment.environment"]
+            != nil
+          - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"])
+            where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"]
+            != nil
+          metric_statements:
+          - set(resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"])
+            where resource.attributes["deployment.environment.name"] == nil and resource.attributes["deployment.environment"]
+            != nil
+          - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"])
+            where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"]
+            != nil
+          trace_statements:
+          - set(resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"])
+            where resource.attributes["deployment.environment.name"] == nil and resource.attributes["deployment.environment"]
+            != nil
+          - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"])
+            where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"]
+            != nil
       receivers:
         otlp/app-telemetry:
           protocols:
@@ -204,6 +229,7 @@ data:
             - batch
             - resourcedetection/cloud
             - resource/observe_common
+            - transform/deployment_environment_compatability
             - attributes/debug_source_app_logs
             receivers:
             - otlp/app-telemetry
@@ -217,6 +243,7 @@ data:
             - batch
             - resourcedetection/cloud
             - resource/observe_common
+            - transform/deployment_environment_compatability
             - attributes/debug_source_app_metrics
             receivers:
             - otlp/app-telemetry
@@ -232,6 +259,7 @@ data:
             - batch
             - resourcedetection/cloud
             - resource/observe_common
+            - transform/deployment_environment_compatability
             - attributes/debug_source_app_traces
             receivers:
             - otlp/app-telemetry

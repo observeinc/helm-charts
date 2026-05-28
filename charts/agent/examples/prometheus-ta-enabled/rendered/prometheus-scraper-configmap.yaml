@@ -28,6 +28,8 @@ data:
             max_elapsed_time: 5m
             max_interval: 30s
           send_metadata: true
+          target_info:
+            enabled: false
           timeout: 10s
       processors:
         batch:
@@ -84,6 +86,29 @@ data:
           - action: upsert
             key: k8s.cluster.uid
             value: ${env:OBSERVE_CLUSTER_UID}
+        transform/deployment_environment_compatability:
+          error_mode: ignore
+          log_statements:
+          - set(resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"])
+            where resource.attributes["deployment.environment.name"] == nil and resource.attributes["deployment.environment"]
+            != nil
+          - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"])
+            where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"]
+            != nil
+          metric_statements:
+          - set(resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"])
+            where resource.attributes["deployment.environment.name"] == nil and resource.attributes["deployment.environment"]
+            != nil
+          - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"])
+            where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"]
+            != nil
+          trace_statements:
+          - set(resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"])
+            where resource.attributes["deployment.environment.name"] == nil and resource.attributes["deployment.environment"]
+            != nil
+          - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"])
+            where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"]
+            != nil
         transform/set_debug_source:
           error_mode: ignore
           metric_statements:

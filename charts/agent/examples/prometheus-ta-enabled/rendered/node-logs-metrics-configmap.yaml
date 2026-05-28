@@ -42,6 +42,8 @@ data:
             max_elapsed_time: 5m
             max_interval: 30s
           send_metadata: true
+          target_info:
+            enabled: false
           timeout: 10s
       extensions:
         file_storage:

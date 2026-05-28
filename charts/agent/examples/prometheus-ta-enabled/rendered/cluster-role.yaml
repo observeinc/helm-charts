@@ -51,4 +51,3 @@ subjects:
 - kind: ServiceAccount
   name: observe-agent-service-account
   namespace: observe
-
