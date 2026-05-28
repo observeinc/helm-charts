@@ -1,12 +1,6 @@
-# Example: deploy the upstream opentelemetry-target-allocator subchart and have
-# it discover scrape targets from Prometheus Operator ServiceMonitor / PodMonitor
-# CRDs in the cluster, instead of (or in addition to) the chart's static
-# pod-annotation-based scrape jobs.
-#
-# Requires the Prometheus Operator CRDs to be installed in the cluster. When
-# includeStaticScrapeConfigs is false, the chart's pod-metrics + cadvisor
-# scrape jobs are dropped from the TA config; only CRD-discovered targets are
-# served.
+# Example: TA discovers scrape targets from Prometheus Operator
+# ServiceMonitor / PodMonitor CRDs (instead of the chart's static
+# pod-annotation jobs). Requires Prometheus Operator CRDs in the cluster.
 observe:
   token:
     create: true

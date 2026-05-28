@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.88.5](https://img.shields.io/badge/Version-0.88.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.16.0](https://img.shields.io/badge/AppVersion-2.16.0-informational?style=flat-square)
+![Version: 0.89.0](https://img.shields.io/badge/Version-0.89.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.16.0](https://img.shields.io/badge/AppVersion-2.16.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -104,13 +104,13 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | application.prometheusScrape.namespaceKeepRegex | string | `"(.*)"` |  |
 | application.prometheusScrape.portKeepRegex | string | `".*metrics"` |  |
 | application.prometheusScrape.targetAllocator.enabled | bool | `false` | Deploy the opentelemetry-target-allocator subchart so multiple scraper replicas can shard targets (consistent hashing). Required for replicaCount > 1; without it, every replica scrapes every target and produces duplicate samples. Requires independentDeployment=true and cadvisor.separate_pipeline=false. |
-| application.prometheusScrape.targetAllocator.includeStaticScrapeConfigs | bool | `true` | Include the chart's static pod-metrics + cadvisor scrape jobs in the Target Allocator config alongside any CRD-discovered targets. Default true preserves the chart's existing pod-annotation-based scraping behavior. Set false for pure-CRD discovery (typically with prometheusCR.enabled=true) to avoid duplicate scraping. |
+| application.prometheusScrape.targetAllocator.includeStaticScrapeConfigs | bool | `true` | Include the chart's static pod-metrics + cadvisor scrape jobs in the TA config alongside any CRD-discovered targets. Set false (with prometheusCR.enabled=true) for pure-CRD discovery. |
 | application.prometheusScrape.targetAllocator.interval | string | `"30s"` | How often each scraper polls TA for assigned targets. Lower values catch short-lived targets (Kubernetes Jobs) sooner, at the cost of more requests. Use 1s if accurate capture of sub-minute Jobs matters. |
-| application.prometheusScrape.targetAllocator.prometheusCR.enabled | bool | `false` | Have the Target Allocator discover scrape targets from Prometheus Operator ServiceMonitor and PodMonitor custom resources in the cluster. Requires the Prometheus Operator CRDs to be installed; the TA subchart's ClusterRole already grants the necessary `monitoring.coreos.com` reads. |
-| application.prometheusScrape.targetAllocator.prometheusCR.podMonitorNamespaceSelector | object | `{}` | PodMonitor namespace selector. Empty (default) matches all namespaces. Same "only-emit-when-set" behavior as serviceMonitorNamespaceSelector. |
-| application.prometheusScrape.targetAllocator.prometheusCR.podMonitorSelector | object | `{}` | PodMonitor label selector. Empty (default) matches all PodMonitors. Same "required when enabled" caveat as serviceMonitorSelector. |
-| application.prometheusScrape.targetAllocator.prometheusCR.serviceMonitorNamespaceSelector | object | `{}` | ServiceMonitor namespace selector. Empty (default) matches all namespaces. The chart only emits this key when set to a non-empty value, so default render is byte-identical to omitting the field. |
-| application.prometheusScrape.targetAllocator.prometheusCR.serviceMonitorSelector | object | `{}` | ServiceMonitor label selector. Empty (default) matches all ServiceMonitors. Note: TA treats this field as required when prometheusCR.enabled=true — omitting it would cause TA to match nothing — so the chart always emits it, defaulting to `{}`. |
+| application.prometheusScrape.targetAllocator.prometheusCR.enabled | bool | `false` | Discover scrape targets from Prometheus Operator ServiceMonitor / PodMonitor CRDs. Requires the operator CRDs in the cluster (the TA subchart's ClusterRole already grants the necessary reads). |
+| application.prometheusScrape.targetAllocator.prometheusCR.podMonitorNamespaceSelector | object | `{}` | PodMonitor namespace selector. Empty (default) matches all namespaces. |
+| application.prometheusScrape.targetAllocator.prometheusCR.podMonitorSelector | object | `{}` | PodMonitor label selector. Same shape and behavior as serviceMonitorSelector. |
+| application.prometheusScrape.targetAllocator.prometheusCR.serviceMonitorNamespaceSelector | object | `{}` | ServiceMonitor namespace selector. Empty (default) matches all namespaces. |
+| application.prometheusScrape.targetAllocator.prometheusCR.serviceMonitorSelector | object | `{}` | ServiceMonitor label selector. Empty (default) matches all SMs. Always rendered; TA treats omitted selectors as "match nothing". |
 | cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
 | cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"DoesNotExist"` |  |
 | cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].key | string | `"kubernetes.io/os"` |  |

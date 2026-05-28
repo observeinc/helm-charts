@@ -11,10 +11,8 @@ data:
     filter_strategy: relabel-config
     prometheus_cr:
       enabled: true
-      # service_monitor_selector and pod_monitor_selector must be present
-      # (even empty) — TA treats omitted label selectors as "match nothing".
-      # Namespace selectors are only emitted when non-empty; TA defaults to
-      # all-namespaces when they're absent.
+      # Label selectors must be present (even empty) — TA treats omitted ones
+      # as "match nothing". Namespace selectors are optional (default = all).
       service_monitor_selector:
         {}
       pod_monitor_selector:
