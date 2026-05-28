@@ -51,6 +51,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | https://open-telemetry.github.io/opentelemetry-helm-charts | monitor(opentelemetry-collector) | 0.155.0 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | forwarder(opentelemetry-collector) | 0.155.0 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | gateway(opentelemetry-collector) | 0.155.0 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | prometheus-ta(opentelemetry-target-allocator) | 0.128.1 |
 
 ## Values
 
@@ -102,6 +103,8 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | application.prometheusScrape.namespaceDropRegex | string | `"(.*istio.*|.*ingress.*|kube-system)"` |  |
 | application.prometheusScrape.namespaceKeepRegex | string | `"(.*)"` |  |
 | application.prometheusScrape.portKeepRegex | string | `".*metrics"` |  |
+| application.prometheusScrape.targetAllocator.enabled | bool | `false` | Deploy the opentelemetry-target-allocator subchart so multiple scraper replicas can shard targets (consistent hashing). Required for replicaCount > 1; without it, every replica scrapes every target and produces duplicate samples. Requires independentDeployment=true and cadvisor.separate_pipeline=false. |
+| application.prometheusScrape.targetAllocator.interval | string | `"30s"` | How often each scraper polls TA for assigned targets. Lower values catch short-lived targets (Kubernetes Jobs) sooner, at the cost of more requests. Use 1s if accurate capture of sub-minute Jobs matters. |
 | cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |
 | cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"DoesNotExist"` |  |
 | cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[1].key | string | `"kubernetes.io/os"` |  |
@@ -597,7 +600,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | node.forwarder.traces.maxSpanDuration | string | `"1h"` | The max span duration to be considered by the agent, or "none" for no limit. Any span over this limit will be dropped. Durations must be a number with a valid time unit: https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/pkg/ottl/ottlfuncs/README.md#duration |
 | node.kubeletstats.useNodeIp | bool | `false` |  |
 | node.metrics.cadvisor.enabled | bool | `false` |  |
-| node.metrics.cadvisor.separate_pipeline | bool | `true` | Merge cadvisor and pod-metrics scrape jobs into a single OpenTelemetry receiver and pipeline. Defaults to true (legacy two-pipeline behavior). Applies in both the cluster-metrics deployment and the dedicated prometheus-scraper deployment (when application.prometheusScrape.independentDeployment=true). |
+| node.metrics.cadvisor.separate_pipeline | bool | `true` | Keep cadvisor and pod-metrics in separate OTel receivers/pipelines (legacy behavior). Set false to share one receiver + pipeline; required to be false when application.prometheusScrape.targetAllocator.enabled=true. |
 | node.metrics.enabled | bool | `true` |  |
 | node.metrics.fileSystem.excludeMountPoints | string | `"[\"/dev/*\",\"/proc/*\",\"/sys/*\",\"/run/k3s/containerd/*\",\"/var/lib/docker/*\",\"/var/lib/kubelet/*\",\"/snap/*\"]"` |  |
 | node.metrics.fileSystem.rootPath | string | `"/hostfs"` |  |
@@ -688,12 +691,19 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | prometheus-scraper.readinessProbe.httpGet.port | int | `13133` |  |
 | prometheus-scraper.readinessProbe.initialDelaySeconds | int | `30` |  |
 | prometheus-scraper.readinessProbe.periodSeconds | int | `5` |  |
+| prometheus-scraper.replicaCount | int | `1` | Number of prometheus-scraper pods. Honored only when independentDeployment=true. Above 1 requires targetAllocator.enabled=true; the chart fails to render otherwise (multiple replicas without TA each scrape every target and emit duplicates). |
 | prometheus-scraper.resources.limits.memory | string | `"512Mi"` |  |
 | prometheus-scraper.resources.requests.cpu | string | `"250m"` |  |
 | prometheus-scraper.resources.requests.memory | string | `"512Mi"` |  |
 | prometheus-scraper.serviceAccount.create | bool | `false` |  |
 | prometheus-scraper.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | prometheus-scraper.tolerations | list | `[]` |  |
+| prometheus-ta.configMap.create | bool | `false` |  |
+| prometheus-ta.configMap.existingName | string | `"prometheus-ta"` |  |
+| prometheus-ta.namespaceOverride | string | `"observe"` |  |
+| prometheus-ta.targetAllocator.resources.limits.memory | string | `"256Mi"` |  |
+| prometheus-ta.targetAllocator.resources.requests.cpu | string | `"50m"` |  |
+| prometheus-ta.targetAllocator.resources.requests.memory | string | `"256Mi"` |  |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

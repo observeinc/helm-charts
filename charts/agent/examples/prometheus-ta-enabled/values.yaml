@@ -1,7 +1,6 @@
-# Example: enable the merged prometheus/k8s_metrics pipeline for pod-metrics + cadvisor.
-# In this PR the flag only merges the two receivers into one pipeline using
-# transform/set_debug_source for routing. Target Allocator infrastructure lands
-# in a follow-up PR.
+# Example: deploy the upstream opentelemetry-target-allocator subchart and shard
+# Prometheus scrape targets across multiple prometheus-scraper replicas via
+# consistent hashing.
 observe:
   token:
     create: true
@@ -10,6 +9,8 @@ application:
   prometheusScrape:
     enabled: true
     independentDeployment: true
+    targetAllocator:
+      enabled: true
 
 node:
   metrics:

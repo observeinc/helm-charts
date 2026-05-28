@@ -211,10 +211,6 @@ data:
               kubernetes_sd_configs:
               - role: pod
               metric_relabel_configs:
-              - action: drop
-                regex: null
-                source_labels:
-                - __name__
               - action: keep
                 regex: (.*)
                 source_labels:

@@ -44,11 +44,9 @@ metrics/spanmetrics:
 {{- $merged := not .Values.node.metrics.cadvisor.separate_pipeline }}
 {{- if $merged }}
 
-{{- /* Merged-pipeline path: pod-metrics and cadvisor scrape jobs share a
-       single receiver AND a single downstream pipeline. debug_source is set
-       per-datapoint by transform/set_debug_source based on the datapoint's
-       resource.service.name, eliminating the fan-out cost of routing through
-       two parallel pipelines. */}}
+{{- /* Merged path: pod-metrics + cadvisor share one receiver and one
+       pipeline; transform/set_debug_source stamps debug_source per
+       datapoint by service.name instead of fanning out to two pipelines. */}}
 metrics/k8s_metrics:
   receivers: [prometheus/k8s_metrics]
   processors:

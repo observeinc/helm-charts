@@ -37,11 +37,6 @@ processors:
   {{- include "config.processors.resource.observe_common" . | nindent 2 }}
   {{- include "config.processors.transform.deployment_environment_compatibility" . | nindent 2 }}
   {{- if $merged }}
-  {{- /* Merged-pipeline path: one pipeline serves both scrape jobs.
-         transform/set_debug_source stamps debug_source AND drops service.name
-         for non-cadvisor jobs in one OTTL pass — replaces the legacy two-pipeline
-         pair (attributes/debug_source_* + resource/drop_service_name on
-         pod_metrics only). */}}
   {{- include "config.processors.transform.set_debug_source" . | nindent 2 }}
   {{- else }}
   {{- include "config.processors.attributes.drop_service_name" . | nindent 2 }}
