@@ -15,6 +15,12 @@ data:
     filter_strategy: relabel-config
     prometheus_cr:
       enabled: {{ $crEnabled }}
+{{- if $crEnabled }}
+      # Empty selectors mean "match any". TA treats omitted selectors as
+      # "match nothing", so always emit the empty form when CR discovery is on.
+      service_monitor_selector: {}
+      pod_monitor_selector: {}
+{{- end }}
     collector_selector:
       matchlabels:
         app.kubernetes.io/name: prometheus-scraper
