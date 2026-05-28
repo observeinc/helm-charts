@@ -210,6 +210,27 @@ attributes/debug_source_cadvisor_metrics:
 {{- end -}}
 {{- end -}}
 
+{{/*
+  Merged-pipeline replacement for the legacy attributes/debug_source_* +
+  drop_service_name pair. One OTTL pass:
+    1. Stamp debug_source by service.name (rewrite-safe — cadvisor emits
+       no target_info series, so service.name isn't overwritten).
+    2. Drop service.name on non-cadvisor jobs so k8sattributes re-populates
+       it from pod labels. Cadvisor has no pod_association source, so its
+       service.name survives as "kubernetes-nodes-cadvisor" (matching the
+       legacy cadvisor pipeline, which never ran drop_service_name).
+*/}}
+{{- define "config.processors.transform.set_debug_source" -}}
+transform/set_debug_source:
+  error_mode: ignore
+  metric_statements:
+    - context: resource
+      statements:
+        - set(attributes["debug_source"], "cadvisor_metrics") where attributes["service.name"] == "kubernetes-nodes-cadvisor"
+        - set(attributes["debug_source"], "pod_metrics") where attributes["service.name"] != "kubernetes-nodes-cadvisor"
+        - delete_key(attributes, "service.name") where attributes["service.name"] != "kubernetes-nodes-cadvisor"
+{{- end -}}
+
 {{- define "config.processors.attributes.sidecar_kubeletstats_metrics" -}}
 attributes/debug_source_sidecar_kubeletstats_metrics:
   actions:

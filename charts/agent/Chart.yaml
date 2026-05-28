@@ -2,7 +2,7 @@ apiVersion: v2
 name: agent
 description: Chart to install K8s collection stack based on Observe Agent
 type: application
-version: 0.88.3
+version: 0.88.4
 appVersion: "2.16.0"
 dependencies:
   - name: opentelemetry-collector
@@ -20,6 +20,14 @@ dependencies:
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     alias: prometheus-scraper
     condition: application.prometheusScrape.independentDeployment
+  # The OTel project releases this chart and opentelemetry-collector above
+  # together, so their appVersions usually match. Patch versions can ship
+  # independently for TA-specific fixes.
+  - name: opentelemetry-target-allocator
+    version: 0.128.1
+    repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+    alias: prometheus-ta
+    condition: application.prometheusScrape.targetAllocator.enabled
   - name: opentelemetry-collector
     version: 0.155.0
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts

@@ -1,6 +1,7 @@
 {{- define "observe.deployment.clusterMetrics.config" -}}
 
 {{- $podMetrics := (and (eq .Values.application.prometheusScrape.enabled true) (eq .Values.application.prometheusScrape.independentDeployment false)) }}
+{{- $merged := and $podMetrics (not .Values.node.metrics.cadvisor.separate_pipeline) }}
 
 exporters:
 {{- include "config.exporters.debug" . | nindent 2 }}
@@ -31,8 +32,12 @@ receivers:
         enabled: true
 
 {{- if $podMetrics }}
+{{- if $merged }}
+{{- include "config.receivers.prometheus.k8s_metrics" . | nindent 2 }}
+{{- else }}
 {{- include "config.receivers.prometheus.pod_metrics" . | nindent 2 }}
 {{- include "config.receivers.prometheus.cadvisor" . | nindent 2 }}
+{{- end }}
 {{- end }}
 
 {{- if .Values.agent.config.global.fleet.enabled }}
@@ -49,8 +54,12 @@ processors:
 
 {{- if $podMetrics }}
 {{- include "config.processors.transform.deployment_environment_compatibility" . | nindent 2 }}
+{{- if $merged }}
+{{- include "config.processors.transform.set_debug_source" . | nindent 2 }}
+{{- else }}
 {{- include "config.processors.attributes.pod_metrics" . | nindent 2 }}
 {{- include "config.processors.attributes.cadvisor_metrics" . | nindent 2 }}
+{{- end }}
 {{- end }}
 
 {{- if .Values.agent.config.global.fleet.enabled }}

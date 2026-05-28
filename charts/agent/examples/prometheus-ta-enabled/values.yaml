@@ -1,0 +1,19 @@
+# Example: deploy the upstream opentelemetry-target-allocator subchart and shard
+# Prometheus scrape targets across multiple prometheus-scraper replicas via
+# consistent hashing.
+observe:
+  token:
+    create: true
+
+application:
+  prometheusScrape:
+    enabled: true
+    independentDeployment: true
+    targetAllocator:
+      enabled: true
+
+node:
+  metrics:
+    cadvisor:
+      enabled: true
+      separate_pipeline: false
