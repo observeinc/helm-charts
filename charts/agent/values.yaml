@@ -166,6 +166,22 @@ application:
         # installed; the TA subchart's ClusterRole already grants the
         # necessary `monitoring.coreos.com` reads.
         enabled: false
+        # -- ServiceMonitor label selector. Empty (default) matches all
+        # ServiceMonitors. Note: TA treats this field as required when
+        # prometheusCR.enabled=true — omitting it would cause TA to match
+        # nothing — so the chart always emits it, defaulting to `{}`.
+        serviceMonitorSelector: {}
+        # -- PodMonitor label selector. Empty (default) matches all PodMonitors.
+        # Same "required when enabled" caveat as serviceMonitorSelector.
+        podMonitorSelector: {}
+        # -- ServiceMonitor namespace selector. Empty (default) matches all
+        # namespaces. The chart only emits this key when set to a non-empty
+        # value, so default render is byte-identical to omitting the field.
+        serviceMonitorNamespaceSelector: {}
+        # -- PodMonitor namespace selector. Empty (default) matches all
+        # namespaces. Same "only-emit-when-set" behavior as
+        # serviceMonitorNamespaceSelector.
+        podMonitorNamespaceSelector: {}
       # -- Include the chart's static pod-metrics + cadvisor scrape jobs in
       # the Target Allocator config alongside any CRD-discovered targets.
       # Default true preserves the chart's existing pod-annotation-based
