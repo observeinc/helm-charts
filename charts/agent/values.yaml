@@ -159,6 +159,19 @@ application:
       # catch short-lived targets (Kubernetes Jobs) sooner, at the cost of
       # more requests. Use 1s if accurate capture of sub-minute Jobs matters.
       interval: 30s
+      prometheusCR:
+        # -- Have the Target Allocator discover scrape targets from
+        # Prometheus Operator ServiceMonitor and PodMonitor custom resources
+        # in the cluster. Requires the Prometheus Operator CRDs to be
+        # installed; the TA subchart's ClusterRole already grants the
+        # necessary `monitoring.coreos.com` reads.
+        enabled: false
+      # -- Include the chart's static pod-metrics + cadvisor scrape jobs in
+      # the Target Allocator config alongside any CRD-discovered targets.
+      # Default true preserves the chart's existing pod-annotation-based
+      # scraping behavior. Set false for pure-CRD discovery (typically with
+      # prometheusCR.enabled=true) to avoid duplicate scraping.
+      includeStaticScrapeConfigs: true
   REDMetrics:
     # -- (bool) Whether to enable generating RED metrics from spans. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview
     enabled: false

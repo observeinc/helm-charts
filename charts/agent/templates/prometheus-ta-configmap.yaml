@@ -1,4 +1,9 @@
 {{- if and .Values.application.prometheusScrape.independentDeployment .Values.application.prometheusScrape.targetAllocator.enabled (not .Values.node.metrics.cadvisor.separate_pipeline) }}
+{{- $ta := .Values.application.prometheusScrape.targetAllocator -}}
+{{- $crEnabled := and $ta.prometheusCR $ta.prometheusCR.enabled -}}
+{{- if and (not $crEnabled) (not $ta.includeStaticScrapeConfigs) -}}
+{{- fail "application.prometheusScrape.targetAllocator: at least one of prometheusCR.enabled or includeStaticScrapeConfigs must be true; otherwise the Target Allocator has no scrape configs to serve" -}}
+{{- end -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -9,14 +14,16 @@ data:
     allocation_strategy: consistent-hashing
     filter_strategy: relabel-config
     prometheus_cr:
-      enabled: false
+      enabled: {{ $crEnabled }}
     collector_selector:
       matchlabels:
         app.kubernetes.io/name: prometheus-scraper
+{{- if $ta.includeStaticScrapeConfigs }}
     config:
       scrape_configs:
 {{ include "observe.prometheus.pod_metrics.scrape_job" . | nindent 8 }}
 {{- if .Values.node.metrics.cadvisor.enabled }}
 {{ include "observe.prometheus.cadvisor.scrape_job" . | nindent 8 }}
+{{- end }}
 {{- end }}
 {{- end }}

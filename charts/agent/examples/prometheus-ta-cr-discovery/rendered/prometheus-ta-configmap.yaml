@@ -1,0 +1,16 @@
+---
+# Source: agent/templates/prometheus-ta-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-ta
+  namespace: observe
+data:
+  targetallocator.yaml: |
+    allocation_strategy: consistent-hashing
+    filter_strategy: relabel-config
+    prometheus_cr:
+      enabled: true
+    collector_selector:
+      matchlabels:
+        app.kubernetes.io/name: prometheus-scraper
