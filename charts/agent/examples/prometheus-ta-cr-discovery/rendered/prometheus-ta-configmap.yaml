@@ -1,0 +1,27 @@
+---
+# Source: agent/templates/prometheus-ta-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-ta
+  namespace: observe
+data:
+  targetallocator.yaml: |
+    allocation_strategy: consistent-hashing
+    filter_strategy: relabel-config
+    prometheus_cr:
+      enabled: true
+      # Label selectors must be present (even empty) — TA treats omitted ones
+      # as "match nothing". Namespace selectors render the same way for
+      # consistency (empty = match all).
+      service_monitor_selector:
+        {}
+      pod_monitor_selector:
+        {}
+      service_monitor_namespace_selector:
+        {}
+      pod_monitor_namespace_selector:
+        {}
+    collector_selector:
+      matchlabels:
+        app.kubernetes.io/name: prometheus-scraper

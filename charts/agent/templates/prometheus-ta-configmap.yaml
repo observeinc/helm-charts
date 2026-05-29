@@ -1,4 +1,9 @@
 {{- if and .Values.application.prometheusScrape.independentDeployment .Values.application.prometheusScrape.targetAllocator.enabled (not .Values.node.metrics.cadvisor.separate_pipeline) }}
+{{- $ta := .Values.application.prometheusScrape.targetAllocator -}}
+{{- $crEnabled := and $ta.prometheusCR $ta.prometheusCR.enabled -}}
+{{- if and (not $crEnabled) (not $ta.includeStaticScrapeConfigs) -}}
+{{- fail "application.prometheusScrape.targetAllocator: at least one of prometheusCR.enabled or includeStaticScrapeConfigs must be true; otherwise the Target Allocator has no scrape configs to serve" -}}
+{{- end -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -9,14 +14,25 @@ data:
     allocation_strategy: consistent-hashing
     filter_strategy: relabel-config
     prometheus_cr:
-      enabled: false
+      enabled: {{ $crEnabled }}
+{{- if $crEnabled }}
+      # Label selectors must be present (even empty) — TA treats omitted ones
+      # as "match nothing". Namespace selectors render the same way for
+      # consistency (empty = match all).
+      service_monitor_selector: {{ toYaml ($ta.prometheusCR.serviceMonitorSelector | default dict) | nindent 8 }}
+      pod_monitor_selector: {{ toYaml ($ta.prometheusCR.podMonitorSelector | default dict) | nindent 8 }}
+      service_monitor_namespace_selector: {{ toYaml ($ta.prometheusCR.serviceMonitorNamespaceSelector | default dict) | nindent 8 }}
+      pod_monitor_namespace_selector: {{ toYaml ($ta.prometheusCR.podMonitorNamespaceSelector | default dict) | nindent 8 }}
+{{- end }}
     collector_selector:
       matchlabels:
         app.kubernetes.io/name: prometheus-scraper
+{{- if $ta.includeStaticScrapeConfigs }}
     config:
       scrape_configs:
 {{ include "observe.prometheus.pod_metrics.scrape_job" . | nindent 8 }}
 {{- if .Values.node.metrics.cadvisor.enabled }}
 {{ include "observe.prometheus.cadvisor.scrape_job" . | nindent 8 }}
+{{- end }}
 {{- end }}
 {{- end }}
