@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.89.0](https://img.shields.io/badge/Version-0.89.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.16.0](https://img.shields.io/badge/AppVersion-2.16.0-informational?style=flat-square)
+![Version: 0.89.1](https://img.shields.io/badge/Version-0.89.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.16.0](https://img.shields.io/badge/AppVersion-2.16.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
