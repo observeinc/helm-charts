@@ -1,24 +1,24 @@
 ---
-# Source: agent/charts/forwarder/templates/deployment.yaml
+# Source: agent/charts/cluster-events/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: example-forwarder
+  name: example-cluster-events
   namespace: observe
   labels:
-    helm.sh/chart: forwarder-0.155.0
-    app.kubernetes.io/name: forwarder
+    helm.sh/chart: cluster-events-0.155.0
+    app.kubernetes.io/name: cluster-events
     app.kubernetes.io/instance: example
     app.kubernetes.io/version: "0.151.0"
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: opentelemetry-collector
     app.kubernetes.io/component: standalone-collector
 spec:
-  replicas: 2
+  replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app.kubernetes.io/name: forwarder
+      app.kubernetes.io/name: cluster-events
       app.kubernetes.io/instance: example
       component: standalone-collector
   strategy:
@@ -33,7 +33,7 @@ spec:
         observe_monitor_scrape: "true"
         observeinc_com_scrape: "false"
       labels:
-        app.kubernetes.io/name: forwarder
+        app.kubernetes.io/name: cluster-events
         app.kubernetes.io/instance: example
         component: standalone-collector
 
@@ -44,7 +44,7 @@ spec:
       securityContext:
         {}
       containers:
-        - name: forwarder
+        - name: cluster-events
           command:
             - /observe-agent
           args:
@@ -52,7 +52,6 @@ spec:
             - start
             - --observe-config=/observe-agent-conf/observe-agent.yaml
             - --config=/conf/relay.yaml
-            - --feature-gates=+connector.spanmetrics.includeCollectorInstanceID
           securityContext:
             {}
           image: "observeinc/observe-agent:2.16.0"
@@ -110,7 +109,7 @@ spec:
                   apiVersion: v1
                   fieldPath: status.podIP
             - name: GOMEMLIMIT
-              value: "409MiB"
+              value: "204MiB"
             - name: OTEL_K8S_POD_UID
               valueFrom:
                 fieldRef:
@@ -125,20 +124,10 @@ spec:
                 configMapKeyRef:
                   key: id
                   name: cluster-info
-            - name: K8S_NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
             - name: TOKEN
               valueFrom:
                 secretKeyRef:
                   key: OBSERVE_TOKEN
-                  name: agent-credentials
-                  optional: true
-            - name: TRACE_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  key: TRACE_TOKEN
                   name: agent-credentials
                   optional: true
           livenessProbe:
@@ -155,13 +144,13 @@ spec:
               port: 13133
           resources:
             limits:
-              memory: 512Mi
+              memory: 256Mi
             requests:
-              cpu: 300m
-              memory: 512Mi
+              cpu: 150m
+              memory: 256Mi
           volumeMounts:
             - mountPath: /conf
-              name: forwarder-configmap
+              name: cluster-events-configmap
             - mountPath: /observe-agent-conf
               name: observe-agent-deployment-config
       initContainers:
@@ -175,9 +164,9 @@ spec:
           name: kube-cluster-info
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: forwarder-configmap
+        - name: cluster-events-configmap
           configMap:
-            name: forwarder
+            name: cluster-events
             items:
               - key: relay
                 path: relay.yaml

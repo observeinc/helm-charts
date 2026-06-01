@@ -51,6 +51,7 @@ spec:
             - start
             - --observe-config=/observe-agent-conf/observe-agent.yaml
             - --config=/conf/relay.yaml
+            - --feature-gates=+connector.spanmetrics.includeCollectorInstanceID
           securityContext:
             {}
           image: "observeinc/observe-agent:2.16.0"
