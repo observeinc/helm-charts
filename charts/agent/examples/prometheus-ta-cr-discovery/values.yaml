@@ -14,8 +14,3 @@ application:
       prometheusCR:
         enabled: true
       includeStaticScrapeConfigs: false
-
-node:
-  metrics:
-    cadvisor:
-      separate_pipeline: false

@@ -109,7 +109,7 @@ metrics/spanmetrics/summary:
 {{- end -}}
 
 {{- define "config.pipelines.prometheus_scrapers" -}}
-{{- $merged := not .Values.node.metrics.cadvisor.separate_pipeline }}
+{{- $merged := or .Values.application.prometheusScrape.targetAllocator.enabled (not .Values.node.metrics.cadvisor.separate_pipeline) }}
 {{- if $merged }}
 
 {{- /* Merged path: pod-metrics + cadvisor share one receiver and one

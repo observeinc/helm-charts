@@ -1,4 +1,4 @@
-{{- if and .Values.application.prometheusScrape.independentDeployment .Values.application.prometheusScrape.targetAllocator.enabled (not .Values.node.metrics.cadvisor.separate_pipeline) }}
+{{- if and .Values.application.prometheusScrape.independentDeployment .Values.application.prometheusScrape.targetAllocator.enabled }}
 {{- $ta := .Values.application.prometheusScrape.targetAllocator -}}
 {{- $crEnabled := and $ta.prometheusCR $ta.prometheusCR.enabled -}}
 {{- if and (not $crEnabled) (not $ta.includeStaticScrapeConfigs) -}}

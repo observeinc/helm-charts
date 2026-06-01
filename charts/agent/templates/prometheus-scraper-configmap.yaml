@@ -1,9 +1,6 @@
 {{- if and .Values.application.prometheusScrape.targetAllocator.enabled (not .Values.application.prometheusScrape.independentDeployment) -}}
 {{- fail "application.prometheusScrape.targetAllocator.enabled requires application.prometheusScrape.independentDeployment=true" -}}
 {{- end -}}
-{{- if and .Values.application.prometheusScrape.targetAllocator.enabled .Values.node.metrics.cadvisor.separate_pipeline -}}
-{{- fail "application.prometheusScrape.targetAllocator.enabled requires node.metrics.cadvisor.separate_pipeline=false; the Target Allocator allocates targets per-receiver, so all scrape jobs must share one prometheus receiver for sharding to work" -}}
-{{- end -}}
 {{- if and .Values.application.prometheusScrape.targetAllocator.prometheusCR.enabled (not .Values.application.prometheusScrape.targetAllocator.enabled) -}}
 {{- fail "application.prometheusScrape.targetAllocator.prometheusCR.enabled requires application.prometheusScrape.targetAllocator.enabled=true; CRD discovery is only configurable through the Target Allocator" -}}
 {{- end -}}
