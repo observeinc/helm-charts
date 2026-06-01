@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.90.0](https://img.shields.io/badge/Version-0.90.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.16.0](https://img.shields.io/badge/AppVersion-2.16.0-informational?style=flat-square)
+![Version: 0.91.0](https://img.shields.io/badge/Version-0.91.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.16.0](https://img.shields.io/badge/AppVersion-2.16.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -82,6 +82,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | agent.config.global.processors.batch.sendBatchMaxSize | int | `4096` |  |
 | agent.config.global.processors.batch.sendBatchSize | int | `4096` |  |
 | agent.config.global.processors.batch.timeout | string | `"5s"` |  |
+| agent.config.global.processors.cloudResourceDetection.detectors | list | `["gcp","ecs","ec2","azure"]` | Detector lists for the cloud resourcedetection processor |
 | agent.config.global.processors.k8sattributesNodeOnlyDaemonset | bool | `false` |  |
 | agent.config.global.service.telemetry.loggingEncoding | string | `"console"` |  |
 | agent.config.global.service.telemetry.loggingLevel | string | `"WARN"` |  |

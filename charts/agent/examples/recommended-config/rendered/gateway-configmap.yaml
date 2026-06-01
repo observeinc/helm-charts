@@ -242,7 +242,6 @@ data:
           timeout: 2s
         resourcedetection/cloud:
           detectors:
-          - eks
           - gcp
           - ecs
           - ec2
