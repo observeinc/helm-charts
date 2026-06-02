@@ -1,7 +1,7 @@
 {{- define "observe.deployment.clusterMetrics.config" -}}
 
 {{- $podMetrics := (and (eq .Values.application.prometheusScrape.enabled true) (eq .Values.application.prometheusScrape.independentDeployment false)) }}
-{{- $merged := and $podMetrics (not .Values.node.metrics.cadvisor.separate_pipeline) }}
+{{- $merged := and $podMetrics (or .Values.application.prometheusScrape.targetAllocator.enabled (not .Values.node.metrics.cadvisor.separate_pipeline)) }}
 
 exporters:
 {{- include "config.exporters.debug" . | nindent 2 }}
