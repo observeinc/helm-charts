@@ -291,10 +291,8 @@ filter/drop_long_spans:
 transform/add_empty_service_attributes:
   error_mode: ignore
   trace_statements:
-    # deployment.environment.name = coalesce(deployment.environment.name, deployment.environment)
-    - set(resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"]) where resource.attributes["deployment.environment.name"] == nil and resource.attributes["deployment.environment"] != nil
-    # deployment.environment = coalesce(deployment.environment, deployment.environment.name)
-    - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]) where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"] != nil
+    - set(resource.attributes["deployment.environment.name"], Coalesce([resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"]]))
+    - set(resource.attributes["deployment.environment"], Coalesce([resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]]))
     # Default any still-missing attributes to an empty string.
     - set(resource.attributes["service.name"], "") where resource.attributes["service.name"] == nil
     - set(resource.attributes["service.namespace"], "") where resource.attributes["service.namespace"] == nil
@@ -307,20 +305,14 @@ transform/add_empty_service_attributes:
 transform/deployment_environment_compatability:
   error_mode: ignore
   trace_statements:
-    # deployment.environment.name = coalesce(deployment.environment.name, deployment.environment)
-    - set(resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"]) where resource.attributes["deployment.environment.name"] == nil and resource.attributes["deployment.environment"] != nil
-    # deployment.environment = coalesce(deployment.environment, deployment.environment.name)
-    - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]) where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"] != nil
+    - set(resource.attributes["deployment.environment.name"], Coalesce([resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"]]))
+    - set(resource.attributes["deployment.environment"], Coalesce([resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]]))
   log_statements:
-    # deployment.environment.name = coalesce(deployment.environment.name, deployment.environment)
-    - set(resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"]) where resource.attributes["deployment.environment.name"] == nil and resource.attributes["deployment.environment"] != nil
-    # deployment.environment = coalesce(deployment.environment, deployment.environment.name)
-    - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]) where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"] != nil
+    - set(resource.attributes["deployment.environment.name"], Coalesce([resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"]]))
+    - set(resource.attributes["deployment.environment"], Coalesce([resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]]))
   metric_statements:
-    # deployment.environment.name = coalesce(deployment.environment.name, deployment.environment)
-    - set(resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"]) where resource.attributes["deployment.environment.name"] == nil and resource.attributes["deployment.environment"] != nil
-    # deployment.environment = coalesce(deployment.environment, deployment.environment.name)
-    - set(resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]) where resource.attributes["deployment.environment"] == nil and resource.attributes["deployment.environment.name"] != nil
+    - set(resource.attributes["deployment.environment.name"], Coalesce([resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"]]))
+    - set(resource.attributes["deployment.environment"], Coalesce([resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]]))
 {{- end }}
 {{- end -}}
 
@@ -347,11 +339,8 @@ attributes/debug_source_span_metrics:
 transform/shape_spans_for_red_metrics:
   error_mode: ignore
   trace_statements:
-    # peer.db.name = coalesce(peer.db.name, db.system.name, db.system)
-    - set(span.attributes["peer.db.name"], span.attributes["db.system.name"]) where span.attributes["peer.db.name"] == nil and span.attributes["db.system.name"] != nil
-    - set(span.attributes["peer.db.name"], span.attributes["db.system"]) where span.attributes["peer.db.name"] == nil and span.attributes["db.system"] != nil
-    # peer.messaging.system = coalesce(peer.messaging.system, messaging.system)
-    - set(span.attributes["peer.messaging.system"], span.attributes["messaging.system"]) where span.attributes["peer.messaging.system"] == nil and span.attributes["messaging.system"] != nil
+    - set(span.attributes["peer.db.name"], Coalesce([span.attributes["peer.db.name"], span.attributes["db.system.name"], span.attributes["db.system"]]))
+    - set(span.attributes["peer.messaging.system"], Coalesce([span.attributes["peer.messaging.system"], span.attributes["messaging.system"]]))
     # Needed because `spanmetrics` connector can only operate on attributes or resource attributes.
     - set(span.attributes["otel.status_description"], span.status.message) where span.status.message != ""
 
