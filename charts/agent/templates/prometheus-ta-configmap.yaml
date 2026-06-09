@@ -16,6 +16,9 @@ data:
     prometheus_cr:
       enabled: {{ $crEnabled }}
 {{- if $crEnabled }}
+{{- with $ta.prometheusCR.scrapeInterval }}
+      scrape_interval: {{ . }}
+{{- end }}
       # Label selectors must be present (even empty) — TA treats omitted ones
       # as "match nothing". Namespace selectors render the same way for
       # consistency (empty = match all).
