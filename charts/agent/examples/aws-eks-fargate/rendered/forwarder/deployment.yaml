@@ -6,10 +6,10 @@ metadata:
   name: example-forwarder
   namespace: observe
   labels:
-    helm.sh/chart: forwarder-0.155.0
+    helm.sh/chart: forwarder-0.143.0
     app.kubernetes.io/name: forwarder
     app.kubernetes.io/instance: example
-    app.kubernetes.io/version: "0.151.0"
+    app.kubernetes.io/version: "0.143.0"
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: opentelemetry-collector
     app.kubernetes.io/component: standalone-collector
@@ -86,19 +86,12 @@ spec:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: status.podIP
-            - name: OTEL_K8S_NODE_NAME
+            - name: GOMEMLIMIT
+              value: "409MiB"
+            - name: OTEL_K8S_POD_UID
               valueFrom:
                 fieldRef:
-                  fieldPath: spec.nodeName
-            - name: OTEL_K8S_NODE_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.hostIP
-            - name: OTEL_K8S_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  apiVersion: v1
-                  fieldPath: metadata.namespace
+                  fieldPath: metadata.uid
             - name: OTEL_K8S_POD_NAME
               valueFrom:
                 fieldRef:
@@ -109,12 +102,6 @@ spec:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: status.podIP
-            - name: GOMEMLIMIT
-              value: "409MiB"
-            - name: OTEL_K8S_POD_UID
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.uid
             - name: OBSERVE_CLUSTER_NAME
               valueFrom:
                 configMapKeyRef:
@@ -173,7 +160,6 @@ spec:
           image: observeinc/kube-cluster-info:v0.11.6
           imagePullPolicy: Always
           name: kube-cluster-info
-      terminationGracePeriodSeconds: 30
       volumes:
         - name: forwarder-configmap
           configMap:
@@ -200,4 +186,3 @@ spec:
                 values:
                 - windows
       hostNetwork: false
-      hostPID: false
