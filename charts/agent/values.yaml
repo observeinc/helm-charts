@@ -682,6 +682,16 @@ prometheus-ta:
     create: false
     existingName: "prometheus-ta"
   targetAllocator:
+    # Expose the target allocator's own metrics (opentelemetry_allocator_*:
+    # targets, collectors_allocatable, targets_per_collector, time_to_allocate)
+    # to the agent monitor. The monitor discovers pods carrying these annotations
+    # and scrapes the TA on its :8080 /metrics endpoint, giving direct visibility
+    # into TA target distribution and shard balance.
+    podAnnotations:
+      observe_monitor_purpose: observecollection
+      observe_monitor_scrape: "true"
+      observe_monitor_path: /metrics
+      observe_monitor_port: "8080"
     resources:
       requests:
         cpu: 50m
