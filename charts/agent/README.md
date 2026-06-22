@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.91.3](https://img.shields.io/badge/Version-0.91.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.16.0](https://img.shields.io/badge/AppVersion-2.16.0-informational?style=flat-square)
+![Version: 0.92.0](https://img.shields.io/badge/Version-0.92.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.16.0](https://img.shields.io/badge/AppVersion-2.16.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -754,6 +754,10 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | prometheus-ta.configMap.create | bool | `false` |  |
 | prometheus-ta.configMap.existingName | string | `"prometheus-ta"` |  |
 | prometheus-ta.namespaceOverride | string | `"observe"` |  |
+| prometheus-ta.targetAllocator.podAnnotations.observe_monitor_path | string | `"/metrics"` |  |
+| prometheus-ta.targetAllocator.podAnnotations.observe_monitor_port | string | `"8080"` |  |
+| prometheus-ta.targetAllocator.podAnnotations.observe_monitor_purpose | string | `"observecollection"` |  |
+| prometheus-ta.targetAllocator.podAnnotations.observe_monitor_scrape | string | `"true"` |  |
 | prometheus-ta.targetAllocator.resources.limits.memory | string | `"256Mi"` |  |
 | prometheus-ta.targetAllocator.resources.requests.cpu | string | `"50m"` |  |
 | prometheus-ta.targetAllocator.resources.requests.memory | string | `"256Mi"` |  |

@@ -22,6 +22,10 @@ spec:
     metadata:
       annotations:
         checksum/config: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+        observe_monitor_path: /metrics
+        observe_monitor_port: "8080"
+        observe_monitor_purpose: observecollection
+        observe_monitor_scrape: "true"
       labels:
         helm.sh/chart: prometheus-ta-0.128.1
         app.kubernetes.io/managed-by: Helm
