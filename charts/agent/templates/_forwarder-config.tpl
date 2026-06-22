@@ -55,7 +55,11 @@ processors:
 
 {{- include "config.processors.memory_limiter" . | nindent 2 }}
 {{- include "config.processors.batch" . | nindent 2 }}
+{{- if ne .Values.nodeless.hostingPlatform "fargate" }}
+  # IMDS is unreachable on Fargate; cloud detector failures bubble up and stall
+  # startup ~80s. See PR #449 for the same fix on the Fargate sidecar pipeline.
 {{- include "config.processors.resource_detection.cloud" . | nindent 2 }}
+{{- end }}
 {{- include "config.processors.filter.drop_long_spans" . | nindent 2 }}
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
 {{- include "config.processors.transform.deployment_environment_compatibility" . | nindent 2 }}
@@ -138,7 +142,10 @@ processors:
 
 {{ if .Values.gatewayDeployment.enabled -}}
   {{/* Separate handling when gateway is enabled, since we do minimal processing on the forwarder in that case */}}
-  {{- $metricsProcessors = (list "memory_limiter" "k8sattributes/passthrough" "batch" "resourcedetection/cloud") }}
+  {{- $metricsProcessors = (list "memory_limiter" "k8sattributes/passthrough" "batch") }}
+  {{- if ne .Values.nodeless.hostingPlatform "fargate" }}
+    {{- $metricsProcessors = concat $metricsProcessors (list "resourcedetection/cloud") }}
+  {{- end }}
 {{- else }}
   {{- $metricsProcessors = (list "memory_limiter" "k8sattributes") }}
 
@@ -157,7 +164,10 @@ processors:
   {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
   {{- $metricsProcessors = concat $metricsProcessors (list "batch") }}
   {{- end }}
-  {{- $metricsProcessors = concat $metricsProcessors (list "resourcedetection/cloud" "resource/observe_common") }}
+  {{- if ne .Values.nodeless.hostingPlatform "fargate" }}
+    {{- $metricsProcessors = concat $metricsProcessors (list "resourcedetection/cloud") }}
+  {{- end }}
+  {{- $metricsProcessors = concat $metricsProcessors (list "resource/observe_common") }}
   {{- if not .Values.cluster.deploymentEnvironment.name }}
     {{- $metricsProcessors = concat $metricsProcessors (list "transform/deployment_environment_compatability") }}
   {{- end }}
@@ -183,7 +193,9 @@ service:
         {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
         - batch
         {{- end }}
+        {{- if ne .Values.nodeless.hostingPlatform "fargate" }}
         - resourcedetection/cloud
+        {{- end }}
         {{- if not .Values.gatewayDeployment.enabled }}
         - resource/observe_common
         {{- if not .Values.cluster.deploymentEnvironment.name }}
@@ -204,7 +216,9 @@ service:
         {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
         - batch
         {{- end }}
+        {{- if ne .Values.nodeless.hostingPlatform "fargate" }}
         - resourcedetection/cloud
+        {{- end }}
         {{- if not .Values.gatewayDeployment.enabled }}
         - resource/observe_common
         {{- if not .Values.cluster.deploymentEnvironment.name }}
