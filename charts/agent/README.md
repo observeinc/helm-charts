@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.92.1](https://img.shields.io/badge/Version-0.92.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.16.0](https://img.shields.io/badge/AppVersion-2.16.0-informational?style=flat-square)
+![Version: 0.92.2](https://img.shields.io/badge/Version-0.92.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.16.0](https://img.shields.io/badge/AppVersion-2.16.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -112,6 +112,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | application.prometheusScrape.targetAllocator.prometheusCR.enabled | bool | `false` | Discover scrape targets from Prometheus Operator ServiceMonitor / PodMonitor CRDs. Requires the operator CRDs in the cluster (the TA subchart's ClusterRole already grants the necessary reads). |
 | application.prometheusScrape.targetAllocator.prometheusCR.podMonitorNamespaceSelector | object | `{}` | PodMonitor namespace selector. Empty (default) matches all namespaces. |
 | application.prometheusScrape.targetAllocator.prometheusCR.podMonitorSelector | object | `{}` | PodMonitor label selector. Same shape and behavior as serviceMonitorSelector. |
+| application.prometheusScrape.targetAllocator.prometheusCR.scrapeInterval | string | `""` | Default scrape interval for SMs/PMs that don't declare their own `interval`. Empty (default) leaves the field unrendered, so TA falls back to its built-in 30s default. |
 | application.prometheusScrape.targetAllocator.prometheusCR.serviceMonitorNamespaceSelector | object | `{}` | ServiceMonitor namespace selector. Empty (default) matches all namespaces. |
 | application.prometheusScrape.targetAllocator.prometheusCR.serviceMonitorSelector | object | `{}` | ServiceMonitor label selector. Empty (default) matches all SMs. Always rendered; TA treats omitted selectors as "match nothing". |
 | cluster-events.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"observeinc.com/unschedulable"` |  |

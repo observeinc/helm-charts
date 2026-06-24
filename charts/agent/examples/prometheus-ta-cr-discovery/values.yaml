@@ -13,4 +13,7 @@ application:
       enabled: true
       prometheusCR:
         enabled: true
+        # Default scrape interval for discovered SMs/PMs that omit their own
+        # `interval`. Without this, TA falls back to its built-in 30s.
+        scrapeInterval: 60s
       includeStaticScrapeConfigs: false
