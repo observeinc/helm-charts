@@ -123,14 +123,6 @@ data:
           - system
           override: false
           timeout: 2s
-        resourcedetection/cloud:
-          detectors:
-          - gcp
-          - ecs
-          - ec2
-          - azure
-          override: false
-          timeout: 2s
         transform/deployment_environment_compatability:
           error_mode: ignore
           log_statements:
@@ -200,7 +192,6 @@ data:
             processors:
             - memory_limiter
             - k8sattributes/passthrough
-            - resourcedetection/cloud
             receivers:
             - otlp/app-telemetry
           metrics/observe-forward:
@@ -210,7 +201,6 @@ data:
             - memory_limiter
             - k8sattributes/passthrough
             - batch
-            - resourcedetection/cloud
             receivers:
             - otlp/app-telemetry
           traces/observe-forward:
@@ -220,6 +210,5 @@ data:
             - filter/drop_long_spans
             - memory_limiter
             - k8sattributes/passthrough
-            - resourcedetection/cloud
             receivers:
             - otlp/app-telemetry

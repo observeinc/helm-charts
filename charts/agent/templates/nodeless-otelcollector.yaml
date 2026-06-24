@@ -28,16 +28,34 @@ spec:
           name: cluster-info
           key: id
     - name: OBSERVE_OTEL_ENDPOINT
-      value: "{{ .Values.observe.collectionEndpoint.value }}v2/otel"
+      value: "{{ trimSuffix "/" .Values.observe.collectionEndpoint.value }}/v2/otel"
     - name: OBSERVE_PROMETHEUS_ENDPOINT
-      value: "{{ .Values.observe.collectionEndpoint.value }}v1/prometheus"
+      value: "{{ trimSuffix "/" .Values.observe.collectionEndpoint.value }}/v1/prometheus"
+    # The sidecar runs the vanilla otel-collector image (no observe-agent
+    # wrapper), so unlike the chart's standalone collectors there is nothing
+    # at startup to derive OBSERVE_AUTHORIZATION_HEADER from observe_url + token.
+    # Construct it here: prefer the inlined helm value when set, otherwise
+    # source the token from the agent-credentials secret. Sidecar pods running
+    # in workload namespaces need that secret present in the same namespace
+    # (Kubernetes does not support cross-namespace secret refs).
+    {{- if .Values.observe.token.value }}
     - name: OBSERVE_AUTHORIZATION_HEADER
       value: "Bearer {{ .Values.observe.token.value }}"
+    {{- else }}
+    - name: OBSERVE_TOKEN
+      valueFrom:
+        secretKeyRef:
+          name: agent-credentials
+          key: OBSERVE_TOKEN
+          optional: true
+    - name: OBSERVE_AUTHORIZATION_HEADER
+      value: "Bearer $(OBSERVE_TOKEN)"
+    {{- end }}
   config:
     {{- include "observe.sidecar.applyFargateSidecarConfig" . | nindent 4 }}
   initContainers:
     - name: kube-cluster-info
-      image: observeinc/kube-cluster-info:v0.11.5
+      image: observeinc/kube-cluster-info:v0.11.6
       imagePullPolicy: Always
       env:
         - name: NAMESPACE
