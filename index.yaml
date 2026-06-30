@@ -3,6 +3,60 @@ entries:
   agent:
   - apiVersion: v2
     appVersion: 2.16.0
+    created: "2026-06-30T16:40:53.208912984Z"
+    dependencies:
+    - alias: cluster-events
+      condition: cluster.events.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.159.0
+    - alias: cluster-metrics
+      condition: cluster.metrics.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.159.0
+    - alias: prometheus-scraper
+      condition: application.prometheusScrape.independentDeployment
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.159.0
+    - alias: prometheus-ta
+      condition: application.prometheusScrape.targetAllocator.enabled
+      name: opentelemetry-target-allocator
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.128.1
+    - alias: node-logs-metrics
+      condition: node.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.159.0
+    - alias: monitor
+      condition: agent.selfMonitor.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.159.0
+    - alias: forwarder
+      condition: node.forwarder.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.159.0
+    - alias: gateway
+      condition: gatewayDeployment.enabled
+      name: opentelemetry-collector
+      repository: https://open-telemetry.github.io/opentelemetry-helm-charts
+      version: 0.159.0
+    description: Chart to install K8s collection stack based on Observe Agent
+    digest: 5e15ea9c976e56c44aa2882ff91c9d8762a2f3d2f15b4c2e9134065261800503
+    maintainers:
+    - email: support@observeinc.com
+      name: Observe
+    name: agent
+    type: application
+    urls:
+    - https://github.com/observeinc/helm-charts/releases/download/agent-0.93.1/agent-0.93.1.tgz
+    version: 0.93.1
+  - apiVersion: v2
+    appVersion: 2.16.0
     created: "2026-06-25T15:25:20.708328576Z"
     dependencies:
     - alias: cluster-events
@@ -11978,4 +12032,4 @@ entries:
     urls:
     - https://github.com/observeinc/helm-charts/releases/download/traces-0.1.0/traces-0.1.0.tgz
     version: 0.1.0
-generated: "2026-06-25T15:25:20.708941438Z"
+generated: "2026-06-30T16:40:53.209757286Z"
