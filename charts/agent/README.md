@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.93.0](https://img.shields.io/badge/Version-0.93.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.16.0](https://img.shields.io/badge/AppVersion-2.16.0-informational?style=flat-square)
+![Version: 0.93.1](https://img.shields.io/badge/Version-0.93.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.16.0](https://img.shields.io/badge/AppVersion-2.16.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -720,3 +720,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | prometheus-ta.targetAllocator.resources.limits.memory | string | `"256Mi"` |  |
 | prometheus-ta.targetAllocator.resources.requests.cpu | string | `"50m"` |  |
 | prometheus-ta.targetAllocator.resources.requests.memory | string | `"256Mi"` |  |
+| serviceAccount | object | `{"annotations":{},"create":true,"name":"observe-agent-service-account"}` | Configuration for the ServiceAccount used by all agent components. |
+| serviceAccount.annotations | object | `{}` | Annotations to add to the ServiceAccount (only applied when create: true). Example for IRSA:   eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/my-role |
+| serviceAccount.create | bool | `true` | If true, the chart creates the ServiceAccount. Set to false to use a pre-existing ServiceAccount (e.g., one already annotated for IRSA). When false, ensure the named ServiceAccount exists in the target namespace before installing the chart. |
+| serviceAccount.name | string | `"observe-agent-service-account"` | Name of the ServiceAccount to create or use. If you change this, also update serviceAccount.name in each sub-chart section below (cluster-events, cluster-metrics, node-logs-metrics, prometheus-scraper, monitor, forwarder, gateway) so that pod specs reference the correct ServiceAccount. |

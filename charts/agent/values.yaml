@@ -18,6 +18,24 @@ observe:
     create: false
     value: ""
 
+# -- Configuration for the ServiceAccount used by all agent components.
+serviceAccount:
+  # -- If true, the chart creates the ServiceAccount. Set to false to use a
+  # pre-existing ServiceAccount (e.g., one already annotated for IRSA).
+  # When false, ensure the named ServiceAccount exists in the target namespace
+  # before installing the chart.
+  create: true
+  # -- Name of the ServiceAccount to create or use.
+  # If you change this, also update serviceAccount.name in each sub-chart
+  # section below (cluster-events, cluster-metrics, node-logs-metrics,
+  # prometheus-scraper, monitor, forwarder, gateway) so that pod specs
+  # reference the correct ServiceAccount.
+  name: "observe-agent-service-account"
+  # -- Annotations to add to the ServiceAccount (only applied when create: true).
+  # Example for IRSA:
+  #   eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/my-role
+  annotations: {}
+
 cluster:
   # -- name given to your cluster.
   # popuplates to k8s.cluster.name per https://opentelemetry.io/docs/specs/semconv/resource/k8s/#cluster
@@ -417,7 +435,7 @@ cluster-events:
 
   serviceAccount:
     create: false
-    name: "observe-agent-service-account"
+    name: "observe-agent-service-account"  # Should match .Values.serviceAccount.name
 
   clusterRole:
     create: false
@@ -553,7 +571,7 @@ cluster-metrics:
 
   serviceAccount:
     create: false
-    name: "observe-agent-service-account"
+    name: "observe-agent-service-account"  # Should match .Values.serviceAccount.name
   clusterRole:
     create: false
     name: "observe-agent-cluster-role"
@@ -722,7 +740,7 @@ prometheus-scraper:
 
   serviceAccount:
     create: false
-    name: "observe-agent-service-account"
+    name: "observe-agent-service-account"  # Should match .Values.serviceAccount.name
   clusterRole:
     create: false
     name: "observe-agent-cluster-role"
@@ -857,7 +875,7 @@ node-logs-metrics:
 
   serviceAccount:
     create: false
-    name: "observe-agent-service-account"
+    name: "observe-agent-service-account"  # Should match .Values.serviceAccount.name
   clusterRole:
     create: false
     name: "observe-agent-cluster-role"
@@ -1043,7 +1061,7 @@ monitor:
 
   serviceAccount:
     create: false
-    name: "observe-agent-service-account"
+    name: "observe-agent-service-account"  # Should match .Values.serviceAccount.name
   clusterRole:
     create: false
     name: "observe-agent-cluster-role"
@@ -1186,7 +1204,7 @@ forwarder:
 
   serviceAccount:
     create: false
-    name: "observe-agent-service-account"
+    name: "observe-agent-service-account"  # Should match .Values.serviceAccount.name
   clusterRole:
     create: false
     name: "observe-agent-cluster-role"
@@ -1340,7 +1358,7 @@ gateway:
 
   serviceAccount:
     create: false
-    name: "observe-agent-service-account"
+    name: "observe-agent-service-account"  # Should match .Values.serviceAccount.name
   clusterRole:
     create: false
     name: "observe-agent-cluster-role"

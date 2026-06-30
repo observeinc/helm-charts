@@ -46,5 +46,5 @@ roleRef:
   name: observe-agent-cluster-role-{{ template "observe-agent.namespace" . }}
 subjects:
 - kind: ServiceAccount
-  name: observe-agent-service-account
+  name: {{ .Values.serviceAccount.name }}
   namespace: {{ template "observe-agent.namespace" . }}
