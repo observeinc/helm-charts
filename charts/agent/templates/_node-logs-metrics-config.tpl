@@ -120,6 +120,7 @@ processors:
 {{- include "config.processors.batch" . | nindent 2 }}
 {{- include "config.processors.attributes.k8sattributes" (merge . (dict "filterToNode" true)) | nindent 2 }}
 {{- include "config.processors.resource.observe_common" . | nindent 2 }}
+{{- include "config.processors.resource.node_name" . | nindent 2 }}
 {{- include "config.processors.metricstransform.duplicate_k8s_cpu_metrics" . | nindent 2 }}
 
 {{- if .Values.agent.config.global.fleet.enabled }}
@@ -183,6 +184,7 @@ service:
           - batch
           {{- end }}
           - resourcedetection/cloud
+          - resource/node_name
           - resource/observe_common
           - attributes/debug_source_hostmetrics
         exporters: [{{ join ", " $hostmetricsExporters }}]
