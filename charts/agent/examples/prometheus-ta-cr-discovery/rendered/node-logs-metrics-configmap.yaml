@@ -121,6 +121,11 @@ data:
           - action: insert
             include: k8s.node.cpu.usage
             new_name: k8s.node.cpu.utilization
+        resource/node_name:
+          attributes:
+          - action: upsert
+            key: k8s.node.name
+            value: ${env:K8S_NODE_NAME}
         resource/observe_common:
           attributes:
           - action: upsert
@@ -280,6 +285,7 @@ data:
             - k8sattributes
             - batch
             - resourcedetection/cloud
+            - resource/node_name
             - resource/observe_common
             - attributes/debug_source_hostmetrics
             receivers:
