@@ -108,6 +108,14 @@ resource/observe_common:
     {{ end }}
 {{- end -}}
 
+{{- define "config.processors.resource.node_name" -}}
+resource/node_name:
+  attributes:
+    - key: k8s.node.name
+      action: upsert
+      value: ${env:K8S_NODE_NAME}
+{{- end -}}
+
 {{- define "config.processors.resource.fargate_resource_attributes" -}}
 resource/fargate_resource_attributes:
   attributes:
