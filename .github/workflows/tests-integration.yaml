@@ -51,7 +51,7 @@ jobs:
             working-directory: integration #Terraform commands and tests are ran from integration directory
     steps:
         - name: Checkout code
-          uses: actions/checkout@v6
+          uses: actions/checkout@v7
           with:
             fetch-depth: 0
             ref: ${{ github.event.inputs.branch }}
@@ -66,7 +66,7 @@ jobs:
             version: latest
 
         - name: Setup Python
-          uses: actions/setup-python@v5
+          uses: actions/setup-python@v7
           with:
             python-version: '3.10'
 
@@ -91,7 +91,7 @@ jobs:
             terraform test -verbose -junit-xml=results-ns-${{ matrix.namespace }}+values-${{ matrix.values }}.xml
 
         - name: Upload Test Results
-          uses: actions/upload-artifact@v4
+          uses: actions/upload-artifact@v7
           if: success() || failure()
           with:
             name: results-ns-${{ matrix.namespace }}+values-${{ matrix.values }}
