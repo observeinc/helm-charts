@@ -54,7 +54,7 @@ spec:
             - --feature-gates=+connector.spanmetrics.includeCollectorInstanceID
           securityContext:
             {}
-          image: "observeinc/observe-agent:2.16.0"
+          image: "observeinc/observe-agent:2.18.0"
           imagePullPolicy: IfNotPresent
           ports:
 
