@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.94.0](https://img.shields.io/badge/Version-0.94.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.18.0](https://img.shields.io/badge/AppVersion-2.18.0-informational?style=flat-square)
+![Version: 0.94.1](https://img.shields.io/badge/Version-0.94.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.18.0](https://img.shields.io/badge/AppVersion-2.18.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -387,7 +387,6 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | gateway.mode | string | `"deployment"` |  |
 | gateway.nameOverride | string | `"gateway"` | --------------------------------------- # Different for each deployment/daemonset # |
 | gateway.namespaceOverride | string | `"observe"` |  |
-| gateway.networkPolicy.allowIngressFrom[0].podSelector.matchLabels."app.kubernetes.io/instance" | string | `"observe-agent"` |  |
 | gateway.networkPolicy.allowIngressFrom[0].podSelector.matchLabels."app.kubernetes.io/name" | string | `"forwarder"` |  |
 | gateway.networkPolicy.egressRules[0] | object | `{}` |  |
 | gateway.networkPolicy.enabled | bool | `true` |  |

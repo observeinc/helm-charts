@@ -1384,11 +1384,15 @@ gateway:
   networkPolicy:
     enabled: true
     egressRules: [{}]
+    # Do not add app.kubernetes.io/instance here — the subchart renders
+    # allowIngressFrom via toYaml (no tpl), so template expressions are
+    # emitted as literals.  A hardcoded release name silently breaks
+    # ingress on policy-enforcing CNIs when the chart is installed under
+    # any other name.
     allowIngressFrom:
       - podSelector:
           matchLabels:
             app.kubernetes.io/name: forwarder
-            app.kubernetes.io/instance: observe-agent
 
   podAnnotations: {
     # This stops optional prometheus scrape config from picking up these pods
