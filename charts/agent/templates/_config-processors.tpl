@@ -349,6 +349,7 @@ transform/shape_spans_for_red_metrics:
   trace_statements:
     - set(span.attributes["peer.db.name"], Coalesce([span.attributes["peer.db.name"], span.attributes["db.system.name"], span.attributes["db.system"]]))
     - set(span.attributes["peer.messaging.system"], Coalesce([span.attributes["peer.messaging.system"], span.attributes["messaging.system"]]))
+    # TODO add any needed attribute coalescing for peer server attributes
     # Needed because `spanmetrics` connector can only operate on attributes or resource attributes.
     - set(span.attributes["otel.status_description"], span.status.message) where span.status.message != ""
 
@@ -387,6 +388,7 @@ transform/promote_peer_to_service:
 transform/remove_service_name_for_peer_metrics:
   error_mode: ignore
   metric_statements:
+    # TODO add span type checking here and add support for peer servers
     - delete_key(resource.attributes, "service.name") where datapoint.attributes["peer.db.name"] != nil or datapoint.attributes["peer.messaging.system"] != nil
 
 # This drops spans (and thus RED metric data) for span kinds that are not relevant to the Observe APM offering. If you use RED metrics outside of APM,
@@ -396,6 +398,7 @@ filter/drop_non_apm_spans:
   error_mode: ignore
   traces:
     span:
+      # TODO update this to keep client spans with a messaging system set or a peer server set.
       # We are keeping: all SERVER spans, all CONSUMER spans, CLIENT spans with a peer db, and PRODUCER spans with a peer messaging system.
       - span.kind == SPAN_KIND_CLIENT and span.attributes["peer.db.name"] == nil and span.attributes["db.system.name"] == nil and span.attributes["db.system"] == nil
       - span.kind == SPAN_KIND_PRODUCER and span.attributes["peer.messaging.system"] == nil and span.attributes["messaging.system"] == nil
