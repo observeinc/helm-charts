@@ -154,6 +154,10 @@ application:
     independentDeployment: false
     # scrape interval
     interval: 60s
+    # -- Per-target scrape timeout. Must be <= interval. Raise this for
+    # exporters that take longer than the default to render a response, such as
+    # jmx-exporter on a broker with many topics.
+    timeout: 10s
     # namespaces to exclude from scraping
     # drop is processed first so all namespaces that match regex will be dropped
     namespaceDropRegex: (.*istio.*|.*ingress.*|kube-system)

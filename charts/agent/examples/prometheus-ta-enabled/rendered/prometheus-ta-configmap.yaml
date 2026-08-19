@@ -19,6 +19,7 @@ data:
 
         - job_name: pod-metrics
           scrape_interval: 60s
+          scrape_timeout: 10s
           honor_labels: true
           kubernetes_sd_configs:
           - role: pod
