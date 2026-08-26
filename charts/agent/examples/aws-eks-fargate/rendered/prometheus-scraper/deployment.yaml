@@ -131,6 +131,16 @@ spec:
                   key: OBSERVE_TOKEN
                   name: agent-credentials
                   optional: true
+            - name: OBSERVE_WORKLOAD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['app.kubernetes.io/name']
+            - name: OBSERVE_RELEASE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['app.kubernetes.io/instance']
+            - name: OBSERVE_AGENT_INSTANCE_ID
+              value: $(OBSERVE_RELEASE_NAME)-$(OBSERVE_WORKLOAD_NAME)
           livenessProbe:
             initialDelaySeconds: 30
             periodSeconds: 5

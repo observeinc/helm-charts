@@ -146,6 +146,10 @@ spec:
                   key: TRACE_TOKEN
                   name: agent-credentials
                   optional: true
+            - name: OBSERVE_AGENT_INSTANCE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
           livenessProbe:
             initialDelaySeconds: 30
             periodSeconds: 5

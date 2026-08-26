@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.94.2](https://img.shields.io/badge/Version-0.94.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.18.0](https://img.shields.io/badge/AppVersion-2.18.0-informational?style=flat-square)
+![Version: 0.94.3](https://img.shields.io/badge/Version-0.94.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.18.0](https://img.shields.io/badge/AppVersion-2.18.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -141,6 +141,12 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | cluster-events.extraEnvs[3].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
 | cluster-events.extraEnvs[3].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
 | cluster-events.extraEnvs[3].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| cluster-events.extraEnvs[4].name | string | `"OBSERVE_WORKLOAD_NAME"` |  |
+| cluster-events.extraEnvs[4].valueFrom.fieldRef.fieldPath | string | `"metadata.labels['app.kubernetes.io/name']"` |  |
+| cluster-events.extraEnvs[5].name | string | `"OBSERVE_RELEASE_NAME"` |  |
+| cluster-events.extraEnvs[5].valueFrom.fieldRef.fieldPath | string | `"metadata.labels['app.kubernetes.io/instance']"` |  |
+| cluster-events.extraEnvs[6].name | string | `"OBSERVE_AGENT_INSTANCE_ID"` |  |
+| cluster-events.extraEnvs[6].value | string | `"$(OBSERVE_RELEASE_NAME)-$(OBSERVE_WORKLOAD_NAME)"` |  |
 | cluster-events.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | cluster-events.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | cluster-events.extraVolumes[0].configMap.defaultMode | int | `420` |  |
@@ -209,6 +215,12 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | cluster-metrics.extraEnvs[3].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
 | cluster-metrics.extraEnvs[3].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
 | cluster-metrics.extraEnvs[3].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| cluster-metrics.extraEnvs[4].name | string | `"OBSERVE_WORKLOAD_NAME"` |  |
+| cluster-metrics.extraEnvs[4].valueFrom.fieldRef.fieldPath | string | `"metadata.labels['app.kubernetes.io/name']"` |  |
+| cluster-metrics.extraEnvs[5].name | string | `"OBSERVE_RELEASE_NAME"` |  |
+| cluster-metrics.extraEnvs[5].valueFrom.fieldRef.fieldPath | string | `"metadata.labels['app.kubernetes.io/instance']"` |  |
+| cluster-metrics.extraEnvs[6].name | string | `"OBSERVE_AGENT_INSTANCE_ID"` |  |
+| cluster-metrics.extraEnvs[6].value | string | `"$(OBSERVE_RELEASE_NAME)-$(OBSERVE_WORKLOAD_NAME)"` |  |
 | cluster-metrics.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | cluster-metrics.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | cluster-metrics.extraVolumes[0].configMap.defaultMode | int | `420` |  |
@@ -294,6 +306,8 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | forwarder.extraEnvs[5].valueFrom.secretKeyRef.key | string | `"TRACE_TOKEN"` |  |
 | forwarder.extraEnvs[5].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
 | forwarder.extraEnvs[5].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| forwarder.extraEnvs[6].name | string | `"OBSERVE_AGENT_INSTANCE_ID"` |  |
+| forwarder.extraEnvs[6].valueFrom.fieldRef.fieldPath | string | `"spec.nodeName"` |  |
 | forwarder.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | forwarder.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | forwarder.extraVolumes[0].configMap.defaultMode | int | `420` |  |
@@ -367,6 +381,8 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | gateway.extraEnvs[4].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
 | gateway.extraEnvs[4].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
 | gateway.extraEnvs[4].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| gateway.extraEnvs[5].name | string | `"OBSERVE_AGENT_INSTANCE_ID"` |  |
+| gateway.extraEnvs[5].valueFrom.fieldRef.fieldPath | string | `"metadata.name"` |  |
 | gateway.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | gateway.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | gateway.extraVolumes[0].configMap.defaultMode | int | `420` |  |
@@ -443,6 +459,12 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | monitor.extraEnvs[3].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
 | monitor.extraEnvs[3].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
 | monitor.extraEnvs[3].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| monitor.extraEnvs[4].name | string | `"OBSERVE_WORKLOAD_NAME"` |  |
+| monitor.extraEnvs[4].valueFrom.fieldRef.fieldPath | string | `"metadata.labels['app.kubernetes.io/name']"` |  |
+| monitor.extraEnvs[5].name | string | `"OBSERVE_RELEASE_NAME"` |  |
+| monitor.extraEnvs[5].valueFrom.fieldRef.fieldPath | string | `"metadata.labels['app.kubernetes.io/instance']"` |  |
+| monitor.extraEnvs[6].name | string | `"OBSERVE_AGENT_INSTANCE_ID"` |  |
+| monitor.extraEnvs[6].value | string | `"$(OBSERVE_RELEASE_NAME)-$(OBSERVE_WORKLOAD_NAME)"` |  |
 | monitor.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | monitor.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | monitor.extraVolumes[0].configMap.defaultMode | int | `420` |  |
@@ -511,14 +533,16 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | node-logs-metrics.extraEnvs[3].valueFrom.fieldRef.fieldPath | string | `"spec.nodeName"` |  |
 | node-logs-metrics.extraEnvs[4].name | string | `"K8S_NODE_IP"` |  |
 | node-logs-metrics.extraEnvs[4].valueFrom.fieldRef.fieldPath | string | `"status.hostIP"` |  |
-| node-logs-metrics.extraEnvs[5].name | string | `"TOKEN"` |  |
-| node-logs-metrics.extraEnvs[5].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
-| node-logs-metrics.extraEnvs[5].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
-| node-logs-metrics.extraEnvs[5].valueFrom.secretKeyRef.optional | bool | `true` |  |
-| node-logs-metrics.extraEnvs[6].name | string | `"TRACES_TOKEN"` |  |
-| node-logs-metrics.extraEnvs[6].valueFrom.secretKeyRef.key | string | `"TRACES_TOKEN"` |  |
+| node-logs-metrics.extraEnvs[5].name | string | `"OBSERVE_AGENT_INSTANCE_ID"` |  |
+| node-logs-metrics.extraEnvs[5].valueFrom.fieldRef.fieldPath | string | `"spec.nodeName"` |  |
+| node-logs-metrics.extraEnvs[6].name | string | `"TOKEN"` |  |
+| node-logs-metrics.extraEnvs[6].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
 | node-logs-metrics.extraEnvs[6].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
 | node-logs-metrics.extraEnvs[6].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| node-logs-metrics.extraEnvs[7].name | string | `"TRACES_TOKEN"` |  |
+| node-logs-metrics.extraEnvs[7].valueFrom.secretKeyRef.key | string | `"TRACES_TOKEN"` |  |
+| node-logs-metrics.extraEnvs[7].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
+| node-logs-metrics.extraEnvs[7].valueFrom.secretKeyRef.optional | bool | `true` |  |
 | node-logs-metrics.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | node-logs-metrics.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | node-logs-metrics.extraVolumeMounts[1].mountPath | string | `"/var/log/pods"` |  |
@@ -667,6 +691,12 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | prometheus-scraper.extraEnvs[3].valueFrom.secretKeyRef.key | string | `"OBSERVE_TOKEN"` |  |
 | prometheus-scraper.extraEnvs[3].valueFrom.secretKeyRef.name | string | `"agent-credentials"` |  |
 | prometheus-scraper.extraEnvs[3].valueFrom.secretKeyRef.optional | bool | `true` |  |
+| prometheus-scraper.extraEnvs[4].name | string | `"OBSERVE_WORKLOAD_NAME"` |  |
+| prometheus-scraper.extraEnvs[4].valueFrom.fieldRef.fieldPath | string | `"metadata.labels['app.kubernetes.io/name']"` |  |
+| prometheus-scraper.extraEnvs[5].name | string | `"OBSERVE_RELEASE_NAME"` |  |
+| prometheus-scraper.extraEnvs[5].valueFrom.fieldRef.fieldPath | string | `"metadata.labels['app.kubernetes.io/instance']"` |  |
+| prometheus-scraper.extraEnvs[6].name | string | `"OBSERVE_AGENT_INSTANCE_ID"` |  |
+| prometheus-scraper.extraEnvs[6].value | string | `"$(OBSERVE_RELEASE_NAME)-$(OBSERVE_WORKLOAD_NAME)"` |  |
 | prometheus-scraper.extraVolumeMounts[0].mountPath | string | `"/observe-agent-conf"` |  |
 | prometheus-scraper.extraVolumeMounts[0].name | string | `"observe-agent-deployment-config"` |  |
 | prometheus-scraper.extraVolumes[0].configMap.defaultMode | int | `420` |  |

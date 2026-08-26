@@ -135,6 +135,10 @@ spec:
                   key: OBSERVE_TOKEN
                   name: agent-credentials
                   optional: true
+            - name: OBSERVE_AGENT_INSTANCE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
           livenessProbe:
             initialDelaySeconds: 30
             periodSeconds: 5
