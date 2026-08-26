@@ -131,16 +131,12 @@ spec:
                   key: OBSERVE_TOKEN
                   name: agent-credentials
                   optional: true
-            - name: DEPLOYMENT_NAME_INSTANCE
+            - name: DEPLOYMENT_INSTANCE_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.labels['app.kubernetes.io/instance']
-            - name: DEPLOYMENT_NAME_CHART
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.labels['app.kubernetes.io/name']
             - name: OBSERVE_AGENT_INSTANCE_ID
-              value: $(DEPLOYMENT_NAME_INSTANCE)-$(DEPLOYMENT_NAME_CHART)
+              value: $(DEPLOYMENT_INSTANCE_NAME)-cluster-metrics
           livenessProbe:
             initialDelaySeconds: 30
             periodSeconds: 5

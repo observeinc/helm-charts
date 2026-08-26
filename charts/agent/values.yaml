@@ -526,18 +526,14 @@ cluster-events:
     # replica, so the deployment name is used because it stays the same when the
     # pod restarts. Override it if you scale this deployment past one replica,
     # otherwise every replica reports the same identity.
-    # The deployment name is "<release>-<chart>". The downward API can only read
-    # the pod's own fields, so it is rebuilt from the two labels that form it.
-    - name: DEPLOYMENT_NAME_INSTANCE
+    # The deployment name is "<release>-cluster-events". The downward API cannot
+    # read it directly, so the release half comes from the label holding it.
+    - name: DEPLOYMENT_INSTANCE_NAME
       valueFrom:
         fieldRef:
           fieldPath: metadata.labels['app.kubernetes.io/instance']
-    - name: DEPLOYMENT_NAME_CHART
-      valueFrom:
-        fieldRef:
-          fieldPath: metadata.labels['app.kubernetes.io/name']
     - name: OBSERVE_AGENT_INSTANCE_ID
-      value: "$(DEPLOYMENT_NAME_INSTANCE)-$(DEPLOYMENT_NAME_CHART)"
+      value: "$(DEPLOYMENT_INSTANCE_NAME)-cluster-events"
   extraEnvsFrom: []
   extraVolumes:
     - name: "observe-agent-deployment-config"
@@ -678,18 +674,14 @@ cluster-metrics:
     # replica, so the deployment name is used because it stays the same when the
     # pod restarts. Override it if you scale this deployment past one replica,
     # otherwise every replica reports the same identity.
-    # The deployment name is "<release>-<chart>". The downward API can only read
-    # the pod's own fields, so it is rebuilt from the two labels that form it.
-    - name: DEPLOYMENT_NAME_INSTANCE
+    # The deployment name is "<release>-cluster-metrics". The downward API cannot
+    # read it directly, so the release half comes from the label holding it.
+    - name: DEPLOYMENT_INSTANCE_NAME
       valueFrom:
         fieldRef:
           fieldPath: metadata.labels['app.kubernetes.io/instance']
-    - name: DEPLOYMENT_NAME_CHART
-      valueFrom:
-        fieldRef:
-          fieldPath: metadata.labels['app.kubernetes.io/name']
     - name: OBSERVE_AGENT_INSTANCE_ID
-      value: "$(DEPLOYMENT_NAME_INSTANCE)-$(DEPLOYMENT_NAME_CHART)"
+      value: "$(DEPLOYMENT_INSTANCE_NAME)-cluster-metrics"
   extraEnvsFrom: []
   extraVolumes:
     - name: "observe-agent-deployment-config"
@@ -863,18 +855,14 @@ prometheus-scraper:
     # replica, so the deployment name is used because it stays the same when the
     # pod restarts. Override it if you scale this deployment past one replica,
     # otherwise every replica reports the same identity.
-    # The deployment name is "<release>-<chart>". The downward API can only read
-    # the pod's own fields, so it is rebuilt from the two labels that form it.
-    - name: DEPLOYMENT_NAME_INSTANCE
+    # The deployment name is "<release>-prometheus-scraper". The downward API cannot
+    # read it directly, so the release half comes from the label holding it.
+    - name: DEPLOYMENT_INSTANCE_NAME
       valueFrom:
         fieldRef:
           fieldPath: metadata.labels['app.kubernetes.io/instance']
-    - name: DEPLOYMENT_NAME_CHART
-      valueFrom:
-        fieldRef:
-          fieldPath: metadata.labels['app.kubernetes.io/name']
     - name: OBSERVE_AGENT_INSTANCE_ID
-      value: "$(DEPLOYMENT_NAME_INSTANCE)-$(DEPLOYMENT_NAME_CHART)"
+      value: "$(DEPLOYMENT_INSTANCE_NAME)-prometheus-scraper"
   extraEnvsFrom: []
   extraVolumes:
     - name: "observe-agent-deployment-config"
@@ -1206,18 +1194,14 @@ monitor:
     # replica, so the deployment name is used because it stays the same when the
     # pod restarts. Override it if you scale this deployment past one replica,
     # otherwise every replica reports the same identity.
-    # The deployment name is "<release>-<chart>". The downward API can only read
-    # the pod's own fields, so it is rebuilt from the two labels that form it.
-    - name: DEPLOYMENT_NAME_INSTANCE
+    # The deployment name is "<release>-monitor". The downward API cannot
+    # read it directly, so the release half comes from the label holding it.
+    - name: DEPLOYMENT_INSTANCE_NAME
       valueFrom:
         fieldRef:
           fieldPath: metadata.labels['app.kubernetes.io/instance']
-    - name: DEPLOYMENT_NAME_CHART
-      valueFrom:
-        fieldRef:
-          fieldPath: metadata.labels['app.kubernetes.io/name']
     - name: OBSERVE_AGENT_INSTANCE_ID
-      value: "$(DEPLOYMENT_NAME_INSTANCE)-$(DEPLOYMENT_NAME_CHART)"
+      value: "$(DEPLOYMENT_INSTANCE_NAME)-monitor"
   extraEnvsFrom: []
   extraVolumes:
     - name: "observe-agent-deployment-config"
