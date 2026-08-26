@@ -528,7 +528,7 @@ cluster-events:
     # otherwise every replica reports the same identity.
     # The deployment name is "<release>-<chart>". The downward API can only read
     # the pod's own fields, so it is rebuilt from the two labels that form it.
-    - name: DEPLOYMENT_NAME_RELEASE
+    - name: DEPLOYMENT_NAME_INSTANCE
       valueFrom:
         fieldRef:
           fieldPath: metadata.labels['app.kubernetes.io/instance']
@@ -537,7 +537,7 @@ cluster-events:
         fieldRef:
           fieldPath: metadata.labels['app.kubernetes.io/name']
     - name: OBSERVE_AGENT_INSTANCE_ID
-      value: "$(DEPLOYMENT_NAME_RELEASE)-$(DEPLOYMENT_NAME_CHART)"
+      value: "$(DEPLOYMENT_NAME_INSTANCE)-$(DEPLOYMENT_NAME_CHART)"
   extraEnvsFrom: []
   extraVolumes:
     - name: "observe-agent-deployment-config"
@@ -680,7 +680,7 @@ cluster-metrics:
     # otherwise every replica reports the same identity.
     # The deployment name is "<release>-<chart>". The downward API can only read
     # the pod's own fields, so it is rebuilt from the two labels that form it.
-    - name: DEPLOYMENT_NAME_RELEASE
+    - name: DEPLOYMENT_NAME_INSTANCE
       valueFrom:
         fieldRef:
           fieldPath: metadata.labels['app.kubernetes.io/instance']
@@ -689,7 +689,7 @@ cluster-metrics:
         fieldRef:
           fieldPath: metadata.labels['app.kubernetes.io/name']
     - name: OBSERVE_AGENT_INSTANCE_ID
-      value: "$(DEPLOYMENT_NAME_RELEASE)-$(DEPLOYMENT_NAME_CHART)"
+      value: "$(DEPLOYMENT_NAME_INSTANCE)-$(DEPLOYMENT_NAME_CHART)"
   extraEnvsFrom: []
   extraVolumes:
     - name: "observe-agent-deployment-config"
@@ -865,7 +865,7 @@ prometheus-scraper:
     # otherwise every replica reports the same identity.
     # The deployment name is "<release>-<chart>". The downward API can only read
     # the pod's own fields, so it is rebuilt from the two labels that form it.
-    - name: DEPLOYMENT_NAME_RELEASE
+    - name: DEPLOYMENT_NAME_INSTANCE
       valueFrom:
         fieldRef:
           fieldPath: metadata.labels['app.kubernetes.io/instance']
@@ -874,7 +874,7 @@ prometheus-scraper:
         fieldRef:
           fieldPath: metadata.labels['app.kubernetes.io/name']
     - name: OBSERVE_AGENT_INSTANCE_ID
-      value: "$(DEPLOYMENT_NAME_RELEASE)-$(DEPLOYMENT_NAME_CHART)"
+      value: "$(DEPLOYMENT_NAME_INSTANCE)-$(DEPLOYMENT_NAME_CHART)"
   extraEnvsFrom: []
   extraVolumes:
     - name: "observe-agent-deployment-config"
@@ -1208,7 +1208,7 @@ monitor:
     # otherwise every replica reports the same identity.
     # The deployment name is "<release>-<chart>". The downward API can only read
     # the pod's own fields, so it is rebuilt from the two labels that form it.
-    - name: DEPLOYMENT_NAME_RELEASE
+    - name: DEPLOYMENT_NAME_INSTANCE
       valueFrom:
         fieldRef:
           fieldPath: metadata.labels['app.kubernetes.io/instance']
@@ -1217,7 +1217,7 @@ monitor:
         fieldRef:
           fieldPath: metadata.labels['app.kubernetes.io/name']
     - name: OBSERVE_AGENT_INSTANCE_ID
-      value: "$(DEPLOYMENT_NAME_RELEASE)-$(DEPLOYMENT_NAME_CHART)"
+      value: "$(DEPLOYMENT_NAME_INSTANCE)-$(DEPLOYMENT_NAME_CHART)"
   extraEnvsFrom: []
   extraVolumes:
     - name: "observe-agent-deployment-config"
