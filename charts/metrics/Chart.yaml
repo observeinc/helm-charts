@@ -2,11 +2,11 @@ apiVersion: v2
 name: metrics
 description: DEPRECATED Observe metrics collection
 type: application
-version: 0.4.0
+version: 0.4.1
 deprecated: true
 dependencies:
   - name: grafana-agent
-    version: 0.42.0
+    version: 0.44.2
     repository: https://grafana.github.io/helm-charts
   - name: endpoint
     version: 0.1.13
