@@ -278,6 +278,7 @@ data:
                 - __meta_kubernetes_pod_name
                 target_label: kubernetes_pod_name
               scrape_interval: 60s
+              scrape_timeout: 10s
       service:
         pipelines:
           logs/heartbeat:

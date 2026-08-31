@@ -5,6 +5,7 @@
 {{- define "observe.prometheus.pod_metrics.scrape_job" -}}
 - job_name: pod-metrics
   scrape_interval: {{.Values.application.prometheusScrape.interval}}
+  scrape_timeout: {{.Values.application.prometheusScrape.timeout}}
   honor_labels: true
   kubernetes_sd_configs:
   - role: pod
