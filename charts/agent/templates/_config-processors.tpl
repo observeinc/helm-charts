@@ -469,3 +469,92 @@ Parameters (passed via dict):
       action: update
       new_name: traces.span.metrics.duration.{{ $suffix }}
 {{- end -}}
+
+{{- /*
+Hash processors for EXTERNAL-WRITE Iceberg source tables.
+
+Observe's source tables carry hidden hash columns that the ingest transformer
+normally computes: _observe_hash126_11identifiers on a k8sEntity table and
+_observe_hash126_6labels on a prometheus table. The query optimizer SUBSTITUTES
+`group by <object>` with the stored hash rather than recomputing it, so the
+column must be populated for that optimization to be correct.
+
+A writer that appends to such a table directly -- bypassing ingest -- therefore
+has to supply those hashes itself, and the collector is the only place that sees
+the data before it is written. Neither processor is needed on the normal ingest
+path, where the transformer fills the columns.
+
+Neither is wired into any pipeline by this chart. Add the one you need to the
+relevant pipeline's `processors` list through an agent.config.<workload>
+override, and note the ordering constraints on each below.
+
+The hash need not match Observe's own algorithm; the optimizer trusts whatever
+is stored. It must only be a deterministic function of the same input, and the
+dataset must never mix external and internal writes -- two rows with equal
+identifiers would otherwise carry different hashes and silently fail to group.
+
+Values are 31 hex digits (124 bits) rather than the full 32. The column is
+decimal(38,0), max ~1.0e38, while a full XXH128 reaches ~3.4e38, so roughly
+two thirds of digests would overflow it. The consumer converts hex to decimal.
+*/ -}}
+
+{{- /*
+_observe_hash126_11identifiers, for a k8sEntity source table.
+
+MUST be placed LAST in the pipeline. observek8sattributes and transform/object
+are what populate observe_transform.identifiers, so hashing any earlier digests
+an empty or partial map.
+
+ToKeyValueString's 4th argument sorts the keys, which is what makes this
+deterministic: identifiers is a map and map order is not stable across records
+or agent versions. It serializes keys AND values, so two entities of the same
+kind hash differently -- hashing sorted keys alone would collapse every Pod onto
+one hash.
+
+Emitted as a sibling attribute, deliberately NOT inside
+observe_transform.identifiers: writing it there would mutate the very map being
+hashed, and would also leak the hash into the identifiers column.
+*/ -}}
+{{- define "config.processors.transform.observe_identifiers_hash" -}}
+transform/identifiers_hash:
+  error_mode: ignore
+  log_statements:
+    - context: log
+      statements:
+        - set(attributes["observe_identifiers_hash"], Substring(XXH128(ToKeyValueString(attributes["observe_transform"]["identifiers"], "=", ",", true)), 0, 31))
+{{- end -}}
+
+{{- /*
+_observe_hash126_6labels, for a prometheus source table.
+
+Ordering is load-bearing twice over:
+
+  1. This must be the ONLY datapoint attribute the pipeline sets after it. The
+     prometheusremotewrite exporter turns datapoint attributes into labels, so
+     any attribute set afterwards lands inside the very label map this hash
+     describes, desynchronizing the two.
+
+  2. It must cover resource attributes as well as datapoint attributes, because
+     the exporter's resource_to_telemetry_conversion folds resource attributes
+     into labels AFTER this processor runs. Hashing datapoint attributes alone
+     would give two series differing only by k8s.pod.name the same hash, and
+     `group by labels` would wrongly merge them.
+
+Concatenating two independently-sorted maps is not globally sorted, but it is
+deterministic and injective over the union -- which is what grouping correctness
+needs. The two key sets are disjoint: resource versus datapoint.
+
+Note this does NOT emit _observe_hash_metric, the metric-NAME hash. That one
+must be bit-identical to a literal the query compiler inlines at compile time,
+and the exporter normalizes metric names at export time -- after every processor
+runs -- so OTTL only ever sees the pre-normalization name. Compute it in the
+writer, over the metric string actually being written.
+*/ -}}
+{{- define "config.processors.transform.observe_metric_hashes" -}}
+transform/metric_hashes:
+  error_mode: ignore
+  metric_statements:
+    - context: datapoint
+      statements:
+        - set(attributes["observe_labels_hash"], Substring(XXH128(Concat([ToKeyValueString(resource.attributes, "=", ",", true), ToKeyValueString(attributes, "=", ",", true)], "|")), 0, 31))
+{{- end -}}
