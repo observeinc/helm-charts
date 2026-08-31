@@ -1,0 +1,32 @@
+# Enable the hash processors for external-write Iceberg source tables.
+#
+# See charts/agent/templates/_config-processors.tpl for what these processors
+# compute and where they get wired.
+#
+# The flag appends `transform/identifiers_hash` to the K8s objects pipeline in
+# cluster-events, and `transform/metric_hashes` to every pipeline that exports
+# to `prometheusremotewrite/observe`.
+observe:
+  token:
+    create: true
+
+application:
+  prometheusScrape:
+    enabled: true
+    independentDeployment: true
+  REDMetrics:
+    enabled: true
+
+agent:
+  config:
+    global:
+      externalWriteHashes:
+        enabled: true
+
+node:
+  forwarder:
+    enabled: true
+    traces:
+      maxSpanDuration: 1h
+    metrics:
+      outputFormat: prometheus

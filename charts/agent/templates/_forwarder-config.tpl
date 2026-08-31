@@ -113,6 +113,10 @@ processors:
 {{- include "config.processors.transform.k8sheartbeat" . | nindent 2 }}
 {{- end }}
 
+{{- if and .Values.agent.config.global.externalWriteHashes.enabled (eq .Values.node.forwarder.metrics.outputFormat "prometheus") }}
+{{- include "config.processors.transform.observe_metric_hashes" . | nindent 2 }}
+{{- end }}
+
 {{- $traceExporters := (list) -}}
 {{- $logsExporters := (list) -}}
 {{- $metricsExporters := (list) -}}
@@ -172,6 +176,10 @@ processors:
     {{- $metricsProcessors = concat $metricsProcessors (list "transform/deployment_environment_compatability") }}
   {{- end }}
   {{- $metricsProcessors = concat $metricsProcessors (list "attributes/debug_source_app_metrics") }}
+{{- end }}
+
+{{- if and .Values.agent.config.global.externalWriteHashes.enabled (eq .Values.node.forwarder.metrics.outputFormat "prometheus") }}
+  {{- $metricsProcessors = concat $metricsProcessors (list "transform/metric_hashes") }}
 {{- end }}
 
 service:

@@ -54,6 +54,10 @@ processors:
 {{- include "config.processors.transform.k8sheartbeat" . | nindent 2 }}
 {{- end }}
 
+{{- if and .Values.agent.config.global.externalWriteHashes.enabled (eq .Values.application.prometheusScrape.enabled true) }}
+{{- include "config.processors.transform.observe_metric_hashes" . | nindent 2 }}
+{{- end }}
+
 service:
   pipelines:
     {{- if eq .Values.application.prometheusScrape.enabled true }}
