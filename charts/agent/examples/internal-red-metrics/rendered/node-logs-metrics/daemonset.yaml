@@ -115,6 +115,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.hostIP
+            - name: OBSERVE_AGENT_INSTANCE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
             - name: TOKEN
               valueFrom:
                 secretKeyRef:

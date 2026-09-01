@@ -131,6 +131,12 @@ spec:
                   key: OBSERVE_TOKEN
                   name: agent-credentials
                   optional: true
+            - name: DEPLOYMENT_INSTANCE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['app.kubernetes.io/instance']
+            - name: OBSERVE_AGENT_INSTANCE_ID
+              value: $(DEPLOYMENT_INSTANCE_NAME)-prometheus-scraper
           livenessProbe:
             initialDelaySeconds: 30
             periodSeconds: 5
