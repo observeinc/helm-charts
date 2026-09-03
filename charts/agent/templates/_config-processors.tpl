@@ -509,5 +509,8 @@ transform/metric_hashes:
   metric_statements:
     - context: datapoint
       statements:
-        - set(attributes["observe_labels_hash"], Substring(XXH128(Concat([ToKeyValueString(resource.attributes, "=", ",", true), ToKeyValueString(attributes, "=", ",", true)], "|")), 0, 31))
+        # resource attrs override datapoint attrs due to ordering (matches prometheusremotewrite resource_to_telemetry_conversion)
+        - merge_maps(cache, attributes, "upsert")
+        - merge_maps(cache, resource.attributes, "upsert")
+        - set(attributes["observe_labels_hash"], Substring(XXH128(ToKeyValueString(cache, "=", ",", true)), 0, 31))
 {{- end -}}

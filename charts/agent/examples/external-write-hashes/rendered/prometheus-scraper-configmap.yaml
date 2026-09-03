@@ -117,9 +117,10 @@ data:
           metric_statements:
           - context: datapoint
             statements:
-            - set(attributes["observe_labels_hash"], Substring(XXH128(Concat([ToKeyValueString(resource.attributes,
-              "=", ",", true), ToKeyValueString(attributes, "=", ",", true)], "|")), 0,
-              31))
+            - merge_maps(cache, attributes, "upsert")
+            - merge_maps(cache, resource.attributes, "upsert")
+            - set(attributes["observe_labels_hash"], Substring(XXH128(ToKeyValueString(cache,
+              "=", ",", true)), 0, 31))
       receivers:
         prometheus/pod_metrics:
           config:
