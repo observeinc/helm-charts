@@ -59,6 +59,10 @@ processors:
 {{- include "config.processors.transform.k8sheartbeat" . | nindent 2 }}
 {{- end }}
 
+{{- if and .Values.agent.config.global.externalWriteHashes.enabled (eq .Values.node.forwarder.metrics.outputFormat "prometheus") }}
+{{- include "config.processors.transform.observe_metric_hashes" . | nindent 2 }}
+{{- end }}
+
   attributes/debug_source_gateway:
     actions:
     - action: upsert
@@ -140,6 +144,9 @@ service:
         - transform/deployment_environment_compatability
         {{- end }}
         - attributes/debug_source_gateway
+        {{- if and .Values.agent.config.global.externalWriteHashes.enabled (eq .Values.node.forwarder.metrics.outputFormat "prometheus") }}
+        - transform/metric_hashes
+        {{- end }}
       exporters: [{{ join ", " $metricsExporters }}]
     {{- if .Values.application.REDMetrics.enabled }}
     {{- include "config.pipelines.RED_metrics" . | nindent 4 }}

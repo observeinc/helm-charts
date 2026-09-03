@@ -68,6 +68,10 @@ processors:
 {{- include "config.processors.transform.k8sheartbeat" . | nindent 2 }}
 {{- end }}
 
+{{- if .Values.agent.config.global.externalWriteHashes.enabled }}
+{{- include "config.processors.transform.observe_metric_hashes" . | nindent 2 }}
+{{- end }}
+
   # attributes to append to objects
   attributes/debug_source_cluster_metrics:
     actions:
@@ -94,6 +98,9 @@ service:
         - resource/observe_common
         - resource/drop_container_info
         - attributes/debug_source_cluster_metrics
+        {{- if .Values.agent.config.global.externalWriteHashes.enabled }}
+        - transform/metric_hashes
+        {{- end }}
       exporters: [{{ join ", " $metricsExporters }}]
     {{- if $podMetrics }}
     {{- include "config.pipelines.prometheus_scrapers" . | nindent 4 }}

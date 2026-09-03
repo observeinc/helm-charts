@@ -125,6 +125,9 @@ metrics/k8s_metrics:
     - batch
     {{- end }}
     - resource/observe_common
+    {{- if .Values.agent.config.global.externalWriteHashes.enabled }}
+    - transform/metric_hashes
+    {{- end }}
   exporters:
     - prometheusremotewrite/observe
     {{- if eq .Values.agent.config.global.debug.enabled true }}
@@ -148,6 +151,9 @@ metrics/pod_metrics:
     - transform/deployment_environment_compatability
     {{- end }}
     - attributes/debug_source_pod_metrics
+    {{- if .Values.agent.config.global.externalWriteHashes.enabled }}
+    - transform/metric_hashes
+    {{- end }}
   exporters:
     - prometheusremotewrite/observe
     {{- if eq .Values.agent.config.global.debug.enabled true }}
@@ -165,6 +171,9 @@ metrics/cadvisor:
     {{- end }}
     - resource/observe_common
     - attributes/debug_source_cadvisor_metrics
+    {{- if .Values.agent.config.global.externalWriteHashes.enabled }}
+    - transform/metric_hashes
+    {{- end }}
   exporters:
     - prometheusremotewrite/observe
     {{- if eq .Values.agent.config.global.debug.enabled true }}

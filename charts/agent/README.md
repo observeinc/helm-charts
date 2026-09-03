@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.94.3](https://img.shields.io/badge/Version-0.94.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.18.0](https://img.shields.io/badge/AppVersion-2.18.0-informational?style=flat-square)
+![Version: 0.94.4](https://img.shields.io/badge/Version-0.94.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.18.0](https://img.shields.io/badge/AppVersion-2.18.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -75,6 +75,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | agent.config.global.exporters.sendingQueue.batch.sizer | string | `"bytes"` |  |
 | agent.config.global.exporters.sendingQueue.enabled | bool | `true` |  |
 | agent.config.global.exporters.timeout | string | `"10s"` |  |
+| agent.config.global.externalWriteHashes | object | `{"enabled":false}` | Compute hash columns in the collector for external-write Iceberg source tables. When true, appends transform/identifiers_hash to the K8s objects pipeline and transform/metric_hashes to every pipeline that exports to prometheusremotewrite/observe. Only needed when a downstream writer appends to an Observe-schema Iceberg table directly (bypassing ingest). Leave false on the standard ingest path. |
 | agent.config.global.fleet.configInterval | string | `"24h"` |  |
 | agent.config.global.fleet.enabled | bool | `false` |  |
 | agent.config.global.fleet.interval | string | `"10m"` |  |

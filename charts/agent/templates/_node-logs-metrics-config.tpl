@@ -129,6 +129,10 @@ processors:
 {{- include "config.processors.transform.k8sheartbeat" . | nindent 2 }}
 {{- end }}
 
+{{- if .Values.agent.config.global.externalWriteHashes.enabled }}
+{{- include "config.processors.transform.observe_metric_hashes" . | nindent 2 }}
+{{- end }}
+
   # attributes to append to objects
   attributes/debug_source_pod_logs:
     actions:
@@ -187,6 +191,9 @@ service:
           - resource/node_name
           - resource/observe_common
           - attributes/debug_source_hostmetrics
+          {{- if .Values.agent.config.global.externalWriteHashes.enabled }}
+          - transform/metric_hashes
+          {{- end }}
         exporters: [{{ join ", " $hostmetricsExporters }}]
       {{- end -}}
       {{- if .Values.node.containers.metrics.enabled }}
@@ -202,6 +209,9 @@ service:
           - resourcedetection/cloud
           - resource/observe_common
           - attributes/debug_source_kubeletstats_metrics
+          {{- if .Values.agent.config.global.externalWriteHashes.enabled }}
+          - transform/metric_hashes
+          {{- end }}
         exporters: [{{ join ", " $kubeletstatsExporters }}]
       {{- end -}}
 

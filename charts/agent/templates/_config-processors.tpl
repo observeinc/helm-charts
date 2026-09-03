@@ -469,3 +469,48 @@ Parameters (passed via dict):
       action: update
       new_name: traces.span.metrics.duration.{{ $suffix }}
 {{- end -}}
+
+{{- /*
+Hash processors for EXTERNAL-WRITE Iceberg source tables.
+
+Observe's source tables carry hidden hash columns that the ingest transformer
+normally computes. A writer using external write (bypassing ingest) has to supply those hashes itself.
+
+These hash need not match Observe's own algorithm, so long as the two algorithms do not mix in the same dataset.
+Values are 31 hex digits (124 bits) rather than the full 32 because the underlying dataset column is
+decimal(38,0), i.e. non-negative integers, max ~1.0e38.
+
+These processors must be after any modifications to the fields they hash are made.
+*/ -}}
+
+{{- /*
+_observe_hash126_11identifiers, for a k8sEntity source table.
+*/ -}}
+{{- define "config.processors.transform.observe_identifiers_hash" -}}
+transform/identifiers_hash:
+  error_mode: ignore
+  log_statements:
+    - context: log
+      statements:
+        - set(attributes["observe_identifiers_hash"], Substring(XXH128(ToKeyValueString(attributes["observe_transform"]["identifiers"], "=", ",", true)), 0, 31))
+{{- end -}}
+
+{{- /*
+_observe_hash126_6labels, for a prometheus source table.
+
+This does NOT emit _observe_hash_metric, the metric-NAME hash. That hash
+must be bit-identical to a literal the query compiler inlines at compile time,
+and the exporter converts metric names to prometheus format, after every processor
+runs. That hash should be calculated in the ingest pipeline itself.
+*/ -}}
+{{- define "config.processors.transform.observe_metric_hashes" -}}
+transform/metric_hashes:
+  error_mode: ignore
+  metric_statements:
+    - context: datapoint
+      statements:
+        # resource attrs override datapoint attrs due to ordering (matches prometheusremotewrite resource_to_telemetry_conversion)
+        - merge_maps(cache, attributes, "upsert")
+        - merge_maps(cache, resource.attributes, "upsert")
+        - set(attributes["observe_labels_hash"], Substring(XXH128(ToKeyValueString(cache, "=", ",", true)), 0, 31))
+{{- end -}}
