@@ -65,7 +65,7 @@ jobs:
           version: ${{ steps.helm-version.outputs.version }}
 
       - name: Install kind
-        uses: helm/kind-action@v1.14.0
+        uses: helm/kind-action@v1.15.0
         with:
           install_only: true
 
