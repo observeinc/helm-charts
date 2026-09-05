@@ -1,6 +1,8 @@
 # This section is for configuring agent to send data to Observe endpoints
 observe:
   # If create = false it is assumed that a secret named agent-credentials with key: OBSERVE_TOKEN already exists
+  # Set create = true to keep the token out of the observe-agent ConfigMap; with create = false and a
+  # non-empty value the token is written to that ConfigMap in plain text as a backwards-compatible fallback.
   token:
     create: false
     value: ""

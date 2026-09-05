@@ -1,6 +1,14 @@
 {{- define "observe.observe-agent" -}}
 observe_url: {{ .Values.observe.collectionEndpoint.value }}
+{{- /*
+The agent resolves `token` from the TOKEN env var (viper AutomaticEnv), which every
+collector gets from the agent-credentials secret and which takes precedence over this
+file. Writing it here too would put the ingest token in a plain ConfigMap, so it is only
+emitted when the chart is not managing the secret and the value would otherwise be lost.
+*/}}
+{{- if and (not .Values.observe.token.create) .Values.observe.token.value }}
 token: {{ .Values.observe.token.value }}
+{{- end }}
 
 debug: false
 

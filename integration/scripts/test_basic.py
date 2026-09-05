@@ -64,9 +64,10 @@ def test_config_map(kube_client, helm_config):
     """
     This test does the following:
     - Check that expected config maps exist in the cluster
-    - Check that the 'observe-agent' config map
-       * Token value exists
-       * Contains the correct token with correct structure
+    - Check that the 'observe-agent' config map does not leak the token
+      (all integration test scenarios use observe.token.create=true, so the
+      token is supplied to pods via the 'agent-credentials' Secret instead -
+      see test_secrets)
     """
 
     #config_map = kube_client.read_namespaced_config_map(name="observe-agent",namespace=helm_config['namespace'])
@@ -91,28 +92,19 @@ def test_config_map(kube_client, helm_config):
     print("All expected ConfigMaps found.")
 
 
-    # Check the 'observe-agent' ConfigMap for observe token
-    print(f"Checking ConfigMap 'observe-agent' for token value")
+    # Check the 'observe-agent' ConfigMap does not contain the observe token in plain text.
+    # The token resolves at runtime from the 'TOKEN' env var (see test_secrets), so the chart
+    # only emits this key when it isn't managing the Secret - not the case in these scenarios.
+    print(f"Checking ConfigMap 'observe-agent' does not leak the token value")
     observe_agent_cm = next((cm for cm in config_maps.items if cm.metadata.name == "observe-agent"), None)
     relay_data = observe_agent_cm.data.get('relay', None)
     assert relay_data, "ConfigMap 'observe-agent' does not contain relay data!"
     relay_data_dict = yaml.safe_load(relay_data) #Convert relay yaml to dict
 
     token_key = "token"
-    if token_key in relay_data_dict: #Check for existence of token + validate token key resolves to correct form
-        token_value = relay_data_dict["token"]
+    assert token_key not in relay_data_dict, f"ConfigMap 'observe-agent' contains token key '{token_key}' in plain text!"
 
-        assert token_value, f"ConfigMap 'observe-agent' has no value for token key {token_key}!"
-        masked_token = token_value[:4] + "******" + token_value[-4:]  # Mask all but first 4 and last 4 chars
-
-        pattern = r"^[a-zA-Z0-9_\*\&\^\$]+:[a-zA-Z0-9_\*\&\^\$]+$"
-        assert re.match(pattern, token_value), f"ConfigMap 'observe-agent' has invalid value for token key {token_key}!"
-
-        print(f"ConfigMap 'observe-agent' contains value for key '{token_key}' (masked): {masked_token}")
-    else:
-        assert False, f"ConfigMap 'observe-agent' does not contain token key '{token_key}'!"
-
-    print("ConfigMap 'observe-agent' with token value verified.")
+    print("ConfigMap 'observe-agent' does not contain the token key, as expected.")
 
 @pytest.mark.tags(
         "default.yaml",
