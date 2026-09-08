@@ -70,6 +70,10 @@ processors:
 {{- include "config.processors.metricstransform.duplicate_k8s_cpu_metrics" . | nindent 2 }}
 {{- include "config.processors.attributes.sidecar_kubeletstats_metrics" . | nindent 2 }}
 
+{{- if .Values.agent.config.global.externalWriteHashes.enabled }}
+{{- include "config.processors.transform.observe_metric_hashes" . | nindent 2 }}
+{{- end }}
+
 # logs specific processors
 {{- include "config.processors.resource.fargate_resource_attributes" . | nindent 2 }}
 {{- include "config.processors.attributes.fargate_pod_logs" . | nindent 2 }}
@@ -100,7 +104,7 @@ service:
     {{- if .Values.nodeless.metrics.enabled }}
     metrics/kubeletstats:
       receivers: [kubeletstats]
-      processors: [memory_limiter, metricstransform/duplicate_k8s_cpu_metrics, k8sattributes, deltatocumulative/observe, batch, resourcedetection/cloud, resource/observe_common, attributes/debug_source_sidecar_kubeletstats_metrics]
+      processors: [memory_limiter, metricstransform/duplicate_k8s_cpu_metrics, k8sattributes, deltatocumulative/observe, batch, resourcedetection/cloud, resource/observe_common, attributes/debug_source_sidecar_kubeletstats_metrics{{- if .Values.agent.config.global.externalWriteHashes.enabled -}}, transform/metric_hashes{{- end -}}]
       exporters: [{{ join ", " $kubeletstatsExporters }}]
 
     {{- end }}

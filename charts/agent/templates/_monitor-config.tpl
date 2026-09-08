@@ -72,6 +72,10 @@ processors:
 {{- include "config.processors.transform.k8sheartbeat" . | nindent 2 }}
 {{- end }}
 
+{{- if .Values.agent.config.global.externalWriteHashes.enabled }}
+{{- include "config.processors.transform.observe_metric_hashes" . | nindent 2 }}
+{{- end }}
+
   # attributes to append to objects
   attributes/debug_source_agent_monitor:
     actions:
@@ -99,6 +103,9 @@ service:
           {{- end }}
           - resource/observe_common
           - attributes/debug_source_agent_monitor
+          {{- if .Values.agent.config.global.externalWriteHashes.enabled }}
+          - transform/metric_hashes
+          {{- end }}
         exporters: [{{ join ", " $metricsExporters }}]
 
       {{- if .Values.agent.config.global.fleet.enabled }}

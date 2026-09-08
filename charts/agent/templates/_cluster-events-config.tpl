@@ -92,6 +92,10 @@ processors:
 
 {{- include "config.processors.attributes.observek8sattributes" . | nindent 2 }}
 
+{{- if .Values.agent.config.global.externalWriteHashes.enabled }}
+{{- include "config.processors.transform.observe_identifiers_hash" . | nindent 2 }}
+{{- end }}
+
 {{- if .Values.agent.config.global.fleet.enabled }}
 {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
 {{- include "config.processors.resource_detection" . | nindent 2 }}
@@ -474,6 +478,9 @@ service:
           - transform/unify
           - observek8sattributes
           - transform/object
+          {{- if .Values.agent.config.global.externalWriteHashes.enabled }}
+          - transform/identifiers_hash
+          {{- end }}
         exporters: [{{ join ", " $objectsExporters }}]
       logs/cluster:
         receivers: [k8sobjects/cluster]
