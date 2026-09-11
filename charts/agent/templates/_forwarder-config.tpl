@@ -17,6 +17,15 @@ exporters:
         tls:
           insecure: true
         compression: snappy
+        sending_queue:
+          enabled: {{ .Values.agent.config.global.exporters.sendingQueue.enabled }}
+          {{- if .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
+          batch:
+            flush_timeout: {{ .Values.agent.config.global.exporters.sendingQueue.batch.flushTimeout }}
+            sizer: {{ .Values.agent.config.global.exporters.sendingQueue.batch.sizer }}
+            min_size: {{ .Values.agent.config.global.exporters.sendingQueue.batch.minSize }}
+            max_size: {{ .Values.agent.config.global.exporters.sendingQueue.batch.maxSize }}
+          {{- end }}
     resolver:
       # use k8s service resolver, if collector runs in kubernetes environment
       k8s:
@@ -27,6 +36,15 @@ exporters:
     tls:
       insecure: true
     compression: snappy
+    sending_queue:
+      enabled: {{ .Values.agent.config.global.exporters.sendingQueue.enabled }}
+      {{- if .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
+      batch:
+        flush_timeout: {{ .Values.agent.config.global.exporters.sendingQueue.batch.flushTimeout }}
+        sizer: {{ .Values.agent.config.global.exporters.sendingQueue.batch.sizer }}
+        min_size: {{ .Values.agent.config.global.exporters.sendingQueue.batch.minSize }}
+        max_size: {{ .Values.agent.config.global.exporters.sendingQueue.batch.maxSize }}
+      {{- end }}
 
 {{- else }}
   {{- include "config.exporters.otlphttp.observe.base" . | nindent 2 }}

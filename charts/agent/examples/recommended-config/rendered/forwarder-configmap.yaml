@@ -16,6 +16,13 @@ data:
           protocol:
             otlp:
               compression: snappy
+              sending_queue:
+                batch:
+                  flush_timeout: 5s
+                  max_size: 41943040
+                  min_size: 0
+                  sizer: bytes
+                enabled: true
               tls:
                 insecure: true
           resolver:
@@ -25,6 +32,13 @@ data:
         otlp/gateway-service:
           compression: snappy
           endpoint: example-gateway.observe.svc.cluster.local:4317
+          sending_queue:
+            batch:
+              flush_timeout: 5s
+              max_size: 41943040
+              min_size: 0
+              sizer: bytes
+            enabled: true
           tls:
             insecure: true
         otlphttp/observe/agentheartbeat:
