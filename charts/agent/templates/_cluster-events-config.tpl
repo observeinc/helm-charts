@@ -69,9 +69,17 @@ receivers:
       - {name: serviceaccounts, mode: watch}
       - {name: customresourcedefinitions, mode: pull, interval: 15m}
       - {name: customresourcedefinitions, mode: watch}
+{{- /* A string (`<plural>` or `<plural>.<group>`) gets a pull and a watch entry; an object is a single receiver entry, passed through as-is. */}}
 {{- range .Values.cluster.events.customResources }}
-      - {name: {{ . }}, mode: pull, interval: 15m}
-      - {name: {{ . }}, mode: watch}
+{{- if kindIs "string" . }}
+{{- $parts := splitn "." 2 . }}
+{{- $resource := dict "name" $parts._0 }}
+{{- with $parts._1 }}{{ $_ := set $resource "group" . }}{{ end }}
+      - {{ merge (dict "mode" "pull" "interval" "15m") $resource | toJson }}
+      - {{ merge (dict "mode" "watch") $resource | toJson }}
+{{- else }}
+      - {{ toJson . }}
+{{- end }}
 {{- end }}
 
 {{- if .Values.agent.config.global.fleet.enabled }}

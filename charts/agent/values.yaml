@@ -54,11 +54,18 @@ cluster:
     waitForInitialPollTimeout: 10s
   # configure the collection of resources and events
   events:
-    # how often to pull resources from cluster
+    # -- How often to pull namespaces to refresh the Cluster entity. The built-in objects and
+    # `customResources` strings are pulled every 15m regardless of this setting.
     pullInterval: 20m
     enabled: true
-    # -- A list of custom resource definition names whose custom resources will be collected, in plural name form.
-    # Example: ["certificates", "virtualservices", "applications", "kustomizations"]
+    # -- Custom resources to collect alongside the built-in objects. Each entry is a string or an object.
+    # A string is the CRD name, `<plural>.<group>` (for example `servicemonitors.monitoring.coreos.com`),
+    # or a bare `<plural>`, and is collected like the built-in objects: pulled every 15m and watched.
+    # Prefer the CRD name; a bare plural uses the first API group that serves it, which may be the wrong resource.
+    # An object is a single k8sobjects receiver entry, passed through as-is. List two per resource: one
+    # with `mode: watch`, and one with `mode: pull` and an `interval` such as `15m`. Without the pull,
+    # unchanged objects expire from Observe.
+    # See charts/agent/examples/custom-resources.
     customResources: []
   # cluster-level metrics and entity events (as metrics) from the Kubernetes API server. It uses the K8s API to listen for updates.
   metrics:
