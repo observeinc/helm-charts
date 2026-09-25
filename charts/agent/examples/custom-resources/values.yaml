@@ -1,0 +1,27 @@
+# Collect custom resources alongside the built-in Kubernetes objects.
+#
+# See cluster.events.customResources in charts/agent/values.yaml for supported keys.
+observe:
+  token:
+    create: true
+
+cluster:
+  events:
+    customResources:
+      # A string gets a pull and a watch entry. A bare plural name uses the
+      # first API group that serves it.
+      - podmonitors
+      # <plural>.<group>, the CRD's metadata.name, pins the API group.
+      - servicemonitors.monitoring.coreos.com
+      # An object is one receiver entry, passed through as-is, so list the
+      # pull and the watch yourself.
+      - name: opentelemetrycollectors
+        group: opentelemetry.io
+        namespaces: [observe]
+        mode: pull
+        interval: 30m
+      - name: opentelemetrycollectors
+        group: opentelemetry.io
+        namespaces: [observe]
+        mode: watch
+        exclude_watch_type: [BOOKMARK]

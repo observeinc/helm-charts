@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.94.5](https://img.shields.io/badge/Version-0.94.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.18.0](https://img.shields.io/badge/AppVersion-2.18.0-informational?style=flat-square)
+![Version: 0.95.0](https://img.shields.io/badge/Version-0.95.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.18.0](https://img.shields.io/badge/AppVersion-2.18.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -253,9 +253,9 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | cluster-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
 | cluster-metrics.tolerations | list | `[]` |  |
 | cluster.deploymentEnvironment.name | string | `""` | deployment environment cluster runs in (e.g. testing, production, etc). populates to deployment.environment.name per https://opentelemetry.io/docs/specs/semconv/resource/deployment-environment/ |
-| cluster.events.customResources | list | `[]` | A list of custom resource definition names whose custom resources will be collected, in plural name form. Example: ["certificates", "virtualservices", "applications", "kustomizations"] |
+| cluster.events.customResources | list | `[]` | Custom resources to collect alongside the built-in objects. Each entry is a string or an object. A string is the CRD name, `<plural>.<group>` (for example `servicemonitors.monitoring.coreos.com`), or a bare `<plural>`, and is collected like the built-in objects: pulled every 15m and watched. Prefer the CRD name; a bare plural uses the first API group that serves it, which may be the wrong resource. An object is a single k8sobjects receiver entry, passed through as-is. List two per resource: one with `mode: watch`, and one with `mode: pull` and an `interval` such as `15m`. Without the pull, unchanged objects expire from Observe. See charts/agent/examples/custom-resources. |
 | cluster.events.enabled | bool | `true` |  |
-| cluster.events.pullInterval | string | `"20m"` |  |
+| cluster.events.pullInterval | string | `"20m"` | How often to pull namespaces to refresh the Cluster entity. The built-in objects and `customResources` strings are pulled every 15m regardless of this setting. |
 | cluster.metadata.waitForInitialPoll | bool | `false` | whether to wait for the initial metadata poll to complete before processing telemetry |
 | cluster.metadata.waitForInitialPollTimeout | string | `"10s"` | timeout for waiting for the initial metadata poll to complete |
 | cluster.metrics.enabled | bool | `true` |  |

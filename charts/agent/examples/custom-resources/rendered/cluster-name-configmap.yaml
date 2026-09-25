@@ -1,0 +1,9 @@
+---
+# Source: agent/templates/cluster-name-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-name
+  namespace: observe
+data:
+  name: observe-agent-monitored-cluster
