@@ -1,0 +1,29 @@
+# Observe Agent Helm chart values that deploy only the Kubernetes object ("entity") collection
+# that Kubernetes Explorer needs. Use these alongside your own OpenTelemetry Collector: object
+# collection needs the Observe-specific observek8sattributes processor, which upstream
+# collector distributions don't include.
+#
+#   helm install observe-agent observe/agent --namespace observe \
+#     --values kubernetes-explorer-values.yaml \
+#     --set observe.collectionEndpoint.value=<your collection URL> \
+#     --set observe.token.create=true --set observe.token.value=<your ingest token>
+cluster:
+  # Must match the k8s.cluster.name your collector sets (OBSERVE_CLUSTER_NAME).
+  name: my-cluster
+  deploymentEnvironment:
+    # Must match the fallback environment your collector sets (DEPLOYMENT_ENVIRONMENT), so that
+    # Kubernetes Explorer can line up objects with metrics and logs.
+    name: prod
+  events:
+    enabled: true
+  metrics:
+    enabled: false
+
+node:
+  enabled: false
+  forwarder:
+    enabled: false
+
+agent:
+  selfMonitor:
+    enabled: false
