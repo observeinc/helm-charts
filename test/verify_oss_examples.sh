@@ -31,11 +31,34 @@ run_collector() {
 
 echo "otelcol-contrib version: $("$OTELCOL_CONTRIB" --version)"
 
+# Validation builds the receivers, and kubeletstats' serviceAccount auth needs in-cluster
+# credentials. Validate its configuration against a kubeconfig that is parsed but never contacted.
+cat > "$tmp/kubeconfig" <<'EOF'
+apiVersion: v1
+kind: Config
+clusters:
+  - name: validate
+    cluster:
+      server: https://127.0.0.1:6443
+contexts:
+  - name: validate
+    context:
+      cluster: validate
+      user: validate
+current-context: validate
+users:
+  - name: validate
+    user:
+      token: validate
+EOF
+export KUBECONFIG="$tmp/kubeconfig"
+
 for config in "$EXAMPLES_DIR"/forwarder.yaml "$EXAMPLES_DIR"/node.yaml "$EXAMPLES_DIR"/cluster-metrics.yaml; do
   name=$(basename "$config")
-  # Validation builds the receivers, and kubeletstats' serviceAccount auth needs in-cluster
-  # credentials; validate the rest of its configuration without them.
-  yq '(.receivers | select(has("kubeletstats")) | .kubeletstats.auth_type) = "none"' "$config" > "$tmp/$name"
+  yq '
+    (.receivers | select(has("kubeletstats")) | .kubeletstats.auth_type) = "none" |
+    (.receivers | select(has("kubeletstats")) | .kubeletstats.k8s_api_config.auth_type) = "kubeConfig"
+  ' "$config" > "$tmp/$name"
   if "$OTELCOL_CONTRIB" validate --config "$tmp/$name" > "$tmp/validate.log" 2>&1; then
     pass "$name validates"
   else
