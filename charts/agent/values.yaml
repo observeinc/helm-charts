@@ -227,6 +227,7 @@ application:
       - k8s.namespace.name
     # -- (list) List of span attributes to include as dimensions for RED metrics. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview
     spanDimensions:
+      # TODO add peer server attributes
       - peer.db.name
       - peer.messaging.system
       - otel.status_description
@@ -240,6 +241,7 @@ application:
         - deployment.environment.name
       # -- (list) List of span attributes to include as dimensions for summary RED metrics. Altering these dimensions will negatively impact query performence in APM.
       spanDimensions:
+        # TODO add peer server attributes
         - peer.db.name
         - peer.messaging.system
         - observe.status_code
