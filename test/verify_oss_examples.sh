@@ -33,7 +33,10 @@ echo "otelcol-contrib version: $("$OTELCOL_CONTRIB" --version)"
 
 for config in "$EXAMPLES_DIR"/forwarder.yaml "$EXAMPLES_DIR"/node.yaml "$EXAMPLES_DIR"/cluster-metrics.yaml; do
   name=$(basename "$config")
-  if "$OTELCOL_CONTRIB" validate --config "$config" > "$tmp/validate.log" 2>&1; then
+  # Validation builds the receivers, and kubeletstats' serviceAccount auth needs in-cluster
+  # credentials; validate the rest of its configuration without them.
+  yq '(.receivers | select(has("kubeletstats")) | .kubeletstats.auth_type) = "none"' "$config" > "$tmp/$name"
+  if "$OTELCOL_CONTRIB" validate --config "$tmp/$name" > "$tmp/validate.log" 2>&1; then
     pass "$name validates"
   else
     cat "$tmp/validate.log" >&2
