@@ -1,0 +1,54 @@
+name: OSS collector examples
+
+# Checks the plain OpenTelemetry Collector examples in examples/oss-collector with the upstream
+# otelcol-contrib distribution: they must validate, and the forwarder example must handle the
+# deployment environment like the chart does. Pull requests use the collector version of the
+# observe-agent release the chart deploys; the weekly run uses the latest release, so removed or
+# renamed upstream components show up before users hit them.
+#
+# The check-examples workflow separately fails when the examples are out of date with the chart
+# (make generate-examples also runs make generate-oss-examples).
+on:
+  pull_request:
+  schedule:
+    - cron: "0 14 * * 1"
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Choose the otelcol-contrib version
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            version=$(gh release view --repo open-telemetry/opentelemetry-collector-releases --json tagName --jq .tagName)
+          else
+            agent_version=$(yq '.appVersion' charts/agent/Chart.yaml)
+            version=$(curl -fsSL "https://raw.githubusercontent.com/observeinc/observe-agent/v${agent_version}/go.mod" \
+              | awk '$1 == "go.opentelemetry.io/collector/otelcol" {print $2}')
+          fi
+          if [ -z "$version" ]; then
+            echo "::error::Could not determine the otelcol-contrib version"
+            exit 1
+          fi
+          echo "version=${version#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Install otelcol-contrib
+        run: |
+          v=${{ steps.version.outputs.version }}
+          curl -fsSL "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v${v}/otelcol-contrib_${v}_linux_amd64.tar.gz" | tar -xz otelcol-contrib
+
+      # node.yaml reads host metrics from the node's root filesystem mounted at /hostfs.
+      - name: Provide the /hostfs mount that node.yaml expects
+        run: sudo ln -s / /hostfs
+
+      - name: Verify examples
+        env:
+          OTELCOL_CONTRIB: ./otelcol-contrib
+        run: test/verify_oss_examples.sh
