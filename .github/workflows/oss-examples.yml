@@ -44,6 +44,10 @@ jobs:
           v=${{ steps.version.outputs.version }}
           curl -fsSL "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v${v}/otelcol-contrib_${v}_linux_amd64.tar.gz" | tar -xz otelcol-contrib
 
+      # node.yaml reads host metrics from the node's root filesystem mounted at /hostfs.
+      - name: Provide the /hostfs mount that node.yaml expects
+        run: sudo ln -s / /hostfs
+
       - name: Verify examples
         env:
           OTELCOL_CONTRIB: ./otelcol-contrib

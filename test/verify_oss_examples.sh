@@ -4,7 +4,8 @@
 # deployment environment that applications set while falling back to DEPLOYMENT_ENVIRONMENT.
 #
 # Requires yq (https://github.com/mikefarah/yq), jq, curl and otelcol-contrib
-# (override the binary with OTELCOL_CONTRIB=/path/to/otelcol-contrib).
+# (override the binary with OTELCOL_CONTRIB=/path/to/otelcol-contrib). node.yaml only validates on
+# Linux with the node's root filesystem at /hostfs; for a local run, `sudo ln -s / /hostfs`.
 set -euo pipefail
 
 repo=$(git rev-parse --show-toplevel)
