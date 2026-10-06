@@ -1,0 +1,32 @@
+# Observe Agent Helm chart values that the collector configurations in this directory are
+# generated from (make generate-oss-examples). The collection URL, token, and deployment
+# environment are placeholders that the generator replaces with environment variable references.
+observe:
+  collectionEndpoint:
+    value: https://123456789012.collect.observeinc.com/
+  token:
+    create: true
+    value: example-datastream:example-token
+
+cluster:
+  name: oss-example-cluster
+  deploymentEnvironment:
+    name: oss-example-environment
+
+application:
+  REDMetrics:
+    enabled: true
+
+gatewayDeployment:
+  enabled: false
+
+node:
+  forwarder:
+    metrics:
+      outputFormat: otel
+
+agent:
+  config:
+    global:
+      fleet:
+        enabled: false

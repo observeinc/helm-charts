@@ -131,3 +131,8 @@ generate-examples:
 		done; \
 	done; \
 	find charts/*/examples -type f -name '*.yaml' -exec perl -0777 -i -pe 's/[ \t]+$$//mg; s/\s+\z/\n/' {} +
+	$(MAKE) generate-oss-examples
+
+.PHONY: generate-oss-examples
+generate-oss-examples:
+	bash examples/oss-collector/generate.sh
