@@ -1,0 +1,21 @@
+# Merged on top of each rendered collector configuration before pruning. The chart's exporters
+# read variables that the observe-agent binary sets at startup (OBSERVE_OTEL_ENDPOINT,
+# OBSERVE_AUTHORIZATION_HEADER, ...); a plain collector reads these instead. Exporters a
+# configuration doesn't use are removed again by the pruning step.
+exporters:
+  otlphttp/observe/base:
+    endpoint: ${env:OBSERVE_COLLECTION_URL}/v2/otel
+    headers:
+      authorization: Bearer ${env:OBSERVE_TOKEN}
+  otlphttp/observe/forward/trace:
+    endpoint: ${env:OBSERVE_COLLECTION_URL}/v2/otel
+    headers:
+      authorization: Bearer ${env:OBSERVE_TOKEN}
+  otlphttp/observe/otel_metrics:
+    endpoint: ${env:OBSERVE_COLLECTION_URL}/v2/otel
+    headers:
+      authorization: Bearer ${env:OBSERVE_TOKEN}
+  prometheusremotewrite/observe:
+    endpoint: ${env:OBSERVE_COLLECTION_URL}/v1/prometheus
+    headers:
+      authorization: Bearer ${env:OBSERVE_TOKEN}

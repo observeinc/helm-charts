@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Checks the plain OpenTelemetry Collector examples in examples/oss-collector/kubernetes with
+# Checks the plain OpenTelemetry Collector examples in charts/agent/examples/oss-collector/collector with
 # upstream otelcol-contrib: every example must validate, and the forwarder example must keep the
 # deployment environment that applications set while falling back to DEPLOYMENT_ENVIRONMENT.
 #
@@ -9,7 +9,7 @@
 set -euo pipefail
 
 repo=$(git rev-parse --show-toplevel)
-EXAMPLES_DIR="$repo/examples/oss-collector/kubernetes"
+EXAMPLES_DIR="$repo/charts/agent/examples/oss-collector/collector"
 OTELCOL_CONTRIB="${OTELCOL_CONTRIB:-otelcol-contrib}"
 
 for cmd in yq jq curl "$OTELCOL_CONTRIB"; do

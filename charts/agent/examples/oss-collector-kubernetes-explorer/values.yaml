@@ -4,7 +4,7 @@
 # collector distributions don't include.
 #
 #   helm install observe-agent observe/agent --namespace observe \
-#     --values kubernetes-explorer-values.yaml \
+#     --values charts/agent/examples/oss-collector-kubernetes-explorer/values.yaml \
 #     --set observe.collectionEndpoint.value=<your collection URL> \
 #     --set observe.token.create=true --set observe.token.value=<your ingest token>
 cluster:

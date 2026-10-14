@@ -87,19 +87,19 @@ send_traces() {
   local now
   now="$(date +%s)000000000"
   local span="{\"resource\": {}, \"scopeSpans\": [{\"spans\": [{\"traceId\": \"0000000000000000000000000000000IDX\", \"spanId\": \"000000000000000IDX\", \"name\": \"GET /\", \"kind\": 2, \"startTimeUnixNano\": \"$now\", \"endTimeUnixNano\": \"$now\"}]}]}"
-  curl -sf -o /dev/null -H 'Content-Type: application/json' "http://$OTLP_HTTP/v1/traces" -d "{\"resourceSpans\": $(resources_json "$span")}"
+  curl -sSf -o /dev/null -H 'Content-Type: application/json' "http://$OTLP_HTTP/v1/traces" -d "{\"resourceSpans\": $(resources_json "$span")}"
 }
 
 send_logs() {
   local log='{"resource": {}, "scopeLogs": [{"logRecords": [{"body": {"stringValue": "hello"}}]}]}'
-  curl -sf -o /dev/null -H 'Content-Type: application/json' "http://$OTLP_HTTP/v1/logs" -d "{\"resourceLogs\": $(resources_json "$log")}"
+  curl -sSf -o /dev/null -H 'Content-Type: application/json' "http://$OTLP_HTTP/v1/logs" -d "{\"resourceLogs\": $(resources_json "$log")}"
 }
 
 send_metrics() {
   local now
   now="$(date +%s)000000000"
   local metric="{\"resource\": {}, \"scopeMetrics\": [{\"metrics\": [{\"name\": \"app.requests\", \"gauge\": {\"dataPoints\": [{\"asInt\": \"1\", \"timeUnixNano\": \"$now\"}]}}]}]}"
-  curl -sf -o /dev/null -H 'Content-Type: application/json' "http://$OTLP_HTTP/v1/metrics" -d "{\"resourceMetrics\": $(resources_json "$metric")}"
+  curl -sSf -o /dev/null -H 'Content-Type: application/json' "http://$OTLP_HTTP/v1/metrics" -d "{\"resourceMetrics\": $(resources_json "$metric")}"
 }
 
 # Prints "service=<deployment.environment.name>/<deployment.environment>" for the first

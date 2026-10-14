@@ -135,4 +135,4 @@ generate-examples:
 
 .PHONY: generate-oss-examples
 generate-oss-examples:
-	bash examples/oss-collector/generate.sh
+	bash charts/agent/examples/oss-collector/generate.sh
