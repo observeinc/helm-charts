@@ -58,6 +58,8 @@ receivers:
 processors:
 {{- include "config.processors.memory_limiter" . | nindent 2 }}
 
+{{- include "config.processors.transform.memory_limiter_legacy_names" . | nindent 2 }}
+
 {{- include "config.processors.batch" . | nindent 2 }}
 
 {{- include "config.processors.attributes.k8sattributes" . | nindent 2 }}
@@ -96,6 +98,7 @@ service:
         # Drop the service.name resource attribute (which is set to the prom scrape job name) before the k8sattributes processor
         processors:
           - memory_limiter
+          - transform/memory_limiter_legacy_names
           - resource/drop_service_name
           - k8sattributes
           {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
