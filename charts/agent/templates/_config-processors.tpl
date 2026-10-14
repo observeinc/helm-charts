@@ -187,6 +187,20 @@ memory_limiter:
   spike_limit_percentage: 15
 {{- end -}}
 
+{{- define "config.processors.transform.memory_limiter_legacy_names" -}}
+# Collector v0.155.0 renamed the memory_limiter metrics from otelcol_processor_* to
+# otelcol_processor_memory_limiter_*. Emit both names until content moves to the new ones.
+transform/memory_limiter_legacy_names:
+  error_mode: ignore
+  metric_statements:
+    - copy_metric(name="otelcol_processor_accepted_log_records_total") where metric.name == "otelcol_processor_memory_limiter_accepted_log_records_total"
+    - copy_metric(name="otelcol_processor_accepted_metric_points_total") where metric.name == "otelcol_processor_memory_limiter_accepted_metric_points_total"
+    - copy_metric(name="otelcol_processor_accepted_spans_total") where metric.name == "otelcol_processor_memory_limiter_accepted_spans_total"
+    - copy_metric(name="otelcol_processor_refused_log_records_total") where metric.name == "otelcol_processor_memory_limiter_refused_log_records_total"
+    - copy_metric(name="otelcol_processor_refused_metric_points_total") where metric.name == "otelcol_processor_memory_limiter_refused_metric_points_total"
+    - copy_metric(name="otelcol_processor_refused_spans_total") where metric.name == "otelcol_processor_memory_limiter_refused_spans_total"
+{{- end -}}
+
 {{- define "config.processors.attributes.observek8sattributes" -}}
 # This processor might edit the log body in-place, which might affect the output of transform/object.
 # Therefore, this processor must always be placed before transform/object in the pipeline.
