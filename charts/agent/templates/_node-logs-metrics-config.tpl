@@ -33,7 +33,10 @@ receivers:
     collection_interval: {{.Values.node.metrics.interval}}
     root_path: {{.Values.node.metrics.fileSystem.rootPath}}
     scrapers:
-      cpu: null
+      cpu:
+        metrics:
+          system.cpu.time:
+            attributes: [cpu, state]
       disk: null
       filesystem:
         exclude_fs_types:
