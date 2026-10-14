@@ -156,6 +156,21 @@ data:
             - set(attributes["observe_transform"]["identifiers"]["k8s.namespace.name"],
               resource.attributes["k8s.namespace.name"]) where resource.attributes["k8s.namespace.name"]
               != nil
+        transform/memory_limiter_legacy_names:
+          error_mode: ignore
+          metric_statements:
+          - copy_metric(name="otelcol_processor_accepted_log_records_total") where metric.name
+            == "otelcol_processor_memory_limiter_accepted_log_records_total"
+          - copy_metric(name="otelcol_processor_accepted_metric_points_total") where metric.name
+            == "otelcol_processor_memory_limiter_accepted_metric_points_total"
+          - copy_metric(name="otelcol_processor_accepted_spans_total") where metric.name
+            == "otelcol_processor_memory_limiter_accepted_spans_total"
+          - copy_metric(name="otelcol_processor_refused_log_records_total") where metric.name
+            == "otelcol_processor_memory_limiter_refused_log_records_total"
+          - copy_metric(name="otelcol_processor_refused_metric_points_total") where metric.name
+            == "otelcol_processor_memory_limiter_refused_metric_points_total"
+          - copy_metric(name="otelcol_processor_refused_spans_total") where metric.name
+            == "otelcol_processor_memory_limiter_refused_spans_total"
       receivers:
         heartbeat:
           auth_check:
@@ -227,6 +242,7 @@ data:
             - prometheusremotewrite/observe
             processors:
             - memory_limiter
+            - transform/memory_limiter_legacy_names
             - resource/drop_service_name
             - k8sattributes
             - resource/observe_common
