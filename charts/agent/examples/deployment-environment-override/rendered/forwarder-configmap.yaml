@@ -1,0 +1,107 @@
+---
+# Source: agent/templates/forwarder-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: forwarder
+  namespace: observe
+data:
+  relay: |
+      exporters:
+        debug/override:
+          sampling_initial: 2
+          sampling_thereafter: 1
+          verbosity: basic
+        loadbalancing/observe-gateway:
+          protocol:
+            otlp:
+              compression: snappy
+              tls:
+                insecure: true
+          resolver:
+            k8s:
+              service: example-gateway.observe
+          routing_key: traceID
+        otlp/gateway-service:
+          compression: snappy
+          endpoint: example-gateway.observe.svc.cluster.local:4317
+          tls:
+            insecure: true
+      processors:
+        batch:
+          send_batch_max_size: 4096
+          send_batch_size: 4096
+          timeout: 5s
+        filter/drop_long_spans:
+          error_mode: ignore
+          traces:
+            span:
+            - (span.end_time - span.start_time) > Duration("1h")
+        k8sattributes/passthrough:
+          passthrough: true
+        memory_limiter:
+          check_interval: 5s
+          limit_percentage: 80
+          spike_limit_percentage: 15
+        resource/observe_common:
+          attributes:
+          - action: upsert
+            key: k8s.cluster.name
+            value: ${env:OBSERVE_CLUSTER_NAME}
+          - action: upsert
+            key: k8s.cluster.uid
+            value: ${env:OBSERVE_CLUSTER_UID}
+          - action: upsert
+            key: deployment.environment.name
+            value: production
+          - action: upsert
+            key: deployment.environment
+            value: production
+        resourcedetection/cloud:
+          detectors:
+          - gcp
+          - ecs
+          - ec2
+          - azure
+          override: false
+          timeout: 2s
+      receivers:
+        otlp/app-telemetry:
+          protocols:
+            grpc:
+              endpoint: ${env:MY_POD_IP}:4317
+            http:
+              endpoint: ${env:MY_POD_IP}:4318
+      service:
+        pipelines:
+          logs/observe-forward:
+            exporters:
+            - otlp/gateway-service
+            processors:
+            - memory_limiter
+            - k8sattributes/passthrough
+            - batch
+            - resourcedetection/cloud
+            receivers:
+            - otlp/app-telemetry
+          metrics/observe-forward:
+            exporters:
+            - otlp/gateway-service
+            processors:
+            - memory_limiter
+            - k8sattributes/passthrough
+            - batch
+            - resourcedetection/cloud
+            receivers:
+            - otlp/app-telemetry
+          traces/observe-forward:
+            exporters:
+            - loadbalancing/observe-gateway
+            processors:
+            - filter/drop_long_spans
+            - memory_limiter
+            - k8sattributes/passthrough
+            - batch
+            - resourcedetection/cloud
+            receivers:
+            - otlp/app-telemetry

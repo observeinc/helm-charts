@@ -1,0 +1,21 @@
+# Sets a cluster deployment environment. By default it is a fallback: telemetry that already sets
+# deployment.environment.name or deployment.environment (for example with OTEL_RESOURCE_ATTRIBUTES
+# or a resource.opentelemetry.io/deployment.environment.name pod annotation) keeps its own value,
+# and everything else gets "production".
+observe:
+  token:
+    create: true
+
+cluster:
+  deploymentEnvironment:
+    name: production
+
+application:
+  REDMetrics:
+    enabled: true
+
+node:
+  forwarder:
+    enabled: true
+    metrics:
+      outputFormat: otel

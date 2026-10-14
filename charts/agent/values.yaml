@@ -46,6 +46,11 @@ cluster:
     # -- deployment environment cluster runs in (e.g. testing, production, etc).
     # populates to deployment.environment.name per https://opentelemetry.io/docs/specs/semconv/resource/deployment-environment/
     name: ""
+    # -- When false, `name` is only applied to telemetry that does not already set `deployment.environment.name`
+    # or `deployment.environment` (e.g. via `OTEL_RESOURCE_ATTRIBUTES` or the
+    # `resource.opentelemetry.io/deployment.environment.name` pod annotation). When true, `name` overrides any
+    # deployment environment set by applications.
+    overrideApplication: false
   # configure k8sattributes processor metadata collection behavior
   metadata:
     # -- whether to wait for the initial metadata poll to complete before processing telemetry
