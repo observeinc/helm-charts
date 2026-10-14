@@ -99,7 +99,7 @@ resource/observe_common:
       value:  ${env:OBSERVE_CLUSTER_UID}
       {{ end -}}
     {{ if .Values.cluster.deploymentEnvironment.name }}
-    {{- if eq (include "config.deploymentEnvironment.overridesApplication" .) "true" }}
+    {{- if .Values.cluster.deploymentEnvironment.overrideApplication }}
     - key: deployment.environment.name
       action: upsert
       value: {{ .Values.cluster.deploymentEnvironment.name }}
@@ -124,16 +124,6 @@ resource/observe_common:
       value: {{ .Values.cluster.deploymentEnvironment.name }}
     {{- end }}
     {{ end }}
-{{- end -}}
-
-{{/*
-  "true" when cluster.deploymentEnvironment.name is set and must override any
-  deployment environment that application telemetry already carries.
-*/}}
-{{- define "config.deploymentEnvironment.overridesApplication" -}}
-{{- if and .Values.cluster.deploymentEnvironment.name .Values.cluster.deploymentEnvironment.overrideApplication -}}
-true
-{{- end -}}
 {{- end -}}
 
 {{- define "config.processors.resource.node_name" -}}
