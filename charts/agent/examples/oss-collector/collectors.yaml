@@ -1,0 +1,27 @@
+# The plain OpenTelemetry Collector configurations that generate.sh writes to collector/. Each one
+# comes from a collector ConfigMap in rendered/: otel-config.yaml is merged on top, then only the
+# listed pipelines and extensions are kept, and every component they don't use is deleted.
+- configmap: forwarder
+  output: forwarder.yaml
+  description: DaemonSet collector that receives application traces, logs, and metrics over OTLP and generates RED metrics.
+  pipelines:
+    - traces/observe-forward
+    - logs/observe-forward
+    - metrics/observe-forward
+    - traces/spanmetrics
+    - metrics/spanmetrics
+    - metrics/spanmetrics/summary
+- configmap: node-logs-metrics
+  output: node.yaml
+  description: DaemonSet collector for container logs, kubelet stats, and node metrics.
+  pipelines:
+    - logs
+    - metrics/hostmetrics
+    - metrics/kubeletstats
+  extensions:
+    - file_storage
+- configmap: cluster-metrics
+  output: cluster-metrics.yaml
+  description: Single-replica Deployment collector for cluster-level Kubernetes metrics.
+  pipelines:
+    - metrics

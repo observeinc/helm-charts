@@ -1,7 +1,7 @@
 # DaemonSet collector for container logs, kubelet stats, and node metrics.
 #
-# GENERATED FILE, DO NOT EDIT. This file is generated from the Observe Agent Helm chart with
-# reference-values.yaml. Run "make generate-oss-examples" to regenerate it.
+# GENERATED FILE, DO NOT EDIT. Run "make generate-examples" to regenerate it from the Observe
+# Agent Helm chart (see README.md).
 #
 # Set these environment variables on the collector container:
 #   DEPLOYMENT_ENVIRONMENT   Fallback deployment.environment.name for telemetry that does not set one
@@ -314,3 +314,4 @@ service:
         - attributes/debug_source_kubeletstats_metrics
       receivers:
         - kubeletstats
+  extensions: ["file_storage"]
