@@ -145,7 +145,7 @@ transform/add_resource_container_name:
     - context: resource
       statements:
       # Extract filename from path (no path, no extension) using regex
-      - set(attributes["k8s.container.name"], attributes["log.file.path"])
+      - set(attributes["k8s.container.name"], attributes["log.file.path"]) where attributes["log.file.path"] != nil
       - replace_pattern(attributes["k8s.container.name"], "^(?:.*/)?([^/]+)\\..*$", "$$1")
 {{- end -}}
 
@@ -167,15 +167,15 @@ transform/k8sheartbeat:
   log_statements:
     - context: log
       statements:
-        - set(attributes["observe_transform"]["identifiers"]["host.name"], resource.attributes["k8s.node.name"])
-        - set(attributes["observe_transform"]["identifiers"]["k8s.pod.uid"], resource.attributes["k8s.pod.uid"])
-        - set(attributes["observe_transform"]["identifiers"]["k8s.pod.name"], resource.attributes["k8s.pod.name"])
-        - set(attributes["observe_transform"]["identifiers"]["k8s.deployment.name"], resource.attributes["k8s.deployment.name"])
-        - set(attributes["observe_transform"]["identifiers"]["k8s.daemonset.name"], resource.attributes["k8s.daemonset.name"])
-        - set(attributes["observe_transform"]["identifiers"]["deployment.environment.name"], resource.attributes["deployment.environment.name"])
-        - set(attributes["observe_transform"]["identifiers"]["k8s.cluster.uid"], resource.attributes["k8s.cluster.uid"])
-        - set(attributes["observe_transform"]["identifiers"]["k8s.cluster.name"], resource.attributes["k8s.cluster.name"])
-        - set(attributes["observe_transform"]["identifiers"]["k8s.namespace.name"], resource.attributes["k8s.namespace.name"])
+        - set(attributes["observe_transform"]["identifiers"]["host.name"], resource.attributes["k8s.node.name"]) where resource.attributes["k8s.node.name"] != nil
+        - set(attributes["observe_transform"]["identifiers"]["k8s.pod.uid"], resource.attributes["k8s.pod.uid"]) where resource.attributes["k8s.pod.uid"] != nil
+        - set(attributes["observe_transform"]["identifiers"]["k8s.pod.name"], resource.attributes["k8s.pod.name"]) where resource.attributes["k8s.pod.name"] != nil
+        - set(attributes["observe_transform"]["identifiers"]["k8s.deployment.name"], resource.attributes["k8s.deployment.name"]) where resource.attributes["k8s.deployment.name"] != nil
+        - set(attributes["observe_transform"]["identifiers"]["k8s.daemonset.name"], resource.attributes["k8s.daemonset.name"]) where resource.attributes["k8s.daemonset.name"] != nil
+        - set(attributes["observe_transform"]["identifiers"]["deployment.environment.name"], resource.attributes["deployment.environment.name"]) where resource.attributes["deployment.environment.name"] != nil
+        - set(attributes["observe_transform"]["identifiers"]["k8s.cluster.uid"], resource.attributes["k8s.cluster.uid"]) where resource.attributes["k8s.cluster.uid"] != nil
+        - set(attributes["observe_transform"]["identifiers"]["k8s.cluster.name"], resource.attributes["k8s.cluster.name"]) where resource.attributes["k8s.cluster.name"] != nil
+        - set(attributes["observe_transform"]["identifiers"]["k8s.namespace.name"], resource.attributes["k8s.namespace.name"]) where resource.attributes["k8s.namespace.name"] != nil
 {{- end -}}
 
 {{- define "config.processors.memory_limiter" -}}
@@ -299,8 +299,8 @@ filter/drop_long_spans:
 transform/add_empty_service_attributes:
   error_mode: ignore
   trace_statements:
-    - set(resource.attributes["deployment.environment.name"], Coalesce([resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"]]))
-    - set(resource.attributes["deployment.environment"], Coalesce([resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]]))
+    - set(resource.attributes["deployment.environment.name"], Coalesce([resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"]])) where resource.attributes["deployment.environment.name"] != nil or resource.attributes["deployment.environment"] != nil
+    - set(resource.attributes["deployment.environment"], Coalesce([resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]])) where resource.attributes["deployment.environment"] != nil or resource.attributes["deployment.environment.name"] != nil
     # Default any still-missing attributes to an empty string.
     - set(resource.attributes["service.name"], "") where resource.attributes["service.name"] == nil
     - set(resource.attributes["service.namespace"], "") where resource.attributes["service.namespace"] == nil
@@ -313,14 +313,14 @@ transform/add_empty_service_attributes:
 transform/deployment_environment_compatability:
   error_mode: ignore
   trace_statements:
-    - set(resource.attributes["deployment.environment.name"], Coalesce([resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"]]))
-    - set(resource.attributes["deployment.environment"], Coalesce([resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]]))
+    - set(resource.attributes["deployment.environment.name"], Coalesce([resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"]])) where resource.attributes["deployment.environment.name"] != nil or resource.attributes["deployment.environment"] != nil
+    - set(resource.attributes["deployment.environment"], Coalesce([resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]])) where resource.attributes["deployment.environment"] != nil or resource.attributes["deployment.environment.name"] != nil
   log_statements:
-    - set(resource.attributes["deployment.environment.name"], Coalesce([resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"]]))
-    - set(resource.attributes["deployment.environment"], Coalesce([resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]]))
+    - set(resource.attributes["deployment.environment.name"], Coalesce([resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"]])) where resource.attributes["deployment.environment.name"] != nil or resource.attributes["deployment.environment"] != nil
+    - set(resource.attributes["deployment.environment"], Coalesce([resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]])) where resource.attributes["deployment.environment"] != nil or resource.attributes["deployment.environment.name"] != nil
   metric_statements:
-    - set(resource.attributes["deployment.environment.name"], Coalesce([resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"]]))
-    - set(resource.attributes["deployment.environment"], Coalesce([resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]]))
+    - set(resource.attributes["deployment.environment.name"], Coalesce([resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"]])) where resource.attributes["deployment.environment.name"] != nil or resource.attributes["deployment.environment"] != nil
+    - set(resource.attributes["deployment.environment"], Coalesce([resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]])) where resource.attributes["deployment.environment"] != nil or resource.attributes["deployment.environment.name"] != nil
 {{- end }}
 {{- end -}}
 
@@ -347,8 +347,8 @@ attributes/debug_source_span_metrics:
 transform/shape_spans_for_red_metrics:
   error_mode: ignore
   trace_statements:
-    - set(span.attributes["peer.db.name"], Coalesce([span.attributes["peer.db.name"], span.attributes["db.system.name"], span.attributes["db.system"]]))
-    - set(span.attributes["peer.messaging.system"], Coalesce([span.attributes["peer.messaging.system"], span.attributes["messaging.system"]]))
+    - set(span.attributes["peer.db.name"], Coalesce([span.attributes["peer.db.name"], span.attributes["db.system.name"], span.attributes["db.system"]])) where span.attributes["peer.db.name"] != nil or span.attributes["db.system.name"] != nil or span.attributes["db.system"] != nil
+    - set(span.attributes["peer.messaging.system"], Coalesce([span.attributes["peer.messaging.system"], span.attributes["messaging.system"]])) where span.attributes["peer.messaging.system"] != nil or span.attributes["messaging.system"] != nil
     # Needed because `spanmetrics` connector can only operate on attributes or resource attributes.
     - set(span.attributes["otel.status_description"], span.status.message) where span.status.message != ""
 
