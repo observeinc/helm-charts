@@ -303,7 +303,12 @@ alternateConfig:
       collection_interval: 60s
       root_path: /hostfs
       scrapers:
-        cpu: null
+        cpu:
+          metrics:
+            system.cpu.time:
+              attributes:
+                - cpu
+                - state
         disk: null
         filesystem:
           exclude_fs_types:
