@@ -25,8 +25,13 @@ export OBSERVE_CLUSTER_NAME=example-cluster OBSERVE_CLUSTER_UID=example-cluster-
 export MY_POD_IP=127.0.0.1 K8S_NODE_NAME=example-node
 export DEPLOYMENT_ENVIRONMENT=prod
 
+# feature_gates <example>: prints the arguments that the example's header says to start it with.
+feature_gates() {
+  sed -nE 's/^#   (--feature-gates=[^ ]+)$/\1/p' "$1"
+}
+
 run_collector() {
-  exec "$OTELCOL_CONTRIB" --config "$1"
+  exec "$OTELCOL_CONTRIB" --config "$1" $collector_args
 }
 
 echo "otelcol-contrib version: $("$OTELCOL_CONTRIB" --version)"
@@ -53,13 +58,13 @@ users:
 EOF
 export KUBECONFIG="$tmp/kubeconfig"
 
-for config in "$EXAMPLES_DIR"/forwarder.yaml "$EXAMPLES_DIR"/node.yaml "$EXAMPLES_DIR"/cluster-metrics.yaml; do
+for config in "$EXAMPLES_DIR"/*.yaml; do
   name=$(basename "$config")
   yq '
     (.receivers | select(has("kubeletstats")) | .kubeletstats.auth_type) = "none" |
     (.receivers | select(has("kubeletstats")) | .kubeletstats.k8s_api_config.auth_type) = "kubeConfig"
   ' "$config" > "$tmp/$name"
-  if "$OTELCOL_CONTRIB" validate --config "$tmp/$name" > "$tmp/validate.log" 2>&1; then
+  if "$OTELCOL_CONTRIB" validate --config "$tmp/$name" $(feature_gates "$config") > "$tmp/validate.log" 2>&1; then
     pass "$name validates"
   else
     cat "$tmp/validate.log" >&2
@@ -70,6 +75,7 @@ done
 out="$tmp/forwarder"
 mkdir -p "$out"
 make_testable "$EXAMPLES_DIR/forwarder.yaml" "$out" "$APP_PIPELINES"
+collector_args=$(feature_gates "$EXAMPLES_DIR/forwarder.yaml")
 if start_collector "forwarder.yaml" "$out"; then
   check_app_pipelines "forwarder.yaml" "$out" "legacy-env=staging/staging new-env=dev/dev no-env=prod/prod"
   stop_collector "forwarder.yaml" "$out"

@@ -18,6 +18,8 @@ Each collector configuration lists, at the top, the environment variables it rea
 - `DEPLOYMENT_ENVIRONMENT`: the fallback `deployment.environment.name`. Telemetry that already sets an environment, for example with `OTEL_RESOURCE_ATTRIBUTES` or a `resource.opentelemetry.io/deployment.environment.name` pod annotation, keeps its own value. See [Set the deployment environment](https://docs.observeinc.com/docs/set-the-deployment-environment#/).
 - `MY_POD_IP` and `K8S_NODE_NAME`: from the downward API (`status.podIP` and `spec.nodeName`).
 
+Start each collector with the `--feature-gates` argument listed under the variables, as the chart does. Without it the collector still starts, but parts of the configuration behave differently than in the chart.
+
 The collectors also need:
 
 - A service account with read access to pods, namespaces, nodes, ReplicaSets, Deployments, and the other workload resources, for the `k8sattributes` processor and the `k8s_cluster` receiver. `node.yaml` also needs access to the `nodes/stats` and `nodes/proxy` resources for kubelet stats.
@@ -34,11 +36,14 @@ The files in `collector/` are generated, so don't edit them by hand. This direct
 
 1. Takes the collector configuration from its rendered ConfigMap and merges [`otel-config.yaml`](otel-config.yaml) on top. That replaces the variables the Observe Agent sets for itself, such as `OBSERVE_OTEL_ENDPOINT`, with the variables above.
 2. Keeps only the listed pipelines and extensions, and deletes every component they don't use.
-3. Fails, leaving the committed files untouched, if the result reads an environment variable it has no description for.
+3. Copies the feature gates from the collector's rendered DaemonSet or Deployment into the file's header.
+4. Fails, leaving the committed files untouched, if the result reads an environment variable it has no description for.
+
+The script then replaces `collector/` with the new files, so a configuration removed from `collectors.yaml` is deleted too.
 
 These checks run in CI:
 
 - `check-examples` regenerates all examples and fails if the committed files differ, so a chart change that affects the collectors also updates these files.
-- The `OSS collector examples` workflow runs [`test/verify_oss_examples.sh`](../../../../test/verify_oss_examples.sh): each configuration must validate with upstream `otelcol-contrib`, and the forwarder must keep the deployment environment that applications set. Pull requests use the collector version of the Observe Agent release that the chart deploys; a weekly run uses the latest `otelcol-contrib` release.
+- The `OSS collector examples` workflow runs [`test/verify_oss_examples.sh`](../../../../test/verify_oss_examples.sh): each configuration must validate with upstream `otelcol-contrib` and the feature gates in its header, and the forwarder must keep the deployment environment that applications set. Pull requests use the collector version of the Observe Agent release that the chart deploys; a weekly run uses the latest `otelcol-contrib` release.
 
 To change what the examples contain, change the chart templates, `values.yaml`, `otel-config.yaml`, or `collectors.yaml`, then run `make generate-examples`.
