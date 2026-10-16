@@ -11,7 +11,9 @@ set -euo pipefail
 
 dir=$(cd "$(dirname "$0")" && pwd)
 out_dir="$dir/collector"
-mkdir -p "$out_dir"
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+mkdir -p "$work/collector"
 
 # Descriptions for every environment variable a generated configuration may reference. The
 # generator fails on a variable that isn't listed here, which catches chart variables that a plain
@@ -66,25 +68,33 @@ generate() {
   pipelines=$(yq -o=json -I=0 ".[$index].pipelines" "$dir/collectors.yaml")
   extensions=$(yq -o=json -I=0 ".[$index].extensions // []" "$dir/collectors.yaml")
 
-  local rendered="$dir/rendered/$configmap-configmap.yaml" work
-  work=$(mktemp -d)
-  trap 'rm -rf "$work"' RETURN
-  yq -e '.data.relay' "$rendered" > "$work/relay.yaml"
-  yq ". * (load(\"$dir/otel-config.yaml\") | ... comments = \"\")" "$work/relay.yaml" > "$work/merged.yaml"
+  local rendered="$dir/rendered/$configmap-configmap.yaml" tmp="$work/$index"
+  mkdir -p "$tmp"
+  yq -e '.data.relay' "$rendered" > "$tmp/relay.yaml"
+  yq ". * (load(\"$dir/otel-config.yaml\") | ... comments = \"\")" "$tmp/relay.yaml" > "$tmp/merged.yaml"
+
+  # The chart passes feature gates as container arguments, not in the collector configuration.
+  local workloads=("$dir/rendered/$configmap"/*.yaml) gates
+  yq ea -e '[select(.kind == "DaemonSet" or .kind == "Deployment" or .kind == "StatefulSet")] | length == 1' "${workloads[@]}" > /dev/null 2>&1 ||
+    { echo "error: $output: expected one DaemonSet, Deployment, or StatefulSet in $dir/rendered/$configmap" >&2; return 1; }
+  gates=$(yq ea -r '
+    select(.kind == "DaemonSet" or .kind == "Deployment" or .kind == "StatefulSet") |
+    .spec.template.spec.containers[].args[] | select(test("^--feature-gates=")) | sub("^--feature-gates=", "")
+  ' "${workloads[@]}" | paste -sd, -)
 
   local pipeline
   for pipeline in $(yq -r '.[]' <<< "$pipelines"); do
-    yq -e ".service.pipelines.\"$pipeline\"" "$work/merged.yaml" > /dev/null 2>&1 ||
+    yq -e ".service.pipelines.\"$pipeline\"" "$tmp/merged.yaml" > /dev/null 2>&1 ||
       { echo "error: $output: pipeline $pipeline is not in $rendered" >&2; return 1; }
   done
   local extension
   for extension in $(yq -r '.[]' <<< "$extensions"); do
-    yq -e ".extensions.\"$extension\"" "$work/merged.yaml" > /dev/null 2>&1 ||
+    yq -e ".extensions.\"$extension\"" "$tmp/merged.yaml" > /dev/null 2>&1 ||
       { echo "error: $output: extension $extension is not in $rendered" >&2; return 1; }
   done
 
-  prune "$work/merged.yaml" "$pipelines" "$extensions" > "$work/config.yaml"
-  if yq -e '.service.pipelines[] | select((.receivers | length) == 0 or (.exporters | length) == 0)' "$work/config.yaml" > /dev/null 2>&1; then
+  prune "$tmp/merged.yaml" "$pipelines" "$extensions" > "$tmp/config.yaml"
+  if yq -e '.service.pipelines[] | select((.receivers | length) == 0 or (.exporters | length) == 0)' "$tmp/config.yaml" > /dev/null 2>&1; then
     echo "error: $output: a pipeline has no receivers or exporters left after removing connectors with no kept pipeline on the other side" >&2
     return 1
   fi
@@ -97,20 +107,28 @@ generate() {
     echo "#"
     echo "# Set these environment variables on the collector container:"
     local var
-    for var in $(grep -oE '\$\{env:[A-Za-z0-9_]+\}' "$work/config.yaml" | sed -E 's/\$\{env:([A-Za-z0-9_]+)\}/\1/' | sort -u); do
+    for var in $(grep -oE '\$\{env:[A-Za-z0-9_]+\}' "$tmp/config.yaml" | sed -E 's/\$\{env:([A-Za-z0-9_]+)\}/\1/' | sort -u); do
       if ! describe_env "$var" > /dev/null; then
         echo "error: $output references \${env:$var}; replace it in otel-config.yaml or describe it in describe_env in $0" >&2
         return 1
       fi
       printf '#   %-24s %s\n' "$var" "$(describe_env "$var")"
     done
-    cat "$work/config.yaml"
-  } > "$work/output.yaml"
-  # Replace the committed file only once everything above succeeded.
-  mv "$work/output.yaml" "$out_dir/$output"
+    if [ -n "$gates" ]; then
+      echo "#"
+      echo "# Start the collector with these arguments, as the chart does:"
+      echo "#   --feature-gates=$gates"
+    fi
+    cat "$tmp/config.yaml"
+  } > "$work/collector/$output"
 }
 
 count=$(yq 'length' "$dir/collectors.yaml")
 for ((i = 0; i < count; i++)); do
   generate "$i"
 done
+
+# Replace collector/ only once every configuration generated, so that outputs no longer listed in
+# collectors.yaml are removed too.
+rm -rf "$out_dir"
+mv "$work/collector" "$out_dir"
