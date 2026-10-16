@@ -1,0 +1,28 @@
+# Chart values that the plain OpenTelemetry Collector configurations in collector/ are generated
+# from (see README.md). The deployment environment is a ${env:...} reference, so the generated
+# configurations read it from the collector's environment at startup.
+observe:
+  token:
+    create: true
+
+cluster:
+  deploymentEnvironment:
+    name: ${env:DEPLOYMENT_ENVIRONMENT}
+
+application:
+  REDMetrics:
+    enabled: true
+
+gatewayDeployment:
+  enabled: false
+
+node:
+  forwarder:
+    metrics:
+      outputFormat: otel
+
+agent:
+  config:
+    global:
+      fleet:
+        enabled: false
