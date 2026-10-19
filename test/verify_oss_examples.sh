@@ -5,6 +5,8 @@
 # while falling back to DEPLOYMENT_ENVIRONMENT. Each values file must render, with the pinned
 # OpenTelemetry Collector chart, into exactly that configuration and set what it reads.
 #
+# Set EXPECTED_COLLECTOR_VERSION to also check that the values are pinned to that collector version.
+#
 # Requires yq (https://github.com/mikefarah/yq), jq, curl, helm and otelcol-contrib
 # (override the binary with OTELCOL_CONTRIB=/path/to/otelcol-contrib). node-values.yaml only
 # validates on Linux with the node's root filesystem at /hostfs; for a local run, `sudo ln -s / /hostfs`.
@@ -38,8 +40,8 @@ run_collector() {
 
 echo "otelcol-contrib version: $("$OTELCOL_CONTRIB" --version)"
 
-# Validation builds the receivers, and kubeletstats' serviceAccount auth needs in-cluster
-# credentials. Validate its configuration against a kubeconfig that is parsed but never contacted.
+# Validation builds the receivers, and the serviceAccount auth of kubeletstats and k8sobjects needs
+# in-cluster credentials. Validate them against a kubeconfig that is parsed but never contacted.
 cat > "$tmp/kubeconfig" <<'EOF'
 apiVersion: v1
 kind: Config
@@ -59,10 +61,30 @@ users:
       token: validate
 EOF
 export KUBECONFIG="$tmp/kubeconfig"
+# Prometheus scrapes that authenticate with the pod's service account read its token and CA
+# certificate; validate them against placeholder files.
+mkdir -p "$tmp/serviceaccount"
+echo validate > "$tmp/serviceaccount/token"
+: > "$tmp/serviceaccount/ca.crt"
 
 chart_name=$(yq '.name' "$OSS_DIR/scripts/upstream-chart.yaml")
 helm pull "$chart_name" --repo "$(yq '.repository' "$OSS_DIR/scripts/upstream-chart.yaml")" \
   --version "$(yq '.version' "$OSS_DIR/scripts/upstream-chart.yaml")" --untar --untardir "$tmp/chart"
+
+collector_version=$(yq '.collectorVersion' "$OSS_DIR/scripts/upstream-chart.yaml")
+chart_app_version=$(yq '.appVersion' "$tmp/chart/$chart_name/Chart.yaml")
+if [ "$chart_app_version" = "$collector_version" ]; then
+  pass "the pinned chart's appVersion is collectorVersion $collector_version"
+else
+  fail "the pinned chart's appVersion is collectorVersion $collector_version (it is $chart_app_version)"
+fi
+if [ -n "${EXPECTED_COLLECTOR_VERSION:-}" ]; then
+  if [ "$collector_version" = "$EXPECTED_COLLECTOR_VERSION" ]; then
+    pass "collectorVersion is the Observe Agent's collector version $EXPECTED_COLLECTOR_VERSION"
+  else
+    fail "collectorVersion is the Observe Agent's collector version $EXPECTED_COLLECTOR_VERSION (it is $collector_version; update scripts/upstream-chart.yaml)"
+  fi
+fi
 
 for values in "$OSS_DIR"/*-values.yaml; do
   name=$(basename "$values" -values.yaml)
@@ -70,9 +92,11 @@ for values in "$OSS_DIR"/*-values.yaml; do
   config="$tmp/$name.yaml"
   yq '.alternateConfig' "$values" > "$config"
 
-  yq '
+  SERVICEACCOUNT=$tmp/serviceaccount yq '
     (.receivers | select(has("kubeletstats")) | .kubeletstats.auth_type) = "none" |
-    (.receivers | select(has("kubeletstats")) | .kubeletstats.k8s_api_config.auth_type) = "kubeConfig"
+    (.receivers | select(has("kubeletstats")) | .kubeletstats.k8s_api_config.auth_type) = "kubeConfig" |
+    (.receivers | with_entries(select(.key | test("^k8sobjects(/|$)"))) | .[].auth_type) = "kubeConfig" |
+    (.. | select(tag == "!!str" and test("^/var/run/secrets/kubernetes.io/serviceaccount/"))) |= sub("^/var/run/secrets/kubernetes.io/serviceaccount/", strenv(SERVICEACCOUNT) + "/")
   ' "$config" > "$tmp/$name-validate.yaml"
   if "$OTELCOL_CONTRIB" validate --config "$tmp/$name-validate.yaml" $(feature_gates "$values") > "$tmp/validate.log" 2>&1; then
     pass "$label configuration validates"
@@ -111,6 +135,12 @@ for values in "$OSS_DIR"/*-values.yaml; do
     fail "$label sets every variable the configuration reads, once (duplicated:${duplicates:+ }$duplicates; missing:$missing)"
   fi
 
+  if [ "$(yq '.image.tag' "$values")" = "$collector_version" ]; then
+    pass "$label pins the image to otelcol-contrib $collector_version"
+  else
+    fail "$label pins the image to otelcol-contrib $collector_version"
+  fi
+
   gates=$(feature_gates "$values")
   if [ -z "$gates" ] || GATES=$gates yq -e '.args[] | select(. == strenv(GATES))' "$tmp/$name-container.yaml" > /dev/null 2>&1; then
     pass "$label passes the feature gates"
@@ -135,6 +165,76 @@ for values in "$OSS_DIR"/*-values.yaml; do
     fail "$label only opens ports the configuration listens on (unused:$unused)"
   fi
 done
+
+# Kubernetes objects from k8sobjects include Secrets, whose values must not reach Observe.
+for values in "$OSS_DIR"/*-values.yaml; do
+  label=$(basename "$values")
+  unredacted=$(yq '
+    .alternateConfig as $c |
+    [$c.receivers | to_entries[] | select(.key | test("^k8sobjects(/|$)")) | select(.value.objects[]?.name == "secrets") | .key] as $secret_receivers |
+    [$c.service.pipelines | to_entries[] |
+      select(.value.receivers | any_c(. as $r | $secret_receivers | any_c(. == $r))) |
+      select(.value.processors | any_c(. == "transform/redact_secrets") | not) | .key] | join(" ")
+  ' "$values")
+  if [ -z "$unredacted" ]; then
+    pass "$label redacts Secrets in every pipeline that receives them"
+  else
+    fail "$label redacts Secrets in every pipeline that receives them (missing transform/redact_secrets: $unredacted)"
+  fi
+done
+
+# Send a pulled and a watched Secret through the cluster-events processors that run before
+# transform/object, and check that what comes out is redacted.
+redaction="$tmp/redaction"
+mkdir -p "$redaction"
+yq '.alternateConfig as $c | {
+  "receivers": {"otlp": {"protocols": {"http": {"endpoint": "127.0.0.1:4319"}}}},
+  "processors": {
+    "transform/unify": $c.processors["transform/unify"],
+    "transform/redact_secrets": $c.processors["transform/redact_secrets"]
+  },
+  "exporters": {"file": {"path": "'"$redaction"'/out.json"}},
+  "service": {
+    "telemetry": {"metrics": {"level": "none"}},
+    "pipelines": {"logs": {"receivers": ["otlp"], "processors": ["transform/unify", "transform/redact_secrets"], "exporters": ["file"]}}
+  }
+}' "$OSS_DIR/cluster-events-values.yaml" > "$redaction/collector.yaml"
+"$OTELCOL_CONTRIB" --config "$redaction/collector.yaml" > "$redaction/collector.log" 2>&1 &
+redaction_pid=$!
+secret='{"apiVersion": "v1", "kind": "Secret", "metadata": {"name": "example", "namespace": "default",
+  "annotations": {"kubectl.kubernetes.io/last-applied-configuration": "{\"data\":{\"token\":\"c2VjcmV0LXZhbHVl\"}}", "keep": "yes"}},
+  "data": {"token": "c2VjcmV0LXZhbHVl"}, "stringData": {"password": "secret-value\nsecond line"}}'
+jq -n --argjson secret "$secret" '
+  def anyvalue: if type == "object" then {kvlistValue: {values: [to_entries[] | {key, value: (.value | anyvalue)}]}}
+    elif type == "array" then {arrayValue: {values: map(anyvalue)}} else {stringValue: tostring} end;
+  {resourceLogs: [{scopeLogs: [{logRecords: [
+    {body: ($secret | anyvalue)},
+    {body: ({type: "ADDED", object: $secret} | anyvalue)}
+  ]}]}]}' > "$redaction/logs.json"
+sent=false
+for _ in $(seq 1 30); do
+  if curl -sf -o /dev/null -H 'Content-Type: application/json' --data @"$redaction/logs.json" http://127.0.0.1:4319/v1/logs; then
+    sent=true
+    break
+  fi
+  sleep 1
+done
+sleep 2
+kill "$redaction_pid" 2> /dev/null
+wait "$redaction_pid" 2> /dev/null
+bodies=$(jq -c '
+  def plain: if .kvlistValue then ((.kvlistValue.values // []) | map({key, value: (.value | plain)}) | from_entries)
+    elif .arrayValue then (.arrayValue.values | map(plain)) elif has("stringValue") then .stringValue else . end;
+  .resourceLogs[].scopeLogs[].logRecords[].body | plain' "$redaction/out.json" 2> /dev/null)
+if [ "$sent" = true ] && [ "$(wc -l <<< "$bodies")" -eq 2 ] && ! grep -q 'secret-value\|c2VjcmV0LXZhbHVl' <<< "$bodies" &&
+  jq -se 'all(.[]; .data.token == "UkVEQUNURUQ=" and .stringData.password == "REDACTED"
+    and (.metadata.annotations | has("kubectl.kubernetes.io/last-applied-configuration") | not) and .metadata.annotations.keep == "yes")' <<< "$bodies" > /dev/null; then
+  pass "cluster-events-values.yaml redacts pulled and watched Secrets"
+else
+  cat "$redaction/collector.log" >&2
+  echo "$bodies" >&2
+  fail "cluster-events-values.yaml redacts pulled and watched Secrets"
+fi
 
 out="$tmp/forwarder"
 mkdir -p "$out"

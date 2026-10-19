@@ -3,7 +3,9 @@
 # GENERATED FILE, DO NOT EDIT. Run "make generate-examples" to regenerate it from the Observe
 # Agent Helm chart (see scripts/README.md).
 #
-# Values for the opentelemetry-collector Helm chart. Create the observe-collector Secret (see README.md), then:
+# Values for the opentelemetry-collector Helm chart 0.155.0, running otelcol-contrib 0.151.0, the
+# collector version of the Observe Agent the values are generated from. Create the observe-collector
+# Secret (see README.md), then:
 #
 #   helm install observe-node opentelemetry-collector --repo https://open-telemetry.github.io/opentelemetry-helm-charts \
 #     --version 0.155.0 --namespace observe --values node-values.yaml
@@ -17,6 +19,7 @@
 mode: daemonset
 image:
   repository: otel/opentelemetry-collector-contrib
+  tag: 0.151.0
 command:
   extraArgs:
     - --feature-gates=+exporter.prometheusremotewritexporter.EnableMultipleWorkers
@@ -76,6 +79,12 @@ extraVolumeMounts:
     mountPropagation: HostToContainer
     name: hostfs
     readOnly: true
+podAnnotations:
+  observe_monitor_path: /metrics
+  observe_monitor_port: "8888"
+  observe_monitor_purpose: observecollection
+  observe_monitor_scrape: "true"
+  observeinc_com_scrape: "false"
 securityContext:
   runAsGroup: 0
   runAsUser: 0
@@ -135,13 +144,16 @@ alternateConfig:
         max_interval: 30s
       send_metadata: true
       target_info:
-        enabled: false
+        enabled: true
       timeout: 10s
   extensions:
     file_storage:
       create_directory: true
     health_check:
       endpoint: ${env:MY_POD_IP}:13133
+    cgroupruntime:
+      gomaxprocs:
+        enabled: true
   processors:
     attributes/debug_source_hostmetrics:
       actions:
@@ -198,7 +210,7 @@ alternateConfig:
               name: k8s.pod.uid
         - sources:
             - from: connection
-      wait_for_metadata: false
+      wait_for_metadata: true
       wait_for_metadata_timeout: 10s
     memory_limiter:
       check_interval: 5s
@@ -264,6 +276,10 @@ alternateConfig:
         - id: container-parser
           max_log_size: 102400
           type: container
+        - combine_field: body
+          id: multiline-recombine
+          is_first_entry: body matches "^(\\d{4}[-/]\\d{2}[-/]\\d{2} \\d{2}:\\d{2}:\\d{2}|\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z?|[A-Za-z]+ \\d{1,2} \\d{2}:\\d{2}:\\d{2})"
+          type: recombine
       poll_interval: 20ms
       retry_on_failure:
         enabled: true
@@ -409,6 +425,24 @@ alternateConfig:
           - attributes/debug_source_kubeletstats_metrics
         receivers:
           - kubeletstats
+    telemetry:
+      logs:
+        encoding: console
+        level: WARN
+      metrics:
+        level: normal
+        readers:
+          - pull:
+              exporter:
+                prometheus:
+                  host: ${env:MY_POD_IP}
+                  port: 8888
+                  with_resource_constant_labels:
+                    included:
+                      - observe.agent.instance.id
+      resource:
+        observe.agent.instance.id: ${env:OTEL_K8S_POD_NAME}
     extensions:
       - health_check
+      - cgroupruntime
       - file_storage

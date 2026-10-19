@@ -36,6 +36,7 @@ find "$rendered" -type f -name '*.yaml' -exec perl -0777 -i -pe 's/[ \t]+$//mg; 
 chart_repository=$(yq '.repository' "$dir/upstream-chart.yaml")
 chart_name=$(yq '.name' "$dir/upstream-chart.yaml")
 chart_version=$(yq '.version' "$dir/upstream-chart.yaml")
+collector_version=$(yq '.collectorVersion' "$dir/upstream-chart.yaml")
 # The Secret that the chart values read every variable from that isn't set from the downward API.
 secret=observe-collector
 # Variables that the OpenTelemetry Collector chart sets on every collector container.
@@ -56,6 +57,7 @@ describe_env() {
     DEPLOYMENT_ENVIRONMENT) echo "Fallback deployment.environment.name for telemetry that does not set one" ;;
     MY_POD_IP) echo "The collector pod's IP address (downward API: status.podIP)" ;;
     K8S_NODE_NAME) echo "The node the collector pod runs on (downward API: spec.nodeName)" ;;
+    OTEL_K8S_POD_NAME) echo "The collector pod's name (downward API: metadata.name)" ;;
     *) return 1 ;;
   esac
 }
@@ -94,7 +96,7 @@ prune() {
 # runs it.
 chart_values() {
   WORKLOAD=$1 CONTAINER=$2 CONFIG=$3 VARS=$4 GATES=$5 HAS_SERVICE=$6 CHART_ENV=$chart_env CHART_PORTS=$chart_ports \
-    RBAC_RULES=$rbac_rules SECRET=$secret yq -n '
+    RBAC_RULES=$rbac_rules SECRET=$secret COLLECTOR_VERSION=$collector_version yq -n '
     load(strenv(WORKLOAD)) as $w | $w.spec.template.spec as $pod |
     ($pod.containers[] | select(.name == strenv(CONTAINER))) as $c |
     [($pod.volumes // [])[] | select(has("configMap") or has("secret") or has("projected")) | .name] as $chart_volumes |
@@ -104,6 +106,7 @@ chart_values() {
     .mode = ($w.kind | downcase) |
     with(select($w.kind == "Deployment"); .replicaCount = ($w.spec.replicas // 1)) |
     .image.repository = "otel/opentelemetry-collector-contrib" |
+    .image.tag = strenv(COLLECTOR_VERSION) |
     with(select(strenv(GATES) != ""); .command.extraArgs = ["--feature-gates=" + strenv(GATES)]) |
     .clusterRole.create = true |
     .clusterRole.rules = env(RBAC_RULES) |
@@ -112,6 +115,9 @@ chart_values() {
       select(.name as $n | (($vars | any_c(. == $n)) and (($chart_env | any_c(. == $n)) | not)))] |
     .extraVolumes = [($pod.volumes // [])[] | select(.name as $n | $chart_volumes | any_c(. == $n) | not)] |
     .extraVolumeMounts = [($c.volumeMounts // [])[] | select(.name as $n | $chart_volumes | any_c(. == $n) | not)] |
+    # The monitor collector scrapes the collectors that carry observe_monitor_* annotations, and
+    # observeinc_com_scrape: "false" keeps Prometheus pod scraping from scraping them a second time.
+    .podAnnotations = (($w.spec.template.metadata.annotations // {}) | with_entries(select(.key | test("^(observe_monitor_|observeinc_com_)")))) |
     .podSecurityContext = ($pod.securityContext // {}) |
     .securityContext = ($c.securityContext // {}) |
     .resources = ($c.resources // {}) |
@@ -126,6 +132,7 @@ chart_values() {
     with(select(.extraEnvs | length == 0); del(.extraEnvs)) |
     with(select(.extraVolumes | length == 0); del(.extraVolumes)) |
     with(select(.extraVolumeMounts | length == 0); del(.extraVolumeMounts)) |
+    with(select(.podAnnotations | length == 0); del(.podAnnotations)) |
     with(select(.podSecurityContext | length == 0); del(.podSecurityContext)) |
     with(select(.securityContext | length == 0); del(.securityContext)) |
     with(select(.resources | length == 0); del(.resources))
@@ -140,11 +147,25 @@ generate() {
   description=$(yq ".[$index].description" "$dir/collectors.yaml")
   pipelines=$(yq -o=json -I=0 ".[$index].pipelines" "$dir/collectors.yaml")
   extensions=$(yq -o=json -I=0 ".[$index].extensions // []" "$dir/collectors.yaml")
+  replace_processors=$(yq -o=json -I=0 ".[$index].replace_processors // {}" "$dir/collectors.yaml")
 
-  local configmap_file="$rendered/$configmap-configmap.yaml" tmp="$work/$index"
+  local tmp="$work/$index"
   mkdir -p "$tmp"
-  yq -e '.data.relay' "$configmap_file" > "$tmp/relay.yaml"
+  CONFIGMAP=$configmap yq ea -e 'select(.kind == "ConfigMap" and .metadata.name == strenv(CONFIGMAP)) | .data.relay' "$rendered"/*.yaml > "$tmp/relay.yaml" 2> /dev/null ||
+    { echo "error: $output: no ConfigMap named $configmap with a relay key in rendered/" >&2; return 1; }
   yq ". * (load(\"$dir/otel-config.yaml\") | ... comments = \"\")" "$tmp/relay.yaml" > "$tmp/merged.yaml"
+
+  local processor replacement
+  for processor in $(yq -r 'keys | .[]' <<< "$replace_processors"); do
+    replacement=$(yq -r ".\"$processor\"" <<< "$replace_processors")
+    PROCESSOR=$processor yq -e '.service.pipelines[].processors[] | select(. == strenv(PROCESSOR))' "$tmp/merged.yaml" > /dev/null 2>&1 ||
+      { echo "error: $output: replace_processors lists $processor, which no pipeline in the $configmap ConfigMap uses" >&2; return 1; }
+    yq -e ".processors.\"$replacement\"" "$tmp/merged.yaml" > /dev/null 2>&1 ||
+      { echo "error: $output: replace_processors replaces $processor with $replacement, which otel-config.yaml doesn't define" >&2; return 1; }
+  done
+  REPLACE=$replace_processors yq -i '
+    env(REPLACE) as $replace | .service.pipelines[].processors |= (map(. as $p | ($replace[$p] // $p)) | ... style = "")
+  ' "$tmp/merged.yaml"
 
   local workloads=("$rendered/$configmap"/*.yaml) gates
   yq ea -e '[select(.kind == "DaemonSet" or .kind == "Deployment" or .kind == "StatefulSet")] | length == 1' "${workloads[@]}" > /dev/null 2>&1 ||
@@ -158,12 +179,12 @@ generate() {
   local pipeline
   for pipeline in $(yq -r '.[]' <<< "$pipelines"); do
     yq -e ".service.pipelines.\"$pipeline\"" "$tmp/merged.yaml" > /dev/null 2>&1 ||
-      { echo "error: $output: pipeline $pipeline is not in rendered/$configmap-configmap.yaml" >&2; return 1; }
+      { echo "error: $output: pipeline $pipeline is not in the $configmap ConfigMap" >&2; return 1; }
   done
   local extension
   for extension in $(yq -r '.[]' <<< "$extensions"); do
     yq -e ".extensions.\"$extension\"" "$tmp/merged.yaml" > /dev/null 2>&1 ||
-      { echo "error: $output: extension $extension is not in rendered/$configmap-configmap.yaml" >&2; return 1; }
+      { echo "error: $output: extension $extension is not in the $configmap ConfigMap" >&2; return 1; }
   done
 
   prune "$tmp/merged.yaml" "$pipelines" "$extensions" > "$tmp/config.yaml"
@@ -198,7 +219,9 @@ generate() {
     echo "# GENERATED FILE, DO NOT EDIT. Run \"make generate-examples\" to regenerate it from the Observe"
     echo "# Agent Helm chart (see scripts/README.md)."
     echo "#"
-    echo "# Values for the $chart_name Helm chart. Create the $secret Secret (see README.md), then:"
+    echo "# Values for the $chart_name Helm chart $chart_version, running otelcol-contrib $collector_version, the"
+    echo "# collector version of the Observe Agent the values are generated from. Create the $secret"
+    echo "# Secret (see README.md), then:"
     echo "#"
     echo "#   helm install observe-$name $chart_name --repo $chart_repository \\"
     echo "#     --version $chart_version --namespace observe --values $output"
@@ -210,6 +233,21 @@ generate() {
     cat "$tmp/values.yaml"
   } > "$work/values/$output"
 }
+
+# Every collector the chart renders, and every pipeline in it, must be kept, so a chart change that
+# adds one can't drop out of the examples unnoticed.
+missing=""
+for cm in $(yq ea -r 'select(.kind == "ConfigMap" and .data.relay != null) | .metadata.name' "$rendered"/*.yaml | grep -v '^---$'); do
+  kept=$(CM=$cm yq -r '.[] | select(.configmap == strenv(CM)) | .pipelines[]' "$dir/collectors.yaml")
+  for pipeline in $(CM=$cm yq ea -r 'select(.kind == "ConfigMap" and .metadata.name == strenv(CM)) | .data.relay | from_yaml | (.service.pipelines // {}) | keys | .[]' "$rendered"/*.yaml | grep -v '^---$'); do
+    grep -qxF "$pipeline" <<< "$kept" || missing+="  $cm $pipeline"$'\n'
+  done
+done
+if [ -n "$missing" ]; then
+  echo "error: collectors.yaml doesn't keep these collector pipelines that the chart renders:" >&2
+  printf '%s' "$missing" >&2
+  exit 1
+fi
 
 count=$(yq 'length' "$dir/collectors.yaml")
 for ((i = 0; i < count; i++)); do

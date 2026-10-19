@@ -2,11 +2,48 @@
 # read variables that the observe-agent binary sets at startup (OBSERVE_OTEL_ENDPOINT,
 # OBSERVE_AUTHORIZATION_HEADER, ...); a plain collector reads these instead. Exporters a
 # configuration doesn't use are removed again by the pruning step.
+processors:
+  # Takes the place of the Observe-specific observek8sattributes processor, which redacts Secrets the
+  # same way: data and stringData values become REDACTED (base64 in data), and the
+  # last-applied-configuration annotation, which can hold the whole Secret, is removed. An error
+  # drops the record instead of exporting it unredacted.
+  transform/redact_secrets:
+    error_mode: propagate
+    log_statements:
+      - context: log
+        statements:
+          - replace_all_patterns(body["data"], "value", "(?s)^.*$", "UkVEQUNURUQ=") where body["kind"] == "Secret" and body["data"] != nil
+          - replace_all_patterns(body["stringData"], "value", "(?s)^.*$", "REDACTED") where body["kind"] == "Secret" and body["stringData"] != nil
+          - delete_key(body["metadata"]["annotations"], "kubectl.kubernetes.io/last-applied-configuration") where body["kind"] == "Secret" and body["metadata"]["annotations"] != nil
 extensions:
   # The OpenTelemetry Collector chart's liveness and readiness probes check this endpoint. The
   # observe-agent binary adds its own health check, so the chart's configuration has none.
   health_check:
     endpoint: ${env:MY_POD_IP}:13133
+  # The observe-agent binary adds this too: it sets GOMAXPROCS from the container's CPU limit.
+  cgroupruntime:
+    gomaxprocs:
+      enabled: true
+service:
+  # The internal telemetry the observe-agent binary configures: the monitor collector scrapes these
+  # metrics from each collector pod, labeled with the collector's instance ID.
+  telemetry:
+    logs:
+      encoding: console
+      level: WARN
+    metrics:
+      level: normal
+      readers:
+        - pull:
+            exporter:
+              prometheus:
+                host: ${env:MY_POD_IP}
+                port: 8888
+                with_resource_constant_labels:
+                  included:
+                    - observe.agent.instance.id
+    resource:
+      observe.agent.instance.id: ${env:OTEL_K8S_POD_NAME}
 exporters:
   otlphttp/observe/base:
     endpoint: ${env:OBSERVE_COLLECTION_URL}/v2/otel
@@ -18,6 +55,10 @@ exporters:
       authorization: Bearer ${env:OBSERVE_TOKEN}
   otlphttp/observe/otel_metrics:
     endpoint: ${env:OBSERVE_COLLECTION_URL}/v2/otel
+    headers:
+      authorization: Bearer ${env:OBSERVE_TOKEN}
+  otlphttp/observe/entity:
+    logs_endpoint: ${env:OBSERVE_COLLECTION_URL}/v1/kubernetes/v1/entity
     headers:
       authorization: Bearer ${env:OBSERVE_TOKEN}
   prometheusremotewrite/observe:

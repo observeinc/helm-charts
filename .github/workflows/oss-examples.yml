@@ -27,18 +27,20 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          agent_version=$(yq '.appVersion' charts/agent/Chart.yaml)
+          agent_collector=$(curl -fsSL "https://raw.githubusercontent.com/observeinc/observe-agent/v${agent_version}/go.mod" \
+            | awk '$1 == "go.opentelemetry.io/collector/otelcol" {print $2}')
           if [ "${{ github.event_name }}" = "schedule" ]; then
             version=$(gh release view --repo open-telemetry/opentelemetry-collector-releases --json tagName --jq .tagName)
           else
-            agent_version=$(yq '.appVersion' charts/agent/Chart.yaml)
-            version=$(curl -fsSL "https://raw.githubusercontent.com/observeinc/observe-agent/v${agent_version}/go.mod" \
-              | awk '$1 == "go.opentelemetry.io/collector/otelcol" {print $2}')
+            version=$agent_collector
           fi
-          if [ -z "$version" ]; then
+          if [ -z "$version" ] || [ -z "$agent_collector" ]; then
             echo "::error::Could not determine the otelcol-contrib version"
             exit 1
           fi
           echo "version=${version#v}" >> "$GITHUB_OUTPUT"
+          echo "agent_collector=${agent_collector#v}" >> "$GITHUB_OUTPUT"
 
       - name: Install Helm
         uses: azure/setup-helm@v5
@@ -55,4 +57,5 @@ jobs:
       - name: Verify examples
         env:
           OTELCOL_CONTRIB: ./otelcol-contrib
+          EXPECTED_COLLECTOR_VERSION: ${{ steps.version.outputs.agent_collector }}
         run: test/verify_oss_examples.sh

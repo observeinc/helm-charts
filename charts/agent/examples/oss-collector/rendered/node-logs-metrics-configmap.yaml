@@ -43,7 +43,7 @@ data:
             max_interval: 30s
           send_metadata: true
           target_info:
-            enabled: false
+            enabled: true
           timeout: 10s
       extensions:
         file_storage:
@@ -104,7 +104,7 @@ data:
               name: k8s.pod.uid
           - sources:
             - from: connection
-          wait_for_metadata: false
+          wait_for_metadata: true
           wait_for_metadata_timeout: 10s
         memory_limiter:
           check_interval: 5s
@@ -170,6 +170,11 @@ data:
           - id: container-parser
             max_log_size: 102400
             type: container
+          - combine_field: body
+            id: multiline-recombine
+            is_first_entry: body matches "^(\\d{4}[-/]\\d{2}[-/]\\d{2} \\d{2}:\\d{2}:\\d{2}|\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z?|[A-Za-z]+
+              \\d{1,2} \\d{2}:\\d{2}:\\d{2})"
+            type: recombine
           poll_interval: 20ms
           retry_on_failure:
             enabled: true

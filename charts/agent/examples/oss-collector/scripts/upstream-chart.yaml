@@ -1,7 +1,9 @@
-# The OpenTelemetry Collector Helm chart that generate.sh writes the *-values.yaml files for. Keep
-# the chart's appVersion, the otelcol-contrib version it deploys, on the collector version of the
-# Observe Agent release that charts/agent deploys.
+# The OpenTelemetry Collector Helm chart and otelcol-contrib version that generate.sh writes the
+# *-values.yaml files for. collectorVersion is the collector version of the Observe Agent release
+# that charts/agent deploys (go.opentelemetry.io/collector/otelcol in its go.mod), and version is
+# the chart release whose appVersion is that collector version. The values pin the image to
+# collectorVersion, and the OSS collector examples workflow fails when either drifts.
 repository: https://open-telemetry.github.io/opentelemetry-helm-charts
 name: opentelemetry-collector
-# appVersion 0.151.0
 version: 0.155.0
+collectorVersion: 0.151.0

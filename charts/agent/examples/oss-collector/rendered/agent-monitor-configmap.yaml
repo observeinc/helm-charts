@@ -29,7 +29,7 @@ data:
             max_interval: 30s
           send_metadata: true
           target_info:
-            enabled: false
+            enabled: true
           timeout: 10s
       processors:
         attributes/debug_source_agent_monitor:
@@ -77,7 +77,7 @@ data:
               name: k8s.pod.uid
           - sources:
             - from: connection
-          wait_for_metadata: false
+          wait_for_metadata: true
           wait_for_metadata_timeout: 10s
         memory_limiter:
           check_interval: 5s

@@ -1,6 +1,7 @@
 # The collectors that generate.sh writes chart values for, as <name>-values.yaml. Each one
 # comes from a collector ConfigMap in rendered/: otel-config.yaml is merged on top, then only the
 # listed pipelines and extensions are kept, and every component they don't use is deleted.
+# replace_processors swaps processors in the pipelines for ones defined in otel-config.yaml first.
 - configmap: forwarder
   name: forwarder
   description: DaemonSet collector that receives application traces, logs, and metrics over OTLP and generates RED metrics.
@@ -13,6 +14,7 @@
     - metrics/spanmetrics/summary
   extensions:
     - health_check
+    - cgroupruntime
 - configmap: node-logs-metrics
   name: node
   description: DaemonSet collector for container logs, kubelet stats, and node metrics.
@@ -22,11 +24,36 @@
     - metrics/kubeletstats
   extensions:
     - health_check
+    - cgroupruntime
     - file_storage
 - configmap: cluster-metrics
   name: cluster-metrics
-  description: Single-replica Deployment collector for cluster-level Kubernetes metrics.
+  description: Single-replica Deployment collector for cluster-level Kubernetes metrics and Prometheus metrics scraped from pods.
+  pipelines:
+    - metrics
+    - metrics/cadvisor
+    - metrics/pod_metrics
+  extensions:
+    - health_check
+    - cgroupruntime
+- configmap: cluster-events
+  name: cluster-events
+  description: Single-replica Deployment collector for Kubernetes objects and events, the entity data Kubernetes Explorer uses.
+  pipelines:
+    - logs/cluster
+    - logs/objects
+  extensions:
+    - health_check
+    - cgroupruntime
+  # observek8sattributes is Observe-specific and not in otelcol-contrib. transform/redact_secrets
+  # redacts Secrets as it does; objects arrive without the status and relationship fields it adds.
+  replace_processors:
+    observek8sattributes: transform/redact_secrets
+- configmap: monitor
+  name: monitor
+  description: Single-replica Deployment collector that scrapes the other collectors' internal metrics, for monitoring the collectors in Observe.
   pipelines:
     - metrics
   extensions:
     - health_check
+    - cgroupruntime
