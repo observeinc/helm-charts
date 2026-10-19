@@ -1,19 +1,33 @@
 #!/usr/bin/env bash
-# Generates plain OpenTelemetry Collector configurations in collector/ from this example's rendered
-# chart output (rendered/, written by `make generate-examples`, which also runs this script).
+# Generates plain OpenTelemetry Collector configurations in collector/, and values for the
+# OpenTelemetry Collector Helm chart in upstream-chart/, from this example's rendered chart output
+# (rendered/, written by `make generate-examples`, which also runs this script).
 #
 # For each entry in collectors.yaml it takes the collector ConfigMap's configuration, merges
 # otel-config.yaml on top, keeps only the listed pipelines and extensions, and deletes every
 # component they don't use. A connector is only kept when a kept pipeline is on both sides of it.
+# The chart values wrap that configuration with the workload settings the collector's rendered
+# DaemonSet or Deployment uses: feature gates, downward API variables, volumes, security context,
+# resources, ports, and the chart's read-only RBAC rules.
 #
 # Requires yq (https://github.com/mikefarah/yq).
 set -euo pipefail
 
 dir=$(cd "$(dirname "$0")" && pwd)
-out_dir="$dir/collector"
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
-mkdir -p "$work/collector"
+mkdir -p "$work/collector" "$work/upstream-chart"
+
+chart_repository=$(yq '.repository' "$dir/upstream-chart.yaml")
+chart_name=$(yq '.name' "$dir/upstream-chart.yaml")
+chart_version=$(yq '.version' "$dir/upstream-chart.yaml")
+# The Secret that the chart values read every variable from that isn't set from the downward API.
+secret=observe-collector
+# Variables that the OpenTelemetry Collector chart sets on every collector container.
+chart_env='["MY_POD_IP", "OTEL_K8S_NODE_NAME", "OTEL_K8S_NODE_IP", "OTEL_K8S_NAMESPACE", "OTEL_K8S_POD_NAME", "OTEL_K8S_POD_IP"]'
+# The OpenTelemetry Collector chart's default ports, which stay enabled unless the values disable them.
+chart_ports='["otlp", "otlp-http", "jaeger-compact", "jaeger-thrift", "jaeger-grpc", "zipkin", "metrics"]'
+rbac_rules=$(yq ea -o=json -I=0 '[select(.kind == "ClusterRole") | .rules[] | select((.verbs - ["get", "list", "watch"]) | length == 0)]' "$dir/rendered/cluster-role.yaml")
 
 # Descriptions for every environment variable a generated configuration may reference. The
 # generator fails on a variable that isn't listed here, which catches chart variables that a plain
@@ -53,11 +67,54 @@ prune() {
     .exporters = ((.exporters // {}) | with_entries(.key as $k | select($e | any_c(. == $k)))) |
     .connectors = ((.connectors // {}) | with_entries(.key as $k | select(($r + $e) | any_c(. == $k)))) |
     .extensions = ((.extensions // {}) | with_entries(.key as $k | select($exts | any_c(. == $k)))) |
-    .service.extensions = $exts |
+    .service.extensions = ($exts | ... style = "") |
     with(select(.service.extensions | length == 0); del(.service.extensions)) |
     with(select(.connectors | length == 0); del(.connectors)) |
     with(select(.extensions | length == 0); del(.extensions))
   ' "$1"
+}
+
+# chart_values <workload> <container> <config> <variables JSON list> <feature gates> <has service>:
+# prints values for the OpenTelemetry Collector chart that run <config> like the rendered <workload>
+# runs it.
+chart_values() {
+  WORKLOAD=$1 CONTAINER=$2 CONFIG=$3 VARS=$4 GATES=$5 HAS_SERVICE=$6 CHART_ENV=$chart_env CHART_PORTS=$chart_ports \
+    RBAC_RULES=$rbac_rules SECRET=$secret yq -n '
+    load(strenv(WORKLOAD)) as $w | $w.spec.template.spec as $pod |
+    ($pod.containers[] | select(.name == strenv(CONTAINER))) as $c |
+    [($pod.volumes // [])[] | select(has("configMap") or has("secret") or has("projected")) | .name] as $chart_volumes |
+    env(VARS) as $vars | env(CHART_ENV) as $chart_env |
+    [load(strenv(CONFIG)).receivers | .. | select(tag == "!!str" and test(":[0-9]+$")) | sub(".*:", "")] as $listening |
+
+    .mode = ($w.kind | downcase) |
+    with(select($w.kind == "Deployment"); .replicaCount = ($w.spec.replicas // 1)) |
+    .image.repository = "otel/opentelemetry-collector-contrib" |
+    with(select(strenv(GATES) != ""); .command.extraArgs = ["--feature-gates=" + strenv(GATES)]) |
+    .clusterRole.create = true |
+    .clusterRole.rules = env(RBAC_RULES) |
+    .extraEnvsFrom = [{"secretRef": {"name": strenv(SECRET)}}] |
+    .extraEnvs = [($c.env // [])[] | select(.valueFrom.fieldRef) |
+      select(.name as $n | (($vars | any_c(. == $n)) and (($chart_env | any_c(. == $n)) | not)))] |
+    .extraVolumes = [($pod.volumes // [])[] | select(.name as $n | $chart_volumes | any_c(. == $n) | not)] |
+    .extraVolumeMounts = [($c.volumeMounts // [])[] | select(.name as $n | $chart_volumes | any_c(. == $n) | not)] |
+    .podSecurityContext = ($pod.securityContext // {}) |
+    .securityContext = ($c.securityContext // {}) |
+    .resources = ($c.resources // {}) |
+    .ports = ((env(CHART_PORTS) | map({"key": ., "value": {"enabled": false}}) | from_entries) *
+      ([($c.ports // [])[] | select((.containerPort | tostring) as $p | $listening | any_c(. == $p))] |
+        map(. as $p | {"key": $p.name, "value": (({"enabled": true, "servicePort": $p.containerPort}) * ($p | del(.name)))}) | from_entries)) |
+    # The chart creates a Service unless told not to, and the API server rejects one without ports.
+    .service.enabled = ((strenv(HAS_SERVICE) == "true") and ([.ports[] | select(.enabled)] | length > 0)) |
+    ... style = "" |
+    .alternateConfig = load(strenv(CONFIG)) |
+
+    with(select(.extraEnvs | length == 0); del(.extraEnvs)) |
+    with(select(.extraVolumes | length == 0); del(.extraVolumes)) |
+    with(select(.extraVolumeMounts | length == 0); del(.extraVolumeMounts)) |
+    with(select(.podSecurityContext | length == 0); del(.podSecurityContext)) |
+    with(select(.securityContext | length == 0); del(.securityContext)) |
+    with(select(.resources | length == 0); del(.resources))
+  '
 }
 
 generate() {
@@ -73,14 +130,14 @@ generate() {
   yq -e '.data.relay' "$rendered" > "$tmp/relay.yaml"
   yq ". * (load(\"$dir/otel-config.yaml\") | ... comments = \"\")" "$tmp/relay.yaml" > "$tmp/merged.yaml"
 
-  # The chart passes feature gates as container arguments, not in the collector configuration.
   local workloads=("$dir/rendered/$configmap"/*.yaml) gates
   yq ea -e '[select(.kind == "DaemonSet" or .kind == "Deployment" or .kind == "StatefulSet")] | length == 1' "${workloads[@]}" > /dev/null 2>&1 ||
     { echo "error: $output: expected one DaemonSet, Deployment, or StatefulSet in $dir/rendered/$configmap" >&2; return 1; }
-  gates=$(yq ea -r '
-    select(.kind == "DaemonSet" or .kind == "Deployment" or .kind == "StatefulSet") |
-    .spec.template.spec.containers[].args[] | select(test("^--feature-gates=")) | sub("^--feature-gates=", "")
-  ' "${workloads[@]}" | paste -sd, -)
+  yq ea 'select(.kind == "DaemonSet" or .kind == "Deployment" or .kind == "StatefulSet")' "${workloads[@]}" > "$tmp/workload.yaml"
+  CONTAINER=$configmap yq -e '.spec.template.spec.containers[] | select(.name == strenv(CONTAINER))' "$tmp/workload.yaml" > /dev/null 2>&1 ||
+    { echo "error: $output: the workload in $dir/rendered/$configmap has no container named $configmap" >&2; return 1; }
+  # The chart passes feature gates as container arguments, not in the collector configuration.
+  gates=$(yq -r '.spec.template.spec.containers[].args[] | select(test("^--feature-gates=")) | sub("^--feature-gates=", "")' "$tmp/workload.yaml" | paste -sd, -)
 
   local pipeline
   for pipeline in $(yq -r '.[]' <<< "$pipelines"); do
@@ -99,6 +156,25 @@ generate() {
     return 1
   fi
 
+  local vars var
+  vars=$(grep -oE '\$\{env:[A-Za-z0-9_]+\}' "$tmp/config.yaml" | sed -E 's/\$\{env:([A-Za-z0-9_]+)\}/\1/' | sort -u)
+  for var in $vars; do
+    describe_env "$var" > /dev/null ||
+      { echo "error: $output references \${env:$var}; replace it in otel-config.yaml or describe it in describe_env in $0" >&2; return 1; }
+  done
+
+  local vars_json
+  vars_json="[$(printf '"%s",' $vars | sed 's/,$//')]"
+  local has_service=false
+  yq ea -e '[select(.kind == "Service")] | length > 0' "${workloads[@]}" > /dev/null 2>&1 && has_service=true
+  chart_values "$tmp/workload.yaml" "$configmap" "$tmp/config.yaml" "$vars_json" "$gates" "$has_service" > "$tmp/values.yaml"
+  # Variables the chart values don't set from the downward API come from the Secret.
+  local secret_vars
+  secret_vars=$(VARS=$vars_json CHART_ENV=$chart_env yq -r '
+    [.extraEnvs[]?.name] as $set | env(CHART_ENV) as $chart_env |
+    env(VARS)[] | select(. as $n | (($set + $chart_env) | any_c(. == $n)) | not)
+  ' "$tmp/values.yaml")
+
   {
     echo "# $description"
     echo "#"
@@ -106,12 +182,7 @@ generate() {
     echo "# Agent Helm chart (see README.md)."
     echo "#"
     echo "# Set these environment variables on the collector container:"
-    local var
-    for var in $(grep -oE '\$\{env:[A-Za-z0-9_]+\}' "$tmp/config.yaml" | sed -E 's/\$\{env:([A-Za-z0-9_]+)\}/\1/' | sort -u); do
-      if ! describe_env "$var" > /dev/null; then
-        echo "error: $output references \${env:$var}; replace it in otel-config.yaml or describe it in describe_env in $0" >&2
-        return 1
-      fi
+    for var in $vars; do
       printf '#   %-24s %s\n' "$var" "$(describe_env "$var")"
     done
     if [ -n "$gates" ]; then
@@ -121,6 +192,25 @@ generate() {
     fi
     cat "$tmp/config.yaml"
   } > "$work/collector/$output"
+
+  local values="${output%.yaml}-values.yaml"
+  {
+    echo "# $description"
+    echo "#"
+    echo "# GENERATED FILE, DO NOT EDIT. Run \"make generate-examples\" to regenerate it from the Observe"
+    echo "# Agent Helm chart (see README.md)."
+    echo "#"
+    echo "# Values for the $chart_name Helm chart. Create the $secret Secret (see README.md), then:"
+    echo "#"
+    echo "#   helm install observe-${output%.yaml} $chart_name --repo $chart_repository \\"
+    echo "#     --version $chart_version --namespace observe --values $values"
+    echo "#"
+    echo "# The collector reads these variables from the $secret Secret:"
+    for var in $secret_vars; do
+      printf '#   %-24s %s\n' "$var" "$(describe_env "$var")"
+    done
+    cat "$tmp/values.yaml"
+  } > "$work/upstream-chart/$values"
 }
 
 count=$(yq 'length' "$dir/collectors.yaml")
@@ -128,7 +218,9 @@ for ((i = 0; i < count; i++)); do
   generate "$i"
 done
 
-# Replace collector/ only once every configuration generated, so that outputs no longer listed in
-# collectors.yaml are removed too.
-rm -rf "$out_dir"
-mv "$work/collector" "$out_dir"
+# Replace the output directories only once every file generated, so that outputs no longer listed
+# in collectors.yaml are removed too.
+for out in collector upstream-chart; do
+  rm -rf "${dir:?}/$out"
+  mv "$work/$out" "$dir/$out"
+done

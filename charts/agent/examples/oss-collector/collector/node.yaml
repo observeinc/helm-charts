@@ -6,6 +6,7 @@
 # Set these environment variables on the collector container:
 #   DEPLOYMENT_ENVIRONMENT   Fallback deployment.environment.name for telemetry that does not set one
 #   K8S_NODE_NAME            The node the collector pod runs on (downward API: spec.nodeName)
+#   MY_POD_IP                The collector pod's IP address (downward API: status.podIP)
 #   OBSERVE_CLUSTER_NAME     The cluster name, set as k8s.cluster.name
 #   OBSERVE_CLUSTER_UID      The UID of the kube-system namespace: kubectl get namespace kube-system -o jsonpath='{.metadata.uid}'
 #   OBSERVE_COLLECTION_URL   Your collection URL, e.g. https://123456789012.collect.observeinc.com
@@ -50,6 +51,8 @@ exporters:
 extensions:
   file_storage:
     create_directory: true
+  health_check:
+    endpoint: ${env:MY_POD_IP}:13133
 processors:
   attributes/debug_source_hostmetrics:
     actions:
@@ -317,4 +320,6 @@ service:
         - attributes/debug_source_kubeletstats_metrics
       receivers:
         - kubeletstats
-  extensions: ["file_storage"]
+  extensions:
+    - health_check
+    - file_storage

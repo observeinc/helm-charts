@@ -11,6 +11,8 @@
     - traces/spanmetrics
     - metrics/spanmetrics
     - metrics/spanmetrics/summary
+  extensions:
+    - health_check
 - configmap: node-logs-metrics
   output: node.yaml
   description: DaemonSet collector for container logs, kubelet stats, and node metrics.
@@ -19,9 +21,12 @@
     - metrics/hostmetrics
     - metrics/kubeletstats
   extensions:
+    - health_check
     - file_storage
 - configmap: cluster-metrics
   output: cluster-metrics.yaml
   description: Single-replica Deployment collector for cluster-level Kubernetes metrics.
   pipelines:
     - metrics
+  extensions:
+    - health_check

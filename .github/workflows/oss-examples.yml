@@ -2,7 +2,8 @@ name: OSS collector examples
 
 # Checks the plain OpenTelemetry Collector examples in charts/agent/examples/oss-collector with the upstream
 # otelcol-contrib distribution: they must validate, and the forwarder example must handle the
-# deployment environment like the chart does. Pull requests use the collector version of the
+# deployment environment like the chart does. The values for the upstream OpenTelemetry Collector
+# Helm chart must render into the same configurations. Pull requests use the collector version of the
 # observe-agent release the chart deploys; the weekly run uses the latest release, so removed or
 # renamed upstream components show up before users hit them.
 #
@@ -38,6 +39,9 @@ jobs:
             exit 1
           fi
           echo "version=${version#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v5
 
       - name: Install otelcol-contrib
         run: |

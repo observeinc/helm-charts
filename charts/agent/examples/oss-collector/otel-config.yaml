@@ -2,6 +2,11 @@
 # read variables that the observe-agent binary sets at startup (OBSERVE_OTEL_ENDPOINT,
 # OBSERVE_AUTHORIZATION_HEADER, ...); a plain collector reads these instead. Exporters a
 # configuration doesn't use are removed again by the pruning step.
+extensions:
+  # The OpenTelemetry Collector chart's liveness and readiness probes check this endpoint. The
+  # observe-agent binary adds its own health check, so the chart's configuration has none.
+  health_check:
+    endpoint: ${env:MY_POD_IP}:13133
 exporters:
   otlphttp/observe/base:
     endpoint: ${env:OBSERVE_COLLECTION_URL}/v2/otel
