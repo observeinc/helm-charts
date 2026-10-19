@@ -1,4 +1,4 @@
-# Chart values that the plain OpenTelemetry Collector configurations in collector/ are generated
+# Chart values that the OpenTelemetry Collector examples in examples/oss-collector are generated
 # from (see README.md). The deployment environment is a ${env:...} reference, so the generated
 # configurations read it from the collector's environment at startup.
 observe:

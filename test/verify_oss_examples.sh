@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Checks the plain OpenTelemetry Collector examples in charts/agent/examples/oss-collector with
+# Checks the OpenTelemetry Collector examples in examples/oss-collector with
 # upstream otelcol-contrib: every configuration in collector/ must validate, and the forwarder
 # must keep the deployment environment that applications set while falling back to
-# DEPLOYMENT_ENVIRONMENT. Every values file in upstream-chart/ must render, with the pinned
+# DEPLOYMENT_ENVIRONMENT. Every values file in helm/ must render, with the pinned
 # OpenTelemetry Collector chart, into the same configuration as collector/ and set what it reads.
 #
 # Requires yq (https://github.com/mikefarah/yq), jq, curl, helm and otelcol-contrib
@@ -11,7 +11,8 @@
 set -euo pipefail
 
 repo=$(git rev-parse --show-toplevel)
-OSS_DIR="$repo/charts/agent/examples/oss-collector"
+GENERATOR_DIR="$repo/scripts/oss-collector"
+OSS_DIR="$repo/examples/oss-collector"
 EXAMPLES_DIR="$OSS_DIR/collector"
 OTELCOL_CONTRIB="${OTELCOL_CONTRIB:-otelcol-contrib}"
 
@@ -75,13 +76,13 @@ for config in "$EXAMPLES_DIR"/*.yaml; do
   fi
 done
 
-chart_name=$(yq '.name' "$OSS_DIR/upstream-chart.yaml")
-helm pull "$chart_name" --repo "$(yq '.repository' "$OSS_DIR/upstream-chart.yaml")" \
-  --version "$(yq '.version' "$OSS_DIR/upstream-chart.yaml")" --untar --untardir "$tmp/chart"
+chart_name=$(yq '.name' "$GENERATOR_DIR/upstream-chart.yaml")
+helm pull "$chart_name" --repo "$(yq '.repository' "$GENERATOR_DIR/upstream-chart.yaml")" \
+  --version "$(yq '.version' "$GENERATOR_DIR/upstream-chart.yaml")" --untar --untardir "$tmp/chart"
 
-for values in "$OSS_DIR"/upstream-chart/*-values.yaml; do
+for values in "$OSS_DIR"/helm/*-values.yaml; do
   name=$(basename "$values" -values.yaml)
-  label="upstream-chart/$(basename "$values")"
+  label="helm/$(basename "$values")"
   if ! helm template "observe-$name" "$tmp/chart/$chart_name" --namespace observe --values "$values" > "$tmp/$name-chart.yaml" 2> "$tmp/helm.log"; then
     cat "$tmp/helm.log" >&2
     fail "$label renders"

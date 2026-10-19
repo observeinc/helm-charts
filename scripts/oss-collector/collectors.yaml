@@ -1,4 +1,4 @@
-# The plain OpenTelemetry Collector configurations that generate.sh writes to collector/. Each one
+# The collectors that generate.sh writes to examples/oss-collector (collector/ and helm/). Each one
 # comes from a collector ConfigMap in rendered/: otel-config.yaml is merged on top, then only the
 # listed pipelines and extensions are kept, and every component they don't use is deleted.
 - configmap: forwarder

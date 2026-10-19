@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Generates plain OpenTelemetry Collector configurations in collector/, and values for the
-# OpenTelemetry Collector Helm chart in upstream-chart/, from this example's rendered chart output
-# (rendered/, written by `make generate-examples`, which also runs this script).
+# Generates the OpenTelemetry Collector examples in examples/oss-collector: plain collector
+# configurations in collector/ and values for the OpenTelemetry Collector Helm chart in helm/. They
+# come from the Observe Agent chart rendered with values.yaml, which is written to rendered/ there
+# too. `make generate-examples` runs this script. See README.md.
 #
 # For each entry in collectors.yaml it takes the collector ConfigMap's configuration, merges
 # otel-config.yaml on top, keeps only the listed pipelines and extensions, and deletes every
@@ -10,13 +11,28 @@
 # DaemonSet or Deployment uses: feature gates, downward API variables, volumes, security context,
 # resources, ports, and the chart's read-only RBAC rules.
 #
-# Requires yq (https://github.com/mikefarah/yq).
+# Requires helm and yq (https://github.com/mikefarah/yq).
 set -euo pipefail
 
 dir=$(cd "$(dirname "$0")" && pwd)
+repo=$(cd "$dir/../.." && pwd)
+out_dir="$repo/examples/oss-collector"
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
-mkdir -p "$work/collector" "$work/upstream-chart"
+mkdir -p "$work/collector" "$work/helm"
+
+# Render the Observe Agent chart the way `make generate-examples` renders the chart examples: the
+# chart's templates in rendered/, and each subchart's in rendered/<subchart>/.
+rendered="$work/rendered"
+[ -d "$repo/charts/agent/charts" ] || helm dependency build "$repo/charts/agent" > /dev/null
+helm template example "$repo/charts/agent" --namespace default --values "$dir/values.yaml" --output-dir "$work/helm-output" > /dev/null
+mkdir -p "$rendered"
+mv "$work/helm-output/agent/templates/"* "$rendered/"
+for subchart in "$work/helm-output/agent/charts/"*/; do
+  mkdir -p "$rendered/$(basename "$subchart")"
+  mv "$subchart/templates/"* "$rendered/$(basename "$subchart")/"
+done
+find "$rendered" -type f -name '*.yaml' -exec perl -0777 -i -pe 's/[ \t]+$//mg; s/\s+\z/\n/' {} +
 
 chart_repository=$(yq '.repository' "$dir/upstream-chart.yaml")
 chart_name=$(yq '.name' "$dir/upstream-chart.yaml")
@@ -27,7 +43,7 @@ secret=observe-collector
 chart_env='["MY_POD_IP", "OTEL_K8S_NODE_NAME", "OTEL_K8S_NODE_IP", "OTEL_K8S_NAMESPACE", "OTEL_K8S_POD_NAME", "OTEL_K8S_POD_IP"]'
 # The OpenTelemetry Collector chart's default ports, which stay enabled unless the values disable them.
 chart_ports='["otlp", "otlp-http", "jaeger-compact", "jaeger-thrift", "jaeger-grpc", "zipkin", "metrics"]'
-rbac_rules=$(yq ea -o=json -I=0 '[select(.kind == "ClusterRole") | .rules[] | select((.verbs - ["get", "list", "watch"]) | length == 0)]' "$dir/rendered/cluster-role.yaml")
+rbac_rules=$(yq ea -o=json -I=0 '[select(.kind == "ClusterRole") | .rules[] | select((.verbs - ["get", "list", "watch"]) | length == 0)]' "$rendered/cluster-role.yaml")
 
 # Descriptions for every environment variable a generated configuration may reference. The
 # generator fails on a variable that isn't listed here, which catches chart variables that a plain
@@ -125,29 +141,29 @@ generate() {
   pipelines=$(yq -o=json -I=0 ".[$index].pipelines" "$dir/collectors.yaml")
   extensions=$(yq -o=json -I=0 ".[$index].extensions // []" "$dir/collectors.yaml")
 
-  local rendered="$dir/rendered/$configmap-configmap.yaml" tmp="$work/$index"
+  local configmap_file="$rendered/$configmap-configmap.yaml" tmp="$work/$index"
   mkdir -p "$tmp"
-  yq -e '.data.relay' "$rendered" > "$tmp/relay.yaml"
+  yq -e '.data.relay' "$configmap_file" > "$tmp/relay.yaml"
   yq ". * (load(\"$dir/otel-config.yaml\") | ... comments = \"\")" "$tmp/relay.yaml" > "$tmp/merged.yaml"
 
-  local workloads=("$dir/rendered/$configmap"/*.yaml) gates
+  local workloads=("$rendered/$configmap"/*.yaml) gates
   yq ea -e '[select(.kind == "DaemonSet" or .kind == "Deployment" or .kind == "StatefulSet")] | length == 1' "${workloads[@]}" > /dev/null 2>&1 ||
-    { echo "error: $output: expected one DaemonSet, Deployment, or StatefulSet in $dir/rendered/$configmap" >&2; return 1; }
+    { echo "error: $output: expected one DaemonSet, Deployment, or StatefulSet in rendered/$configmap" >&2; return 1; }
   yq ea 'select(.kind == "DaemonSet" or .kind == "Deployment" or .kind == "StatefulSet")' "${workloads[@]}" > "$tmp/workload.yaml"
   CONTAINER=$configmap yq -e '.spec.template.spec.containers[] | select(.name == strenv(CONTAINER))' "$tmp/workload.yaml" > /dev/null 2>&1 ||
-    { echo "error: $output: the workload in $dir/rendered/$configmap has no container named $configmap" >&2; return 1; }
+    { echo "error: $output: the workload in rendered/$configmap has no container named $configmap" >&2; return 1; }
   # The chart passes feature gates as container arguments, not in the collector configuration.
   gates=$(yq -r '.spec.template.spec.containers[].args[] | select(test("^--feature-gates=")) | sub("^--feature-gates=", "")' "$tmp/workload.yaml" | paste -sd, -)
 
   local pipeline
   for pipeline in $(yq -r '.[]' <<< "$pipelines"); do
     yq -e ".service.pipelines.\"$pipeline\"" "$tmp/merged.yaml" > /dev/null 2>&1 ||
-      { echo "error: $output: pipeline $pipeline is not in $rendered" >&2; return 1; }
+      { echo "error: $output: pipeline $pipeline is not in rendered/$configmap-configmap.yaml" >&2; return 1; }
   done
   local extension
   for extension in $(yq -r '.[]' <<< "$extensions"); do
     yq -e ".extensions.\"$extension\"" "$tmp/merged.yaml" > /dev/null 2>&1 ||
-      { echo "error: $output: extension $extension is not in $rendered" >&2; return 1; }
+      { echo "error: $output: extension $extension is not in rendered/$configmap-configmap.yaml" >&2; return 1; }
   done
 
   prune "$tmp/merged.yaml" "$pipelines" "$extensions" > "$tmp/config.yaml"
@@ -179,7 +195,7 @@ generate() {
     echo "# $description"
     echo "#"
     echo "# GENERATED FILE, DO NOT EDIT. Run \"make generate-examples\" to regenerate it from the Observe"
-    echo "# Agent Helm chart (see README.md)."
+    echo "# Agent Helm chart (see scripts/oss-collector/README.md)."
     echo "#"
     echo "# Set these environment variables on the collector container:"
     for var in $vars; do
@@ -198,9 +214,9 @@ generate() {
     echo "# $description"
     echo "#"
     echo "# GENERATED FILE, DO NOT EDIT. Run \"make generate-examples\" to regenerate it from the Observe"
-    echo "# Agent Helm chart (see README.md)."
+    echo "# Agent Helm chart (see scripts/oss-collector/README.md)."
     echo "#"
-    echo "# Values for the $chart_name Helm chart. Create the $secret Secret (see README.md), then:"
+    echo "# Values for the $chart_name Helm chart. Create the $secret Secret (see examples/oss-collector/README.md), then:"
     echo "#"
     echo "#   helm install observe-${output%.yaml} $chart_name --repo $chart_repository \\"
     echo "#     --version $chart_version --namespace observe --values $values"
@@ -210,7 +226,7 @@ generate() {
       printf '#   %-24s %s\n' "$var" "$(describe_env "$var")"
     done
     cat "$tmp/values.yaml"
-  } > "$work/upstream-chart/$values"
+  } > "$work/helm/$values"
 }
 
 count=$(yq 'length' "$dir/collectors.yaml")
@@ -220,7 +236,7 @@ done
 
 # Replace the output directories only once every file generated, so that outputs no longer listed
 # in collectors.yaml are removed too.
-for out in collector upstream-chart; do
-  rm -rf "${dir:?}/$out"
-  mv "$work/$out" "$dir/$out"
+for out in collector helm rendered; do
+  rm -rf "${out_dir:?}/$out"
+  mv "$work/$out" "$out_dir/$out"
 done

@@ -1,9 +1,9 @@
 # DaemonSet collector that receives application traces, logs, and metrics over OTLP and generates RED metrics.
 #
 # GENERATED FILE, DO NOT EDIT. Run "make generate-examples" to regenerate it from the Observe
-# Agent Helm chart (see README.md).
+# Agent Helm chart (see scripts/oss-collector/README.md).
 #
-# Values for the opentelemetry-collector Helm chart. Create the observe-collector Secret (see README.md), then:
+# Values for the opentelemetry-collector Helm chart. Create the observe-collector Secret (see examples/oss-collector/README.md), then:
 #
 #   helm install observe-forwarder opentelemetry-collector --repo https://open-telemetry.github.io/opentelemetry-helm-charts \
 #     --version 0.155.0 --namespace observe --values forwarder-values.yaml

@@ -1,6 +1,6 @@
 name: OSS collector examples
 
-# Checks the plain OpenTelemetry Collector examples in charts/agent/examples/oss-collector with the upstream
+# Checks the OpenTelemetry Collector examples in examples/oss-collector with the upstream
 # otelcol-contrib distribution: they must validate, and the forwarder example must handle the
 # deployment environment like the chart does. The values for the upstream OpenTelemetry Collector
 # Helm chart must render into the same configurations. Pull requests use the collector version of the
@@ -8,7 +8,7 @@ name: OSS collector examples
 # renamed upstream components show up before users hit them.
 #
 # The check-examples workflow separately fails when the examples are out of date with the chart
-# (make generate-examples also runs charts/agent/examples/oss-collector/generate.sh).
+# (make generate-examples also runs scripts/oss-collector/generate.sh).
 on:
   pull_request:
   schedule:

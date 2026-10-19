@@ -1,4 +1,4 @@
-# The OpenTelemetry Collector Helm chart that generate.sh writes values for in upstream-chart/. Keep
+# The OpenTelemetry Collector Helm chart that generate.sh writes values for in examples/oss-collector/helm/. Keep
 # the chart's appVersion, the otelcol-contrib version it deploys, on the collector version of the
 # Observe Agent release that charts/agent deploys.
 repository: https://open-telemetry.github.io/opentelemetry-helm-charts

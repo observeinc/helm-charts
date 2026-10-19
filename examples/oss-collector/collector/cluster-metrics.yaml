@@ -1,7 +1,7 @@
 # Single-replica Deployment collector for cluster-level Kubernetes metrics.
 #
 # GENERATED FILE, DO NOT EDIT. Run "make generate-examples" to regenerate it from the Observe
-# Agent Helm chart (see README.md).
+# Agent Helm chart (see scripts/oss-collector/README.md).
 #
 # Set these environment variables on the collector container:
 #   DEPLOYMENT_ENVIRONMENT   Fallback deployment.environment.name for telemetry that does not set one
