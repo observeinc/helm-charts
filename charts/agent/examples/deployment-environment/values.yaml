@@ -1,4 +1,4 @@
-# Sets a cluster deployment environment. By default it is a fallback: telemetry that already sets
+# Sets a cluster deployment environment as a fallback: telemetry that already sets
 # deployment.environment.name or deployment.environment (for example with OTEL_RESOURCE_ATTRIBUTES
 # or a resource.opentelemetry.io/deployment.environment.name pod annotation) keeps its own value,
 # and everything else gets "production".
@@ -9,6 +9,7 @@ observe:
 cluster:
   deploymentEnvironment:
     name: production
+    overrideApplication: false
 
 application:
   REDMetrics:

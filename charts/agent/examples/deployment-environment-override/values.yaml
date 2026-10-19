@@ -1,5 +1,6 @@
 # Sets a cluster deployment environment that overrides the environment applications set, so all
-# telemetry gets "production". Application telemetry goes through the gateway here.
+# telemetry gets "production". Overriding is the default; it is set explicitly here for clarity.
+# Application telemetry goes through the gateway here.
 observe:
   token:
     create: true
