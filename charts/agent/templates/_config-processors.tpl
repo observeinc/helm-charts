@@ -99,7 +99,8 @@ resource/observe_common:
       value:  ${env:OBSERVE_CLUSTER_UID}
       {{ end -}}
     {{ if .Values.cluster.deploymentEnvironment.name }}
-    {{- if .Values.cluster.deploymentEnvironment.overrideApplication }}
+    {{- /* Only an explicit false selects the fallback: upgrades with --reuse-values don't pick up the new default. */}}
+    {{- if ne .Values.cluster.deploymentEnvironment.overrideApplication false }}
     - key: deployment.environment.name
       action: upsert
       value: {{ .Values.cluster.deploymentEnvironment.name }}
