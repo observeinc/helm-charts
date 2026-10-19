@@ -113,7 +113,7 @@ generate-examples:
 		EXAMPLES=$$(find $${EXAMPLES_DIR} -maxdepth 1 -mindepth 1 -type d -exec basename \{\} \;); \
 		for example in $${EXAMPLES}; do \
 			echo "Generating example: $${example}"; \
-			VALUES=$$(find $${EXAMPLES_DIR}/$${example} -name *values.yaml); \
+			VALUES=$$(find $${EXAMPLES_DIR}/$${example} -maxdepth 1 -name values.yaml); \
 			rm -rf "$${EXAMPLES_DIR}/$${example}/rendered"; \
 			for value in $${VALUES}; do \
 				helm template example charts/$${chart_name} --namespace default --values $${value} --output-dir "$${EXAMPLES_DIR}/$${example}/rendered"; \
@@ -135,4 +135,4 @@ generate-examples:
 
 .PHONY: generate-oss-examples
 generate-oss-examples:
-	bash scripts/oss-collector/generate.sh
+	bash charts/agent/examples/oss-collector/scripts/generate.sh

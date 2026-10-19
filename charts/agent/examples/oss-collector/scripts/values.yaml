@@ -1,6 +1,6 @@
-# Chart values that the OpenTelemetry Collector examples in examples/oss-collector are generated
-# from (see README.md). The deployment environment is a ${env:...} reference, so the generated
-# configurations read it from the collector's environment at startup.
+# Observe Agent chart values that the OpenTelemetry Collector chart values in the parent directory
+# are generated from (see README.md). The deployment environment is a ${env:...} reference, so the
+# generated configurations read it from the collector's environment at startup.
 observe:
   token:
     create: true

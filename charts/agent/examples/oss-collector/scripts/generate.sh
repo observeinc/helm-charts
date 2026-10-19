@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
-# Generates the OpenTelemetry Collector examples in examples/oss-collector: plain collector
-# configurations in collector/ and values for the OpenTelemetry Collector Helm chart in helm/. They
-# come from the Observe Agent chart rendered with values.yaml, which is written to rendered/ there
-# too. `make generate-examples` runs this script. See README.md.
+# Generates the OpenTelemetry Collector Helm chart values in charts/agent/examples/oss-collector, one
+# per collector, from the Observe Agent chart rendered with values.yaml into rendered/ there.
+# `make generate-examples` runs this script. See README.md.
 #
 # For each entry in collectors.yaml it takes the collector ConfigMap's configuration, merges
 # otel-config.yaml on top, keeps only the listed pipelines and extensions, and deletes every
@@ -15,11 +14,11 @@
 set -euo pipefail
 
 dir=$(cd "$(dirname "$0")" && pwd)
-repo=$(cd "$dir/../.." && pwd)
-out_dir="$repo/examples/oss-collector"
+out_dir=$(cd "$dir/.." && pwd)
+repo=$(cd "$out_dir/../../../.." && pwd)
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
-mkdir -p "$work/collector" "$work/helm"
+mkdir -p "$work/values"
 
 # Render the Observe Agent chart the way `make generate-examples` renders the chart examples: the
 # chart's templates in rendered/, and each subchart's in rendered/<subchart>/.
@@ -134,9 +133,10 @@ chart_values() {
 }
 
 generate() {
-  local index=$1 configmap output description pipelines extensions
+  local index=$1 configmap name output description pipelines extensions
   configmap=$(yq ".[$index].configmap" "$dir/collectors.yaml")
-  output=$(yq ".[$index].output" "$dir/collectors.yaml")
+  name=$(yq ".[$index].name" "$dir/collectors.yaml")
+  output="$name-values.yaml"
   description=$(yq ".[$index].description" "$dir/collectors.yaml")
   pipelines=$(yq -o=json -I=0 ".[$index].pipelines" "$dir/collectors.yaml")
   extensions=$(yq -o=json -I=0 ".[$index].extensions // []" "$dir/collectors.yaml")
@@ -191,42 +191,24 @@ generate() {
     env(VARS)[] | select(. as $n | (($set + $chart_env) | any_c(. == $n)) | not)
   ' "$tmp/values.yaml")
 
-  {
-    echo "# $description"
-    echo "#"
-    echo "# GENERATED FILE, DO NOT EDIT. Run \"make generate-examples\" to regenerate it from the Observe"
-    echo "# Agent Helm chart (see scripts/oss-collector/README.md)."
-    echo "#"
-    echo "# Set these environment variables on the collector container:"
-    for var in $vars; do
-      printf '#   %-24s %s\n' "$var" "$(describe_env "$var")"
-    done
-    if [ -n "$gates" ]; then
-      echo "#"
-      echo "# Start the collector with these arguments, as the chart does:"
-      echo "#   --feature-gates=$gates"
-    fi
-    cat "$tmp/config.yaml"
-  } > "$work/collector/$output"
 
-  local values="${output%.yaml}-values.yaml"
   {
     echo "# $description"
     echo "#"
     echo "# GENERATED FILE, DO NOT EDIT. Run \"make generate-examples\" to regenerate it from the Observe"
-    echo "# Agent Helm chart (see scripts/oss-collector/README.md)."
+    echo "# Agent Helm chart (see scripts/README.md)."
     echo "#"
-    echo "# Values for the $chart_name Helm chart. Create the $secret Secret (see examples/oss-collector/README.md), then:"
+    echo "# Values for the $chart_name Helm chart. Create the $secret Secret (see README.md), then:"
     echo "#"
-    echo "#   helm install observe-${output%.yaml} $chart_name --repo $chart_repository \\"
-    echo "#     --version $chart_version --namespace observe --values $values"
+    echo "#   helm install observe-$name $chart_name --repo $chart_repository \\"
+    echo "#     --version $chart_version --namespace observe --values $output"
     echo "#"
     echo "# The collector reads these variables from the $secret Secret:"
     for var in $secret_vars; do
       printf '#   %-24s %s\n' "$var" "$(describe_env "$var")"
     done
     cat "$tmp/values.yaml"
-  } > "$work/helm/$values"
+  } > "$work/values/$output"
 }
 
 count=$(yq 'length' "$dir/collectors.yaml")
@@ -234,9 +216,9 @@ for ((i = 0; i < count; i++)); do
   generate "$i"
 done
 
-# Replace the output directories only once every file generated, so that outputs no longer listed
-# in collectors.yaml are removed too.
-for out in collector helm rendered; do
-  rm -rf "${out_dir:?}/$out"
-  mv "$work/$out" "$out_dir/$out"
-done
+# Replace the outputs only once every file generated, so that collectors no longer listed in
+# collectors.yaml are removed too.
+rm -rf "${out_dir:?}/rendered"
+rm -f "$out_dir"/*-values.yaml
+mv "$work/rendered" "$out_dir/rendered"
+mv "$work/values/"*-values.yaml "$out_dir/"

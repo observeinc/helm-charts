@@ -1,8 +1,8 @@
-# The collectors that generate.sh writes to examples/oss-collector (collector/ and helm/). Each one
+# The collectors that generate.sh writes chart values for, as <name>-values.yaml. Each one
 # comes from a collector ConfigMap in rendered/: otel-config.yaml is merged on top, then only the
 # listed pipelines and extensions are kept, and every component they don't use is deleted.
 - configmap: forwarder
-  output: forwarder.yaml
+  name: forwarder
   description: DaemonSet collector that receives application traces, logs, and metrics over OTLP and generates RED metrics.
   pipelines:
     - traces/observe-forward
@@ -14,7 +14,7 @@
   extensions:
     - health_check
 - configmap: node-logs-metrics
-  output: node.yaml
+  name: node
   description: DaemonSet collector for container logs, kubelet stats, and node metrics.
   pipelines:
     - logs
@@ -24,7 +24,7 @@
     - health_check
     - file_storage
 - configmap: cluster-metrics
-  output: cluster-metrics.yaml
+  name: cluster-metrics
   description: Single-replica Deployment collector for cluster-level Kubernetes metrics.
   pipelines:
     - metrics

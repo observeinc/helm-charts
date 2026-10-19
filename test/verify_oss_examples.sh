@@ -1,19 +1,17 @@
 #!/usr/bin/env bash
-# Checks the OpenTelemetry Collector examples in examples/oss-collector with
-# upstream otelcol-contrib: every configuration in collector/ must validate, and the forwarder
-# must keep the deployment environment that applications set while falling back to
-# DEPLOYMENT_ENVIRONMENT. Every values file in helm/ must render, with the pinned
-# OpenTelemetry Collector chart, into the same configuration as collector/ and set what it reads.
+# Checks the OpenTelemetry Collector Helm chart values in charts/agent/examples/oss-collector. The
+# collector configuration in each values file's alternateConfig must validate with upstream
+# otelcol-contrib, and the forwarder must keep the deployment environment that applications set
+# while falling back to DEPLOYMENT_ENVIRONMENT. Each values file must render, with the pinned
+# OpenTelemetry Collector chart, into exactly that configuration and set what it reads.
 #
 # Requires yq (https://github.com/mikefarah/yq), jq, curl, helm and otelcol-contrib
-# (override the binary with OTELCOL_CONTRIB=/path/to/otelcol-contrib). node.yaml only validates on
-# Linux with the node's root filesystem at /hostfs; for a local run, `sudo ln -s / /hostfs`.
+# (override the binary with OTELCOL_CONTRIB=/path/to/otelcol-contrib). node-values.yaml only
+# validates on Linux with the node's root filesystem at /hostfs; for a local run, `sudo ln -s / /hostfs`.
 set -euo pipefail
 
 repo=$(git rev-parse --show-toplevel)
-GENERATOR_DIR="$repo/scripts/oss-collector"
-OSS_DIR="$repo/examples/oss-collector"
-EXAMPLES_DIR="$OSS_DIR/collector"
+OSS_DIR="$repo/charts/agent/examples/oss-collector"
 OTELCOL_CONTRIB="${OTELCOL_CONTRIB:-otelcol-contrib}"
 
 for cmd in yq jq curl helm "$OTELCOL_CONTRIB"; do
@@ -29,9 +27,9 @@ export OBSERVE_CLUSTER_NAME=example-cluster OBSERVE_CLUSTER_UID=example-cluster-
 export MY_POD_IP=127.0.0.1 K8S_NODE_NAME=example-node
 export DEPLOYMENT_ENVIRONMENT=prod
 
-# feature_gates <example>: prints the arguments that the example's header says to start it with.
+# feature_gates <values file>: prints the --feature-gates argument the values start the collector with.
 feature_gates() {
-  sed -nE 's/^#   (--feature-gates=[^ ]+)$/\1/p' "$1"
+  yq '(.command.extraArgs // [])[] | select(test("^--feature-gates="))' "$1"
 }
 
 run_collector() {
@@ -62,27 +60,27 @@ users:
 EOF
 export KUBECONFIG="$tmp/kubeconfig"
 
-for config in "$EXAMPLES_DIR"/*.yaml; do
-  name=$(basename "$config")
+chart_name=$(yq '.name' "$OSS_DIR/scripts/upstream-chart.yaml")
+helm pull "$chart_name" --repo "$(yq '.repository' "$OSS_DIR/scripts/upstream-chart.yaml")" \
+  --version "$(yq '.version' "$OSS_DIR/scripts/upstream-chart.yaml")" --untar --untardir "$tmp/chart"
+
+for values in "$OSS_DIR"/*-values.yaml; do
+  name=$(basename "$values" -values.yaml)
+  label=$(basename "$values")
+  config="$tmp/$name.yaml"
+  yq '.alternateConfig' "$values" > "$config"
+
   yq '
     (.receivers | select(has("kubeletstats")) | .kubeletstats.auth_type) = "none" |
     (.receivers | select(has("kubeletstats")) | .kubeletstats.k8s_api_config.auth_type) = "kubeConfig"
-  ' "$config" > "$tmp/$name"
-  if "$OTELCOL_CONTRIB" validate --config "$tmp/$name" $(feature_gates "$config") > "$tmp/validate.log" 2>&1; then
-    pass "$name validates"
+  ' "$config" > "$tmp/$name-validate.yaml"
+  if "$OTELCOL_CONTRIB" validate --config "$tmp/$name-validate.yaml" $(feature_gates "$values") > "$tmp/validate.log" 2>&1; then
+    pass "$label configuration validates"
   else
     cat "$tmp/validate.log" >&2
-    fail "$name validates"
+    fail "$label configuration validates"
   fi
-done
 
-chart_name=$(yq '.name' "$GENERATOR_DIR/upstream-chart.yaml")
-helm pull "$chart_name" --repo "$(yq '.repository' "$GENERATOR_DIR/upstream-chart.yaml")" \
-  --version "$(yq '.version' "$GENERATOR_DIR/upstream-chart.yaml")" --untar --untardir "$tmp/chart"
-
-for values in "$OSS_DIR"/helm/*-values.yaml; do
-  name=$(basename "$values" -values.yaml)
-  label="helm/$(basename "$values")"
   if ! helm template "observe-$name" "$tmp/chart/$chart_name" --namespace observe --values "$values" > "$tmp/$name-chart.yaml" 2> "$tmp/helm.log"; then
     cat "$tmp/helm.log" >&2
     fail "$label renders"
@@ -90,12 +88,12 @@ for values in "$OSS_DIR"/helm/*-values.yaml; do
   fi
 
   yq ea 'select(.kind == "ConfigMap" and .data.relay) | .data.relay' "$tmp/$name-chart.yaml" | yq -P 'sort_keys(..)' > "$tmp/$name-chart-config.yaml"
-  yq -P 'sort_keys(..) | ... comments = ""' "$EXAMPLES_DIR/$name.yaml" > "$tmp/$name-config.yaml"
+  yq -P 'sort_keys(..)' "$config" > "$tmp/$name-config.yaml"
   if diff -u "$tmp/$name-config.yaml" "$tmp/$name-chart-config.yaml" > "$tmp/diff.log"; then
-    pass "$label renders the configuration in collector/$name.yaml"
+    pass "$label renders exactly its alternateConfig"
   else
     cat "$tmp/diff.log" >&2
-    fail "$label renders the configuration in collector/$name.yaml"
+    fail "$label renders exactly its alternateConfig"
   fi
 
   yq ea 'select(.kind == "DaemonSet" or .kind == "Deployment") | .spec.template.spec.containers[0]' "$tmp/$name-chart.yaml" > "$tmp/$name-container.yaml"
@@ -103,7 +101,7 @@ for values in "$OSS_DIR"/helm/*-values.yaml; do
   # The variables the values file's header says come from the Secret.
   from_secret=$(sed -nE 's/^#   ([A-Z][A-Z0-9_]+) .*/\1/p' "$values")
   missing=""
-  for var in $(grep -oE '\$\{env:[A-Za-z0-9_]+\}' "$EXAMPLES_DIR/$name.yaml" | sed -E 's/\$\{env:([A-Za-z0-9_]+)\}/\1/' | sort -u); do
+  for var in $(grep -oE '\$\{env:[A-Za-z0-9_]+\}' "$config" | sed -E 's/\$\{env:([A-Za-z0-9_]+)\}/\1/' | sort -u); do
     VAR=$var yq -e '.env[] | select(.name == strenv(VAR))' "$tmp/$name-container.yaml" > /dev/null 2>&1 ||
       grep -qx "$var" <<< "$from_secret" || missing="$missing $var"
   done
@@ -113,7 +111,7 @@ for values in "$OSS_DIR"/helm/*-values.yaml; do
     fail "$label sets every variable the configuration reads, once (duplicated:${duplicates:+ }$duplicates; missing:$missing)"
   fi
 
-  gates=$(feature_gates "$EXAMPLES_DIR/$name.yaml")
+  gates=$(feature_gates "$values")
   if [ -z "$gates" ] || GATES=$gates yq -e '.args[] | select(. == strenv(GATES))' "$tmp/$name-container.yaml" > /dev/null 2>&1; then
     pass "$label passes the feature gates"
   else
@@ -129,7 +127,7 @@ for values in "$OSS_DIR"/helm/*-values.yaml; do
 
   unused=""
   for port in $(yq '.ports[].containerPort' "$tmp/$name-container.yaml"); do
-    grep -qE ":$port\$" <(yq '.receivers | .. | select(tag == "!!str")' "$EXAMPLES_DIR/$name.yaml") || unused="$unused $port"
+    grep -qE ":$port\$" <(yq '.receivers | .. | select(tag == "!!str")' "$config") || unused="$unused $port"
   done
   if [ -z "$unused" ]; then
     pass "$label only opens ports the configuration listens on"
@@ -140,11 +138,11 @@ done
 
 out="$tmp/forwarder"
 mkdir -p "$out"
-make_testable "$EXAMPLES_DIR/forwarder.yaml" "$out" "$APP_PIPELINES"
-collector_args=$(feature_gates "$EXAMPLES_DIR/forwarder.yaml")
-if start_collector "forwarder.yaml" "$out"; then
-  check_app_pipelines "forwarder.yaml" "$out" "legacy-env=staging/staging new-env=dev/dev no-env=prod/prod"
-  stop_collector "forwarder.yaml" "$out"
+make_testable "$tmp/forwarder.yaml" "$out" "$APP_PIPELINES"
+collector_args=$(feature_gates "$OSS_DIR/forwarder-values.yaml")
+if start_collector "forwarder-values.yaml" "$out"; then
+  check_app_pipelines "forwarder-values.yaml" "$out" "legacy-env=staging/staging new-env=dev/dev no-env=prod/prod"
+  stop_collector "forwarder-values.yaml" "$out"
 fi
 
 if [ "$any_failed" = true ]; then
