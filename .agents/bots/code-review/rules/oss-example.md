@@ -9,7 +9,7 @@ Check this rule when a pull request changes any of:
 - `charts/agent/templates/**` collector configuration: processors, pipelines, receivers, exporters, or the environment variables they read
 - `charts/agent/values.yaml` defaults that change the rendered collector configuration
 - `charts/agent/Chart.yaml` `appVersion`, which changes the collector version the examples are validated against
-- `charts/agent/examples/oss-collector/**` or `charts/agent/examples/oss-collector-kubernetes-explorer/**`
+- `charts/agent/examples/oss-collector/**`
 - `test/verify_oss_examples.sh` or `test/lib/deployment_environment.sh`
 
 ## What to check

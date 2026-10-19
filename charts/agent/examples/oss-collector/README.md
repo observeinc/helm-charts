@@ -7,7 +7,6 @@ These examples show how to send Kubernetes telemetry to Observe with a plain [Op
 | [`collector/forwarder.yaml`](collector/forwarder.yaml) | DaemonSet | Application traces, logs, and metrics over OTLP, and RED (request rate, error, and duration) metrics generated from traces |
 | [`collector/node.yaml`](collector/node.yaml) | DaemonSet | Container logs, kubelet stats, and node metrics |
 | [`collector/cluster-metrics.yaml`](collector/cluster-metrics.yaml) | Deployment with one replica | Cluster-level Kubernetes metrics |
-| [`../oss-collector-kubernetes-explorer/values.yaml`](../oss-collector-kubernetes-explorer/values.yaml) | Values for the `observe/agent` Helm chart | Kubernetes objects for Kubernetes Explorer (see below) |
 
 ## Deploy the collectors
 
@@ -25,10 +24,6 @@ The collectors also need:
 - A service account with read access to pods, namespaces, nodes, ReplicaSets, Deployments, and the other workload resources, for the `k8sattributes` processor and the `k8s_cluster` receiver. `node.yaml` also needs access to the `nodes/stats` and `nodes/proxy` resources for kubelet stats.
 - For `node.yaml`: the node's root filesystem mounted read-only at `/hostfs`, `/var/log/pods` mounted read-only, and a writable volume at `/var/lib/otelcol/file_storage` so that log read positions survive restarts.
 - For `forwarder.yaml`: ports 4317 (gRPC) and 4318 (HTTP) exposed so applications on the node can send OTLP to the collector.
-
-## Kubernetes Explorer
-
-Kubernetes Explorer needs Kubernetes object data, which the Observe-specific `observek8sattributes` processor produces. Upstream collector distributions don't include it. Deploy the `observe/agent` Helm chart with only object collection enabled, using the values in the [`oss-collector-kubernetes-explorer`](../oss-collector-kubernetes-explorer/) example. Set the cluster name and deployment environment in those values to the same values as `OBSERVE_CLUSTER_NAME` and `DEPLOYMENT_ENVIRONMENT`, so that Kubernetes Explorer can line up objects with metrics and logs.
 
 ## How these examples stay up to date
 
