@@ -23,7 +23,9 @@ mkdir -p "$work/values"
 # Render the Observe Agent chart the way `make generate-examples` renders the chart examples: the
 # chart's templates in rendered/, and each subchart's in rendered/<subchart>/.
 rendered="$work/rendered"
-[ -d "$repo/charts/agent/charts" ] || helm dependency build "$repo/charts/agent" > /dev/null
+if helm dependency list "$repo/charts/agent" | awk 'NR > 1 && NF && $4 != "ok"' | grep -q .; then
+  helm dependency build "$repo/charts/agent" > /dev/null
+fi
 helm template example "$repo/charts/agent" --namespace default --values "$dir/values.yaml" --output-dir "$work/helm-output" > /dev/null
 mkdir -p "$rendered"
 mv "$work/helm-output/agent/templates/"* "$rendered/"
@@ -57,7 +59,6 @@ describe_env() {
     DEPLOYMENT_ENVIRONMENT) echo "Fallback deployment.environment.name for telemetry that does not set one" ;;
     MY_POD_IP) echo "The collector pod's IP address (downward API: status.podIP)" ;;
     K8S_NODE_NAME) echo "The node the collector pod runs on (downward API: spec.nodeName)" ;;
-    OTEL_K8S_POD_NAME) echo "The collector pod's name (downward API: metadata.name)" ;;
     *) return 1 ;;
   esac
 }
@@ -118,6 +119,9 @@ chart_values() {
     # The monitor collector scrapes the collectors that carry observe_monitor_* annotations, and
     # observeinc_com_scrape: "false" keeps Prometheus pod scraping from scraping them a second time.
     .podAnnotations = (($w.spec.template.metadata.annotations // {}) | with_entries(select(.key | test("^(observe_monitor_|observeinc_com_)")))) |
+    .affinity = ($pod.affinity // {}) |
+    .nodeSelector = ($pod.nodeSelector // {}) |
+    .tolerations = ($pod.tolerations // []) |
     .podSecurityContext = ($pod.securityContext // {}) |
     .securityContext = ($c.securityContext // {}) |
     .resources = ($c.resources // {}) |
@@ -133,6 +137,9 @@ chart_values() {
     with(select(.extraVolumes | length == 0); del(.extraVolumes)) |
     with(select(.extraVolumeMounts | length == 0); del(.extraVolumeMounts)) |
     with(select(.podAnnotations | length == 0); del(.podAnnotations)) |
+    with(select(.affinity | length == 0); del(.affinity)) |
+    with(select(.nodeSelector | length == 0); del(.nodeSelector)) |
+    with(select(.tolerations | length == 0); del(.tolerations)) |
     with(select(.podSecurityContext | length == 0); del(.podSecurityContext)) |
     with(select(.securityContext | length == 0); del(.securityContext)) |
     with(select(.resources | length == 0); del(.resources))

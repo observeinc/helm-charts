@@ -166,42 +166,42 @@ for values in "$OSS_DIR"/*-values.yaml; do
   fi
 done
 
-# Kubernetes objects from k8sobjects include Secrets, whose values must not reach Observe.
+# Kubernetes objects from k8sobjects include Secrets, whose values must not reach Observe. In every
+# pipeline that receives them, transform/redact_secrets must run before any processor that reads or
+# copies the log body; only these may run before it.
 for values in "$OSS_DIR"/*-values.yaml; do
   label=$(basename "$values")
-  unredacted=$(yq '
-    .alternateConfig as $c |
-    [$c.receivers | to_entries[] | select(.key | test("^k8sobjects(/|$)")) | select(.value.objects[]?.name == "secrets") | .key] as $secret_receivers |
-    [$c.service.pipelines | to_entries[] |
-      select(.value.receivers | any_c(. as $r | $secret_receivers | any_c(. == $r))) |
-      select(.value.processors | any_c(. == "transform/redact_secrets") | not) | .key] | join(" ")
-  ' "$values")
-  if [ -z "$unredacted" ]; then
-    pass "$label redacts Secrets in every pipeline that receives them"
+  problems=$(yq -o=json '.alternateConfig' "$values" | jq -r '
+    [(.receivers // {}) | to_entries[] | select(.key | test("^k8sobjects(/|$)")) | select(any(.value.objects[]?; .name == "secrets")) | .key] as $secret_receivers |
+    .service.pipelines | to_entries[] | select(any(.value.receivers[]; . as $r | $secret_receivers | index($r))) |
+    .key as $pipeline | (.value.processors // []) as $processors | ($processors | index("transform/redact_secrets")) as $i |
+    if $i == null then "\($pipeline) has no transform/redact_secrets"
+    else ($processors[:$i] | map(select(test("^(memory_limiter|batch|resource/.+|transform/unify)$") | not))) as $before |
+      if ($before | length) > 0 then "\($pipeline) runs \($before | join(", ")) before transform/redact_secrets" else empty end
+    end')
+  if [ -z "$problems" ]; then
+    pass "$label redacts Secrets before anything else reads them"
   else
-    fail "$label redacts Secrets in every pipeline that receives them (missing transform/redact_secrets: $unredacted)"
+    fail "$label redacts Secrets before anything else reads them ($problems)"
   fi
 done
 
-# Send a pulled and a watched Secret through the cluster-events processors that run before
-# transform/object, and check that what comes out is redacted.
+# Send a pulled and a watched Secret through the processors of the cluster-events pipeline that
+# receives Secrets, in their real order, and check that no Secret value comes out anywhere.
 redaction="$tmp/redaction"
 mkdir -p "$redaction"
-yq '.alternateConfig as $c | {
+yq '.alternateConfig as $c | ($c.service.pipelines["logs/objects"].processors) as $processors | {
   "receivers": {"otlp": {"protocols": {"http": {"endpoint": "127.0.0.1:4319"}}}},
-  "processors": {
-    "transform/unify": $c.processors["transform/unify"],
-    "transform/redact_secrets": $c.processors["transform/redact_secrets"]
-  },
+  "processors": ($processors | map(. as $id | {"key": $id, "value": $c.processors[$id]}) | from_entries),
   "exporters": {"file": {"path": "'"$redaction"'/out.json"}},
   "service": {
     "telemetry": {"metrics": {"level": "none"}},
-    "pipelines": {"logs": {"receivers": ["otlp"], "processors": ["transform/unify", "transform/redact_secrets"], "exporters": ["file"]}}
+    "pipelines": {"logs": {"receivers": ["otlp"], "processors": $processors, "exporters": ["file"]}}
   }
 }' "$OSS_DIR/cluster-events-values.yaml" > "$redaction/collector.yaml"
 "$OTELCOL_CONTRIB" --config "$redaction/collector.yaml" > "$redaction/collector.log" 2>&1 &
 redaction_pid=$!
-secret='{"apiVersion": "v1", "kind": "Secret", "metadata": {"name": "example", "namespace": "default",
+secret='{"apiVersion": "v1", "kind": "Secret", "metadata": {"name": "example", "namespace": "default", "uid": "example-uid",
   "annotations": {"kubectl.kubernetes.io/last-applied-configuration": "{\"data\":{\"token\":\"c2VjcmV0LXZhbHVl\"}}", "keep": "yes"}},
   "data": {"token": "c2VjcmV0LXZhbHVl"}, "stringData": {"password": "secret-value\nsecond line"}}'
 jq -n --argjson secret "$secret" '
@@ -219,21 +219,21 @@ for _ in $(seq 1 30); do
   fi
   sleep 1
 done
-sleep 2
-kill "$redaction_pid" 2> /dev/null
-wait "$redaction_pid" 2> /dev/null
+sleep 3
+kill "$redaction_pid" 2> /dev/null || true
+wait "$redaction_pid" 2> /dev/null || true
 bodies=$(jq -c '
   def plain: if .kvlistValue then ((.kvlistValue.values // []) | map({key, value: (.value | plain)}) | from_entries)
     elif .arrayValue then (.arrayValue.values | map(plain)) elif has("stringValue") then .stringValue else . end;
-  .resourceLogs[].scopeLogs[].logRecords[].body | plain' "$redaction/out.json" 2> /dev/null)
-if [ "$sent" = true ] && [ "$(wc -l <<< "$bodies")" -eq 2 ] && ! grep -q 'secret-value\|c2VjcmV0LXZhbHVl' <<< "$bodies" &&
+  .resourceLogs[].scopeLogs[].logRecords[].body | plain' "$redaction/out.json" 2> /dev/null || true)
+if [ "$sent" = true ] && [ "$(grep -c . <<< "$bodies")" -eq 2 ] && ! grep -q 'secret-value\|c2VjcmV0LXZhbHVl' "$redaction/out.json" &&
   jq -se 'all(.[]; .data.token == "UkVEQUNURUQ=" and .stringData.password == "REDACTED"
-    and (.metadata.annotations | has("kubectl.kubernetes.io/last-applied-configuration") | not) and .metadata.annotations.keep == "yes")' <<< "$bodies" > /dev/null; then
-  pass "cluster-events-values.yaml redacts pulled and watched Secrets"
+    and (.metadata.annotations | has("kubectl.kubernetes.io/last-applied-configuration") | not) and .metadata.annotations.keep == "yes")' <<< "$bodies" > /dev/null 2>&1; then
+  pass "cluster-events-values.yaml redacts pulled and watched Secrets in every field it exports"
 else
   cat "$redaction/collector.log" >&2
   echo "$bodies" >&2
-  fail "cluster-events-values.yaml redacts pulled and watched Secrets"
+  fail "cluster-events-values.yaml redacts pulled and watched Secrets in every field it exports"
 fi
 
 out="$tmp/forwarder"

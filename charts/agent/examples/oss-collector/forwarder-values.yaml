@@ -53,6 +53,17 @@ podAnnotations:
   observe_monitor_purpose: observecollection
   observe_monitor_scrape: "true"
   observeinc_com_scrape: "false"
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: observeinc.com/unschedulable
+              operator: DoesNotExist
+            - key: kubernetes.io/os
+              operator: NotIn
+              values:
+                - windows
 resources:
   limits:
     memory: 512Mi
@@ -468,11 +479,6 @@ alternateConfig:
                 prometheus:
                   host: ${env:MY_POD_IP}
                   port: 8888
-                  with_resource_constant_labels:
-                    included:
-                      - observe.agent.instance.id
-      resource:
-        observe.agent.instance.id: ${env:OTEL_K8S_POD_NAME}
     extensions:
       - health_check
       - cgroupruntime

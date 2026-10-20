@@ -26,7 +26,7 @@ extensions:
       enabled: true
 service:
   # The internal telemetry the observe-agent binary configures: the monitor collector scrapes these
-  # metrics from each collector pod, labeled with the collector's instance ID.
+  # metrics from each collector pod.
   telemetry:
     logs:
       encoding: console
@@ -39,11 +39,6 @@ service:
               prometheus:
                 host: ${env:MY_POD_IP}
                 port: 8888
-                with_resource_constant_labels:
-                  included:
-                    - observe.agent.instance.id
-    resource:
-      observe.agent.instance.id: ${env:OTEL_K8S_POD_NAME}
 exporters:
   otlphttp/observe/base:
     endpoint: ${env:OBSERVE_COLLECTION_URL}/v2/otel
