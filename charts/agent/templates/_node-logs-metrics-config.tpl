@@ -81,6 +81,12 @@ receivers:
         mute_process_exe_error: true
         mute_process_io_error: true
         mute_process_user_error: true
+        # Command lines can contain secrets and add high-cardinality labels.
+        resource_attributes:
+          process.command:
+            enabled: false
+          process.command_line:
+            enabled: false
       {{- end }}
   {{ end -}}
   {{- if .Values.node.containers.metrics.enabled }}

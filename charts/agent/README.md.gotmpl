@@ -29,7 +29,11 @@ node-logs-metrics:
 
 Host PID access gives all containers in the agent pod visibility into host processes. The cluster's security policy must permit this access. Kubernetes does not allow `hostPID` and `shareProcessNamespace` to both be true.
 
-The process scraper uses the existing host filesystem mount and hostmetrics pipeline. Per-process metrics can increase metric volume. Executable-path, I/O, and user lookup errors are muted; this does not grant access to protected process data. To change scraper options, use `agent.config.nodeLogsMetrics.receivers.hostmetrics.scrapers.process`.
+The process scraper uses the existing host filesystem mount and hostmetrics pipeline. Per-process metrics can increase metric volume. Executable-path, I/O, and user lookup errors are muted.
+
+The `process.command` and `process.command_line` resource attributes are disabled by default. Resource attributes become metric labels, and process command lines can contain secrets such as passwords, tokens, and connection strings. Other process attributes, such as `process.executable.path` and `process.owner`, stay enabled. Before you enable command-line attributes, make sure that they cannot expose secrets from any process on the node.
+
+To change scraper options, use `agent.config.nodeLogsMetrics.receivers.hostmetrics.scrapers.process`.
 
 ## cluster-events
 

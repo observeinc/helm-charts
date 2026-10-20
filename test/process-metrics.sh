@@ -47,7 +47,7 @@ assert_yaml "$pod" '.hostPID == false and .shareProcessNamespace != true'
 enabled=(--set node.metrics.process.enabled=true --set node-logs-metrics.hostPID=true)
 manifest=$(render "${enabled[@]}")
 config=$(printf '%s\n' "$manifest" | collector_config)
-assert_yaml "$config" '.receivers.hostmetrics.scrapers.process == {"mute_process_exe_error": true, "mute_process_io_error": true, "mute_process_user_error": true}'
+assert_yaml "$config" '.receivers.hostmetrics.scrapers.process == {"mute_process_exe_error": true, "mute_process_io_error": true, "mute_process_user_error": true, "resource_attributes": {"process.command": {"enabled": false}, "process.command_line": {"enabled": false}}}'
 assert_yaml "$config" '.service.pipelines."metrics/hostmetrics".receivers == ["hostmetrics"]'
 assert_yaml "$config" '.service.pipelines."metrics/hostmetrics".exporters == ["prometheusremotewrite/observe"]'
 assert_yaml "$config" '.exporters."prometheusremotewrite/observe".resource_to_telemetry_conversion.enabled == true'
@@ -75,6 +75,12 @@ assert_yaml "$resources" '. == 0'
 manifest=$(render "${enabled[@]}" --set agent.config.nodeLogsMetrics.receivers.hostmetrics.scrapers.process.mute_process_io_error=false)
 config=$(printf '%s\n' "$manifest" | collector_config)
 assert_yaml "$config" '.receivers.hostmetrics.scrapers.process.mute_process_io_error == false'
+assert_yaml "$config" '.receivers.hostmetrics.scrapers.process.resource_attributes."process.command_line".enabled == false'
+
+manifest=$(render "${enabled[@]}" --set 'agent.config.nodeLogsMetrics.receivers.hostmetrics.scrapers.process.resource_attributes.process\.command_line.enabled=true')
+config=$(printf '%s\n' "$manifest" | collector_config)
+assert_yaml "$config" '.receivers.hostmetrics.scrapers.process.resource_attributes."process.command_line".enabled == true'
+assert_yaml "$config" '.receivers.hostmetrics.scrapers.process.resource_attributes."process.command".enabled == false'
 
 manifest=$(render --set node-logs-metrics.shareProcessNamespace=true)
 pod=$(printf '%s\n' "$manifest" | node_pod)
