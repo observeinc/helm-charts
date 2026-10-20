@@ -11,6 +11,26 @@
 
 This service is a *daemonset* which means it runs on every node in the cluster. It is responsible for collecting logs from pods that are running on the node. In addition, it scrapes the API of the kubelet running on the node for metrics about the node and the pods running on the node.
 
+### Process metrics
+
+Per-process metrics are disabled by default. To enable them, set:
+
+```yaml
+node:
+  enabled: true
+  metrics:
+    enabled: true
+    process:
+      enabled: true
+node-logs-metrics:
+  hostPID: true
+  shareProcessNamespace: false
+```
+
+Host PID access gives all containers in the agent pod visibility into host processes. The cluster's security policy must permit this access. Kubernetes does not allow `hostPID` and `shareProcessNamespace` to both be true.
+
+The process scraper uses the existing host filesystem mount and hostmetrics pipeline. Per-process metrics can increase metric volume. Executable-path, I/O, and user lookup errors are muted; this does not grant access to protected process data. To change scraper options, use `agent.config.nodeLogsMetrics.receivers.hostmetrics.scrapers.process`.
+
 ## cluster-events
 
 This service is a *single-instance deployment*. It's critical that this service is only a single instance since otherwise it would produce duplicate data. It is responsible for both scraping for Kubernetes events on startup as well as registering as a listener for any new Kubernetes events produced by the cluster. These events are then transformed and become the basis for the representation of all the resources in your Kubernetes cluster as well as any events that happen on those resources.

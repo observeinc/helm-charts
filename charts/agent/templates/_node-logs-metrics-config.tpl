@@ -10,6 +10,14 @@ multiline:
 {{- end }}
 
 {{- define "observe.daemonset.logsMetrics.config" -}}
+{{- if and .Values.node.metrics.enabled .Values.node.metrics.process.enabled }}
+{{- if not (index .Values "node-logs-metrics" "hostPID") }}
+{{- fail "node.metrics.process.enabled requires node-logs-metrics.hostPID=true so the hostmetrics process scraper can see host processes." }}
+{{- end }}
+{{- end }}
+{{- if and (index .Values "node-logs-metrics" "hostPID") (index .Values "node-logs-metrics" "shareProcessNamespace") }}
+{{- fail "node-logs-metrics.shareProcessNamespace cannot be enabled together with node-logs-metrics.hostPID." }}
+{{- end }}
 
 extensions:
 {{- include "config.extensions.file_storage" . | nindent 2 }}
@@ -68,6 +76,12 @@ receivers:
       load: null
       memory: null
       network: null
+      {{- if .Values.node.metrics.process.enabled }}
+      process:
+        mute_process_exe_error: true
+        mute_process_io_error: true
+        mute_process_user_error: true
+      {{- end }}
   {{ end -}}
   {{- if .Values.node.containers.metrics.enabled }}
   {{- $endpoint := "" }}

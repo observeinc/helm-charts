@@ -20,6 +20,15 @@ jobs:
       - name: Generate examples
         run: make generate-examples
 
+      - name: Install yq
+        uses: dcarbone/install-yq-action@v1.3.1
+        with:
+          version: v4.53.6
+          force: 'true'
+
+      - name: Test process metrics configuration
+        run: bash test/process-metrics.sh
+
       - name: Check for diff
         run: |
           git diff --exit-code || {
