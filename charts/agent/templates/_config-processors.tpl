@@ -100,7 +100,7 @@ resource/observe_common:
       {{ end -}}
     {{ if .Values.cluster.deploymentEnvironment.name }}
     {{- /* Only an explicit false selects the fallback: upgrades with --reuse-values don't pick up the new default. */}}
-    {{- if ne .Values.cluster.deploymentEnvironment.overrideApplication false }}
+    {{- if ne (toString .Values.cluster.deploymentEnvironment.overrideApplication) "false" }}
     - key: deployment.environment.name
       action: upsert
       value: {{ .Values.cluster.deploymentEnvironment.name }}
@@ -324,8 +324,13 @@ transform/add_empty_service_attributes:
     # Default any still-missing attributes.
     - set(resource.attributes["service.name"], "") where resource.attributes["service.name"] == nil
     - set(resource.attributes["service.namespace"], "") where resource.attributes["service.namespace"] == nil
-    - set(resource.attributes["deployment.environment.name"], {{ .Values.cluster.deploymentEnvironment.name | quote }}) where resource.attributes["deployment.environment.name"] == nil
-    - set(resource.attributes["deployment.environment"], {{ .Values.cluster.deploymentEnvironment.name | quote }}) where resource.attributes["deployment.environment"] == nil
+    {{- with .Values.cluster.deploymentEnvironment.name }}
+    - set(resource.attributes["deployment.environment.name"], {{ . | quote }}) where resource.attributes["deployment.environment.name"] == nil
+    - set(resource.attributes["deployment.environment"], {{ . | quote }}) where resource.attributes["deployment.environment"] == nil
+    {{- else }}
+    - set(resource.attributes["deployment.environment.name"], "") where resource.attributes["deployment.environment.name"] == nil
+    - set(resource.attributes["deployment.environment"], "") where resource.attributes["deployment.environment"] == nil
+    {{- end }}
 {{- end -}}
 
 {{- define "config.processors.transform.deployment_environment_compatibility" -}}
