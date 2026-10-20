@@ -99,12 +99,31 @@ resource/observe_common:
       value:  ${env:OBSERVE_CLUSTER_UID}
       {{ end -}}
     {{ if .Values.cluster.deploymentEnvironment.name }}
+    {{- /* Only an explicit false selects the fallback: upgrades with --reuse-values don't pick up the new default. */}}
+    {{- if ne (toString .Values.cluster.deploymentEnvironment.overrideApplication) "false" }}
     - key: deployment.environment.name
       action: upsert
       value: {{ .Values.cluster.deploymentEnvironment.name }}
     - key: deployment.environment
       action: upsert
       value: {{ .Values.cluster.deploymentEnvironment.name }}
+    {{- else }}
+    # Mirror an environment the telemetry already carries (e.g. from a
+    # resource.opentelemetry.io/* pod annotation) onto the other key before
+    # falling back to the cluster value.
+    - key: deployment.environment.name
+      action: insert
+      from_attribute: deployment.environment
+    - key: deployment.environment
+      action: insert
+      from_attribute: deployment.environment.name
+    - key: deployment.environment.name
+      action: insert
+      value: {{ .Values.cluster.deploymentEnvironment.name }}
+    - key: deployment.environment
+      action: insert
+      value: {{ .Values.cluster.deploymentEnvironment.name }}
+    {{- end }}
     {{ end }}
 {{- end -}}
 
@@ -295,17 +314,23 @@ filter/drop_long_spans:
 # Normalizes deployment environment (coalescing from the deprecated `deployment.environment`
 # onto `deployment.environment.name` and vice versa) and defaults the service / environment resource
 # attributes so they can be referenced as spanmetrics dimensions and in Observe even when the instrumentation
-# did not supply them.
+# did not supply them. A missing deployment environment defaults to cluster.deploymentEnvironment.name, since
+# the later resource/observe_common fallback cannot replace the default once it is set.
 transform/add_empty_service_attributes:
   error_mode: ignore
   trace_statements:
     - set(resource.attributes["deployment.environment.name"], Coalesce([resource.attributes["deployment.environment.name"], resource.attributes["deployment.environment"]]))
     - set(resource.attributes["deployment.environment"], Coalesce([resource.attributes["deployment.environment"], resource.attributes["deployment.environment.name"]]))
-    # Default any still-missing attributes to an empty string.
+    # Default any still-missing attributes.
     - set(resource.attributes["service.name"], "") where resource.attributes["service.name"] == nil
     - set(resource.attributes["service.namespace"], "") where resource.attributes["service.namespace"] == nil
+    {{- with .Values.cluster.deploymentEnvironment.name }}
+    - set(resource.attributes["deployment.environment.name"], {{ . | quote }}) where resource.attributes["deployment.environment.name"] == nil
+    - set(resource.attributes["deployment.environment"], {{ . | quote }}) where resource.attributes["deployment.environment"] == nil
+    {{- else }}
     - set(resource.attributes["deployment.environment.name"], "") where resource.attributes["deployment.environment.name"] == nil
     - set(resource.attributes["deployment.environment"], "") where resource.attributes["deployment.environment"] == nil
+    {{- end }}
 {{- end -}}
 
 {{- define "config.processors.transform.deployment_environment_compatibility" -}}
