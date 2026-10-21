@@ -112,8 +112,9 @@ generate-examples:
 		EXAMPLES_DIR=charts/$${chart_name}/examples; \
 		EXAMPLES=$$(find $${EXAMPLES_DIR} -maxdepth 1 -mindepth 1 -type d -exec basename \{\} \;); \
 		for example in $${EXAMPLES}; do \
+			[ -f "$${EXAMPLES_DIR}/$${example}/values.yaml" ] || continue; \
 			echo "Generating example: $${example}"; \
-			VALUES=$$(find $${EXAMPLES_DIR}/$${example} -name *values.yaml); \
+			VALUES=$$(find $${EXAMPLES_DIR}/$${example} -maxdepth 1 -name values.yaml); \
 			rm -rf "$${EXAMPLES_DIR}/$${example}/rendered"; \
 			for value in $${VALUES}; do \
 				helm template example charts/$${chart_name} --namespace default --values $${value} --output-dir "$${EXAMPLES_DIR}/$${example}/rendered"; \
@@ -131,3 +132,8 @@ generate-examples:
 		done; \
 	done; \
 	find charts/*/examples -type f -name '*.yaml' -exec perl -0777 -i -pe 's/[ \t]+$$//mg; s/\s+\z/\n/' {} +
+	$(MAKE) generate-oss-examples
+
+.PHONY: generate-oss-examples
+generate-oss-examples:
+	bash charts/agent/examples/oss-collector/scripts/generate.sh

@@ -1,0 +1,45 @@
+# Observe Agent chart values that the OpenTelemetry Collector chart values in the parent directory
+# are generated from (see README.md). The deployment environment is a ${env:...} reference, so the
+# generated configurations read it from the collector's environment at startup.
+observe:
+  token:
+    create: true
+
+# Every collection feature of the Observe Agent chart is on, so the examples collect everything the
+# agent can. Left out: nodeless (for clusters without nodes, instead of the node collectors), the
+# gateway deployment (a forwarding tier that samples traces), and the Prometheus target allocator.
+cluster:
+  metadata:
+    # Hold telemetry until the first pod metadata poll completes, so it isn't sent unenriched.
+    waitForInitialPoll: true
+  deploymentEnvironment:
+    name: ${env:DEPLOYMENT_ENVIRONMENT}
+    # Telemetry that sets its own environment keeps it; DEPLOYMENT_ENVIRONMENT is only a fallback.
+    overrideApplication: false
+
+application:
+  REDMetrics:
+    enabled: true
+  # Scrapes Prometheus metrics from pods with a container port named *metrics or a
+  # prometheus.io/port annotation, as the Observe Agent chart does when this is enabled.
+  prometheusScrape:
+    enabled: true
+
+gatewayDeployment:
+  enabled: false
+
+node:
+  metrics:
+    cadvisor:
+      enabled: true
+  containers:
+    logs:
+      autoMultilineDetection: true
+
+agent:
+  config:
+    global:
+      fleet:
+        enabled: false
+      exporters:
+        emitPrometheusTargetInfoMetrics: true
