@@ -451,7 +451,7 @@ cluster-events:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.18.0
+    tag: 2.19.0
     pullPolicy: IfNotPresent
 
   command:
@@ -518,7 +518,7 @@ cluster-events:
   # this init container provides the cluster uid (kube-system namespace) as config map
   initContainers:
     - name: kube-cluster-info
-      image: observeinc/kube-cluster-info:v0.11.6
+      image: observeinc/kube-cluster-info:v0.11.14
       imagePullPolicy: Always
       env:
         - name: NAMESPACE
@@ -587,7 +587,7 @@ cluster-metrics:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.18.0
+    tag: 2.19.0
     pullPolicy: IfNotPresent
 
   command:
@@ -654,7 +654,7 @@ cluster-metrics:
   # this init container provides the cluster uid (kube-system namespace) as config map
   initContainers:
     - name: kube-cluster-info
-      image: observeinc/kube-cluster-info:v0.11.6
+      image: observeinc/kube-cluster-info:v0.11.14
       imagePullPolicy: Always
       env:
         - name: NAMESPACE
@@ -756,7 +756,7 @@ prometheus-scraper:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.18.0
+    tag: 2.19.0
     pullPolicy: IfNotPresent
 
   command:
@@ -823,7 +823,7 @@ prometheus-scraper:
   # this init container provides the cluster uid (kube-system namespace) as config map
   initContainers:
     - name: kube-cluster-info
-      image: observeinc/kube-cluster-info:v0.11.6
+      image: observeinc/kube-cluster-info:v0.11.14
       imagePullPolicy: Always
       env:
         - name: NAMESPACE
@@ -891,7 +891,7 @@ node-logs-metrics:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.18.0
+    tag: 2.19.0
     pullPolicy: IfNotPresent
 
   command:
@@ -966,7 +966,7 @@ node-logs-metrics:
   # this init container provides the cluster uid (kube-system namespace) as config map
   initContainers:
     - name: kube-cluster-info
-      image: observeinc/kube-cluster-info:v0.11.6
+      image: observeinc/kube-cluster-info:v0.11.14
       imagePullPolicy: Always
       env:
         - name: NAMESPACE
@@ -1077,7 +1077,7 @@ monitor:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.18.0
+    tag: 2.19.0
     pullPolicy: IfNotPresent
 
   command:
@@ -1144,7 +1144,7 @@ monitor:
   # this init container provides the cluster uid (kube-system namespace) as config map
   initContainers:
     - name: kube-cluster-info
-      image: observeinc/kube-cluster-info:v0.11.6
+      image: observeinc/kube-cluster-info:v0.11.14
       imagePullPolicy: Always
       env:
         - name: NAMESPACE
@@ -1218,7 +1218,7 @@ forwarder:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.18.0
+    tag: 2.19.0
     pullPolicy: IfNotPresent
 
   command:
@@ -1291,7 +1291,7 @@ forwarder:
   # this init container provides the cluster uid (kube-system namespace) as config map
   initContainers:
     - name: kube-cluster-info
-      image: observeinc/kube-cluster-info:v0.11.6
+      image: observeinc/kube-cluster-info:v0.11.14
       imagePullPolicy: Always
       env:
         - name: NAMESPACE
@@ -1372,7 +1372,7 @@ gateway:
   # Same for each deployment/daemonset      #
   image:
     repository: observeinc/observe-agent
-    tag: 2.18.0
+    tag: 2.19.0
     pullPolicy: IfNotPresent
 
   command:
@@ -1454,7 +1454,7 @@ gateway:
   # this init container provides the cluster uid (kube-system namespace) as config map
   initContainers:
     - name: kube-cluster-info
-      image: observeinc/kube-cluster-info:v0.11.6
+      image: observeinc/kube-cluster-info:v0.11.14
       imagePullPolicy: Always
       env:
         - name: NAMESPACE
