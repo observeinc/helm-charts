@@ -55,7 +55,7 @@ spec:
     {{- include "observe.sidecar.applyFargateSidecarConfig" . | nindent 4 }}
   initContainers:
     - name: kube-cluster-info
-      image: observeinc/kube-cluster-info:v0.11.6
+      image: observeinc/kube-cluster-info:v0.11.14
       imagePullPolicy: Always
       env:
         - name: NAMESPACE
