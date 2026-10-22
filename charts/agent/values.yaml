@@ -248,6 +248,15 @@ application:
         - peer.db.name
         - peer.messaging.system
         - observe.status_code
+  GenAIMetrics:
+    # -- (bool) Whether to build GenAI metrics from spans, following the OpenTelemetry GenAI semantic conventions. Spans longer than `node.forwarder.traces.maxSpanDuration` are not counted. Turn off the SDK's own GenAI metrics when enabling this, or the same calls are counted twice.
+    enabled: false
+    # -- (bool) Adds `gen_ai.conversation.id` to the duration and token metrics. Each conversation becomes its own set of data points, so the number of series grows with the number of conversations.
+    includeConversationId: false
+    # -- (bool) Adds `user.id` to the duration metrics. The number of series grows with the number of users.
+    includeUserId: false
+    # -- (list) Builds metrics only from spans that match at least one entry. Each entry sets `serviceName`, `instrumentationScopeName`, or both, and a span matches when it has every field that is set. Empty means all GenAI spans.
+    include: []
 
 nodeless:
   # -- (bool) Enables nodeless mode. Nodeless mode is intended for environments where daemonsets are not supported. See https://docs.observeinc.com/docs/deploy-to-a-serverless-kubernetes-cluster for details on setup required.

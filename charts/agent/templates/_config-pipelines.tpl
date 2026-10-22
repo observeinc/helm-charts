@@ -201,3 +201,40 @@ logs/heartbeat:
     receivers:
         - heartbeat
 {{- end }}
+
+{{- define "config.pipelines.genai_metrics" -}}
+# The connector only aggregates within one batch, so batching before it means fewer data points.
+traces/genai_metrics:
+  receivers:
+    - otlp/app-telemetry
+  processors:
+    - memory_limiter
+    {{- if ne .Values.node.forwarder.traces.maxSpanDuration "none" }}
+    - filter/drop_long_spans
+    {{- end }}
+    - k8sattributes
+    - filter/genai_spans_only
+    - transform/add_empty_service_attributes
+    - batch
+  exporters:
+    - signal_to_metrics/genai
+metrics/genai_metrics:
+  receivers:
+    - signal_to_metrics/genai
+  processors:
+    - memory_limiter
+    {{- if not .Values.cluster.deploymentEnvironment.name }}
+    # The connector keeps only deployment.environment.name, so this copies it back to deployment.environment.
+    - transform/deployment_environment_compatability
+    {{- end }}
+    {{- if not .Values.agent.config.global.exporters.sendingQueue.batch.enabled }}
+    - batch
+    {{- end }}
+    - resource/observe_common
+    - attributes/debug_source_genai_metrics
+  exporters:
+    - otlphttp/observe/otel_metrics
+    {{- if eq .Values.agent.config.global.debug.enabled true }}
+    - debug/override
+    {{- end }}
+{{- end -}}

@@ -539,3 +539,31 @@ transform/metric_hashes:
         - merge_maps(cache, resource.attributes, "upsert")
         - set(attributes["observe_labels_hash"], Substring(XXH128(ToKeyValueString(cache, "=", ",", true)), 0, 31))
 {{- end -}}
+
+{{- define "config.processors.genai_metrics" -}}
+attributes/debug_source_genai_metrics:
+  actions:
+    - action: insert
+      key: debug_source
+      value: genai_metrics
+
+filter/genai_spans_only:
+  error_mode: ignore
+  traces:
+    span:
+      - span.attributes["gen_ai.operation.name"] == nil
+      {{- with .Values.application.GenAIMetrics.include }}
+      {{- $entries := list }}
+      {{- range $i, $include := . }}
+      {{- $fields := list }}
+      {{- $service := toString ($include.serviceName | default "") }}
+      {{- $scope := toString ($include.instrumentationScopeName | default "") }}
+      {{- if $service }}{{ $fields = append $fields (printf `resource.attributes["service.name"] == %q` $service) }}{{ end }}
+      {{- if $scope }}{{ $fields = append $fields (printf `instrumentation_scope.name == %q` $scope) }}{{ end }}
+      {{- if not $fields }}{{ fail (printf "application.GenAIMetrics.include[%d] must set serviceName, instrumentationScopeName, or both" $i) }}{{ end }}
+      {{- $entries = append $entries (printf "(%s)" (join " and " $fields)) }}
+      {{- end }}
+      # Drops spans that match none of the `include` entries.
+      - {{ printf "not (%s)" (join " or " $entries) | toJson }}
+      {{- end }}
+{{- end -}}
