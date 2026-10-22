@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.96.2](https://img.shields.io/badge/Version-0.96.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.19.0](https://img.shields.io/badge/AppVersion-2.19.0-informational?style=flat-square)
+![Version: 0.97.0](https://img.shields.io/badge/Version-0.97.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.19.0](https://img.shields.io/badge/AppVersion-2.19.0-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -93,6 +93,10 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | agent.config.prometheusScraper | string | `nil` | Additional OTel collector config for prometheus-scraper deployment |
 | agent.selfMonitor.enabled | bool | `true` |  |
 | agent.selfMonitor.metrics.scrapeInterval | string | `"60s"` |  |
+| application.GenAIMetrics.enabled | bool | `false` | Whether to build GenAI metrics from spans, following the OpenTelemetry GenAI semantic conventions. Spans longer than `node.forwarder.traces.maxSpanDuration` are not counted. Turn off the SDK's own GenAI metrics when enabling this, or the same calls are counted twice. |
+| application.GenAIMetrics.include | list | `[]` | Builds metrics only from spans that match at least one entry. Each entry sets `serviceName`, `instrumentationScopeName`, or both, and a span matches when it has every field that is set. Empty means all GenAI spans. |
+| application.GenAIMetrics.includeConversationId | bool | `false` | Adds `gen_ai.conversation.id` to the duration and token metrics. Each conversation becomes its own set of data points, so the number of series grows with the number of conversations. |
+| application.GenAIMetrics.includeUserId | bool | `false` | Adds `user.id` to the duration metrics. The number of series grows with the number of users. |
 | application.REDMetrics.enabled | bool | `false` | Whether to enable generating RED metrics from spans. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview |
 | application.REDMetrics.onlyGenerateForAPMSpans | bool | `true` | If enabled, this will skip generating RED metrics for spans that are not considered to be top level in APM (which are spans with kind Server, kind Consumer, or calls to DB or messaging system clients). If this is set to false, metrics generated for non APM spans will be suffixed with `.internal`. If this flag and trace sampling are both enabled, it will not be possible to deduce accurate RED metrics for non-APM spans. |
 | application.REDMetrics.resourceDimensions | list | `["service.namespace","service.version","deployment.environment.name","k8s.pod.name","k8s.namespace.name"]` | List of resource attributes to include as dimensions for RED metrics. See https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector#overview |
