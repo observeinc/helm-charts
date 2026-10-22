@@ -1,0 +1,15 @@
+observe:
+  token:
+    create: true
+
+application:
+  GenAIMetrics:
+    enabled: true
+    includeConversationId: true
+    include:
+      - serviceName: chat-service
+        instrumentationScopeName: "@genai-otel/core"
+      - serviceName: agent-service
+
+gatewayDeployment:
+  enabled: true
