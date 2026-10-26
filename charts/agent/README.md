@@ -10,6 +10,30 @@ Chart to install K8s collection stack based on Observe Agent
 
 This service is a *daemonset* which means it runs on every node in the cluster. It is responsible for collecting logs from pods that are running on the node. In addition, it scrapes the API of the kubelet running on the node for metrics about the node and the pods running on the node.
 
+### Process metrics
+
+Per-process metrics are disabled by default. To enable them, set:
+
+```yaml
+node:
+  enabled: true
+  metrics:
+    enabled: true
+    process:
+      enabled: true
+node-logs-metrics:
+  hostPID: true
+  shareProcessNamespace: false
+```
+
+Host PID access gives all containers in the agent pod visibility into host processes. The cluster's security policy must permit this access. Kubernetes does not allow `hostPID` and `shareProcessNamespace` to both be true.
+
+The process scraper uses the existing host filesystem mount and hostmetrics pipeline. Per-process metrics can increase metric volume. Executable-path, I/O, and user lookup errors are muted.
+
+The `process.command` and `process.command_line` resource attributes are disabled by default. Resource attributes become metric labels, and process command lines can contain secrets such as passwords, tokens, and connection strings. Other process attributes, such as `process.executable.path` and `process.owner`, stay enabled. Before you enable command-line attributes, make sure that they cannot expose secrets from any process on the node.
+
+To change scraper options, use `agent.config.nodeLogsMetrics.receivers.hostmetrics.scrapers.process`.
+
 ## cluster-events
 
 This service is a *single-instance deployment*. It's critical that this service is only a single instance since otherwise it would produce duplicate data. It is responsible for both scraping for Kubernetes events on startup as well as registering as a listener for any new Kubernetes events produced by the cluster. These events are then transformed and become the basis for the representation of all the resources in your Kubernetes cluster as well as any events that happen on those resources.
@@ -550,6 +574,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | node-logs-metrics.extraVolumes[3].name | string | `"varlibotelcol"` |  |
 | node-logs-metrics.extraVolumes[4].hostPath.path | string | `"/"` |  |
 | node-logs-metrics.extraVolumes[4].name | string | `"hostfs"` |  |
+| node-logs-metrics.hostPID | bool | `false` | Give the agent pod visibility into all host processes. Required for `node.metrics.process.enabled`. |
 | node-logs-metrics.image | object | `{"pullPolicy":"IfNotPresent","repository":"observeinc/observe-agent","tag":"2.19.0"}` | --------------------------------------- # Same for each deployment/daemonset      # |
 | node-logs-metrics.initContainers[0].env[0].name | string | `"NAMESPACE"` |  |
 | node-logs-metrics.initContainers[0].env[0].valueFrom.fieldRef.fieldPath | string | `"metadata.namespace"` |  |
@@ -589,6 +614,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | node-logs-metrics.securityContext.runAsUser | int | `0` |  |
 | node-logs-metrics.serviceAccount.create | bool | `false` |  |
 | node-logs-metrics.serviceAccount.name | string | `"observe-agent-service-account"` |  |
+| node-logs-metrics.shareProcessNamespace | bool | `false` | Share processes between containers in the pod. Must be false when `node-logs-metrics.hostPID` is true. |
 | node-logs-metrics.tolerations | list | `[]` |  |
 | node.containers.logs.autoMultilineDetection | bool | `false` | Enable automatic detection of multiline logs that start with a timestamp. Cannot be combined with multiline config block. Examples of supported timestamp formats: `2025-03-28 13:45:30`, `2025-03-28T14:33:53.743350Z`, `Jul 15 15:16:01`, `2025/05/16 19:46:15` |
 | node.containers.logs.enabled | bool | `true` |  |
@@ -619,6 +645,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | node.metrics.fileSystem.excludeMountPoints | string | `"[\"/dev/*\",\"/proc/*\",\"/sys/*\",\"/run/k3s/containerd/*\",\"/var/lib/docker/*\",\"/var/lib/kubelet/*\",\"/snap/*\"]"` |  |
 | node.metrics.fileSystem.rootPath | string | `"/hostfs"` |  |
 | node.metrics.interval | string | `"60s"` |  |
+| node.metrics.process.enabled | bool | `false` | Enable the hostmetrics process scraper to collect per-process metrics on each node. Requires node metrics to be enabled, `node-logs-metrics.hostPID=true`, and `node-logs-metrics.shareProcessNamespace=false`. Per-process metrics can increase metric volume. Host PID access must be permitted by the cluster's security policy. |
 | nodeless.enabled | bool | `false` | Enables nodeless mode. Nodeless mode is intended for environments where daemonsets are not supported. See https://docs.observeinc.com/docs/deploy-to-a-serverless-kubernetes-cluster for details on setup required. |
 | nodeless.hostingPlatform | string | `""` | The hosting platform for the nodeless mode. Valid values are "fargate". |
 | nodeless.logs.autoMultilineDetection | bool | `false` | Enable automatic detection of multiline logs that start with a timestamp. Cannot be combined with multiline config block. Examples of supported timestamp formats: `2025-03-28 13:45:30`, `2025-03-28T14:33:53.743350Z`, `Jul 15 15:16:01`, `2025/05/16 19:46:15` |
