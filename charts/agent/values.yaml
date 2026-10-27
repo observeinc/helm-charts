@@ -95,6 +95,11 @@ node:
     fileSystem:
       rootPath: /hostfs
       excludeMountPoints: '["/dev/*","/proc/*","/sys/*","/run/k3s/containerd/*","/var/lib/docker/*","/var/lib/kubelet/*","/snap/*"]'
+    process:
+      # -- Enable the hostmetrics process scraper to collect per-process metrics on each node.
+      # Requires node metrics to be enabled, `node-logs-metrics.hostPID=true`, and `node-logs-metrics.shareProcessNamespace=false`.
+      # Per-process metrics can increase metric volume. Host PID access must be permitted by the cluster's security policy.
+      enabled: false
     cadvisor:
       enabled: false
       # -- Keep cadvisor and pod-metrics in separate OTel receivers/pipelines
@@ -869,6 +874,10 @@ prometheus-scraper:
 ################################################
 node-logs-metrics:
   mode: daemonset
+  # -- Give the agent pod visibility into all host processes. Required for `node.metrics.process.enabled`.
+  hostPID: false
+  # -- Share processes between containers in the pod. Must be false when `node-logs-metrics.hostPID` is true.
+  shareProcessNamespace: false
   # ----------------------------------------- #
   # Different for each deployment/daemonset #
   nameOverride: "node-logs-metrics"

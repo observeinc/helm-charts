@@ -1,0 +1,12 @@
+# Enable the hostmetrics process scraper on the node-logs-metrics DaemonSet
+observe:
+  token:
+    create: true
+
+node:
+  metrics:
+    process:
+      enabled: true
+
+node-logs-metrics:
+  hostPID: true
