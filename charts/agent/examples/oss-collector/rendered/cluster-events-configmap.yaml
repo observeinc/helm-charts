@@ -83,14 +83,22 @@ data:
             - set(attributes["observe_transform"]["control"]["isDelete"], false) where attributes["observe_transform"]["control"]["isDelete"]
               == nil
             - set(attributes["observe_transform"]["control"]["version"], body["metadata"]["resourceVersion"])
+              where body["metadata"]["resourceVersion"] != nil
             - set(attributes["observe_transform"]["identifiers"]["clusterName"], resource.attributes["k8s.cluster.name"])
+              where resource.attributes["k8s.cluster.name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["clusterUid"], resource.attributes["k8s.cluster.uid"])
+              where resource.attributes["k8s.cluster.uid"] != nil
             - set(attributes["observe_transform"]["identifiers"]["uid"], resource.attributes["k8s.cluster.uid"])
+              where resource.attributes["k8s.cluster.uid"] != nil
             - set(attributes["observe_transform"]["identifiers"]["kind"], "Cluster")
             - set(attributes["observe_transform"]["identifiers"]["name"], resource.attributes["k8s.cluster.name"])
+              where resource.attributes["k8s.cluster.name"] != nil
             - set(attributes["observe_transform"]["facets"]["creationTimestamp"], body["metadata"]["creationTimestamp"])
+              where body["metadata"]["creationTimestamp"] != nil
             - set(attributes["observe_transform"]["facets"]["labels"], body["metadata"]["labels"])
+              where body["metadata"]["labels"] != nil
             - set(attributes["observe_transform"]["facets"]["annotations"], body["metadata"]["annotations"])
+              where body["metadata"]["annotations"] != nil
             - set(body, "")
         transform/object:
           error_mode: ignore
@@ -101,23 +109,37 @@ data:
             - set(attributes["observe_transform"]["valid_from"], observed_time_unix_nano)
             - set(attributes["observe_transform"]["valid_to"], Int(observed_time_unix_nano)
               + 5400000000000)
-            - set(attributes["observe_transform"]["kind"], body["kind"])
+            - set(attributes["observe_transform"]["kind"], body["kind"]) where body["kind"]
+              != nil
             - set(attributes["observe_transform"]["control"]["isDelete"], false) where attributes["observe_transform"]["control"]["isDelete"]
               == nil
             - set(attributes["observe_transform"]["control"]["version"], body["metadata"]["resourceVersion"])
+              where body["metadata"]["resourceVersion"] != nil
             - set(attributes["observe_transform"]["control"]["agentVersion"], "2.19.0")
             - set(attributes["observe_transform"]["identifiers"]["clusterName"], resource.attributes["k8s.cluster.name"])
+              where resource.attributes["k8s.cluster.name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["clusterUid"], resource.attributes["k8s.cluster.uid"])
+              where resource.attributes["k8s.cluster.uid"] != nil
             - set(attributes["observe_transform"]["identifiers"]["kind"], body["kind"])
+              where body["kind"] != nil
             - set(attributes["observe_transform"]["identifiers"]["name"], body["metadata"]["name"])
+              where body["metadata"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["namespaceName"], body["metadata"]["namespace"])
+              where body["metadata"]["namespace"] != nil
             - set(attributes["observe_transform"]["identifiers"]["uid"], body["metadata"]["uid"])
+              where body["metadata"]["uid"] != nil
             - set(attributes["observe_transform"]["facets"]["creationTimestamp"], body["metadata"]["creationTimestamp"])
+              where body["metadata"]["creationTimestamp"] != nil
             - set(attributes["observe_transform"]["facets"]["deletionTimestamp"], body["metadata"]["deletionTimestamp"])
+              where body["metadata"]["deletionTimestamp"] != nil
             - set(attributes["observe_transform"]["facets"]["ownerRefKind"], body["metadata"]["ownerReferences"][0]["kind"])
+              where body["metadata"]["ownerReferences"][0]["kind"] != nil
             - set(attributes["observe_transform"]["facets"]["ownerRefName"], body["metadata"]["ownerReferences"][0]["name"])
+              where body["metadata"]["ownerReferences"][0]["name"] != nil
             - set(attributes["observe_transform"]["facets"]["labels"], body["metadata"]["labels"])
+              where body["metadata"]["labels"] != nil
             - set(attributes["observe_transform"]["facets"]["annotations"], body["metadata"]["annotations"])
+              where body["metadata"]["annotations"] != nil
             - set(attributes["observe_transform"]["facets"]["replicaSetName"], body["metadata"]["ownerReferences"][0]["name"])
               where body["metadata"]["ownerReferences"][0]["kind"] == "ReplicaSet"
             - set(attributes["observe_transform"]["facets"]["daemonSetName"], body["metadata"]["ownerReferences"][0]["name"])
@@ -141,45 +163,71 @@ data:
             context: log
             statements:
             - set(attributes["observe_transform"]["identifiers"]["podName"], body["metadata"]["name"])
+              where body["metadata"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["podUid"], body["metadata"]["uid"])
+              where body["metadata"]["uid"] != nil
             - set(attributes["observe_transform"]["facets"]["phase"], body["status"]["phase"])
+              where body["status"]["phase"] != nil
             - set(attributes["observe_transform"]["facets"]["podIP"], body["status"]["podIP"])
+              where body["status"]["podIP"] != nil
             - set(attributes["observe_transform"]["facets"]["qosClass"], body["status"]["qosClass"])
+              where body["status"]["qosClass"] != nil
             - set(attributes["observe_transform"]["facets"]["startTime"], body["status"]["startTime"])
+              where body["status"]["startTime"] != nil
             - set(attributes["observe_transform"]["facets"]["readinessGates"], body["object"]["spec"]["readinessGates"])
+              where body["object"]["spec"]["readinessGates"] != nil
             - set(attributes["observe_transform"]["facets"]["nodeName"], body["spec"]["nodeName"])
+              where body["spec"]["nodeName"] != nil
           - conditions:
             - body["kind"] == "Namespace"
             context: log
             statements:
             - set(attributes["observe_transform"]["facets"]["status"], body["status"]["phase"])
+              where body["status"]["phase"] != nil
             - set(attributes["observe_transform"]["identifiers"]["namespaceName"], body["metadata"]["name"])
+              where body["metadata"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["namespaceUid"], body["metadata"]["uid"])
+              where body["metadata"]["uid"] != nil
           - conditions:
             - body["kind"] == "Node"
             context: log
             statements:
             - set(attributes["observe_transform"]["identifiers"]["nodeName"], body["metadata"]["name"])
+              where body["metadata"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["nodeUid"], body["metadata"]["uid"])
+              where body["metadata"]["uid"] != nil
             - set(attributes["observe_transform"]["facets"]["kernelVersion"], body["status"]["nodeInfo"]["kernelVersion"])
+              where body["status"]["nodeInfo"]["kernelVersion"] != nil
             - set(attributes["observe_transform"]["facets"]["kubeProxyVersion"], body["status"]["nodeInfo"]["kubeProxyVersion"])
+              where body["status"]["nodeInfo"]["kubeProxyVersion"] != nil
             - set(attributes["observe_transform"]["facets"]["kubeletVersion"], body["status"]["nodeInfo"]["kubeletVersion"])
+              where body["status"]["nodeInfo"]["kubeletVersion"] != nil
             - set(attributes["observe_transform"]["facets"]["osImage"], body["status"]["nodeInfo"]["osImage"])
+              where body["status"]["nodeInfo"]["osImage"] != nil
             - set(attributes["observe_transform"]["facets"]["taints"], body["spec"]["taints"])
+              where body["spec"]["taints"] != nil
           - conditions:
             - body["kind"] == "Deployment"
             context: log
             statements:
             - set(attributes["observe_transform"]["identifiers"]["deploymentName"], body["metadata"]["name"])
+              where body["metadata"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["deploymentUid"], body["metadata"]["uid"])
+              where body["metadata"]["uid"] != nil
             - set(attributes["observe_transform"]["facets"]["updatedReplicas"], body["status"]["updatedReplicas"])
+              where body["status"]["updatedReplicas"] != nil
             - set(attributes["observe_transform"]["facets"]["availableReplicas"], body["status"]["availableReplicas"])
+              where body["status"]["availableReplicas"] != nil
             - set(attributes["observe_transform"]["facets"]["readyReplicas"], body["status"]["readyReplicas"])
+              where body["status"]["readyReplicas"] != nil
             - set(attributes["observe_transform"]["facets"]["readyReplicas"], 0) where attributes["observe_transform"]["facets"]["readyReplicas"]
               == nil
             - set(attributes["observe_transform"]["facets"]["unavailableReplicas"], body["status"]["unavailableReplicas"])
+              where body["status"]["unavailableReplicas"] != nil
             - set(attributes["observe_transform"]["facets"]["selector"], body["spec"]["selector"]["matchLabels"])
+              where body["spec"]["selector"]["matchLabels"] != nil
             - set(attributes["observe_transform"]["facets"]["desiredReplicas"], body["spec"]["replicas"])
+              where body["spec"]["replicas"] != nil
             - set(attributes["observe_transform"]["facets"]["status"], "Healthy")
             - set(attributes["observe_transform"]["facets"]["status"], "Unhealthy") where
               attributes["observe_transform"]["facets"]["desiredReplicas"] != nil and attributes["observe_transform"]["facets"]["readyReplicas"]
@@ -189,11 +237,17 @@ data:
             context: log
             statements:
             - set(attributes["observe_transform"]["identifiers"]["replicaSetName"], body["metadata"]["name"])
+              where body["metadata"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["replicaSetUid"], body["metadata"]["uid"])
+              where body["metadata"]["uid"] != nil
             - set(attributes["observe_transform"]["facets"]["desiredReplicas"], body["spec"]["replicas"])
+              where body["spec"]["replicas"] != nil
             - set(attributes["observe_transform"]["facets"]["currentReplicas"], body["status"]["replicas"])
+              where body["status"]["replicas"] != nil
             - set(attributes["observe_transform"]["facets"]["availableReplicas"], body["status"]["availableReplicas"])
+              where body["status"]["availableReplicas"] != nil
             - set(attributes["observe_transform"]["facets"]["readyReplicas"], body["status"]["readyReplicas"])
+              where body["status"]["readyReplicas"] != nil
             - set(attributes["observe_transform"]["facets"]["readyReplicas"], 0) where attributes["observe_transform"]["facets"]["readyReplicas"]
               == nil
             - set(attributes["observe_transform"]["facets"]["status"], "Healthy")
@@ -205,43 +259,65 @@ data:
             context: log
             statements:
             - set(attributes["observe_transform"]["identifiers"]["involvedObjectKind"],
-              body["involvedObject"]["kind"])
+              body["involvedObject"]["kind"]) where body["involvedObject"]["kind"] != nil
             - set(attributes["observe_transform"]["identifiers"]["involvedObjectName"],
-              body["involvedObject"]["name"])
+              body["involvedObject"]["name"]) where body["involvedObject"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["involvedObjectUid"], body["involvedObject"]["uid"])
+              where body["involvedObject"]["uid"] != nil
             - set(attributes["observe_transform"]["facets"]["firstTimestamp"], body["firstTimestamp"])
+              where body["firstTimestamp"] != nil
             - set(attributes["observe_transform"]["facets"]["lastTimestamp"], body["lastTimestamp"])
+              where body["lastTimestamp"] != nil
             - set(attributes["observe_transform"]["facets"]["message"], body["message"])
-            - set(attributes["observe_transform"]["facets"]["reason"], body["reason"])
-            - set(attributes["observe_transform"]["facets"]["count"], body["count"])
-            - set(attributes["observe_transform"]["facets"]["type"], body["type"])
+              where body["message"] != nil
+            - set(attributes["observe_transform"]["facets"]["reason"], body["reason"]) where
+              body["reason"] != nil
+            - set(attributes["observe_transform"]["facets"]["count"], body["count"]) where
+              body["count"] != nil
+            - set(attributes["observe_transform"]["facets"]["type"], body["type"]) where
+              body["type"] != nil
             - set(attributes["observe_transform"]["facets"]["sourceComponent"], body["source"]["component"])
+              where body["source"]["component"] != nil
           - conditions:
             - body["kind"] == "Job"
             context: log
             statements:
             - set(attributes["observe_transform"]["identifiers"]["jobName"], body["metadata"]["name"])
+              where body["metadata"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["jobUid"], body["metadata"]["uid"])
+              where body["metadata"]["uid"] != nil
             - set(attributes["observe_transform"]["facets"]["cronJobName"], body["metadata"]["ownerReferences"][0]["name"])
               where body["metadata"]["ownerReferences"][0]["kind"] == "CronJob"
             - set(attributes["observe_transform"]["facets"]["cronJobUid"], body["metadata"]["ownerReferences"][0]["uid"])
               where body["metadata"]["ownerReferences"][0]["kind"] == "CronJob"
             - set(attributes["observe_transform"]["facets"]["completions"], body["spec"]["completions"])
+              where body["spec"]["completions"] != nil
             - set(attributes["observe_transform"]["facets"]["parallelism"], body["spec"]["parallelism"])
+              where body["spec"]["parallelism"] != nil
             - set(attributes["observe_transform"]["facets"]["activeDeadlineSeconds"], body["spec"]["activeDeadlineSeconds"])
+              where body["spec"]["activeDeadlineSeconds"] != nil
             - set(attributes["observe_transform"]["facets"]["backoffLimit"], body["spec"]["backoffLimit"])
+              where body["spec"]["backoffLimit"] != nil
             - set(attributes["observe_transform"]["facets"]["startTime"], body["status"]["startTime"])
+              where body["status"]["startTime"] != nil
             - set(attributes["observe_transform"]["facets"]["activePods"], body["status"]["active"])
+              where body["status"]["active"] != nil
             - set(attributes["observe_transform"]["facets"]["failedPods"], body["status"]["falied"])
+              where body["status"]["falied"] != nil
             - set(attributes["observe_transform"]["facets"]["succeededPods"], body["status"]["succeeded"])
+              where body["status"]["succeeded"] != nil
             - set(attributes["observe_transform"]["facets"]["readyPods"], body["status"]["ready"])
+              where body["status"]["ready"] != nil
           - conditions:
             - body["kind"] == "CronJob"
             context: log
             statements:
             - set(attributes["observe_transform"]["identifiers"]["cronJobName"], body["metadata"]["name"])
+              where body["metadata"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["cronJobUid"], body["metadata"]["uid"])
+              where body["metadata"]["uid"] != nil
             - set(attributes["observe_transform"]["facets"]["schedule"], body["spec"]["schedule"])
+              where body["spec"]["schedule"] != nil
             - set(attributes["observe_transform"]["facets"]["suspend"], "Active") where
               body["spec"]["suspend"] == false
             - set(attributes["observe_transform"]["facets"]["suspend"], "Suspend") where
@@ -251,17 +327,30 @@ data:
             context: log
             statements:
             - set(attributes["observe_transform"]["identifiers"]["daemonSetName"], body["metadata"]["name"])
+              where body["metadata"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["daemonSetUid"], body["metadata"]["uid"])
+              where body["metadata"]["uid"] != nil
             - set(attributes["observe_transform"]["facets"]["updateStrategy"], body["spec"]["updateStrategy"]["type"])
+              where body["spec"]["updateStrategy"]["type"] != nil
             - set(attributes["observe_transform"]["facets"]["maxUnavailable"], body["spec"]["updateStrategy"]["rollingUpdate"]["maxUnavailable"])
+              where body["spec"]["updateStrategy"]["rollingUpdate"]["maxUnavailable"] !=
+              nil
             - set(attributes["observe_transform"]["facets"]["maxSurge"], body["spec"]["updateStrategy"]["rollingUpdate"]["maxSurge"])
+              where body["spec"]["updateStrategy"]["rollingUpdate"]["maxSurge"] != nil
             - set(attributes["observe_transform"]["facets"]["numberReady"], body["status"]["numberReady"])
+              where body["status"]["numberReady"] != nil
             - set(attributes["observe_transform"]["facets"]["desiredNumberScheduled"], body["status"]["desiredNumberScheduled"])
+              where body["status"]["desiredNumberScheduled"] != nil
             - set(attributes["observe_transform"]["facets"]["currentNumberScheduled"], body["status"]["currentNumberScheduled"])
+              where body["status"]["currentNumberScheduled"] != nil
             - set(attributes["observe_transform"]["facets"]["updatedNumberScheduled"], body["status"]["updatedNumberScheduled"])
+              where body["status"]["updatedNumberScheduled"] != nil
             - set(attributes["observe_transform"]["facets"]["numberAvailable"], body["status"]["numberAvailable"])
+              where body["status"]["numberAvailable"] != nil
             - set(attributes["observe_transform"]["facets"]["numberUnavailable"], body["status"]["numberUnavailable"])
+              where body["status"]["numberUnavailable"] != nil
             - set(attributes["observe_transform"]["facets"]["numberMisscheduled"], body["status"]["numberMisscheduled"])
+              where body["status"]["numberMisscheduled"] != nil
             - set(attributes["observe_transform"]["facets"]["status"], "Healthy")
             - set(attributes["observe_transform"]["facets"]["status"], "Unhealthy") where
               attributes["observe_transform"]["facets"]["desiredNumberScheduled"] != nil
@@ -271,14 +360,23 @@ data:
             context: log
             statements:
             - set(attributes["observe_transform"]["identifiers"]["statefulSetName"], body["metadata"]["name"])
+              where body["metadata"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["statefulSetUid"], body["metadata"]["uid"])
+              where body["metadata"]["uid"] != nil
             - set(attributes["observe_transform"]["facets"]["serviceName"], body["spec"]["serviceName"])
+              where body["spec"]["serviceName"] != nil
             - set(attributes["observe_transform"]["facets"]["podManagementPolicy"], body["spec"]["podManagementPolicy"])
+              where body["spec"]["podManagementPolicy"] != nil
             - set(attributes["observe_transform"]["facets"]["desiredReplicas"], body["spec"]["replicas"])
+              where body["spec"]["replicas"] != nil
             - set(attributes["observe_transform"]["facets"]["updateStrategy"], body["spec"]["updateStrategy"]["type"])
+              where body["spec"]["updateStrategy"]["type"] != nil
             - set(attributes["observe_transform"]["facets"]["partition"], body["spec"]["updateStrategy"]["rollingUpdate"]["partition"])
+              where body["spec"]["updateStrategy"]["rollingUpdate"]["partition"] != nil
             - set(attributes["observe_transform"]["facets"]["currentReplicas"], body["status"]["currentReplicas"])
+              where body["status"]["currentReplicas"] != nil
             - set(attributes["observe_transform"]["facets"]["readyReplicas"], body["status"]["readyReplicas"])
+              where body["status"]["readyReplicas"] != nil
             - set(attributes["observe_transform"]["facets"]["status"], "Healthy")
             - set(attributes["observe_transform"]["facets"]["status"], "Unhealthy") where
               attributes["observe_transform"]["facets"]["desiredReplicas"] != nil and attributes["observe_transform"]["facets"]["readyReplicas"]
@@ -288,60 +386,91 @@ data:
             context: log
             statements:
             - set(attributes["observe_transform"]["identifiers"]["configMapName"], body["metadata"]["name"])
+              where body["metadata"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["configMapUid"], body["metadata"]["uid"])
+              where body["metadata"]["uid"] != nil
             - set(attributes["observe_transform"]["facets"]["immutable"], body["immutable"])
+              where body["immutable"] != nil
           - conditions:
             - body["kind"] == "Secret"
             context: log
             statements:
             - set(attributes["observe_transform"]["identifiers"]["secretName"], body["metadata"]["name"])
+              where body["metadata"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["secretUid"], body["metadata"]["uid"])
+              where body["metadata"]["uid"] != nil
             - set(attributes["observe_transform"]["facets"]["immutable"], body["immutable"])
-            - set(attributes["observe_transform"]["facets"]["data"], body["data"])
-            - set(attributes["observe_transform"]["facets"]["type"], body["type"])
+              where body["immutable"] != nil
+            - set(attributes["observe_transform"]["facets"]["data"], body["data"]) where
+              body["data"] != nil
+            - set(attributes["observe_transform"]["facets"]["type"], body["type"]) where
+              body["type"] != nil
           - conditions:
             - body["kind"] == "PersistentVolume"
             context: log
             statements:
             - set(attributes["observe_transform"]["identifiers"]["persistentVolumeName"],
-              body["metadata"]["name"])
+              body["metadata"]["name"]) where body["metadata"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["persistentVolumeUid"],
-              body["metadata"]["uid"])
+              body["metadata"]["uid"]) where body["metadata"]["uid"] != nil
             - set(attributes["observe_transform"]["facets"]["capacity"], body["spec"]["capacity"]["storage"])
+              where body["spec"]["capacity"]["storage"] != nil
             - set(attributes["observe_transform"]["facets"]["reclaimPolicy"], body["spec"]["persistentVolumeReclaimPolicy"])
+              where body["spec"]["persistentVolumeReclaimPolicy"] != nil
             - set(attributes["observe_transform"]["facets"]["class"], body["spec"]["storageClassName"])
+              where body["spec"]["storageClassName"] != nil
             - set(attributes["observe_transform"]["facets"]["accessModes"], body["spec"]["accessModes"])
+              where body["spec"]["accessModes"] != nil
             - set(attributes["observe_transform"]["facets"]["volumeMode"], body["spec"]["volumeMode"])
+              where body["spec"]["volumeMode"] != nil
             - set(attributes["observe_transform"]["facets"]["phase"], body["status"]["phase"])
+              where body["status"]["phase"] != nil
           - conditions:
             - body["kind"] == "PersistentVolumeClaim"
             context: log
             statements:
             - set(attributes["observe_transform"]["identifiers"]["persistentVolumeClaimName"],
-              body["metadata"]["name"])
+              body["metadata"]["name"]) where body["metadata"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["persistentVolumeClaimUid"],
-              body["metadata"]["uid"])
+              body["metadata"]["uid"]) where body["metadata"]["uid"] != nil
             - set(attributes["observe_transform"]["facets"]["capacityRequests"], body["spec"]["resources"]["requests"]["storage"])
+              where body["spec"]["resources"]["requests"]["storage"] != nil
             - set(attributes["observe_transform"]["facets"]["capacityLimits"], body["spec"]["resources"]["limits"]["storage"])
+              where body["spec"]["resources"]["limits"]["storage"] != nil
             - set(attributes["observe_transform"]["facets"]["class"], body["spec"]["storageClassName"])
+              where body["spec"]["storageClassName"] != nil
             - set(attributes["observe_transform"]["facets"]["volumeName"], body["spec"]["volumeName"])
+              where body["spec"]["volumeName"] != nil
             - set(attributes["observe_transform"]["facets"]["desiredAccessModes"], body["spec"]["accessModes"])
+              where body["spec"]["accessModes"] != nil
             - set(attributes["observe_transform"]["facets"]["volumeMode"], body["spec"]["volumeMode"])
+              where body["spec"]["volumeMode"] != nil
             - set(attributes["observe_transform"]["facets"]["capacity"], body["status"]["capacity"]["storage"])
+              where body["status"]["capacity"]["storage"] != nil
             - set(attributes["observe_transform"]["facets"]["phase"], body["status"]["phase"])
+              where body["status"]["phase"] != nil
             - set(attributes["observe_transform"]["facets"]["currentAccessModes"], body["spec"]["accessModes"])
+              where body["spec"]["accessModes"] != nil
           - conditions:
             - body["kind"] == "Service"
             context: log
             statements:
             - set(attributes["observe_transform"]["identifiers"]["serviceName"], body["metadata"]["name"])
+              where body["metadata"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["serviceUid"], body["metadata"]["uid"])
+              where body["metadata"]["uid"] != nil
             - set(attributes["observe_transform"]["facets"]["serviceType"], body["spec"]["type"])
+              where body["spec"]["type"] != nil
             - set(attributes["observe_transform"]["facets"]["clusterIP"], body["spec"]["clusterIP"])
+              where body["spec"]["clusterIP"] != nil
             - set(attributes["observe_transform"]["facets"]["externalIPs"], body["spec"]["externalIPs"])
+              where body["spec"]["externalIPs"] != nil
             - set(attributes["observe_transform"]["facets"]["sessionAffinity"], body["spec"]["sessionAffinity"])
+              where body["spec"]["sessionAffinity"] != nil
             - set(attributes["observe_transform"]["facets"]["externalName"], body["spec"]["externalName"])
+              where body["spec"]["externalName"] != nil
             - set(attributes["observe_transform"]["facets"]["externalTrafficPolicy"], body["spec"]["externalTrafficPolicy"])
+              where body["spec"]["externalTrafficPolicy"] != nil
             - set(attributes["observe_transform"]["facets"]["ipFamilies"], "IPv4,IPv6")
               where Len(body["spec"]["ipFamilies"]) == 2
             - set(attributes["observe_transform"]["facets"]["ipFamilies"], body["spec"]["ipFamilies"][0])
@@ -351,8 +480,11 @@ data:
             context: log
             statements:
             - set(attributes["observe_transform"]["identifiers"]["ingressName"], body["metadata"]["name"])
+              where body["metadata"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["ingressUid"], body["metadata"]["uid"])
+              where body["metadata"]["uid"] != nil
             - set(attributes["observe_transform"]["facets"]["class"], body["spec"]["ingressClassName"])
+              where body["spec"]["ingressClassName"] != nil
             - set(attributes["observe_transform"]["facets"]["class"], body["metadata"]["annotations"]["kubernetes.io/ingress.class"])
               where attributes["observe_transform"]["facets"]["class"] == nil
           - conditions:
@@ -360,35 +492,47 @@ data:
             context: log
             statements:
             - set(attributes["observe_transform"]["identifiers"]["roleBindingName"], body["metadata"]["name"])
+              where body["metadata"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["roleBindingUid"], body["metadata"]["uid"])
+              where body["metadata"]["uid"] != nil
             - set(attributes["observe_transform"]["facets"]["subjects"], body["subjects"])
+              where body["subjects"] != nil
             - set(attributes["observe_transform"]["facets"]["role"], body["roleRef"]["name"])
+              where body["roleRef"]["name"] != nil
           - conditions:
             - body["kind"] == "Role"
             context: log
             statements:
             - set(attributes["observe_transform"]["identifiers"]["roleName"], body["metadata"]["name"])
+              where body["metadata"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["roleUid"], body["metadata"]["uid"])
-            - set(attributes["observe_transform"]["facets"]["rules"], body["rules"])
+              where body["metadata"]["uid"] != nil
+            - set(attributes["observe_transform"]["facets"]["rules"], body["rules"]) where
+              body["rules"] != nil
             - set(attributes["observe_transform"]["facets"]["role"], body["roleRef"]["name"])
+              where body["roleRef"]["name"] != nil
           - conditions:
             - body["kind"] == "ClusterRoleBinding"
             context: log
             statements:
             - set(attributes["observe_transform"]["identifiers"]["clusterRoleBindingName"],
-              body["metadata"]["name"])
+              body["metadata"]["name"]) where body["metadata"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["clusterRoleBindingUid"],
-              body["metadata"]["uid"])
+              body["metadata"]["uid"]) where body["metadata"]["uid"] != nil
             - set(attributes["observe_transform"]["facets"]["subjects"], body["subjects"])
+              where body["subjects"] != nil
             - set(attributes["observe_transform"]["facets"]["role"], body["roleRef"]["name"])
+              where body["roleRef"]["name"] != nil
           - conditions:
             - body["kind"] == "ServiceAccount"
             context: log
             statements:
             - set(attributes["observe_transform"]["identifiers"]["serviceAccountName"],
-              body["metadata"]["name"])
+              body["metadata"]["name"]) where body["metadata"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["serviceAccountUid"], body["metadata"]["uid"])
+              where body["metadata"]["uid"] != nil
             - set(attributes["observe_transform"]["facets"]["automountToken"], body["automountServiceAccountToken"])
+              where body["automountServiceAccountToken"] != nil
         transform/unify:
           error_mode: ignore
           log_statements:
