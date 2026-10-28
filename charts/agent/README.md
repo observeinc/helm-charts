@@ -497,7 +497,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | node-logs-metrics.command.extraArgs[0] | string | `"start"` |  |
 | node-logs-metrics.command.extraArgs[1] | string | `"--observe-config=/observe-agent-conf/observe-agent.yaml"` |  |
 | node-logs-metrics.command.extraArgs[2] | string | `"--config=/conf/relay.yaml"` |  |
-| node-logs-metrics.command.extraArgs[3] | string | `"--feature-gates=+exporter.prometheusremotewritexporter.EnableMultipleWorkers"` |  |
+| node-logs-metrics.command.extraArgs[3] | string | `"--feature-gates=+exporter.prometheusremotewritexporter.EnableMultipleWorkers,-receiver.kubeletstats.cpuUsageScrapeBased"` |  |
 | node-logs-metrics.command.name | string | `"observe-agent"` |  |
 | node-logs-metrics.configMap.create | bool | `false` |  |
 | node-logs-metrics.configMap.existingName | string | `"node-logs-metrics"` |  |
