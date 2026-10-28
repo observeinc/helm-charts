@@ -896,7 +896,8 @@ node-logs-metrics:
 
   command:
     name: "observe-agent"
-    extraArgs: ["start", "--observe-config=/observe-agent-conf/observe-agent.yaml", "--config=/conf/relay.yaml", "--feature-gates=+exporter.prometheusremotewritexporter.EnableMultipleWorkers"]
+    # -receiver.kubeletstats.cpuUsageScrapeBased keeps *.cpu.usage from the kubelet's UsageNanoCores, which Kubernetes Explorer reads.
+    extraArgs: ["start", "--observe-config=/observe-agent-conf/observe-agent.yaml", "--config=/conf/relay.yaml", "--feature-gates=+exporter.prometheusremotewritexporter.EnableMultipleWorkers,-receiver.kubeletstats.cpuUsageScrapeBased"]
 
   serviceAccount:
     create: false

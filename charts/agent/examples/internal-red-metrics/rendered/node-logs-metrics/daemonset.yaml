@@ -51,7 +51,7 @@ spec:
             - start
             - --observe-config=/observe-agent-conf/observe-agent.yaml
             - --config=/conf/relay.yaml
-            - --feature-gates=+exporter.prometheusremotewritexporter.EnableMultipleWorkers
+            - --feature-gates=+exporter.prometheusremotewritexporter.EnableMultipleWorkers,-receiver.kubeletstats.cpuUsageScrapeBased
           securityContext:
             runAsGroup: 0
             runAsUser: 0
