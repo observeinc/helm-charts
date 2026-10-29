@@ -1,9 +1,16 @@
 {{- define "observe.daemonset.forwarder.config" -}}
 
 {{- $redMetrics := (and .Values.application.REDMetrics.enabled (not .Values.gatewayDeployment.enabled)) }}
-{{- if $redMetrics }}
+{{- /* dig, since upgrades with --reuse-values keep values that have no GenAIMetrics. */}}
+{{- $genaiMetrics := (and (dig "GenAIMetrics" "enabled" false .Values.application) (not .Values.gatewayDeployment.enabled)) }}
+{{- if or $redMetrics $genaiMetrics }}
 connectors:
+{{- end }}
+{{- if $redMetrics }}
 {{- include "config.connectors.RED_metrics" . | nindent 2 }}
+{{- end }}
+{{- if $genaiMetrics }}
+{{- include "config.connectors.genai_metrics" . | nindent 2 }}
 {{- end }}
 
 exporters:
@@ -105,6 +112,10 @@ processors:
 
 {{- if $redMetrics }}
 {{- include "config.processors.RED_metrics" . | nindent 2 }}
+{{- end }}
+
+{{- if $genaiMetrics }}
+{{- include "config.processors.genai_metrics" . | nindent 2 }}
 {{- end }}
 
 {{- if .Values.agent.config.global.fleet.enabled }}
@@ -241,6 +252,9 @@ service:
       exporters: [{{ join ", " $metricsExporters }}]
     {{- if $redMetrics }}
     {{- include "config.pipelines.RED_metrics" . | nindent 4 }}
+    {{- end }}
+    {{- if $genaiMetrics }}
+    {{- include "config.pipelines.genai_metrics" . | nindent 4 }}
     {{- end }}
 
     {{- if .Values.agent.config.global.fleet.enabled }}

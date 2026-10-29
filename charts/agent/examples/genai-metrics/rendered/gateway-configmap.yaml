@@ -1,0 +1,760 @@
+---
+# Source: agent/templates/gateway-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway
+  namespace: observe
+data:
+  relay: |
+      connectors:
+        signal_to_metrics/genai:
+          error_mode: ignore
+          spans:
+          - attributes:
+            - key: gen_ai.operation.name
+            - key: gen_ai.provider.name
+              optional: true
+            - key: gen_ai.request.model
+              optional: true
+            - key: gen_ai.response.model
+              optional: true
+            - key: server.address
+              optional: true
+            - key: server.port
+              optional: true
+            - key: gen_ai.agent.name
+              optional: true
+            - key: error.type
+              optional: true
+            - key: gen_ai.conversation.id
+              optional: true
+            conditions:
+            - (attributes["gen_ai.operation.name"] == "chat" or attributes["gen_ai.operation.name"]
+              == "generate_content" or attributes["gen_ai.operation.name"] == "text_completion")
+            description: GenAI client inference operation duration.
+            histogram:
+              buckets:
+              - 0.01
+              - 0.02
+              - 0.04
+              - 0.08
+              - 0.16
+              - 0.32
+              - 0.64
+              - 1.28
+              - 2.56
+              - 5.12
+              - 10.24
+              - 20.48
+              - 40.96
+              - 81.92
+              value: Seconds(end_time - start_time)
+            include_resource_attributes:
+            - key: service.name
+            - key: service.namespace
+            - key: service.version
+            - key: deployment.environment.name
+            - key: k8s.namespace.name
+            - key: k8s.pod.name
+            name: gen_ai.client.inference.duration
+            unit: s
+          - attributes:
+            - key: gen_ai.operation.name
+            - key: gen_ai.provider.name
+              optional: true
+            - key: gen_ai.request.model
+              optional: true
+            - key: gen_ai.response.model
+              optional: true
+            - key: server.address
+              optional: true
+            - key: server.port
+              optional: true
+            - key: gen_ai.agent.name
+              optional: true
+            - key: error.type
+              optional: true
+            - key: gen_ai.conversation.id
+              optional: true
+            conditions:
+            - attributes["gen_ai.operation.name"] != nil and not (attributes["gen_ai.operation.name"]
+              == "chat" or attributes["gen_ai.operation.name"] == "generate_content" or
+              attributes["gen_ai.operation.name"] == "text_completion") and attributes["gen_ai.operation.name"]
+              != "execute_tool" and attributes["gen_ai.operation.name"] != "invoke_workflow"
+              and not (attributes["gen_ai.operation.name"] == "invoke_agent" and kind ==
+              SPAN_KIND_INTERNAL)
+            description: GenAI operation duration.
+            histogram:
+              buckets:
+              - 0.01
+              - 0.02
+              - 0.04
+              - 0.08
+              - 0.16
+              - 0.32
+              - 0.64
+              - 1.28
+              - 2.56
+              - 5.12
+              - 10.24
+              - 20.48
+              - 40.96
+              - 81.92
+              value: Seconds(end_time - start_time)
+            include_resource_attributes:
+            - key: service.name
+            - key: service.namespace
+            - key: service.version
+            - key: deployment.environment.name
+            - key: k8s.namespace.name
+            - key: k8s.pod.name
+            name: gen_ai.client.operation.duration
+            unit: s
+          - attributes:
+            - key: gen_ai.operation.name
+            - key: gen_ai.provider.name
+              optional: true
+            - key: gen_ai.request.model
+              optional: true
+            - key: gen_ai.response.model
+              optional: true
+            - key: server.address
+              optional: true
+            - key: server.port
+              optional: true
+            - key: gen_ai.agent.name
+              optional: true
+            - key: gen_ai.conversation.id
+              optional: true
+            - default_value: unknown
+              key: gen_ai.token.modality
+            conditions:
+            - (attributes["gen_ai.operation.name"] == "chat" or attributes["gen_ai.operation.name"]
+              == "generate_content" or attributes["gen_ai.operation.name"] == "text_completion")
+            description: The number of input (prompt) tokens used, including cached tokens.
+            include_resource_attributes:
+            - key: service.name
+            - key: service.namespace
+            - key: service.version
+            - key: deployment.environment.name
+            - key: k8s.namespace.name
+            - key: k8s.pod.name
+            name: gen_ai.client.inference.usage.input_tokens
+            sum:
+              monotonic: true
+              value: Int(Coalesce([attributes["gen_ai.usage.input_tokens"], 0]))
+            unit: '{token}'
+          - attributes:
+            - key: gen_ai.operation.name
+            - key: gen_ai.provider.name
+              optional: true
+            - key: gen_ai.request.model
+              optional: true
+            - key: gen_ai.response.model
+              optional: true
+            - key: server.address
+              optional: true
+            - key: server.port
+              optional: true
+            - key: gen_ai.agent.name
+              optional: true
+            - key: gen_ai.conversation.id
+              optional: true
+            - default_value: unknown
+              key: gen_ai.token.modality
+            conditions:
+            - (attributes["gen_ai.operation.name"] == "chat" or attributes["gen_ai.operation.name"]
+              == "generate_content" or attributes["gen_ai.operation.name"] == "text_completion")
+            description: The number of output (completion) tokens used, including reasoning
+              tokens.
+            include_resource_attributes:
+            - key: service.name
+            - key: service.namespace
+            - key: service.version
+            - key: deployment.environment.name
+            - key: k8s.namespace.name
+            - key: k8s.pod.name
+            name: gen_ai.client.inference.usage.output_tokens
+            sum:
+              monotonic: true
+              value: Int(Coalesce([attributes["gen_ai.usage.output_tokens"], 0]))
+            unit: '{token}'
+          - attributes:
+            - key: gen_ai.operation.name
+            - key: gen_ai.provider.name
+              optional: true
+            - key: gen_ai.request.model
+              optional: true
+            - key: gen_ai.response.model
+              optional: true
+            - key: server.address
+              optional: true
+            - key: server.port
+              optional: true
+            - key: gen_ai.agent.name
+              optional: true
+            - key: gen_ai.conversation.id
+              optional: true
+            - default_value: unknown
+              key: gen_ai.token.modality
+            conditions:
+            - (attributes["gen_ai.operation.name"] == "chat" or attributes["gen_ai.operation.name"]
+              == "generate_content" or attributes["gen_ai.operation.name"] == "text_completion")
+            description: The number of input tokens served from a provider-managed cache.
+            include_resource_attributes:
+            - key: service.name
+            - key: service.namespace
+            - key: service.version
+            - key: deployment.environment.name
+            - key: k8s.namespace.name
+            - key: k8s.pod.name
+            name: gen_ai.client.inference.usage.cache_read.input_tokens
+            sum:
+              monotonic: true
+              value: Int(Coalesce([attributes["gen_ai.usage.cache_read.input_tokens"], 0]))
+            unit: '{token}'
+          - attributes:
+            - key: gen_ai.operation.name
+            - key: gen_ai.provider.name
+              optional: true
+            - key: gen_ai.request.model
+              optional: true
+            - key: gen_ai.response.model
+              optional: true
+            - key: server.address
+              optional: true
+            - key: server.port
+              optional: true
+            - key: gen_ai.agent.name
+              optional: true
+            - key: gen_ai.conversation.id
+              optional: true
+            - default_value: unknown
+              key: gen_ai.token.modality
+            conditions:
+            - (attributes["gen_ai.operation.name"] == "chat" or attributes["gen_ai.operation.name"]
+              == "generate_content" or attributes["gen_ai.operation.name"] == "text_completion")
+            description: The number of input tokens written to a provider-managed cache.
+            include_resource_attributes:
+            - key: service.name
+            - key: service.namespace
+            - key: service.version
+            - key: deployment.environment.name
+            - key: k8s.namespace.name
+            - key: k8s.pod.name
+            name: gen_ai.client.inference.usage.cache_write.input_tokens
+            sum:
+              monotonic: true
+              value: Int(Coalesce([attributes["gen_ai.usage.cache_write.input_tokens"],
+                0]))
+            unit: '{token}'
+          - attributes:
+            - key: gen_ai.operation.name
+            - key: gen_ai.provider.name
+              optional: true
+            - key: gen_ai.request.model
+              optional: true
+            - key: gen_ai.response.model
+              optional: true
+            - key: server.address
+              optional: true
+            - key: server.port
+              optional: true
+            - key: gen_ai.agent.name
+              optional: true
+            - key: gen_ai.conversation.id
+              optional: true
+            - default_value: unknown
+              key: gen_ai.token.modality
+            conditions:
+            - (attributes["gen_ai.operation.name"] == "chat" or attributes["gen_ai.operation.name"]
+              == "generate_content" or attributes["gen_ai.operation.name"] == "text_completion")
+            description: The number of output tokens used for reasoning (e.g. chain-of-thought,
+              extended thinking).
+            include_resource_attributes:
+            - key: service.name
+            - key: service.namespace
+            - key: service.version
+            - key: deployment.environment.name
+            - key: k8s.namespace.name
+            - key: k8s.pod.name
+            name: gen_ai.client.inference.usage.reasoning.output_tokens
+            sum:
+              monotonic: true
+              value: Int(Coalesce([attributes["gen_ai.usage.reasoning.output_tokens"], 0]))
+            unit: '{token}'
+          - attributes:
+            - key: gen_ai.operation.name
+            - key: gen_ai.provider.name
+              optional: true
+            - key: gen_ai.request.model
+              optional: true
+            - key: gen_ai.response.model
+              optional: true
+            - key: server.address
+              optional: true
+            - key: server.port
+              optional: true
+            - key: gen_ai.agent.name
+              optional: true
+            - key: error.type
+              optional: true
+            - key: gen_ai.conversation.id
+              optional: true
+            conditions:
+            - (attributes["gen_ai.operation.name"] == "chat" or attributes["gen_ai.operation.name"]
+              == "generate_content" or attributes["gen_ai.operation.name"] == "text_completion")
+            description: The number of input (prompt) tokens used per inference operation.
+            histogram:
+              buckets:
+              - 1
+              - 4
+              - 16
+              - 64
+              - 256
+              - 1024
+              - 4096
+              - 16384
+              - 65536
+              - 262144
+              - 1048576
+              - 4194304
+              - 16777216
+              - 67108864
+              value: Int(Coalesce([attributes["gen_ai.usage.input_tokens"], 0]))
+            include_resource_attributes:
+            - key: service.name
+            - key: service.namespace
+            - key: service.version
+            - key: deployment.environment.name
+            - key: k8s.namespace.name
+            - key: k8s.pod.name
+            name: gen_ai.client.inference.operation.input_tokens
+            unit: '{token}'
+          - attributes:
+            - key: gen_ai.operation.name
+            - key: gen_ai.provider.name
+              optional: true
+            - key: gen_ai.request.model
+              optional: true
+            - key: gen_ai.response.model
+              optional: true
+            - key: server.address
+              optional: true
+            - key: server.port
+              optional: true
+            - key: gen_ai.agent.name
+              optional: true
+            - key: error.type
+              optional: true
+            - key: gen_ai.conversation.id
+              optional: true
+            conditions:
+            - (attributes["gen_ai.operation.name"] == "chat" or attributes["gen_ai.operation.name"]
+              == "generate_content" or attributes["gen_ai.operation.name"] == "text_completion")
+            description: The number of output (completion) tokens used per inference operation.
+            histogram:
+              buckets:
+              - 1
+              - 4
+              - 16
+              - 64
+              - 256
+              - 1024
+              - 4096
+              - 16384
+              - 65536
+              - 262144
+              - 1048576
+              - 4194304
+              - 16777216
+              - 67108864
+              value: Int(Coalesce([attributes["gen_ai.usage.output_tokens"], 0]))
+            include_resource_attributes:
+            - key: service.name
+            - key: service.namespace
+            - key: service.version
+            - key: deployment.environment.name
+            - key: k8s.namespace.name
+            - key: k8s.pod.name
+            name: gen_ai.client.inference.operation.output_tokens
+            unit: '{token}'
+          - attributes:
+            - key: gen_ai.tool.name
+              optional: true
+            - key: gen_ai.tool.type
+              optional: true
+            - key: gen_ai.agent.name
+              optional: true
+            - key: error.type
+              optional: true
+            - key: gen_ai.conversation.id
+              optional: true
+            conditions:
+            - attributes["gen_ai.operation.name"] == "execute_tool"
+            description: Measures the duration of a tool execution.
+            histogram:
+              buckets:
+              - 0.01
+              - 0.02
+              - 0.04
+              - 0.08
+              - 0.16
+              - 0.32
+              - 0.64
+              - 1.28
+              - 2.56
+              - 5.12
+              - 10.24
+              - 20.48
+              - 40.96
+              - 81.92
+              value: Seconds(end_time - start_time)
+            include_resource_attributes:
+            - key: service.name
+            - key: service.namespace
+            - key: service.version
+            - key: deployment.environment.name
+            - key: k8s.namespace.name
+            - key: k8s.pod.name
+            name: gen_ai.execute_tool.duration
+            unit: s
+          - attributes:
+            - key: gen_ai.agent.name
+              optional: true
+            - key: gen_ai.request.model
+              optional: true
+            - key: error.type
+              optional: true
+            - key: gen_ai.conversation.id
+              optional: true
+            conditions:
+            - attributes["gen_ai.operation.name"] == "invoke_agent" and kind == SPAN_KIND_INTERNAL
+            description: Measures the duration of an in-process agent invocation.
+            histogram:
+              buckets:
+              - 0.1
+              - 0.2
+              - 0.4
+              - 0.8
+              - 1.6
+              - 3.2
+              - 6.4
+              - 12.8
+              - 25.6
+              - 51.2
+              - 102.4
+              - 204.8
+              - 409.6
+              value: Seconds(end_time - start_time)
+            include_resource_attributes:
+            - key: service.name
+            - key: service.namespace
+            - key: service.version
+            - key: deployment.environment.name
+            - key: k8s.namespace.name
+            - key: k8s.pod.name
+            name: gen_ai.invoke_agent.duration
+            unit: s
+          - attributes:
+            - key: gen_ai.workflow.name
+              optional: true
+            - key: error.type
+              optional: true
+            - key: gen_ai.conversation.id
+              optional: true
+            conditions:
+            - attributes["gen_ai.operation.name"] == "invoke_workflow"
+            description: Measures the duration of a workflow execution.
+            histogram:
+              buckets:
+              - 1
+              - 5
+              - 10
+              - 30
+              - 60
+              - 120
+              - 300
+              - 600
+              - 1800
+              - 3600
+              - 7200
+              value: Seconds(end_time - start_time)
+            include_resource_attributes:
+            - key: service.name
+            - key: service.namespace
+            - key: service.version
+            - key: deployment.environment.name
+            - key: k8s.namespace.name
+            - key: k8s.pod.name
+            name: gen_ai.invoke_workflow.duration
+            unit: s
+      exporters:
+        debug/override:
+          sampling_initial: 2
+          sampling_thereafter: 1
+          verbosity: basic
+        otlphttp/observe/base:
+          compression: zstd
+          endpoint: ${env:OBSERVE_OTEL_ENDPOINT}
+          headers:
+            authorization: ${env:OBSERVE_AUTHORIZATION_HEADER}
+            x-observe-target-package: Kubernetes Explorer
+          retry_on_failure:
+            enabled: true
+            initial_interval: 1s
+            max_elapsed_time: 5m
+            max_interval: 30s
+          sending_queue:
+            enabled: true
+          timeout: 10s
+        otlphttp/observe/forward/trace:
+          compression: zstd
+          endpoint: ${env:OBSERVE_OTEL_ENDPOINT}
+          headers:
+            authorization: Bearer ${env:TRACE_TOKEN}
+            x-observe-target-package: Tracing
+          retry_on_failure:
+            enabled: true
+            initial_interval: 1s
+            max_elapsed_time: 5m
+            max_interval: 30s
+          sending_queue:
+            enabled: true
+          timeout: 10s
+        otlphttp/observe/otel_metrics:
+          compression: zstd
+          endpoint: ${env:OBSERVE_OTEL_ENDPOINT}
+          headers:
+            authorization: ${env:OBSERVE_AUTHORIZATION_HEADER}
+            x-observe-target-package: Metrics
+          retry_on_failure:
+            enabled: true
+            initial_interval: 1s
+            max_elapsed_time: 5m
+            max_interval: 30s
+          sending_queue:
+            enabled: true
+          timeout: 10s
+      processors:
+        attributes/debug_source_gateway:
+          actions:
+          - action: upsert
+            key: debug_source
+            value: gateway
+        attributes/debug_source_genai_metrics:
+          actions:
+          - action: insert
+            key: debug_source
+            value: genai_metrics
+        batch:
+          send_batch_max_size: 4096
+          send_batch_size: 4096
+          timeout: 5s
+        deltatocumulative/observe:
+          max_stale: 5m
+        filter/drop_long_spans:
+          error_mode: ignore
+          traces:
+            span:
+            - (span.end_time - span.start_time) > Duration("1h")
+        filter/genai_spans_only:
+          error_mode: ignore
+          traces:
+            span:
+            - span.attributes["gen_ai.operation.name"] == nil
+            - not ((resource.attributes["service.name"] == "chat-service" and instrumentation_scope.name
+              == "@genai-otel/core") or (resource.attributes["service.name"] == "agent-service"))
+        k8sattributes:
+          extract:
+            labels:
+            - from: pod
+              key_regex: (app\.kubernetes\.io/.+)
+              tag_name: $1
+            metadata:
+            - k8s.namespace.name
+            - k8s.deployment.name
+            - k8s.replicaset.name
+            - k8s.statefulset.name
+            - k8s.daemonset.name
+            - k8s.cronjob.name
+            - k8s.job.name
+            - k8s.node.name
+            - k8s.node.uid
+            - k8s.pod.name
+            - k8s.pod.uid
+            - k8s.cluster.uid
+            - k8s.container.name
+            - container.id
+            - service.namespace
+            - service.name
+            - service.version
+            - service.instance.id
+            otel_annotations: true
+          passthrough: false
+          pod_association:
+          - sources:
+            - from: resource_attribute
+              name: k8s.pod.ip
+          - sources:
+            - from: resource_attribute
+              name: k8s.pod.uid
+          - sources:
+            - from: connection
+          wait_for_metadata: false
+          wait_for_metadata_timeout: 10s
+        memory_limiter:
+          check_interval: 5s
+          limit_percentage: 80
+          spike_limit_percentage: 15
+        resource/observe_common:
+          attributes:
+          - action: upsert
+            key: k8s.cluster.name
+            value: ${env:OBSERVE_CLUSTER_NAME}
+          - action: upsert
+            key: k8s.cluster.uid
+            value: ${env:OBSERVE_CLUSTER_UID}
+        resourcedetection/cloud:
+          detectors:
+          - gcp
+          - ecs
+          - ec2
+          - azure
+          override: false
+          timeout: 2s
+        tail_sampling/observe:
+          policies:
+          - name: retain-all-errors
+            status_code:
+              status_codes:
+              - ERROR
+            type: status_code
+          - name: sample-probabilistically-10-percent
+            probabilistic:
+              sampling_percentage: 10
+            type: probabilistic
+        transform/add_empty_service_attributes:
+          error_mode: ignore
+          trace_statements:
+          - set(resource.attributes["deployment.environment.name"], Coalesce([resource.attributes["deployment.environment.name"],
+            resource.attributes["deployment.environment"]]))
+          - set(resource.attributes["deployment.environment"], Coalesce([resource.attributes["deployment.environment"],
+            resource.attributes["deployment.environment.name"]]))
+          - set(resource.attributes["service.name"], "") where resource.attributes["service.name"]
+            == nil
+          - set(resource.attributes["service.namespace"], "") where resource.attributes["service.namespace"]
+            == nil
+          - set(resource.attributes["deployment.environment.name"], "") where resource.attributes["deployment.environment.name"]
+            == nil
+          - set(resource.attributes["deployment.environment"], "") where resource.attributes["deployment.environment"]
+            == nil
+        transform/add_span_status_code:
+          error_mode: ignore
+          trace_statements:
+          - set(span.attributes["observe.status_code"], Int(span.attributes["rpc.grpc.status_code"]))
+            where span.attributes["observe.status_code"] == nil and span.attributes["rpc.grpc.status_code"]
+            != nil
+          - set(span.attributes["observe.status_code"], Int(span.attributes["grpc.status_code"]))
+            where span.attributes["observe.status_code"] == nil and span.attributes["grpc.status_code"]
+            != nil
+          - set(span.attributes["observe.status_code"], Int(span.attributes["rpc.status_code"]))
+            where span.attributes["observe.status_code"] == nil and span.attributes["rpc.status_code"]
+            != nil
+          - set(span.attributes["observe.status_code"], Int(span.attributes["http.status_code"]))
+            where span.attributes["observe.status_code"] == nil and span.attributes["http.status_code"]
+            != nil
+          - set(span.attributes["observe.status_code"], Int(span.attributes["http.response.status_code"]))
+            where span.attributes["observe.status_code"] == nil and span.attributes["http.response.status_code"]
+            != nil
+        transform/deployment_environment_compatability:
+          error_mode: ignore
+          log_statements:
+          - set(resource.attributes["deployment.environment.name"], Coalesce([resource.attributes["deployment.environment.name"],
+            resource.attributes["deployment.environment"]]))
+          - set(resource.attributes["deployment.environment"], Coalesce([resource.attributes["deployment.environment"],
+            resource.attributes["deployment.environment.name"]]))
+          metric_statements:
+          - set(resource.attributes["deployment.environment.name"], Coalesce([resource.attributes["deployment.environment.name"],
+            resource.attributes["deployment.environment"]]))
+          - set(resource.attributes["deployment.environment"], Coalesce([resource.attributes["deployment.environment"],
+            resource.attributes["deployment.environment.name"]]))
+          trace_statements:
+          - set(resource.attributes["deployment.environment.name"], Coalesce([resource.attributes["deployment.environment.name"],
+            resource.attributes["deployment.environment"]]))
+          - set(resource.attributes["deployment.environment"], Coalesce([resource.attributes["deployment.environment"],
+            resource.attributes["deployment.environment.name"]]))
+      receivers:
+        otlp/app-telemetry:
+          protocols:
+            grpc:
+              endpoint: ${env:MY_POD_IP}:4317
+              max_recv_msg_size_mib: 50
+            http:
+              endpoint: ${env:MY_POD_IP}:4318
+      service:
+        pipelines:
+          logs/observe-forward:
+            exporters:
+            - otlphttp/observe/base
+            processors:
+            - memory_limiter
+            - k8sattributes
+            - batch
+            - resource/observe_common
+            - transform/deployment_environment_compatability
+            - attributes/debug_source_gateway
+            receivers:
+            - otlp/app-telemetry
+          metrics/genai_metrics:
+            exporters:
+            - otlphttp/observe/otel_metrics
+            processors:
+            - memory_limiter
+            - transform/deployment_environment_compatability
+            - batch
+            - resource/observe_common
+            - attributes/debug_source_genai_metrics
+            receivers:
+            - signal_to_metrics/genai
+          metrics/observe-forward:
+            exporters:
+            - prometheusremotewrite/observe
+            processors:
+            - memory_limiter
+            - k8sattributes
+            - deltatocumulative/observe
+            - batch
+            - resource/observe_common
+            - transform/deployment_environment_compatability
+            - attributes/debug_source_gateway
+            receivers:
+            - otlp/app-telemetry
+          traces/genai_metrics:
+            exporters:
+            - signal_to_metrics/genai
+            processors:
+            - memory_limiter
+            - filter/drop_long_spans
+            - k8sattributes
+            - filter/genai_spans_only
+            - transform/add_empty_service_attributes
+            - batch
+            receivers:
+            - otlp/app-telemetry
+          traces/observe-forward:
+            exporters:
+            - otlphttp/observe/forward/trace
+            processors:
+            - memory_limiter
+            - k8sattributes
+            - transform/add_span_status_code
+            - transform/add_empty_service_attributes
+            - attributes/debug_source_gateway
+            - tail_sampling/observe
+            - batch
+            - resource/observe_common
+            - transform/deployment_environment_compatability
+            receivers:
+            - otlp/app-telemetry
