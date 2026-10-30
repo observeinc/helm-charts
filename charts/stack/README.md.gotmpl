@@ -5,6 +5,10 @@
 
 {{ template "chart.description" . }}
 
+## Maintenance status
+
+This chart is no longer updated and will not get new releases, including for security advisories that affect the fluent-bit and grafana-agent images it deploys. Migrate to the [agent chart](https://github.com/observeinc/helm-charts/tree/main/charts/agent), which replaces it. See [Install on Kubernetes](https://docs.observeinc.com/docs/kubernetes).
+
 This stack contains the following telemetry-gathering services:
 * stack: Installs several agents required for the Kubernetes Observe app
   * logs (provided by fluent-bit)

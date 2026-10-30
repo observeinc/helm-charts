@@ -6,6 +6,10 @@
 
 DEPRECATED Observe logs collection
 
+## Maintenance status
+
+This chart is no longer updated and will not get new releases, including for security advisories that affect the fluent-bit image it deploys. Migrate to the [agent chart](https://github.com/observeinc/helm-charts/tree/main/charts/agent), which replaces it. See [Install on Kubernetes](https://docs.observeinc.com/docs/kubernetes).
+
 ## Requirements
 
 | Repository | Name | Version |

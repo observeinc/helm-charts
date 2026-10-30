@@ -5,6 +5,10 @@
 
 {{ template "chart.description" . }}
 
+## Maintenance status
+
+This chart is no longer updated and will not get new releases, including for security advisories that affect the OpenTelemetry Collector image it deploys. Migrate to the [agent chart](https://github.com/observeinc/helm-charts/tree/main/charts/agent), which replaces it. See [Install on Kubernetes](https://docs.observeinc.com/docs/kubernetes).
+
 ## Installing Traces
 
 The values for `${OBSERVE_COLLECTION_ENDPOINT}` and `${OBSERVE_TOKEN}` are provided
