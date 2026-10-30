@@ -6,6 +6,10 @@
 
 DEPRECATED Observe metrics collection
 
+## Maintenance status
+
+This chart is no longer updated and will not get new releases, including for security advisories that affect the grafana-agent image it deploys. Grafana Agent is also archived upstream. Migrate to the [agent chart](https://github.com/observeinc/helm-charts/tree/main/charts/agent), which replaces it. See [Install on Kubernetes](https://docs.observeinc.com/docs/kubernetes).
+
 ## Requirements
 
 | Repository | Name | Version |
