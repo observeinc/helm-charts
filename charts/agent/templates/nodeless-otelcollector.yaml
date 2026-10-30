@@ -65,7 +65,7 @@ spec:
     {{- if .Values.nodeless.logs.enabled }}
     - name: logging-sidecar
       restartPolicy: Always
-      image: alpine:3.24.3
+      image: alpine/kubectl:1.37.1
       resources:
         requests:
           memory: 100Mi
@@ -75,7 +75,7 @@ spec:
       command: ["/bin/sh", "-c"]
       args:
         - |
-          apk add --no-cache logrotate curl kubectl
+          apk add --no-cache logrotate curl
 
           {{- if not .Values.nodeless.logs.containerNameFromFile }}
           # Get the first container name
