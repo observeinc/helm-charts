@@ -6,7 +6,7 @@ metadata:
   name: fargate-collector
 spec:
   mode: sidecar
-  image: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.141.0"
+  image: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.164.0"
   env:
     - name: K8S_NODE_NAME
       valueFrom:
@@ -236,7 +236,7 @@ spec:
               fieldPath: metadata.namespace
     - name: logging-sidecar
       restartPolicy: Always
-      image: alpine/k8s:1.28.3
+      image: alpine/kubectl:1.37.1
       resources:
         requests:
           memory: 100Mi
