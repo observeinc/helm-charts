@@ -6,7 +6,7 @@ metadata:
   name: fargate-collector
 spec:
   mode: sidecar
-  image: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.141.0"
+  image: "ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.164.0"
   env:
     - name: K8S_NODE_NAME
       valueFrom:
@@ -236,7 +236,7 @@ spec:
               fieldPath: metadata.namespace
     - name: logging-sidecar
       restartPolicy: Always
-      image: alpine/k8s:1.28.3
+      image: alpine:3.24.3
       resources:
         requests:
           memory: 100Mi
@@ -246,7 +246,7 @@ spec:
       command: ["/bin/sh", "-c"]
       args:
         - |
-          apk add --no-cache logrotate curl
+          apk add --no-cache logrotate curl kubectl
           # Get the first container name
           APP_CONTAINER=$(kubectl get pod "$POD_NAME" -n "$POD_NAMESPACE" \
             -o jsonpath='{.spec.containers[0].name}')
