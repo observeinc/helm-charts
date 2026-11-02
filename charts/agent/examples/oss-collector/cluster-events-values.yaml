@@ -387,7 +387,7 @@ alternateConfig:
             - set(attributes["observe_transform"]["identifiers"]["ingressName"], body["metadata"]["name"]) where body["metadata"]["name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["ingressUid"], body["metadata"]["uid"]) where body["metadata"]["uid"] != nil
             - set(attributes["observe_transform"]["facets"]["class"], body["spec"]["ingressClassName"]) where body["spec"]["ingressClassName"] != nil
-            - set(attributes["observe_transform"]["facets"]["class"], body["metadata"]["annotations"]["kubernetes.io/ingress.class"]) where attributes["observe_transform"]["facets"]["class"] == nil
+            - set(attributes["observe_transform"]["facets"]["class"], body["metadata"]["annotations"]["kubernetes.io/ingress.class"]) where attributes["observe_transform"]["facets"]["class"] == nil and body["metadata"]["annotations"]["kubernetes.io/ingress.class"] != nil
         - conditions:
             - body["kind"] == "RoleBinding"
           context: log

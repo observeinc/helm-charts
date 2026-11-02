@@ -481,7 +481,8 @@ data:
             - set(attributes["observe_transform"]["facets"]["class"], body["spec"]["ingressClassName"])
               where body["spec"]["ingressClassName"] != nil
             - set(attributes["observe_transform"]["facets"]["class"], body["metadata"]["annotations"]["kubernetes.io/ingress.class"])
-              where attributes["observe_transform"]["facets"]["class"] == nil
+              where attributes["observe_transform"]["facets"]["class"] == nil and body["metadata"]["annotations"]["kubernetes.io/ingress.class"]
+              != nil
           - conditions:
             - body["kind"] == "RoleBinding"
             context: log

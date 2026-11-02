@@ -391,7 +391,7 @@ processors:
           - set(attributes["observe_transform"]["identifiers"]["ingressUid"], body["metadata"]["uid"]) where body["metadata"]["uid"] != nil
           # spec
           - set(attributes["observe_transform"]["facets"]["class"], body["spec"]["ingressClassName"]) where body["spec"]["ingressClassName"] != nil
-          - set(attributes["observe_transform"]["facets"]["class"], body["metadata"]["annotations"]["kubernetes.io/ingress.class"]) where attributes["observe_transform"]["facets"]["class"] == nil
+          - set(attributes["observe_transform"]["facets"]["class"], body["metadata"]["annotations"]["kubernetes.io/ingress.class"]) where attributes["observe_transform"]["facets"]["class"] == nil and body["metadata"]["annotations"]["kubernetes.io/ingress.class"] != nil
       - context: log
         conditions:
           - body["kind"] == "RoleBinding"
