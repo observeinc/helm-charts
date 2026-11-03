@@ -22,7 +22,7 @@ image:
   tag: 0.151.0
 command:
   extraArgs:
-    - --feature-gates=+exporter.prometheusremotewritexporter.EnableMultipleWorkers
+    - --feature-gates=+exporter.prometheusremotewritexporter.EnableMultipleWorkers,-receiver.kubeletstats.cpuUsageScrapeBased
 clusterRole:
   create: true
   rules:
