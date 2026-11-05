@@ -1,6 +1,6 @@
 # agent
 
-![Version: 0.97.1](https://img.shields.io/badge/Version-0.97.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.19.1](https://img.shields.io/badge/AppVersion-2.19.1-informational?style=flat-square)
+![Version: 0.97.2](https://img.shields.io/badge/Version-0.97.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.19.1](https://img.shields.io/badge/AppVersion-2.19.1-informational?style=flat-square)
 
 Chart to install K8s collection stack based on Observe Agent
 
@@ -51,7 +51,7 @@ This service is an *OpenTelemetryCollector*, a custom resource that is managed b
 | https://open-telemetry.github.io/opentelemetry-helm-charts | monitor(opentelemetry-collector) | 0.159.0 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | forwarder(opentelemetry-collector) | 0.159.0 |
 | https://open-telemetry.github.io/opentelemetry-helm-charts | gateway(opentelemetry-collector) | 0.159.0 |
-| https://open-telemetry.github.io/opentelemetry-helm-charts | prometheus-ta(opentelemetry-target-allocator) | 0.128.1 |
+| https://open-telemetry.github.io/opentelemetry-helm-charts | prometheus-ta(opentelemetry-target-allocator) | 0.162.0 |
 
 ## Values
 

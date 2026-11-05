@@ -6,10 +6,10 @@ metadata:
   namespace: observe
   name: example-prometheus-ta-ta
   labels:
-    helm.sh/chart: prometheus-ta-0.128.1
+    helm.sh/chart: prometheus-ta-0.162.0
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: opentelemetry-target-allocator
-    app.kubernetes.io/version: "0.151.0"
+    app.kubernetes.io/version: "0.162.0"
     app.kubernetes.io/name: prometheus-ta
     app.kubernetes.io/instance: example
 spec:
@@ -27,10 +27,10 @@ spec:
         observe_monitor_purpose: observecollection
         observe_monitor_scrape: "true"
       labels:
-        helm.sh/chart: prometheus-ta-0.128.1
+        helm.sh/chart: prometheus-ta-0.162.0
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/part-of: opentelemetry-target-allocator
-        app.kubernetes.io/version: "0.151.0"
+        app.kubernetes.io/version: "0.162.0"
         app.kubernetes.io/name: prometheus-ta
         app.kubernetes.io/instance: example
     spec:
@@ -38,7 +38,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: targetallocator
-          image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.151.0
+          image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.162.0
           ports:
             - containerPort: 8080
               name: http-port
