@@ -2,7 +2,7 @@
 
 > **:exclamation: This Helm Chart is deprecated!**
 
-![Version: 0.4.0](https://img.shields.io/badge/Version-0.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.4.1](https://img.shields.io/badge/Version-0.4.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 DEPRECATED Observe metrics collection
 
@@ -15,7 +15,7 @@ This chart is no longer updated and will not get new releases, including for sec
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../endpoint | endpoint | 0.1.13 |
-| https://grafana.github.io/helm-charts | grafana-agent | 0.42.0 |
+| https://grafana.github.io/helm-charts | grafana-agent | 0.44.2 |
 
 ## Values
 
