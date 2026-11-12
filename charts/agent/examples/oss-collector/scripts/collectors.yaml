@@ -1,6 +1,7 @@
 # The collectors that generate.sh writes chart values for, as <name>-values.yaml. Each one
-# comes from a collector ConfigMap in rendered/: otel-config.yaml is merged on top, then only the
-# listed pipelines and extensions are kept, and every component they don't use is deleted.
+# comes from a collector ConfigMap in the rendered Observe Agent chart: otel-config.yaml is merged
+# on top, then only the listed pipelines and extensions are kept, and every component they don't
+# use is deleted.
 # replace_processors swaps processors in the pipelines for ones defined in otel-config.yaml first.
 - configmap: forwarder
   name: forwarder

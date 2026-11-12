@@ -2,7 +2,7 @@
 
 [`generate.sh`](generate.sh) generates the OpenTelemetry Collector Helm chart values in the parent directory, one `<name>-values.yaml` per collector. Customers use those files; this directory is only how they're made.
 
-`make generate-examples` runs it after the chart examples. It renders the Observe Agent chart with [`values.yaml`](values.yaml) into `../rendered/`, the same way `make generate-examples` renders the chart examples. Then, for each entry in [`collectors.yaml`](collectors.yaml), it:
+`make generate-examples` runs it after the chart examples. It renders the Observe Agent chart with [`values.yaml`](values.yaml) into a temporary directory, the same way `make generate-examples` renders the chart examples, and deletes it when it's done. Then, for each entry in [`collectors.yaml`](collectors.yaml), it:
 
 1. Takes the collector configuration from its rendered ConfigMap and merges [`otel-config.yaml`](otel-config.yaml) on top. That replaces the variables the Observe Agent sets for itself, such as `OBSERVE_OTEL_ENDPOINT`, with `OBSERVE_COLLECTION_URL` and `OBSERVE_TOKEN`, and adds the health check that the Observe Agent provides itself.
 2. Replaces the processors in `replace_processors` with ones `otel-config.yaml` defines, such as the Observe-specific `observek8sattributes` with `transform/redact_secrets`, which redacts Secrets the same way. Then it keeps only the listed pipelines and extensions, and deletes every component they don't use.
@@ -11,7 +11,7 @@
 
 Before any of that, it fails if the chart renders a collector, or a pipeline in one, that `collectors.yaml` doesn't keep, so a collector or pipeline the chart adds can't be left out of the values unnoticed.
 
-The script then replaces the values files and `rendered/`, so a collector removed from `collectors.yaml` is deleted too.
+The script then replaces the values files, so a collector removed from `collectors.yaml` is deleted too.
 
 These checks run in CI:
 

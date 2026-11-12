@@ -48,4 +48,4 @@ The collector configuration is in `alternateConfig`, which replaces the chart's 
 
 `cluster-events-values.yaml` sends Kubernetes objects, including Secrets, to Observe. Its `transform/redact_secrets` processor replaces Secret values with `REDACTED` and removes the `kubectl.kubernetes.io/last-applied-configuration` annotation, as the Observe Agent does; keep it if you change the configuration. The Observe Agent also adds status and relationship fields to objects with its own `observek8sattributes` processor, which `otelcol-contrib` doesn't include, so parts of Kubernetes Explorer that use those fields stay empty.
 
-The values files are generated from the Observe Agent chart and checked in CI, so don't edit them here. [`scripts/`](scripts/) generates them, and `rendered/` is the Observe Agent chart output they're generated from.
+The values files are generated from the Observe Agent chart and checked in CI, so don't edit them here. [`scripts/`](scripts/) generates them.

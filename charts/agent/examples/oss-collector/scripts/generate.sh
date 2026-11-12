@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Generates the OpenTelemetry Collector Helm chart values in charts/agent/examples/oss-collector, one
-# per collector, from the Observe Agent chart rendered with values.yaml into rendered/ there.
+# per collector, from the Observe Agent chart rendered with values.yaml into a temporary directory.
 # `make generate-examples` runs this script. See README.md.
 #
 # For each entry in collectors.yaml it takes the collector ConfigMap's configuration, merges
@@ -21,7 +21,7 @@ trap 'rm -rf "$work"' EXIT
 mkdir -p "$work/values"
 
 # Render the Observe Agent chart the way `make generate-examples` renders the chart examples: the
-# chart's templates in rendered/, and each subchart's in rendered/<subchart>/.
+# chart's templates in $rendered, and each subchart's in $rendered/<subchart>/.
 rendered="$work/rendered"
 if helm dependency list "$repo/charts/agent" | awk 'NR > 1 && NF && $4 != "ok"' | grep -q .; then
   helm dependency build "$repo/charts/agent" > /dev/null
@@ -159,7 +159,7 @@ generate() {
   local tmp="$work/$index"
   mkdir -p "$tmp"
   CONFIGMAP=$configmap yq ea -e 'select(.kind == "ConfigMap" and .metadata.name == strenv(CONFIGMAP)) | .data.relay' "$rendered"/*.yaml > "$tmp/relay.yaml" 2> /dev/null ||
-    { echo "error: $output: no ConfigMap named $configmap with a relay key in rendered/" >&2; return 1; }
+    { echo "error: $output: no ConfigMap named $configmap with a relay key in the rendered chart" >&2; return 1; }
   yq ". * (load(\"$dir/otel-config.yaml\") | ... comments = \"\")" "$tmp/relay.yaml" > "$tmp/merged.yaml"
 
   local processor replacement
@@ -176,10 +176,10 @@ generate() {
 
   local workloads=("$rendered/$configmap"/*.yaml) gates
   yq ea -e '[select(.kind == "DaemonSet" or .kind == "Deployment" or .kind == "StatefulSet")] | length == 1' "${workloads[@]}" > /dev/null 2>&1 ||
-    { echo "error: $output: expected one DaemonSet, Deployment, or StatefulSet in rendered/$configmap" >&2; return 1; }
+    { echo "error: $output: expected one DaemonSet, Deployment, or StatefulSet in the rendered $configmap subchart" >&2; return 1; }
   yq ea 'select(.kind == "DaemonSet" or .kind == "Deployment" or .kind == "StatefulSet")' "${workloads[@]}" > "$tmp/workload.yaml"
   CONTAINER=$configmap yq -e '.spec.template.spec.containers[] | select(.name == strenv(CONTAINER))' "$tmp/workload.yaml" > /dev/null 2>&1 ||
-    { echo "error: $output: the workload in rendered/$configmap has no container named $configmap" >&2; return 1; }
+    { echo "error: $output: the workload in the rendered $configmap subchart has no container named $configmap" >&2; return 1; }
   # The chart passes feature gates as container arguments, not in the collector configuration.
   gates=$(yq -r '.spec.template.spec.containers[].args[] | select(test("^--feature-gates=")) | sub("^--feature-gates=", "")' "$tmp/workload.yaml" | paste -sd, -)
 
@@ -263,7 +263,5 @@ done
 
 # Replace the outputs only once every file generated, so that collectors no longer listed in
 # collectors.yaml are removed too.
-rm -rf "${out_dir:?}/rendered"
 rm -f "$out_dir"/*-values.yaml
-mv "$work/rendered" "$out_dir/rendered"
 mv "$work/values/"*-values.yaml "$out_dir/"
