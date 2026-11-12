@@ -15,9 +15,7 @@ on:
     - cron: "0 6 * * *" #Runs at 06:00 UTC Daily
 
 
-#Special permissions required for OIDC authentication
 permissions:
-    id-token: write
     contents: write
     pull-requests: write
     actions: write
