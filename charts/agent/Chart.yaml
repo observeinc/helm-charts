@@ -24,7 +24,7 @@ dependencies:
   # together, so their appVersions usually match. Patch versions can ship
   # independently for TA-specific fixes.
   - name: opentelemetry-target-allocator
-    version: 0.128.1
+    version: 0.162.0
     repository: https://open-telemetry.github.io/opentelemetry-helm-charts
     alias: prometheus-ta
     condition: application.prometheusScrape.targetAllocator.enabled
