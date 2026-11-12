@@ -109,7 +109,7 @@ data:
               == nil
             - set(attributes["observe_transform"]["control"]["version"], body["metadata"]["resourceVersion"])
               where body["metadata"]["resourceVersion"] != nil
-            - set(attributes["observe_transform"]["control"]["agentVersion"], "2.19.1")
+            - set(attributes["observe_transform"]["control"]["agentVersion"], "2.19.2")
             - set(attributes["observe_transform"]["identifiers"]["clusterName"], resource.attributes["k8s.cluster.name"])
               where resource.attributes["k8s.cluster.name"] != nil
             - set(attributes["observe_transform"]["identifiers"]["clusterUid"], resource.attributes["k8s.cluster.uid"])

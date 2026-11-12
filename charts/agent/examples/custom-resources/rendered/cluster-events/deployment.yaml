@@ -54,7 +54,7 @@ spec:
             - --config=/conf/relay.yaml
           securityContext:
             {}
-          image: "observeinc/observe-agent:2.19.1"
+          image: "observeinc/observe-agent:2.19.2"
           imagePullPolicy: IfNotPresent
           ports:
 
