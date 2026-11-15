@@ -15,7 +15,7 @@ This chart is no longer updated and will not get new releases, including for sec
 | Repository | Name | Version |
 |------------|------|---------|
 | file://../endpoint | endpoint | 0.1.13 |
-| https://fluent.github.io/helm-charts | fluent-bit | 0.54.0 |
+| https://fluent.github.io/helm-charts | fluent-bit | fluent-operator-fluent-bit-crds-4.4.0 |
 
 ## Values
 
