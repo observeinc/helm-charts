@@ -87,6 +87,10 @@ bump-version:
 		fi; \
 	done
 
+.PHONY: test-scripts
+test-scripts:
+	python3 -m unittest discover scripts/agent_release_notes
+
 .PHONY: pre-commit
 pre-commit:
 	pre-commit run --show-diff-on-failure --color=always --all-files

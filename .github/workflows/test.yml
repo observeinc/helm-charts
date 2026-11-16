@@ -27,6 +27,9 @@ jobs:
       - name: Lint charts
         run: make lint
 
+      - name: Test release scripts
+        run: make test-scripts
+
   test-charts-matrix:
     runs-on: ubuntu-latest
     strategy:
