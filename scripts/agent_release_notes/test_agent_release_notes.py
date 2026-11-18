@@ -59,6 +59,20 @@ class PreviousTagTest(unittest.TestCase):
             arn.previous_tag("agent-0.1.0", ["agent-0.1.0"])
 
 
+class ReleaseRefsTest(unittest.TestCase):
+    TAGS = ["agent-0.97.3", "agent-0.97.4"]
+
+    def test_a_released_version_reads_its_tag(self):
+        self.assertEqual(arn.release_refs("agent-0.97.4", self.TAGS, True), ("agent-0.97.3", "agent-0.97.4"))
+
+    def test_an_unreleased_version_previews_head_against_the_latest_release(self):
+        self.assertEqual(arn.release_refs("agent-0.98.0", self.TAGS, True), ("agent-0.97.4", "HEAD"))
+
+    def test_an_unreleased_version_fails_outside_preview(self):
+        with self.assertRaisesRegex(SystemExit, "no tag agent-0.98.0"):
+            arn.release_refs("agent-0.98.0", self.TAGS, False)
+
+
 class HelmSectionTest(unittest.TestCase):
     TAGS = ["opentelemetry-collector-0.150.0", "opentelemetry-collector-0.151.0", "opentelemetry-collector-0.159.0",
             "opentelemetry-collector-0.159.1", "opentelemetry-target-allocator-0.128.1"]

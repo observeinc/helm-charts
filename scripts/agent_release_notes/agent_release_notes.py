@@ -9,6 +9,8 @@ Helm chart dependencies changed, the upstream chart releases in between are link
 Usage:
     agent_release_notes.py --agent-repo PATH [--tag agent-X.Y.Z]   print the section as Markdown
     agent_release_notes.py --agent-repo PATH --update-release      also write it into the GitHub release
+
+Without --tag or --update-release, a chart version at HEAD that has no tag yet is previewed from HEAD.
 """
 import argparse
 import os
@@ -67,6 +69,18 @@ def previous_tag(tag, tags):
     if not lower:
         sys.exit(f"error: no agent release before {tag}")
     return max(lower, key=chart_version)
+
+
+def release_refs(tag, tags, preview_unreleased):
+    """Return the previous release tag and the ref holding the release's Chart.yaml.
+
+    With preview_unreleased, a chart version that has no tag yet is read from HEAD.
+    """
+    if tag in tags:
+        return previous_tag(tag, tags), tag
+    if not preview_unreleased:
+        sys.exit(f"error: no tag {tag}; run `git fetch --tags` first")
+    return previous_tag(tag, tags), "HEAD"
 
 
 def upstream_versions(name, tags):
@@ -131,14 +145,11 @@ def main():
     agent_repo = os.path.abspath(args.agent_repo)
 
     os.chdir(run("git", "rev-parse", "--show-toplevel").strip())
-    with open(CHART) as f:
-        tag = args.tag or f"agent-{parse_chart(f.read())['version']}"
+    tag = args.tag or f"agent-{parse_chart(run('git', 'show', f'HEAD:{CHART}'))['version']}"
     tags = run("git", "tag", "--list", "agent-*").split()
-    if tag not in tags:
-        sys.exit(f"error: no tag {tag}; run `git fetch --tags` first")
-    prev = previous_tag(tag, tags)
+    prev, ref = release_refs(tag, tags, preview_unreleased=not args.tag and not args.update_release)
     old = parse_chart(run("git", "show", f"{prev}:{CHART}"))
-    new = parse_chart(run("git", "show", f"{tag}:{CHART}"))
+    new = parse_chart(run("git", "show", f"{ref}:{CHART}"))
 
     upstream_tags = []
     for name in set(old["deps"]) & set(new["deps"]):
@@ -146,7 +157,8 @@ def main():
             refs = run("git", "ls-remote", "--tags", "--refs", OTEL_HELM_GIT, f"refs/tags/{name}-*")
             upstream_tags += [line.split("refs/tags/", 1)[1] for line in refs.splitlines()]
     helm_md = render_helm_section(old["deps"], new["deps"], upstream_tags)
-    print(f"{prev} -> {tag}: Observe Agent {old['appVersion']} -> {new['appVersion']}", file=sys.stderr)
+    unreleased = " (unreleased, read from HEAD)" if ref == "HEAD" else ""
+    print(f"{prev} -> {tag}{unreleased}: Observe Agent {old['appVersion']} -> {new['appVersion']}", file=sys.stderr)
 
     if args.update_release:
         body = run("gh", "release", "view", tag, "--json", "body", "-q", ".body")
