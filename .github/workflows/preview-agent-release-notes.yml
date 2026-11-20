@@ -1,0 +1,43 @@
+name: Preview Agent Release Notes
+
+on:
+  pull_request:
+    paths:
+      - charts/agent/Chart.yaml
+      - scripts/agent_release_notes/**
+      - .github/workflows/preview-agent-release-notes.yml
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Agent chart release to preview, such as agent-0.97.4 (default: the agent chart version on the selected branch)"
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Check out observe-agent
+        uses: actions/checkout@v7
+        with:
+          repository: observeinc/observe-agent
+          path: observe-agent
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Preview the agent release notes in the run summary
+        env:
+          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          TAG: "${{ inputs.tag }}"
+        run: |
+          python3 scripts/agent_release_notes/agent_release_notes.py --agent-repo observe-agent ${TAG:+--tag "$TAG"} >> "$GITHUB_STEP_SUMMARY"

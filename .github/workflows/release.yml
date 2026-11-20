@@ -28,6 +28,7 @@ jobs:
         run: |
           make build-deps
       - name: Run chart-releaser
+        id: cr
         uses: helm/chart-releaser-action@v1.7.0
         with:
           charts_dir: charts
@@ -35,3 +36,24 @@ jobs:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           CR_GENERATE_RELEASE_NOTES: true
           CR_SKIP_EXISTING: true
+
+      - name: Check out observe-agent
+        if: contains(format(',{0},', steps.cr.outputs.changed_charts), ',charts/agent,')
+        uses: actions/checkout@v7
+        with:
+          repository: observeinc/observe-agent
+          path: observe-agent
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v7
+        if: contains(format(',{0},', steps.cr.outputs.changed_charts), ',charts/agent,')
+        with:
+          python-version: '3.12'
+
+      - name: Add Observe Agent and OpenTelemetry changes to the agent release notes
+        if: contains(format(',{0},', steps.cr.outputs.changed_charts), ',charts/agent,')
+        env:
+          GH_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        run: |
+          git fetch --tags
+          python3 scripts/agent_release_notes/agent_release_notes.py --agent-repo observe-agent --update-release
